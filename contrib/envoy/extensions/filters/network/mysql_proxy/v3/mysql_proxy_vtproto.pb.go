@@ -48,6 +48,11 @@ func (m *MySQLProxy) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.DownstreamSsl != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.DownstreamSsl))
+		i--
+		dAtA[i] = 0x18
+	}
 	if len(m.AccessLog) > 0 {
 		i -= len(m.AccessLog)
 		copy(dAtA[i:], m.AccessLog)
@@ -78,6 +83,9 @@ func (m *MySQLProxy) SizeVT() (n int) {
 	l = len(m.AccessLog)
 	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.DownstreamSsl != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.DownstreamSsl))
 	}
 	n += len(m.unknownFields)
 	return n

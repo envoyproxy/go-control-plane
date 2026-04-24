@@ -23,6 +23,70 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Downstream SSL operational modes.
+type MySQLProxy_SSLMode int32
+
+const (
+	// Do not terminate SSL session initiated by a client.
+	// The MySQL proxy filter will pass all encrypted and unencrypted packets to the upstream server.
+	MySQLProxy_DISABLE MySQLProxy_SSLMode = 0
+	// The MySQL proxy filter will terminate SSL session initiated by a client
+	// and close downstream connections that do not initiate SSL.
+	// The filter will mediate “caching_sha2_password“ RSA authentication when
+	// the upstream MySQL server requires full authentication over the plaintext connection.
+	// The filter chain must use :ref:`starttls transport socket
+	// <envoy_v3_api_msg_extensions.transport_sockets.starttls.v3.StartTlsConfig>`.
+	MySQLProxy_REQUIRE MySQLProxy_SSLMode = 1
+	// The MySQL proxy filter will accept downstream client's encryption settings.
+	// If the client wants to use clear-text, Envoy will not enforce SSL encryption.
+	// If the client wants to use encryption, Envoy will terminate SSL and mediate
+	// “caching_sha2_password“ RSA authentication when needed.
+	// The filter chain must use :ref:`starttls transport socket
+	// <envoy_v3_api_msg_extensions.transport_sockets.starttls.v3.StartTlsConfig>`.
+	MySQLProxy_ALLOW MySQLProxy_SSLMode = 2
+)
+
+// Enum value maps for MySQLProxy_SSLMode.
+var (
+	MySQLProxy_SSLMode_name = map[int32]string{
+		0: "DISABLE",
+		1: "REQUIRE",
+		2: "ALLOW",
+	}
+	MySQLProxy_SSLMode_value = map[string]int32{
+		"DISABLE": 0,
+		"REQUIRE": 1,
+		"ALLOW":   2,
+	}
+)
+
+func (x MySQLProxy_SSLMode) Enum() *MySQLProxy_SSLMode {
+	p := new(MySQLProxy_SSLMode)
+	*p = x
+	return p
+}
+
+func (x MySQLProxy_SSLMode) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (MySQLProxy_SSLMode) Descriptor() protoreflect.EnumDescriptor {
+	return file_contrib_envoy_extensions_filters_network_mysql_proxy_v3_mysql_proxy_proto_enumTypes[0].Descriptor()
+}
+
+func (MySQLProxy_SSLMode) Type() protoreflect.EnumType {
+	return &file_contrib_envoy_extensions_filters_network_mysql_proxy_v3_mysql_proxy_proto_enumTypes[0]
+}
+
+func (x MySQLProxy_SSLMode) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use MySQLProxy_SSLMode.Descriptor instead.
+func (MySQLProxy_SSLMode) EnumDescriptor() ([]byte, []int) {
+	return file_contrib_envoy_extensions_filters_network_mysql_proxy_v3_mysql_proxy_proto_rawDescGZIP(), []int{0, 0}
+}
+
 type MySQLProxy struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The human readable prefix to use when emitting :ref:`statistics
@@ -30,7 +94,12 @@ type MySQLProxy struct {
 	StatPrefix string `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// [#not-implemented-hide:] The optional path to use for writing MySQL access logs.
 	// If the access log field is empty, access logs will not be written.
-	AccessLog     string `protobuf:"bytes,2,opt,name=access_log,json=accessLog,proto3" json:"access_log,omitempty"`
+	AccessLog string `protobuf:"bytes,2,opt,name=access_log,json=accessLog,proto3" json:"access_log,omitempty"`
+	// Controls whether to terminate SSL sessions initiated by downstream clients.
+	// If enabled, the filter chain must use
+	// :ref:`starttls transport socket <envoy_v3_api_msg_extensions.transport_sockets.starttls.v3.StartTlsConfig>`.
+	// Defaults to “DISABLE“.
+	DownstreamSsl MySQLProxy_SSLMode `protobuf:"varint,3,opt,name=downstream_ssl,json=downstreamSsl,proto3,enum=envoy.extensions.filters.network.mysql_proxy.v3.MySQLProxy_SSLMode" json:"downstream_ssl,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -79,17 +148,29 @@ func (x *MySQLProxy) GetAccessLog() string {
 	return ""
 }
 
+func (x *MySQLProxy) GetDownstreamSsl() MySQLProxy_SSLMode {
+	if x != nil {
+		return x.DownstreamSsl
+	}
+	return MySQLProxy_DISABLE
+}
+
 var File_contrib_envoy_extensions_filters_network_mysql_proxy_v3_mysql_proxy_proto protoreflect.FileDescriptor
 
 const file_contrib_envoy_extensions_filters_network_mysql_proxy_v3_mysql_proxy_proto_rawDesc = "" +
 	"\n" +
-	"Icontrib/envoy/extensions/filters/network/mysql_proxy/v3/mysql_proxy.proto\x12/envoy.extensions.filters.network.mysql_proxy.v3\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\x99\x01\n" +
+	"Icontrib/envoy/extensions/filters/network/mysql_proxy/v3/mysql_proxy.proto\x12/envoy.extensions.filters.network.mysql_proxy.v3\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xb5\x02\n" +
 	"\n" +
 	"MySQLProxy\x12(\n" +
 	"\vstat_prefix\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\n" +
 	"statPrefix\x12\x1d\n" +
 	"\n" +
-	"access_log\x18\x02 \x01(\tR\taccessLog:B\x9aň\x1e=\n" +
+	"access_log\x18\x02 \x01(\tR\taccessLog\x12j\n" +
+	"\x0edownstream_ssl\x18\x03 \x01(\x0e2C.envoy.extensions.filters.network.mysql_proxy.v3.MySQLProxy.SSLModeR\rdownstreamSsl\".\n" +
+	"\aSSLMode\x12\v\n" +
+	"\aDISABLE\x10\x00\x12\v\n" +
+	"\aREQUIRE\x10\x01\x12\t\n" +
+	"\x05ALLOW\x10\x02:B\x9aň\x1e=\n" +
 	";envoy.config.filter.network.mysql_proxy.v1alpha1.MySQLProxyB\xc8\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"=io.envoyproxy.envoy.extensions.filters.network.mysql_proxy.v3B\x0fMysqlProxyProtoP\x01Zlgithub.com/envoyproxy/go-control-plane/contrib/envoy/extensions/filters/network/mysql_proxy/v3;mysql_proxyv3b\x06proto3"
 
@@ -105,16 +186,19 @@ func file_contrib_envoy_extensions_filters_network_mysql_proxy_v3_mysql_proxy_pr
 	return file_contrib_envoy_extensions_filters_network_mysql_proxy_v3_mysql_proxy_proto_rawDescData
 }
 
+var file_contrib_envoy_extensions_filters_network_mysql_proxy_v3_mysql_proxy_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_contrib_envoy_extensions_filters_network_mysql_proxy_v3_mysql_proxy_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_contrib_envoy_extensions_filters_network_mysql_proxy_v3_mysql_proxy_proto_goTypes = []any{
-	(*MySQLProxy)(nil), // 0: envoy.extensions.filters.network.mysql_proxy.v3.MySQLProxy
+	(MySQLProxy_SSLMode)(0), // 0: envoy.extensions.filters.network.mysql_proxy.v3.MySQLProxy.SSLMode
+	(*MySQLProxy)(nil),      // 1: envoy.extensions.filters.network.mysql_proxy.v3.MySQLProxy
 }
 var file_contrib_envoy_extensions_filters_network_mysql_proxy_v3_mysql_proxy_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0, // 0: envoy.extensions.filters.network.mysql_proxy.v3.MySQLProxy.downstream_ssl:type_name -> envoy.extensions.filters.network.mysql_proxy.v3.MySQLProxy.SSLMode
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_contrib_envoy_extensions_filters_network_mysql_proxy_v3_mysql_proxy_proto_init() }
@@ -127,13 +211,14 @@ func file_contrib_envoy_extensions_filters_network_mysql_proxy_v3_mysql_proxy_pr
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_contrib_envoy_extensions_filters_network_mysql_proxy_v3_mysql_proxy_proto_rawDesc), len(file_contrib_envoy_extensions_filters_network_mysql_proxy_v3_mysql_proxy_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_contrib_envoy_extensions_filters_network_mysql_proxy_v3_mysql_proxy_proto_goTypes,
 		DependencyIndexes: file_contrib_envoy_extensions_filters_network_mysql_proxy_v3_mysql_proxy_proto_depIdxs,
+		EnumInfos:         file_contrib_envoy_extensions_filters_network_mysql_proxy_v3_mysql_proxy_proto_enumTypes,
 		MessageInfos:      file_contrib_envoy_extensions_filters_network_mysql_proxy_v3_mysql_proxy_proto_msgTypes,
 	}.Build()
 	File_contrib_envoy_extensions_filters_network_mysql_proxy_v3_mysql_proxy_proto = out.File
