@@ -61,15 +61,35 @@ func (m *Config) validate(all bool) error {
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetStatPrefix()) < 1 {
-		err := ConfigValidationError{
-			field:  "StatPrefix",
-			reason: "value length must be at least 1 runes",
+	// no validation rules for StatPrefix
+
+	if all {
+		switch v := interface{}(m.GetStatsScope()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ConfigValidationError{
+					field:  "StatsScope",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ConfigValidationError{
+					field:  "StatsScope",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
 		}
-		if !all {
-			return err
+	} else if v, ok := interface{}(m.GetStatsScope()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ConfigValidationError{
+				field:  "StatsScope",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
 		}
-		errors = append(errors, err)
 	}
 
 	for idx, item := range m.GetHistograms() {
