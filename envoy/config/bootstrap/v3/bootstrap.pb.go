@@ -1651,6 +1651,123 @@ func (x *MemoryAllocatorManager) GetMaxUnfreedMemoryBytes() uint64 {
 	return 0
 }
 
+// A placeholder proto so that users can explicitly configure the standard
+// Listener Manager via the bootstrap's :ref:`listener_manager <envoy_v3_api_field_config.bootstrap.v3.Bootstrap.listener_manager>`.
+// [#not-implemented-hide:]
+type ListenerManager struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListenerManager) Reset() {
+	*x = ListenerManager{}
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListenerManager) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListenerManager) ProtoMessage() {}
+
+func (x *ListenerManager) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListenerManager.ProtoReflect.Descriptor instead.
+func (*ListenerManager) Descriptor() ([]byte, []int) {
+	return file_envoy_config_bootstrap_v3_bootstrap_proto_rawDescGZIP(), []int{11}
+}
+
+// A placeholder proto so that users can explicitly configure the standard
+// Validation Listener Manager via the bootstrap's :ref:`listener_manager <envoy_v3_api_field_config.bootstrap.v3.Bootstrap.listener_manager>`.
+// [#not-implemented-hide:]
+type ValidationListenerManager struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ValidationListenerManager) Reset() {
+	*x = ValidationListenerManager{}
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ValidationListenerManager) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ValidationListenerManager) ProtoMessage() {}
+
+func (x *ValidationListenerManager) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ValidationListenerManager.ProtoReflect.Descriptor instead.
+func (*ValidationListenerManager) Descriptor() ([]byte, []int) {
+	return file_envoy_config_bootstrap_v3_bootstrap_proto_rawDescGZIP(), []int{12}
+}
+
+// A placeholder proto so that users can explicitly configure the API
+// Listener Manager via the bootstrap's :ref:`listener_manager <envoy_v3_api_field_config.bootstrap.v3.Bootstrap.listener_manager>`.
+// [#not-implemented-hide:]
+type ApiListenerManager struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ApiListenerManager) Reset() {
+	*x = ApiListenerManager{}
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ApiListenerManager) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ApiListenerManager) ProtoMessage() {}
+
+func (x *ApiListenerManager) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ApiListenerManager.ProtoReflect.Descriptor instead.
+func (*ApiListenerManager) Descriptor() ([]byte, []int) {
+	return file_envoy_config_bootstrap_v3_bootstrap_proto_rawDescGZIP(), []int{13}
+}
+
 type Bootstrap_StaticResources struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Static :ref:`Listeners <envoy_v3_api_msg_config.listener.v3.Listener>`. These listeners are
@@ -1670,7 +1787,7 @@ type Bootstrap_StaticResources struct {
 
 func (x *Bootstrap_StaticResources) Reset() {
 	*x = Bootstrap_StaticResources{}
-	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[11]
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1682,7 +1799,7 @@ func (x *Bootstrap_StaticResources) String() string {
 func (*Bootstrap_StaticResources) ProtoMessage() {}
 
 func (x *Bootstrap_StaticResources) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[11]
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1749,7 +1866,7 @@ type Bootstrap_DynamicResources struct {
 
 func (x *Bootstrap_DynamicResources) Reset() {
 	*x = Bootstrap_DynamicResources{}
-	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[12]
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1761,7 +1878,7 @@ func (x *Bootstrap_DynamicResources) String() string {
 func (*Bootstrap_DynamicResources) ProtoMessage() {}
 
 func (x *Bootstrap_DynamicResources) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[12]
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1824,7 +1941,7 @@ type Bootstrap_ApplicationLogConfig struct {
 
 func (x *Bootstrap_ApplicationLogConfig) Reset() {
 	*x = Bootstrap_ApplicationLogConfig{}
-	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[13]
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1836,7 +1953,7 @@ func (x *Bootstrap_ApplicationLogConfig) String() string {
 func (*Bootstrap_ApplicationLogConfig) ProtoMessage() {}
 
 func (x *Bootstrap_ApplicationLogConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[13]
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1878,7 +1995,7 @@ type Bootstrap_DeferredStatOptions struct {
 
 func (x *Bootstrap_DeferredStatOptions) Reset() {
 	*x = Bootstrap_DeferredStatOptions{}
-	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[14]
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1890,7 +2007,7 @@ func (x *Bootstrap_DeferredStatOptions) String() string {
 func (*Bootstrap_DeferredStatOptions) ProtoMessage() {}
 
 func (x *Bootstrap_DeferredStatOptions) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[14]
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1924,7 +2041,7 @@ type Bootstrap_GrpcAsyncClientManagerConfig struct {
 
 func (x *Bootstrap_GrpcAsyncClientManagerConfig) Reset() {
 	*x = Bootstrap_GrpcAsyncClientManagerConfig{}
-	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[15]
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1936,7 +2053,7 @@ func (x *Bootstrap_GrpcAsyncClientManagerConfig) String() string {
 func (*Bootstrap_GrpcAsyncClientManagerConfig) ProtoMessage() {}
 
 func (x *Bootstrap_GrpcAsyncClientManagerConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[15]
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1972,7 +2089,7 @@ type Bootstrap_ApplicationLogConfig_LogFormat struct {
 
 func (x *Bootstrap_ApplicationLogConfig_LogFormat) Reset() {
 	*x = Bootstrap_ApplicationLogConfig_LogFormat{}
-	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[17]
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1984,7 +2101,7 @@ func (x *Bootstrap_ApplicationLogConfig_LogFormat) String() string {
 func (*Bootstrap_ApplicationLogConfig_LogFormat) ProtoMessage() {}
 
 func (x *Bootstrap_ApplicationLogConfig_LogFormat) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[17]
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2063,7 +2180,7 @@ type ClusterManager_OutlierDetection struct {
 
 func (x *ClusterManager_OutlierDetection) Reset() {
 	*x = ClusterManager_OutlierDetection{}
-	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[18]
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2075,7 +2192,7 @@ func (x *ClusterManager_OutlierDetection) String() string {
 func (*ClusterManager_OutlierDetection) ProtoMessage() {}
 
 func (x *ClusterManager_OutlierDetection) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[18]
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2116,7 +2233,7 @@ type Watchdog_WatchdogAction struct {
 
 func (x *Watchdog_WatchdogAction) Reset() {
 	*x = Watchdog_WatchdogAction{}
-	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[19]
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2128,7 +2245,7 @@ func (x *Watchdog_WatchdogAction) String() string {
 func (*Watchdog_WatchdogAction) ProtoMessage() {}
 
 func (x *Watchdog_WatchdogAction) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[19]
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2182,7 +2299,7 @@ type RuntimeLayer_DiskLayer struct {
 
 func (x *RuntimeLayer_DiskLayer) Reset() {
 	*x = RuntimeLayer_DiskLayer{}
-	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[20]
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2194,7 +2311,7 @@ func (x *RuntimeLayer_DiskLayer) String() string {
 func (*RuntimeLayer_DiskLayer) ProtoMessage() {}
 
 func (x *RuntimeLayer_DiskLayer) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[20]
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2240,7 +2357,7 @@ type RuntimeLayer_AdminLayer struct {
 
 func (x *RuntimeLayer_AdminLayer) Reset() {
 	*x = RuntimeLayer_AdminLayer{}
-	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[21]
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2252,7 +2369,7 @@ func (x *RuntimeLayer_AdminLayer) String() string {
 func (*RuntimeLayer_AdminLayer) ProtoMessage() {}
 
 func (x *RuntimeLayer_AdminLayer) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[21]
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2281,7 +2398,7 @@ type RuntimeLayer_RtdsLayer struct {
 
 func (x *RuntimeLayer_RtdsLayer) Reset() {
 	*x = RuntimeLayer_RtdsLayer{}
-	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[22]
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2293,7 +2410,7 @@ func (x *RuntimeLayer_RtdsLayer) String() string {
 func (*RuntimeLayer_RtdsLayer) ProtoMessage() {}
 
 func (x *RuntimeLayer_RtdsLayer) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[22]
+	mi := &file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2501,7 +2618,10 @@ const file_envoy_config_bootstrap_v3_bootstrap_proto_rawDesc = "" +
 	"\x17memory_release_interval\x18\x02 \x01(\v2\x19.google.protobuf.DurationR\x15memoryReleaseInterval\x12S\n" +
 	"\x17soft_memory_limit_bytes\x18\x03 \x01(\v2\x1c.google.protobuf.UInt64ValueR\x14softMemoryLimitBytes\x12[\n" +
 	"\x1cmax_per_cpu_cache_size_bytes\x18\x04 \x01(\v2\x1c.google.protobuf.UInt32ValueR\x17maxPerCpuCacheSizeBytes\x127\n" +
-	"\x18max_unfreed_memory_bytes\x18\x05 \x01(\x04R\x15maxUnfreedMemoryBytesB\x91\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x18max_unfreed_memory_bytes\x18\x05 \x01(\x04R\x15maxUnfreedMemoryBytes\"\x11\n" +
+	"\x0fListenerManager\"\x1b\n" +
+	"\x19ValidationListenerManager\"\x14\n" +
+	"\x12ApiListenerManagerB\x91\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"'io.envoyproxy.envoy.config.bootstrap.v3B\x0eBootstrapProtoP\x01ZLgithub.com/envoyproxy/go-control-plane/envoy/config/bootstrap/v3;bootstrapv3b\x06proto3"
 
 var (
@@ -2517,7 +2637,7 @@ func file_envoy_config_bootstrap_v3_bootstrap_proto_rawDescGZIP() []byte {
 }
 
 var file_envoy_config_bootstrap_v3_bootstrap_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
+var file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
 var file_envoy_config_bootstrap_v3_bootstrap_proto_goTypes = []any{
 	(Watchdog_WatchdogAction_WatchdogEvent)(0),     // 0: envoy.config.bootstrap.v3.Watchdog.WatchdogAction.WatchdogEvent
 	(CustomInlineHeader_InlineHeaderType)(0),       // 1: envoy.config.bootstrap.v3.CustomInlineHeader.InlineHeaderType
@@ -2532,116 +2652,119 @@ var file_envoy_config_bootstrap_v3_bootstrap_proto_goTypes = []any{
 	(*LayeredRuntime)(nil),                         // 10: envoy.config.bootstrap.v3.LayeredRuntime
 	(*CustomInlineHeader)(nil),                     // 11: envoy.config.bootstrap.v3.CustomInlineHeader
 	(*MemoryAllocatorManager)(nil),                 // 12: envoy.config.bootstrap.v3.MemoryAllocatorManager
-	(*Bootstrap_StaticResources)(nil),              // 13: envoy.config.bootstrap.v3.Bootstrap.StaticResources
-	(*Bootstrap_DynamicResources)(nil),             // 14: envoy.config.bootstrap.v3.Bootstrap.DynamicResources
-	(*Bootstrap_ApplicationLogConfig)(nil),         // 15: envoy.config.bootstrap.v3.Bootstrap.ApplicationLogConfig
-	(*Bootstrap_DeferredStatOptions)(nil),          // 16: envoy.config.bootstrap.v3.Bootstrap.DeferredStatOptions
-	(*Bootstrap_GrpcAsyncClientManagerConfig)(nil), // 17: envoy.config.bootstrap.v3.Bootstrap.GrpcAsyncClientManagerConfig
-	nil, // 18: envoy.config.bootstrap.v3.Bootstrap.CertificateProviderInstancesEntry
-	(*Bootstrap_ApplicationLogConfig_LogFormat)(nil), // 19: envoy.config.bootstrap.v3.Bootstrap.ApplicationLogConfig.LogFormat
-	(*ClusterManager_OutlierDetection)(nil),          // 20: envoy.config.bootstrap.v3.ClusterManager.OutlierDetection
-	(*Watchdog_WatchdogAction)(nil),                  // 21: envoy.config.bootstrap.v3.Watchdog.WatchdogAction
-	(*RuntimeLayer_DiskLayer)(nil),                   // 22: envoy.config.bootstrap.v3.RuntimeLayer.DiskLayer
-	(*RuntimeLayer_AdminLayer)(nil),                  // 23: envoy.config.bootstrap.v3.RuntimeLayer.AdminLayer
-	(*RuntimeLayer_RtdsLayer)(nil),                   // 24: envoy.config.bootstrap.v3.RuntimeLayer.RtdsLayer
-	(*v3.Node)(nil),                                  // 25: envoy.config.core.v3.Node
-	(*v3.ApiConfigSource)(nil),                       // 26: envoy.config.core.v3.ApiConfigSource
-	(*v31.StatsSink)(nil),                            // 27: envoy.config.metrics.v3.StatsSink
-	(*v31.StatsConfig)(nil),                          // 28: envoy.config.metrics.v3.StatsConfig
-	(*durationpb.Duration)(nil),                      // 29: google.protobuf.Duration
-	(*v32.Tracing)(nil),                              // 30: envoy.config.trace.v3.Tracing
-	(*v33.OverloadManager)(nil),                      // 31: envoy.config.overload.v3.OverloadManager
-	(*wrapperspb.UInt64Value)(nil),                   // 32: google.protobuf.UInt64Value
-	(*v3.DnsResolutionConfig)(nil),                   // 33: envoy.config.core.v3.DnsResolutionConfig
-	(*v3.TypedExtensionConfig)(nil),                  // 34: envoy.config.core.v3.TypedExtensionConfig
-	(*v3.ConfigSource)(nil),                          // 35: envoy.config.core.v3.ConfigSource
-	(*v34.AccessLog)(nil),                            // 36: envoy.config.accesslog.v3.AccessLog
-	(*v3.Address)(nil),                               // 37: envoy.config.core.v3.Address
-	(*v3.SocketOption)(nil),                          // 38: envoy.config.core.v3.SocketOption
-	(*v35.StringMatcher)(nil),                        // 39: envoy.type.matcher.v3.StringMatcher
-	(*v3.BindConfig)(nil),                            // 40: envoy.config.core.v3.BindConfig
-	(*v36.Percent)(nil),                              // 41: envoy.type.v3.Percent
-	(*structpb.Struct)(nil),                          // 42: google.protobuf.Struct
-	(*wrapperspb.UInt32Value)(nil),                   // 43: google.protobuf.UInt32Value
-	(*v37.Listener)(nil),                             // 44: envoy.config.listener.v3.Listener
-	(*v38.Cluster)(nil),                              // 45: envoy.config.cluster.v3.Cluster
-	(*v39.Secret)(nil),                               // 46: envoy.extensions.transport_sockets.tls.v3.Secret
-	(*v3.EventServiceConfig)(nil),                    // 47: envoy.config.core.v3.EventServiceConfig
+	(*ListenerManager)(nil),                        // 13: envoy.config.bootstrap.v3.ListenerManager
+	(*ValidationListenerManager)(nil),              // 14: envoy.config.bootstrap.v3.ValidationListenerManager
+	(*ApiListenerManager)(nil),                     // 15: envoy.config.bootstrap.v3.ApiListenerManager
+	(*Bootstrap_StaticResources)(nil),              // 16: envoy.config.bootstrap.v3.Bootstrap.StaticResources
+	(*Bootstrap_DynamicResources)(nil),             // 17: envoy.config.bootstrap.v3.Bootstrap.DynamicResources
+	(*Bootstrap_ApplicationLogConfig)(nil),         // 18: envoy.config.bootstrap.v3.Bootstrap.ApplicationLogConfig
+	(*Bootstrap_DeferredStatOptions)(nil),          // 19: envoy.config.bootstrap.v3.Bootstrap.DeferredStatOptions
+	(*Bootstrap_GrpcAsyncClientManagerConfig)(nil), // 20: envoy.config.bootstrap.v3.Bootstrap.GrpcAsyncClientManagerConfig
+	nil, // 21: envoy.config.bootstrap.v3.Bootstrap.CertificateProviderInstancesEntry
+	(*Bootstrap_ApplicationLogConfig_LogFormat)(nil), // 22: envoy.config.bootstrap.v3.Bootstrap.ApplicationLogConfig.LogFormat
+	(*ClusterManager_OutlierDetection)(nil),          // 23: envoy.config.bootstrap.v3.ClusterManager.OutlierDetection
+	(*Watchdog_WatchdogAction)(nil),                  // 24: envoy.config.bootstrap.v3.Watchdog.WatchdogAction
+	(*RuntimeLayer_DiskLayer)(nil),                   // 25: envoy.config.bootstrap.v3.RuntimeLayer.DiskLayer
+	(*RuntimeLayer_AdminLayer)(nil),                  // 26: envoy.config.bootstrap.v3.RuntimeLayer.AdminLayer
+	(*RuntimeLayer_RtdsLayer)(nil),                   // 27: envoy.config.bootstrap.v3.RuntimeLayer.RtdsLayer
+	(*v3.Node)(nil),                                  // 28: envoy.config.core.v3.Node
+	(*v3.ApiConfigSource)(nil),                       // 29: envoy.config.core.v3.ApiConfigSource
+	(*v31.StatsSink)(nil),                            // 30: envoy.config.metrics.v3.StatsSink
+	(*v31.StatsConfig)(nil),                          // 31: envoy.config.metrics.v3.StatsConfig
+	(*durationpb.Duration)(nil),                      // 32: google.protobuf.Duration
+	(*v32.Tracing)(nil),                              // 33: envoy.config.trace.v3.Tracing
+	(*v33.OverloadManager)(nil),                      // 34: envoy.config.overload.v3.OverloadManager
+	(*wrapperspb.UInt64Value)(nil),                   // 35: google.protobuf.UInt64Value
+	(*v3.DnsResolutionConfig)(nil),                   // 36: envoy.config.core.v3.DnsResolutionConfig
+	(*v3.TypedExtensionConfig)(nil),                  // 37: envoy.config.core.v3.TypedExtensionConfig
+	(*v3.ConfigSource)(nil),                          // 38: envoy.config.core.v3.ConfigSource
+	(*v34.AccessLog)(nil),                            // 39: envoy.config.accesslog.v3.AccessLog
+	(*v3.Address)(nil),                               // 40: envoy.config.core.v3.Address
+	(*v3.SocketOption)(nil),                          // 41: envoy.config.core.v3.SocketOption
+	(*v35.StringMatcher)(nil),                        // 42: envoy.type.matcher.v3.StringMatcher
+	(*v3.BindConfig)(nil),                            // 43: envoy.config.core.v3.BindConfig
+	(*v36.Percent)(nil),                              // 44: envoy.type.v3.Percent
+	(*structpb.Struct)(nil),                          // 45: google.protobuf.Struct
+	(*wrapperspb.UInt32Value)(nil),                   // 46: google.protobuf.UInt32Value
+	(*v37.Listener)(nil),                             // 47: envoy.config.listener.v3.Listener
+	(*v38.Cluster)(nil),                              // 48: envoy.config.cluster.v3.Cluster
+	(*v39.Secret)(nil),                               // 49: envoy.extensions.transport_sockets.tls.v3.Secret
+	(*v3.EventServiceConfig)(nil),                    // 50: envoy.config.core.v3.EventServiceConfig
 }
 var file_envoy_config_bootstrap_v3_bootstrap_proto_depIdxs = []int32{
-	25, // 0: envoy.config.bootstrap.v3.Bootstrap.node:type_name -> envoy.config.core.v3.Node
-	13, // 1: envoy.config.bootstrap.v3.Bootstrap.static_resources:type_name -> envoy.config.bootstrap.v3.Bootstrap.StaticResources
-	14, // 2: envoy.config.bootstrap.v3.Bootstrap.dynamic_resources:type_name -> envoy.config.bootstrap.v3.Bootstrap.DynamicResources
+	28, // 0: envoy.config.bootstrap.v3.Bootstrap.node:type_name -> envoy.config.core.v3.Node
+	16, // 1: envoy.config.bootstrap.v3.Bootstrap.static_resources:type_name -> envoy.config.bootstrap.v3.Bootstrap.StaticResources
+	17, // 2: envoy.config.bootstrap.v3.Bootstrap.dynamic_resources:type_name -> envoy.config.bootstrap.v3.Bootstrap.DynamicResources
 	4,  // 3: envoy.config.bootstrap.v3.Bootstrap.cluster_manager:type_name -> envoy.config.bootstrap.v3.ClusterManager
-	26, // 4: envoy.config.bootstrap.v3.Bootstrap.hds_config:type_name -> envoy.config.core.v3.ApiConfigSource
-	27, // 5: envoy.config.bootstrap.v3.Bootstrap.stats_sinks:type_name -> envoy.config.metrics.v3.StatsSink
-	16, // 6: envoy.config.bootstrap.v3.Bootstrap.deferred_stat_options:type_name -> envoy.config.bootstrap.v3.Bootstrap.DeferredStatOptions
-	28, // 7: envoy.config.bootstrap.v3.Bootstrap.stats_config:type_name -> envoy.config.metrics.v3.StatsConfig
-	29, // 8: envoy.config.bootstrap.v3.Bootstrap.stats_flush_interval:type_name -> google.protobuf.Duration
-	29, // 9: envoy.config.bootstrap.v3.Bootstrap.stats_eviction_interval:type_name -> google.protobuf.Duration
+	29, // 4: envoy.config.bootstrap.v3.Bootstrap.hds_config:type_name -> envoy.config.core.v3.ApiConfigSource
+	30, // 5: envoy.config.bootstrap.v3.Bootstrap.stats_sinks:type_name -> envoy.config.metrics.v3.StatsSink
+	19, // 6: envoy.config.bootstrap.v3.Bootstrap.deferred_stat_options:type_name -> envoy.config.bootstrap.v3.Bootstrap.DeferredStatOptions
+	31, // 7: envoy.config.bootstrap.v3.Bootstrap.stats_config:type_name -> envoy.config.metrics.v3.StatsConfig
+	32, // 8: envoy.config.bootstrap.v3.Bootstrap.stats_flush_interval:type_name -> google.protobuf.Duration
+	32, // 9: envoy.config.bootstrap.v3.Bootstrap.stats_eviction_interval:type_name -> google.protobuf.Duration
 	6,  // 10: envoy.config.bootstrap.v3.Bootstrap.watchdog:type_name -> envoy.config.bootstrap.v3.Watchdog
 	5,  // 11: envoy.config.bootstrap.v3.Bootstrap.watchdogs:type_name -> envoy.config.bootstrap.v3.Watchdogs
-	30, // 12: envoy.config.bootstrap.v3.Bootstrap.tracing:type_name -> envoy.config.trace.v3.Tracing
+	33, // 12: envoy.config.bootstrap.v3.Bootstrap.tracing:type_name -> envoy.config.trace.v3.Tracing
 	10, // 13: envoy.config.bootstrap.v3.Bootstrap.layered_runtime:type_name -> envoy.config.bootstrap.v3.LayeredRuntime
 	3,  // 14: envoy.config.bootstrap.v3.Bootstrap.admin:type_name -> envoy.config.bootstrap.v3.Admin
-	31, // 15: envoy.config.bootstrap.v3.Bootstrap.overload_manager:type_name -> envoy.config.overload.v3.OverloadManager
-	32, // 16: envoy.config.bootstrap.v3.Bootstrap.stats_server_version_override:type_name -> google.protobuf.UInt64Value
-	33, // 17: envoy.config.bootstrap.v3.Bootstrap.dns_resolution_config:type_name -> envoy.config.core.v3.DnsResolutionConfig
-	34, // 18: envoy.config.bootstrap.v3.Bootstrap.typed_dns_resolver_config:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	34, // 19: envoy.config.bootstrap.v3.Bootstrap.bootstrap_extensions:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	34, // 15: envoy.config.bootstrap.v3.Bootstrap.overload_manager:type_name -> envoy.config.overload.v3.OverloadManager
+	35, // 16: envoy.config.bootstrap.v3.Bootstrap.stats_server_version_override:type_name -> google.protobuf.UInt64Value
+	36, // 17: envoy.config.bootstrap.v3.Bootstrap.dns_resolution_config:type_name -> envoy.config.core.v3.DnsResolutionConfig
+	37, // 18: envoy.config.bootstrap.v3.Bootstrap.typed_dns_resolver_config:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	37, // 19: envoy.config.bootstrap.v3.Bootstrap.bootstrap_extensions:type_name -> envoy.config.core.v3.TypedExtensionConfig
 	7,  // 20: envoy.config.bootstrap.v3.Bootstrap.fatal_actions:type_name -> envoy.config.bootstrap.v3.FatalAction
-	35, // 21: envoy.config.bootstrap.v3.Bootstrap.config_sources:type_name -> envoy.config.core.v3.ConfigSource
-	35, // 22: envoy.config.bootstrap.v3.Bootstrap.default_config_source:type_name -> envoy.config.core.v3.ConfigSource
-	18, // 23: envoy.config.bootstrap.v3.Bootstrap.certificate_provider_instances:type_name -> envoy.config.bootstrap.v3.Bootstrap.CertificateProviderInstancesEntry
+	38, // 21: envoy.config.bootstrap.v3.Bootstrap.config_sources:type_name -> envoy.config.core.v3.ConfigSource
+	38, // 22: envoy.config.bootstrap.v3.Bootstrap.default_config_source:type_name -> envoy.config.core.v3.ConfigSource
+	21, // 23: envoy.config.bootstrap.v3.Bootstrap.certificate_provider_instances:type_name -> envoy.config.bootstrap.v3.Bootstrap.CertificateProviderInstancesEntry
 	11, // 24: envoy.config.bootstrap.v3.Bootstrap.inline_headers:type_name -> envoy.config.bootstrap.v3.CustomInlineHeader
-	34, // 25: envoy.config.bootstrap.v3.Bootstrap.default_regex_engine:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	34, // 26: envoy.config.bootstrap.v3.Bootstrap.xds_delegate_extension:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	34, // 27: envoy.config.bootstrap.v3.Bootstrap.xds_config_tracker_extension:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	34, // 28: envoy.config.bootstrap.v3.Bootstrap.listener_manager:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	15, // 29: envoy.config.bootstrap.v3.Bootstrap.application_log_config:type_name -> envoy.config.bootstrap.v3.Bootstrap.ApplicationLogConfig
-	17, // 30: envoy.config.bootstrap.v3.Bootstrap.grpc_async_client_manager_config:type_name -> envoy.config.bootstrap.v3.Bootstrap.GrpcAsyncClientManagerConfig
+	37, // 25: envoy.config.bootstrap.v3.Bootstrap.default_regex_engine:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	37, // 26: envoy.config.bootstrap.v3.Bootstrap.xds_delegate_extension:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	37, // 27: envoy.config.bootstrap.v3.Bootstrap.xds_config_tracker_extension:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	37, // 28: envoy.config.bootstrap.v3.Bootstrap.listener_manager:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	18, // 29: envoy.config.bootstrap.v3.Bootstrap.application_log_config:type_name -> envoy.config.bootstrap.v3.Bootstrap.ApplicationLogConfig
+	20, // 30: envoy.config.bootstrap.v3.Bootstrap.grpc_async_client_manager_config:type_name -> envoy.config.bootstrap.v3.Bootstrap.GrpcAsyncClientManagerConfig
 	12, // 31: envoy.config.bootstrap.v3.Bootstrap.memory_allocator_manager:type_name -> envoy.config.bootstrap.v3.MemoryAllocatorManager
-	36, // 32: envoy.config.bootstrap.v3.Admin.access_log:type_name -> envoy.config.accesslog.v3.AccessLog
-	37, // 33: envoy.config.bootstrap.v3.Admin.address:type_name -> envoy.config.core.v3.Address
-	38, // 34: envoy.config.bootstrap.v3.Admin.socket_options:type_name -> envoy.config.core.v3.SocketOption
-	39, // 35: envoy.config.bootstrap.v3.Admin.allow_paths:type_name -> envoy.type.matcher.v3.StringMatcher
-	20, // 36: envoy.config.bootstrap.v3.ClusterManager.outlier_detection:type_name -> envoy.config.bootstrap.v3.ClusterManager.OutlierDetection
-	40, // 37: envoy.config.bootstrap.v3.ClusterManager.upstream_bind_config:type_name -> envoy.config.core.v3.BindConfig
-	26, // 38: envoy.config.bootstrap.v3.ClusterManager.load_stats_config:type_name -> envoy.config.core.v3.ApiConfigSource
+	39, // 32: envoy.config.bootstrap.v3.Admin.access_log:type_name -> envoy.config.accesslog.v3.AccessLog
+	40, // 33: envoy.config.bootstrap.v3.Admin.address:type_name -> envoy.config.core.v3.Address
+	41, // 34: envoy.config.bootstrap.v3.Admin.socket_options:type_name -> envoy.config.core.v3.SocketOption
+	42, // 35: envoy.config.bootstrap.v3.Admin.allow_paths:type_name -> envoy.type.matcher.v3.StringMatcher
+	23, // 36: envoy.config.bootstrap.v3.ClusterManager.outlier_detection:type_name -> envoy.config.bootstrap.v3.ClusterManager.OutlierDetection
+	43, // 37: envoy.config.bootstrap.v3.ClusterManager.upstream_bind_config:type_name -> envoy.config.core.v3.BindConfig
+	29, // 38: envoy.config.bootstrap.v3.ClusterManager.load_stats_config:type_name -> envoy.config.core.v3.ApiConfigSource
 	6,  // 39: envoy.config.bootstrap.v3.Watchdogs.main_thread_watchdog:type_name -> envoy.config.bootstrap.v3.Watchdog
 	6,  // 40: envoy.config.bootstrap.v3.Watchdogs.worker_watchdog:type_name -> envoy.config.bootstrap.v3.Watchdog
-	21, // 41: envoy.config.bootstrap.v3.Watchdog.actions:type_name -> envoy.config.bootstrap.v3.Watchdog.WatchdogAction
-	29, // 42: envoy.config.bootstrap.v3.Watchdog.miss_timeout:type_name -> google.protobuf.Duration
-	29, // 43: envoy.config.bootstrap.v3.Watchdog.megamiss_timeout:type_name -> google.protobuf.Duration
-	29, // 44: envoy.config.bootstrap.v3.Watchdog.kill_timeout:type_name -> google.protobuf.Duration
-	29, // 45: envoy.config.bootstrap.v3.Watchdog.max_kill_timeout_jitter:type_name -> google.protobuf.Duration
-	29, // 46: envoy.config.bootstrap.v3.Watchdog.multikill_timeout:type_name -> google.protobuf.Duration
-	41, // 47: envoy.config.bootstrap.v3.Watchdog.multikill_threshold:type_name -> envoy.type.v3.Percent
-	34, // 48: envoy.config.bootstrap.v3.FatalAction.config:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	42, // 49: envoy.config.bootstrap.v3.Runtime.base:type_name -> google.protobuf.Struct
-	42, // 50: envoy.config.bootstrap.v3.RuntimeLayer.static_layer:type_name -> google.protobuf.Struct
-	22, // 51: envoy.config.bootstrap.v3.RuntimeLayer.disk_layer:type_name -> envoy.config.bootstrap.v3.RuntimeLayer.DiskLayer
-	23, // 52: envoy.config.bootstrap.v3.RuntimeLayer.admin_layer:type_name -> envoy.config.bootstrap.v3.RuntimeLayer.AdminLayer
-	24, // 53: envoy.config.bootstrap.v3.RuntimeLayer.rtds_layer:type_name -> envoy.config.bootstrap.v3.RuntimeLayer.RtdsLayer
+	24, // 41: envoy.config.bootstrap.v3.Watchdog.actions:type_name -> envoy.config.bootstrap.v3.Watchdog.WatchdogAction
+	32, // 42: envoy.config.bootstrap.v3.Watchdog.miss_timeout:type_name -> google.protobuf.Duration
+	32, // 43: envoy.config.bootstrap.v3.Watchdog.megamiss_timeout:type_name -> google.protobuf.Duration
+	32, // 44: envoy.config.bootstrap.v3.Watchdog.kill_timeout:type_name -> google.protobuf.Duration
+	32, // 45: envoy.config.bootstrap.v3.Watchdog.max_kill_timeout_jitter:type_name -> google.protobuf.Duration
+	32, // 46: envoy.config.bootstrap.v3.Watchdog.multikill_timeout:type_name -> google.protobuf.Duration
+	44, // 47: envoy.config.bootstrap.v3.Watchdog.multikill_threshold:type_name -> envoy.type.v3.Percent
+	37, // 48: envoy.config.bootstrap.v3.FatalAction.config:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	45, // 49: envoy.config.bootstrap.v3.Runtime.base:type_name -> google.protobuf.Struct
+	45, // 50: envoy.config.bootstrap.v3.RuntimeLayer.static_layer:type_name -> google.protobuf.Struct
+	25, // 51: envoy.config.bootstrap.v3.RuntimeLayer.disk_layer:type_name -> envoy.config.bootstrap.v3.RuntimeLayer.DiskLayer
+	26, // 52: envoy.config.bootstrap.v3.RuntimeLayer.admin_layer:type_name -> envoy.config.bootstrap.v3.RuntimeLayer.AdminLayer
+	27, // 53: envoy.config.bootstrap.v3.RuntimeLayer.rtds_layer:type_name -> envoy.config.bootstrap.v3.RuntimeLayer.RtdsLayer
 	9,  // 54: envoy.config.bootstrap.v3.LayeredRuntime.layers:type_name -> envoy.config.bootstrap.v3.RuntimeLayer
 	1,  // 55: envoy.config.bootstrap.v3.CustomInlineHeader.inline_header_type:type_name -> envoy.config.bootstrap.v3.CustomInlineHeader.InlineHeaderType
-	29, // 56: envoy.config.bootstrap.v3.MemoryAllocatorManager.memory_release_interval:type_name -> google.protobuf.Duration
-	32, // 57: envoy.config.bootstrap.v3.MemoryAllocatorManager.soft_memory_limit_bytes:type_name -> google.protobuf.UInt64Value
-	43, // 58: envoy.config.bootstrap.v3.MemoryAllocatorManager.max_per_cpu_cache_size_bytes:type_name -> google.protobuf.UInt32Value
-	44, // 59: envoy.config.bootstrap.v3.Bootstrap.StaticResources.listeners:type_name -> envoy.config.listener.v3.Listener
-	45, // 60: envoy.config.bootstrap.v3.Bootstrap.StaticResources.clusters:type_name -> envoy.config.cluster.v3.Cluster
-	46, // 61: envoy.config.bootstrap.v3.Bootstrap.StaticResources.secrets:type_name -> envoy.extensions.transport_sockets.tls.v3.Secret
-	35, // 62: envoy.config.bootstrap.v3.Bootstrap.DynamicResources.lds_config:type_name -> envoy.config.core.v3.ConfigSource
-	35, // 63: envoy.config.bootstrap.v3.Bootstrap.DynamicResources.cds_config:type_name -> envoy.config.core.v3.ConfigSource
-	26, // 64: envoy.config.bootstrap.v3.Bootstrap.DynamicResources.ads_config:type_name -> envoy.config.core.v3.ApiConfigSource
-	19, // 65: envoy.config.bootstrap.v3.Bootstrap.ApplicationLogConfig.log_format:type_name -> envoy.config.bootstrap.v3.Bootstrap.ApplicationLogConfig.LogFormat
-	29, // 66: envoy.config.bootstrap.v3.Bootstrap.GrpcAsyncClientManagerConfig.max_cached_entry_idle_duration:type_name -> google.protobuf.Duration
-	34, // 67: envoy.config.bootstrap.v3.Bootstrap.CertificateProviderInstancesEntry.value:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	42, // 68: envoy.config.bootstrap.v3.Bootstrap.ApplicationLogConfig.LogFormat.json_format:type_name -> google.protobuf.Struct
-	47, // 69: envoy.config.bootstrap.v3.ClusterManager.OutlierDetection.event_service:type_name -> envoy.config.core.v3.EventServiceConfig
-	34, // 70: envoy.config.bootstrap.v3.Watchdog.WatchdogAction.config:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	32, // 56: envoy.config.bootstrap.v3.MemoryAllocatorManager.memory_release_interval:type_name -> google.protobuf.Duration
+	35, // 57: envoy.config.bootstrap.v3.MemoryAllocatorManager.soft_memory_limit_bytes:type_name -> google.protobuf.UInt64Value
+	46, // 58: envoy.config.bootstrap.v3.MemoryAllocatorManager.max_per_cpu_cache_size_bytes:type_name -> google.protobuf.UInt32Value
+	47, // 59: envoy.config.bootstrap.v3.Bootstrap.StaticResources.listeners:type_name -> envoy.config.listener.v3.Listener
+	48, // 60: envoy.config.bootstrap.v3.Bootstrap.StaticResources.clusters:type_name -> envoy.config.cluster.v3.Cluster
+	49, // 61: envoy.config.bootstrap.v3.Bootstrap.StaticResources.secrets:type_name -> envoy.extensions.transport_sockets.tls.v3.Secret
+	38, // 62: envoy.config.bootstrap.v3.Bootstrap.DynamicResources.lds_config:type_name -> envoy.config.core.v3.ConfigSource
+	38, // 63: envoy.config.bootstrap.v3.Bootstrap.DynamicResources.cds_config:type_name -> envoy.config.core.v3.ConfigSource
+	29, // 64: envoy.config.bootstrap.v3.Bootstrap.DynamicResources.ads_config:type_name -> envoy.config.core.v3.ApiConfigSource
+	22, // 65: envoy.config.bootstrap.v3.Bootstrap.ApplicationLogConfig.log_format:type_name -> envoy.config.bootstrap.v3.Bootstrap.ApplicationLogConfig.LogFormat
+	32, // 66: envoy.config.bootstrap.v3.Bootstrap.GrpcAsyncClientManagerConfig.max_cached_entry_idle_duration:type_name -> google.protobuf.Duration
+	37, // 67: envoy.config.bootstrap.v3.Bootstrap.CertificateProviderInstancesEntry.value:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	45, // 68: envoy.config.bootstrap.v3.Bootstrap.ApplicationLogConfig.LogFormat.json_format:type_name -> google.protobuf.Struct
+	50, // 69: envoy.config.bootstrap.v3.ClusterManager.OutlierDetection.event_service:type_name -> envoy.config.core.v3.EventServiceConfig
+	37, // 70: envoy.config.bootstrap.v3.Watchdog.WatchdogAction.config:type_name -> envoy.config.core.v3.TypedExtensionConfig
 	0,  // 71: envoy.config.bootstrap.v3.Watchdog.WatchdogAction.event:type_name -> envoy.config.bootstrap.v3.Watchdog.WatchdogAction.WatchdogEvent
-	35, // 72: envoy.config.bootstrap.v3.RuntimeLayer.RtdsLayer.rtds_config:type_name -> envoy.config.core.v3.ConfigSource
+	38, // 72: envoy.config.bootstrap.v3.RuntimeLayer.RtdsLayer.rtds_config:type_name -> envoy.config.core.v3.ConfigSource
 	73, // [73:73] is the sub-list for method output_type
 	73, // [73:73] is the sub-list for method input_type
 	73, // [73:73] is the sub-list for extension type_name
@@ -2664,7 +2787,7 @@ func file_envoy_config_bootstrap_v3_bootstrap_proto_init() {
 		(*RuntimeLayer_AdminLayer_)(nil),
 		(*RuntimeLayer_RtdsLayer_)(nil),
 	}
-	file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[17].OneofWrappers = []any{
+	file_envoy_config_bootstrap_v3_bootstrap_proto_msgTypes[20].OneofWrappers = []any{
 		(*Bootstrap_ApplicationLogConfig_LogFormat_JsonFormat)(nil),
 		(*Bootstrap_ApplicationLogConfig_LogFormat_TextFormat)(nil),
 	}
@@ -2674,7 +2797,7 @@ func file_envoy_config_bootstrap_v3_bootstrap_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_config_bootstrap_v3_bootstrap_proto_rawDesc), len(file_envoy_config_bootstrap_v3_bootstrap_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   23,
+			NumMessages:   26,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

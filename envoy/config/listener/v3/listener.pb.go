@@ -785,123 +785,6 @@ type Listener_InternalListener struct {
 
 func (*Listener_InternalListener) isListener_ListenerSpecifier() {}
 
-// A placeholder proto so that users can explicitly configure the standard
-// Listener Manager via the bootstrap's :ref:`listener_manager <envoy_v3_api_field_config.bootstrap.v3.Bootstrap.listener_manager>`.
-// [#not-implemented-hide:]
-type ListenerManager struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListenerManager) Reset() {
-	*x = ListenerManager{}
-	mi := &file_envoy_config_listener_v3_listener_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListenerManager) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListenerManager) ProtoMessage() {}
-
-func (x *ListenerManager) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_listener_v3_listener_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListenerManager.ProtoReflect.Descriptor instead.
-func (*ListenerManager) Descriptor() ([]byte, []int) {
-	return file_envoy_config_listener_v3_listener_proto_rawDescGZIP(), []int{3}
-}
-
-// A placeholder proto so that users can explicitly configure the standard
-// Validation Listener Manager via the bootstrap's :ref:`listener_manager <envoy_v3_api_field_config.bootstrap.v3.Bootstrap.listener_manager>`.
-// [#not-implemented-hide:]
-type ValidationListenerManager struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ValidationListenerManager) Reset() {
-	*x = ValidationListenerManager{}
-	mi := &file_envoy_config_listener_v3_listener_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ValidationListenerManager) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ValidationListenerManager) ProtoMessage() {}
-
-func (x *ValidationListenerManager) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_listener_v3_listener_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ValidationListenerManager.ProtoReflect.Descriptor instead.
-func (*ValidationListenerManager) Descriptor() ([]byte, []int) {
-	return file_envoy_config_listener_v3_listener_proto_rawDescGZIP(), []int{4}
-}
-
-// A placeholder proto so that users can explicitly configure the API
-// Listener Manager via the bootstrap's :ref:`listener_manager <envoy_v3_api_field_config.bootstrap.v3.Bootstrap.listener_manager>`.
-// [#not-implemented-hide:]
-type ApiListenerManager struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ApiListenerManager) Reset() {
-	*x = ApiListenerManager{}
-	mi := &file_envoy_config_listener_v3_listener_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ApiListenerManager) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ApiListenerManager) ProtoMessage() {}
-
-func (x *ApiListenerManager) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_listener_v3_listener_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ApiListenerManager.ProtoReflect.Descriptor instead.
-func (*ApiListenerManager) Descriptor() ([]byte, []int) {
-	return file_envoy_config_listener_v3_listener_proto_rawDescGZIP(), []int{5}
-}
-
 // [#not-implemented-hide:]
 type Listener_DeprecatedV1 struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -918,7 +801,7 @@ type Listener_DeprecatedV1 struct {
 
 func (x *Listener_DeprecatedV1) Reset() {
 	*x = Listener_DeprecatedV1{}
-	mi := &file_envoy_config_listener_v3_listener_proto_msgTypes[6]
+	mi := &file_envoy_config_listener_v3_listener_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -930,7 +813,7 @@ func (x *Listener_DeprecatedV1) String() string {
 func (*Listener_DeprecatedV1) ProtoMessage() {}
 
 func (x *Listener_DeprecatedV1) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_listener_v3_listener_proto_msgTypes[6]
+	mi := &file_envoy_config_listener_v3_listener_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -967,7 +850,7 @@ type Listener_ConnectionBalanceConfig struct {
 
 func (x *Listener_ConnectionBalanceConfig) Reset() {
 	*x = Listener_ConnectionBalanceConfig{}
-	mi := &file_envoy_config_listener_v3_listener_proto_msgTypes[7]
+	mi := &file_envoy_config_listener_v3_listener_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -979,7 +862,7 @@ func (x *Listener_ConnectionBalanceConfig) String() string {
 func (*Listener_ConnectionBalanceConfig) ProtoMessage() {}
 
 func (x *Listener_ConnectionBalanceConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_listener_v3_listener_proto_msgTypes[7]
+	mi := &file_envoy_config_listener_v3_listener_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1051,7 +934,7 @@ type Listener_InternalListenerConfig struct {
 
 func (x *Listener_InternalListenerConfig) Reset() {
 	*x = Listener_InternalListenerConfig{}
-	mi := &file_envoy_config_listener_v3_listener_proto_msgTypes[8]
+	mi := &file_envoy_config_listener_v3_listener_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1063,7 +946,7 @@ func (x *Listener_InternalListenerConfig) String() string {
 func (*Listener_InternalListenerConfig) ProtoMessage() {}
 
 func (x *Listener_InternalListenerConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_listener_v3_listener_proto_msgTypes[8]
+	mi := &file_envoy_config_listener_v3_listener_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1098,7 +981,7 @@ type Listener_FcdsConfig struct {
 
 func (x *Listener_FcdsConfig) Reset() {
 	*x = Listener_FcdsConfig{}
-	mi := &file_envoy_config_listener_v3_listener_proto_msgTypes[9]
+	mi := &file_envoy_config_listener_v3_listener_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1110,7 +993,7 @@ func (x *Listener_FcdsConfig) String() string {
 func (*Listener_FcdsConfig) ProtoMessage() {}
 
 func (x *Listener_FcdsConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_listener_v3_listener_proto_msgTypes[9]
+	mi := &file_envoy_config_listener_v3_listener_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1154,7 +1037,7 @@ type Listener_ConnectionBalanceConfig_ExactBalance struct {
 
 func (x *Listener_ConnectionBalanceConfig_ExactBalance) Reset() {
 	*x = Listener_ConnectionBalanceConfig_ExactBalance{}
-	mi := &file_envoy_config_listener_v3_listener_proto_msgTypes[10]
+	mi := &file_envoy_config_listener_v3_listener_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1166,7 +1049,7 @@ func (x *Listener_ConnectionBalanceConfig_ExactBalance) String() string {
 func (*Listener_ConnectionBalanceConfig_ExactBalance) ProtoMessage() {}
 
 func (x *Listener_ConnectionBalanceConfig_ExactBalance) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_listener_v3_listener_proto_msgTypes[10]
+	mi := &file_envoy_config_listener_v3_listener_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1257,10 +1140,7 @@ const file_envoy_config_listener_v3_listener_proto_rawDesc = "" +
 	"\aDEFAULT\x10\x00\x12\x0f\n" +
 	"\vMODIFY_ONLY\x10\x01:\x1c\x9aň\x1e\x17\n" +
 	"\x15envoy.api.v2.ListenerB\x14\n" +
-	"\x12listener_specifierJ\x04\b\x0e\x10\x0fJ\x04\b\x17\x10\x18\"\x11\n" +
-	"\x0fListenerManager\"\x1b\n" +
-	"\x19ValidationListenerManager\"\x14\n" +
-	"\x12ApiListenerManagerB\x8d\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x12listener_specifierJ\x04\b\x0e\x10\x0fJ\x04\b\x17\x10\x18B\x8d\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"&io.envoyproxy.envoy.config.listener.v3B\rListenerProtoP\x01ZJgithub.com/envoyproxy/go-control-plane/envoy/config/listener/v3;listenerv3b\x06proto3"
 
 var (
@@ -1276,77 +1156,74 @@ func file_envoy_config_listener_v3_listener_proto_rawDescGZIP() []byte {
 }
 
 var file_envoy_config_listener_v3_listener_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_envoy_config_listener_v3_listener_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_envoy_config_listener_v3_listener_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_envoy_config_listener_v3_listener_proto_goTypes = []any{
 	(Listener_DrainType)(0),                               // 0: envoy.config.listener.v3.Listener.DrainType
 	(*AdditionalAddress)(nil),                             // 1: envoy.config.listener.v3.AdditionalAddress
 	(*ListenerCollection)(nil),                            // 2: envoy.config.listener.v3.ListenerCollection
 	(*Listener)(nil),                                      // 3: envoy.config.listener.v3.Listener
-	(*ListenerManager)(nil),                               // 4: envoy.config.listener.v3.ListenerManager
-	(*ValidationListenerManager)(nil),                     // 5: envoy.config.listener.v3.ValidationListenerManager
-	(*ApiListenerManager)(nil),                            // 6: envoy.config.listener.v3.ApiListenerManager
-	(*Listener_DeprecatedV1)(nil),                         // 7: envoy.config.listener.v3.Listener.DeprecatedV1
-	(*Listener_ConnectionBalanceConfig)(nil),              // 8: envoy.config.listener.v3.Listener.ConnectionBalanceConfig
-	(*Listener_InternalListenerConfig)(nil),               // 9: envoy.config.listener.v3.Listener.InternalListenerConfig
-	(*Listener_FcdsConfig)(nil),                           // 10: envoy.config.listener.v3.Listener.FcdsConfig
-	(*Listener_ConnectionBalanceConfig_ExactBalance)(nil), // 11: envoy.config.listener.v3.Listener.ConnectionBalanceConfig.ExactBalance
-	(*v3.Address)(nil),                                    // 12: envoy.config.core.v3.Address
-	(*v3.SocketOptionsOverride)(nil),                      // 13: envoy.config.core.v3.SocketOptionsOverride
-	(*v3.TcpKeepalive)(nil),                               // 14: envoy.config.core.v3.TcpKeepalive
-	(*v31.CollectionEntry)(nil),                           // 15: xds.core.v3.CollectionEntry
-	(*FilterChain)(nil),                                   // 16: envoy.config.listener.v3.FilterChain
-	(*v32.Matcher)(nil),                                   // 17: xds.type.matcher.v3.Matcher
-	(*wrapperspb.BoolValue)(nil),                          // 18: google.protobuf.BoolValue
-	(*wrapperspb.UInt32Value)(nil),                        // 19: google.protobuf.UInt32Value
-	(*durationpb.Duration)(nil),                           // 20: google.protobuf.Duration
-	(*v3.Metadata)(nil),                                   // 21: envoy.config.core.v3.Metadata
-	(*ListenerFilter)(nil),                                // 22: envoy.config.listener.v3.ListenerFilter
-	(*v3.SocketOption)(nil),                               // 23: envoy.config.core.v3.SocketOption
-	(v3.TrafficDirection)(0),                              // 24: envoy.config.core.v3.TrafficDirection
-	(*UdpListenerConfig)(nil),                             // 25: envoy.config.listener.v3.UdpListenerConfig
-	(*ApiListener)(nil),                                   // 26: envoy.config.listener.v3.ApiListener
-	(*v33.AccessLog)(nil),                                 // 27: envoy.config.accesslog.v3.AccessLog
-	(*v3.TypedExtensionConfig)(nil),                       // 28: envoy.config.core.v3.TypedExtensionConfig
-	(*v3.ConfigSource)(nil),                               // 29: envoy.config.core.v3.ConfigSource
+	(*Listener_DeprecatedV1)(nil),                         // 4: envoy.config.listener.v3.Listener.DeprecatedV1
+	(*Listener_ConnectionBalanceConfig)(nil),              // 5: envoy.config.listener.v3.Listener.ConnectionBalanceConfig
+	(*Listener_InternalListenerConfig)(nil),               // 6: envoy.config.listener.v3.Listener.InternalListenerConfig
+	(*Listener_FcdsConfig)(nil),                           // 7: envoy.config.listener.v3.Listener.FcdsConfig
+	(*Listener_ConnectionBalanceConfig_ExactBalance)(nil), // 8: envoy.config.listener.v3.Listener.ConnectionBalanceConfig.ExactBalance
+	(*v3.Address)(nil),                                    // 9: envoy.config.core.v3.Address
+	(*v3.SocketOptionsOverride)(nil),                      // 10: envoy.config.core.v3.SocketOptionsOverride
+	(*v3.TcpKeepalive)(nil),                               // 11: envoy.config.core.v3.TcpKeepalive
+	(*v31.CollectionEntry)(nil),                           // 12: xds.core.v3.CollectionEntry
+	(*FilterChain)(nil),                                   // 13: envoy.config.listener.v3.FilterChain
+	(*v32.Matcher)(nil),                                   // 14: xds.type.matcher.v3.Matcher
+	(*wrapperspb.BoolValue)(nil),                          // 15: google.protobuf.BoolValue
+	(*wrapperspb.UInt32Value)(nil),                        // 16: google.protobuf.UInt32Value
+	(*durationpb.Duration)(nil),                           // 17: google.protobuf.Duration
+	(*v3.Metadata)(nil),                                   // 18: envoy.config.core.v3.Metadata
+	(*ListenerFilter)(nil),                                // 19: envoy.config.listener.v3.ListenerFilter
+	(*v3.SocketOption)(nil),                               // 20: envoy.config.core.v3.SocketOption
+	(v3.TrafficDirection)(0),                              // 21: envoy.config.core.v3.TrafficDirection
+	(*UdpListenerConfig)(nil),                             // 22: envoy.config.listener.v3.UdpListenerConfig
+	(*ApiListener)(nil),                                   // 23: envoy.config.listener.v3.ApiListener
+	(*v33.AccessLog)(nil),                                 // 24: envoy.config.accesslog.v3.AccessLog
+	(*v3.TypedExtensionConfig)(nil),                       // 25: envoy.config.core.v3.TypedExtensionConfig
+	(*v3.ConfigSource)(nil),                               // 26: envoy.config.core.v3.ConfigSource
 }
 var file_envoy_config_listener_v3_listener_proto_depIdxs = []int32{
-	12, // 0: envoy.config.listener.v3.AdditionalAddress.address:type_name -> envoy.config.core.v3.Address
-	13, // 1: envoy.config.listener.v3.AdditionalAddress.socket_options:type_name -> envoy.config.core.v3.SocketOptionsOverride
-	14, // 2: envoy.config.listener.v3.AdditionalAddress.tcp_keepalive:type_name -> envoy.config.core.v3.TcpKeepalive
-	15, // 3: envoy.config.listener.v3.ListenerCollection.entries:type_name -> xds.core.v3.CollectionEntry
-	12, // 4: envoy.config.listener.v3.Listener.address:type_name -> envoy.config.core.v3.Address
+	9,  // 0: envoy.config.listener.v3.AdditionalAddress.address:type_name -> envoy.config.core.v3.Address
+	10, // 1: envoy.config.listener.v3.AdditionalAddress.socket_options:type_name -> envoy.config.core.v3.SocketOptionsOverride
+	11, // 2: envoy.config.listener.v3.AdditionalAddress.tcp_keepalive:type_name -> envoy.config.core.v3.TcpKeepalive
+	12, // 3: envoy.config.listener.v3.ListenerCollection.entries:type_name -> xds.core.v3.CollectionEntry
+	9,  // 4: envoy.config.listener.v3.Listener.address:type_name -> envoy.config.core.v3.Address
 	1,  // 5: envoy.config.listener.v3.Listener.additional_addresses:type_name -> envoy.config.listener.v3.AdditionalAddress
-	16, // 6: envoy.config.listener.v3.Listener.filter_chains:type_name -> envoy.config.listener.v3.FilterChain
-	10, // 7: envoy.config.listener.v3.Listener.fcds_config:type_name -> envoy.config.listener.v3.Listener.FcdsConfig
-	17, // 8: envoy.config.listener.v3.Listener.filter_chain_matcher:type_name -> xds.type.matcher.v3.Matcher
-	18, // 9: envoy.config.listener.v3.Listener.use_original_dst:type_name -> google.protobuf.BoolValue
-	16, // 10: envoy.config.listener.v3.Listener.default_filter_chain:type_name -> envoy.config.listener.v3.FilterChain
-	19, // 11: envoy.config.listener.v3.Listener.per_connection_buffer_limit_bytes:type_name -> google.protobuf.UInt32Value
-	20, // 12: envoy.config.listener.v3.Listener.per_connection_buffer_high_watermark_timeout:type_name -> google.protobuf.Duration
-	21, // 13: envoy.config.listener.v3.Listener.metadata:type_name -> envoy.config.core.v3.Metadata
-	7,  // 14: envoy.config.listener.v3.Listener.deprecated_v1:type_name -> envoy.config.listener.v3.Listener.DeprecatedV1
+	13, // 6: envoy.config.listener.v3.Listener.filter_chains:type_name -> envoy.config.listener.v3.FilterChain
+	7,  // 7: envoy.config.listener.v3.Listener.fcds_config:type_name -> envoy.config.listener.v3.Listener.FcdsConfig
+	14, // 8: envoy.config.listener.v3.Listener.filter_chain_matcher:type_name -> xds.type.matcher.v3.Matcher
+	15, // 9: envoy.config.listener.v3.Listener.use_original_dst:type_name -> google.protobuf.BoolValue
+	13, // 10: envoy.config.listener.v3.Listener.default_filter_chain:type_name -> envoy.config.listener.v3.FilterChain
+	16, // 11: envoy.config.listener.v3.Listener.per_connection_buffer_limit_bytes:type_name -> google.protobuf.UInt32Value
+	17, // 12: envoy.config.listener.v3.Listener.per_connection_buffer_high_watermark_timeout:type_name -> google.protobuf.Duration
+	18, // 13: envoy.config.listener.v3.Listener.metadata:type_name -> envoy.config.core.v3.Metadata
+	4,  // 14: envoy.config.listener.v3.Listener.deprecated_v1:type_name -> envoy.config.listener.v3.Listener.DeprecatedV1
 	0,  // 15: envoy.config.listener.v3.Listener.drain_type:type_name -> envoy.config.listener.v3.Listener.DrainType
-	22, // 16: envoy.config.listener.v3.Listener.listener_filters:type_name -> envoy.config.listener.v3.ListenerFilter
-	20, // 17: envoy.config.listener.v3.Listener.listener_filters_timeout:type_name -> google.protobuf.Duration
-	18, // 18: envoy.config.listener.v3.Listener.transparent:type_name -> google.protobuf.BoolValue
-	18, // 19: envoy.config.listener.v3.Listener.freebind:type_name -> google.protobuf.BoolValue
-	23, // 20: envoy.config.listener.v3.Listener.socket_options:type_name -> envoy.config.core.v3.SocketOption
-	19, // 21: envoy.config.listener.v3.Listener.tcp_fast_open_queue_length:type_name -> google.protobuf.UInt32Value
-	24, // 22: envoy.config.listener.v3.Listener.traffic_direction:type_name -> envoy.config.core.v3.TrafficDirection
-	25, // 23: envoy.config.listener.v3.Listener.udp_listener_config:type_name -> envoy.config.listener.v3.UdpListenerConfig
-	26, // 24: envoy.config.listener.v3.Listener.api_listener:type_name -> envoy.config.listener.v3.ApiListener
-	8,  // 25: envoy.config.listener.v3.Listener.connection_balance_config:type_name -> envoy.config.listener.v3.Listener.ConnectionBalanceConfig
-	18, // 26: envoy.config.listener.v3.Listener.enable_reuse_port:type_name -> google.protobuf.BoolValue
-	27, // 27: envoy.config.listener.v3.Listener.access_log:type_name -> envoy.config.accesslog.v3.AccessLog
-	19, // 28: envoy.config.listener.v3.Listener.tcp_backlog_size:type_name -> google.protobuf.UInt32Value
-	19, // 29: envoy.config.listener.v3.Listener.max_connections_to_accept_per_socket_event:type_name -> google.protobuf.UInt32Value
-	18, // 30: envoy.config.listener.v3.Listener.bind_to_port:type_name -> google.protobuf.BoolValue
-	9,  // 31: envoy.config.listener.v3.Listener.internal_listener:type_name -> envoy.config.listener.v3.Listener.InternalListenerConfig
-	14, // 32: envoy.config.listener.v3.Listener.tcp_keepalive:type_name -> envoy.config.core.v3.TcpKeepalive
-	18, // 33: envoy.config.listener.v3.Listener.DeprecatedV1.bind_to_port:type_name -> google.protobuf.BoolValue
-	11, // 34: envoy.config.listener.v3.Listener.ConnectionBalanceConfig.exact_balance:type_name -> envoy.config.listener.v3.Listener.ConnectionBalanceConfig.ExactBalance
-	28, // 35: envoy.config.listener.v3.Listener.ConnectionBalanceConfig.extend_balance:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	29, // 36: envoy.config.listener.v3.Listener.FcdsConfig.config_source:type_name -> envoy.config.core.v3.ConfigSource
+	19, // 16: envoy.config.listener.v3.Listener.listener_filters:type_name -> envoy.config.listener.v3.ListenerFilter
+	17, // 17: envoy.config.listener.v3.Listener.listener_filters_timeout:type_name -> google.protobuf.Duration
+	15, // 18: envoy.config.listener.v3.Listener.transparent:type_name -> google.protobuf.BoolValue
+	15, // 19: envoy.config.listener.v3.Listener.freebind:type_name -> google.protobuf.BoolValue
+	20, // 20: envoy.config.listener.v3.Listener.socket_options:type_name -> envoy.config.core.v3.SocketOption
+	16, // 21: envoy.config.listener.v3.Listener.tcp_fast_open_queue_length:type_name -> google.protobuf.UInt32Value
+	21, // 22: envoy.config.listener.v3.Listener.traffic_direction:type_name -> envoy.config.core.v3.TrafficDirection
+	22, // 23: envoy.config.listener.v3.Listener.udp_listener_config:type_name -> envoy.config.listener.v3.UdpListenerConfig
+	23, // 24: envoy.config.listener.v3.Listener.api_listener:type_name -> envoy.config.listener.v3.ApiListener
+	5,  // 25: envoy.config.listener.v3.Listener.connection_balance_config:type_name -> envoy.config.listener.v3.Listener.ConnectionBalanceConfig
+	15, // 26: envoy.config.listener.v3.Listener.enable_reuse_port:type_name -> google.protobuf.BoolValue
+	24, // 27: envoy.config.listener.v3.Listener.access_log:type_name -> envoy.config.accesslog.v3.AccessLog
+	16, // 28: envoy.config.listener.v3.Listener.tcp_backlog_size:type_name -> google.protobuf.UInt32Value
+	16, // 29: envoy.config.listener.v3.Listener.max_connections_to_accept_per_socket_event:type_name -> google.protobuf.UInt32Value
+	15, // 30: envoy.config.listener.v3.Listener.bind_to_port:type_name -> google.protobuf.BoolValue
+	6,  // 31: envoy.config.listener.v3.Listener.internal_listener:type_name -> envoy.config.listener.v3.Listener.InternalListenerConfig
+	11, // 32: envoy.config.listener.v3.Listener.tcp_keepalive:type_name -> envoy.config.core.v3.TcpKeepalive
+	15, // 33: envoy.config.listener.v3.Listener.DeprecatedV1.bind_to_port:type_name -> google.protobuf.BoolValue
+	8,  // 34: envoy.config.listener.v3.Listener.ConnectionBalanceConfig.exact_balance:type_name -> envoy.config.listener.v3.Listener.ConnectionBalanceConfig.ExactBalance
+	25, // 35: envoy.config.listener.v3.Listener.ConnectionBalanceConfig.extend_balance:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	26, // 36: envoy.config.listener.v3.Listener.FcdsConfig.config_source:type_name -> envoy.config.core.v3.ConfigSource
 	37, // [37:37] is the sub-list for method output_type
 	37, // [37:37] is the sub-list for method input_type
 	37, // [37:37] is the sub-list for extension type_name
@@ -1365,7 +1242,7 @@ func file_envoy_config_listener_v3_listener_proto_init() {
 	file_envoy_config_listener_v3_listener_proto_msgTypes[2].OneofWrappers = []any{
 		(*Listener_InternalListener)(nil),
 	}
-	file_envoy_config_listener_v3_listener_proto_msgTypes[7].OneofWrappers = []any{
+	file_envoy_config_listener_v3_listener_proto_msgTypes[4].OneofWrappers = []any{
 		(*Listener_ConnectionBalanceConfig_ExactBalance_)(nil),
 		(*Listener_ConnectionBalanceConfig_ExtendBalance)(nil),
 	}
@@ -1375,7 +1252,7 @@ func file_envoy_config_listener_v3_listener_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_config_listener_v3_listener_proto_rawDesc), len(file_envoy_config_listener_v3_listener_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   11,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
