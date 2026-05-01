@@ -567,7 +567,7 @@ func (x *TcpProxy_WeightedCluster) GetClusters() []*TcpProxy_WeightedCluster_Clu
 // Configuration for tunneling TCP over other transports or application layers.
 // Tunneling is supported over HTTP/1.1 and HTTP/2. The upstream protocol is
 // determined by the cluster configuration.
-// [#next-free-field: 10]
+// [#next-free-field: 11]
 type TcpProxy_TunnelingConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The hostname to send in the synthesized CONNECT headers to the upstream proxy.
@@ -637,8 +637,13 @@ type TcpProxy_TunnelingConfig struct {
 	// This enables customizing the key used by access log formatters such as
 	// “%DYNAMIC_METADATA(envoy.filters.network.tcp_proxy:<key>)%“.
 	RequestIdMetadataKey string `protobuf:"bytes,9,opt,name=request_id_metadata_key,json=requestIdMetadataKey,proto3" json:"request_id_metadata_key,omitempty"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
+	// Specifies a collection of Formatter plugins that can be used in substitution formatters
+	// in “headers_to_add“.
+	// See the formatters extensions documentation for details.
+	// [#extension-category: envoy.formatter]
+	Formatters    []*v3.TypedExtensionConfig `protobuf:"bytes,10,rep,name=formatters,proto3" json:"formatters,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *TcpProxy_TunnelingConfig) Reset() {
@@ -732,6 +737,13 @@ func (x *TcpProxy_TunnelingConfig) GetRequestIdMetadataKey() string {
 		return x.RequestIdMetadataKey
 	}
 	return ""
+}
+
+func (x *TcpProxy_TunnelingConfig) GetFormatters() []*v3.TypedExtensionConfig {
+	if x != nil {
+		return x.Formatters
+	}
+	return nil
 }
 
 type TcpProxy_OnDemand struct {
@@ -944,7 +956,7 @@ var File_envoy_extensions_filters_network_tcp_proxy_v3_tcp_proxy_proto protorefl
 
 const file_envoy_extensions_filters_network_tcp_proxy_v3_tcp_proxy_proto_rawDesc = "" +
 	"\n" +
-	"=envoy/extensions/filters/network/tcp_proxy/v3/tcp_proxy.proto\x12-envoy.extensions.filters.network.tcp_proxy.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a\"envoy/config/core/v3/backoff.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a)envoy/config/core/v3/proxy_protocol.proto\x1aYenvoy/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto\x1a\x1fenvoy/type/v3/hash_policy.proto\x1a\x1benvoy/type/v3/percent.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xd2\x1c\n" +
+	"=envoy/extensions/filters/network/tcp_proxy/v3/tcp_proxy.proto\x12-envoy.extensions.filters.network.tcp_proxy.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a\"envoy/config/core/v3/backoff.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a$envoy/config/core/v3/extension.proto\x1a)envoy/config/core/v3/proxy_protocol.proto\x1aYenvoy/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto\x1a\x1fenvoy/type/v3/hash_policy.proto\x1a\x1benvoy/type/v3/percent.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\x9e\x1d\n" +
 	"\bTcpProxy\x12(\n" +
 	"\vstat_prefix\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\n" +
 	"statPrefix\x12\x1a\n" +
@@ -979,7 +991,7 @@ const file_envoy_extensions_filters_network_tcp_proxy_v3_tcp_proxy_proto_rawDesc
 	"\x06weight\x18\x02 \x01(\rB\a\xfaB\x04*\x02(\x01R\x06weight\x12E\n" +
 	"\x0emetadata_match\x18\x03 \x01(\v2\x1e.envoy.config.core.v3.MetadataR\rmetadataMatch:V\x9aň\x1eQ\n" +
 	"Oenvoy.config.filter.network.tcp_proxy.v2.TcpProxy.WeightedCluster.ClusterWeight:H\x9aň\x1eC\n" +
-	"Aenvoy.config.filter.network.tcp_proxy.v2.TcpProxy.WeightedCluster\x1a\xf7\x04\n" +
+	"Aenvoy.config.filter.network.tcp_proxy.v2.TcpProxy.WeightedCluster\x1a\xc3\x05\n" +
 	"\x0fTunnelingConfig\x12#\n" +
 	"\bhostname\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\bhostname\x12\x19\n" +
 	"\buse_post\x18\x02 \x01(\bR\ausePost\x12X\n" +
@@ -989,7 +1001,11 @@ const file_envoy_extensions_filters_network_tcp_proxy_v3_tcp_proxy_proto_rawDesc
 	"\x1bpropagate_response_trailers\x18\x06 \x01(\bR\x19propagateResponseTrailers\x12\x81\x01\n" +
 	"\x14request_id_extension\x18\a \x01(\v2O.envoy.extensions.filters.network.http_connection_manager.v3.RequestIDExtensionR\x12requestIdExtension\x12*\n" +
 	"\x11request_id_header\x18\b \x01(\tR\x0frequestIdHeader\x125\n" +
-	"\x17request_id_metadata_key\x18\t \x01(\tR\x14requestIdMetadataKey:H\x9aň\x1eC\n" +
+	"\x17request_id_metadata_key\x18\t \x01(\tR\x14requestIdMetadataKey\x12J\n" +
+	"\n" +
+	"formatters\x18\n" +
+	" \x03(\v2*.envoy.config.core.v3.TypedExtensionConfigR\n" +
+	"formatters:H\x9aň\x1eC\n" +
 	"Aenvoy.config.filter.network.tcp_proxy.v2.TcpProxy.TunnelingConfig\x1a\xb3\x01\n" +
 	"\bOnDemand\x12E\n" +
 	"\fodcds_config\x18\x01 \x01(\v2\".envoy.config.core.v3.ConfigSourceR\vodcdsConfig\x12+\n" +
@@ -1044,7 +1060,8 @@ var file_envoy_extensions_filters_network_tcp_proxy_v3_tcp_proxy_proto_goTypes =
 	(*v3.TlvEntry)(nil),                            // 15: envoy.config.core.v3.TlvEntry
 	(*v3.HeaderValueOption)(nil),                   // 16: envoy.config.core.v3.HeaderValueOption
 	(*v33.RequestIDExtension)(nil),                 // 17: envoy.extensions.filters.network.http_connection_manager.v3.RequestIDExtension
-	(*v3.ConfigSource)(nil),                        // 18: envoy.config.core.v3.ConfigSource
+	(*v3.TypedExtensionConfig)(nil),                // 18: envoy.config.core.v3.TypedExtensionConfig
+	(*v3.ConfigSource)(nil),                        // 19: envoy.config.core.v3.ConfigSource
 }
 var file_envoy_extensions_filters_network_tcp_proxy_v3_tcp_proxy_proto_depIdxs = []int32{
 	3,  // 0: envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy.weighted_clusters:type_name -> envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy.WeightedCluster
@@ -1069,15 +1086,16 @@ var file_envoy_extensions_filters_network_tcp_proxy_v3_tcp_proxy_proto_depIdxs =
 	7,  // 19: envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy.WeightedCluster.clusters:type_name -> envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy.WeightedCluster.ClusterWeight
 	16, // 20: envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy.TunnelingConfig.headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
 	17, // 21: envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy.TunnelingConfig.request_id_extension:type_name -> envoy.extensions.filters.network.http_connection_manager.v3.RequestIDExtension
-	18, // 22: envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy.OnDemand.odcds_config:type_name -> envoy.config.core.v3.ConfigSource
-	9,  // 23: envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy.OnDemand.timeout:type_name -> google.protobuf.Duration
-	9,  // 24: envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy.TcpAccessLogOptions.access_log_flush_interval:type_name -> google.protobuf.Duration
-	8,  // 25: envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy.WeightedCluster.ClusterWeight.metadata_match:type_name -> envoy.config.core.v3.Metadata
-	26, // [26:26] is the sub-list for method output_type
-	26, // [26:26] is the sub-list for method input_type
-	26, // [26:26] is the sub-list for extension type_name
-	26, // [26:26] is the sub-list for extension extendee
-	0,  // [0:26] is the sub-list for field type_name
+	18, // 22: envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy.TunnelingConfig.formatters:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	19, // 23: envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy.OnDemand.odcds_config:type_name -> envoy.config.core.v3.ConfigSource
+	9,  // 24: envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy.OnDemand.timeout:type_name -> google.protobuf.Duration
+	9,  // 25: envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy.TcpAccessLogOptions.access_log_flush_interval:type_name -> google.protobuf.Duration
+	8,  // 26: envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy.WeightedCluster.ClusterWeight.metadata_match:type_name -> envoy.config.core.v3.Metadata
+	27, // [27:27] is the sub-list for method output_type
+	27, // [27:27] is the sub-list for method input_type
+	27, // [27:27] is the sub-list for extension type_name
+	27, // [27:27] is the sub-list for extension extendee
+	0,  // [0:27] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_network_tcp_proxy_v3_tcp_proxy_proto_init() }
