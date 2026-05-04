@@ -3298,6 +3298,8 @@ func (m *ApiListenerManager) validate(all bool) error {
 
 	var errors []error
 
+	// no validation rules for ThreadingModel
+
 	if len(errors) > 0 {
 		return ApiListenerManagerMultiError(errors)
 	}

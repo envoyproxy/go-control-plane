@@ -2414,6 +2414,11 @@ func (m *ApiListenerManager) MarshalToSizedBufferVTStrict(dAtA []byte) (int, err
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.ThreadingModel != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.ThreadingModel))
+		i--
+		dAtA[i] = 0x8
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -3375,6 +3380,9 @@ func (m *ApiListenerManager) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
+	if m.ThreadingModel != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.ThreadingModel))
+	}
 	n += len(m.unknownFields)
 	return n
 }
