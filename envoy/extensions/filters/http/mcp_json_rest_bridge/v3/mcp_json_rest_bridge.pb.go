@@ -101,9 +101,27 @@ type McpJsonRestBridge struct {
 	// General server information.
 	ServerInfo *ServerInfo `protobuf:"bytes,1,opt,name=server_info,json=serverInfo,proto3" json:"server_info,omitempty"`
 	// Configuration for the MCP tools.
-	ToolConfig    *ServerToolConfig `protobuf:"bytes,2,opt,name=tool_config,json=toolConfig,proto3" json:"tool_config,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	ToolConfig *ServerToolConfig `protobuf:"bytes,2,opt,name=tool_config,json=toolConfig,proto3" json:"tool_config,omitempty"`
+	// Maximum size of the request body to buffer for transcoding and validation.
+	// If the request body exceeds this size, the request is rejected with “413 Payload Too Large“.
+	// This limit applies to prevent unbounded buffering.
+	//
+	// It defaults to 64KB (65536 bytes) as the MCP calls (tools, resources, or prompts)
+	// only pass small arguments or identifiers.
+	//
+	// Setting it to 0 would disable the limit. It is not recommended to do so in production.
+	MaxRequestBodySize *wrapperspb.UInt32Value `protobuf:"bytes,3,opt,name=max_request_body_size,json=maxRequestBodySize,proto3" json:"max_request_body_size,omitempty"`
+	// Maximum size of the response body to buffer for transcoding.
+	// If the response body exceeds this size, the response is rejected with an appropriate error.
+	// This limit applies to prevent unbounded buffering.
+	//
+	// It defaults to 1MB (1048576 bytes) to prevent transcoding failures on large payloads like
+	// file reads, while aligning with Envoy's standard default connection buffer limit.
+	//
+	// Setting it to 0 would disable the limit. It is not recommended to do so in production.
+	MaxResponseBodySize *wrapperspb.UInt32Value `protobuf:"bytes,4,opt,name=max_response_body_size,json=maxResponseBodySize,proto3" json:"max_response_body_size,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *McpJsonRestBridge) Reset() {
@@ -146,6 +164,20 @@ func (x *McpJsonRestBridge) GetServerInfo() *ServerInfo {
 func (x *McpJsonRestBridge) GetToolConfig() *ServerToolConfig {
 	if x != nil {
 		return x.ToolConfig
+	}
+	return nil
+}
+
+func (x *McpJsonRestBridge) GetMaxRequestBodySize() *wrapperspb.UInt32Value {
+	if x != nil {
+		return x.MaxRequestBodySize
+	}
+	return nil
+}
+
+func (x *McpJsonRestBridge) GetMaxResponseBodySize() *wrapperspb.UInt32Value {
+	if x != nil {
+		return x.MaxResponseBodySize
 	}
 	return nil
 }
@@ -485,12 +517,14 @@ var File_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bri
 
 const file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_rawDesc = "" +
 	"\n" +
-	"Penvoy/extensions/filters/http/mcp_json_rest_bridge/v3/mcp_json_rest_bridge.proto\x125envoy.extensions.filters.http.mcp_json_rest_bridge.v3\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xe1\x01\n" +
+	"Penvoy/extensions/filters/http/mcp_json_rest_bridge/v3/mcp_json_rest_bridge.proto\x125envoy.extensions.filters.http.mcp_json_rest_bridge.v3\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x85\x03\n" +
 	"\x11McpJsonRestBridge\x12b\n" +
 	"\vserver_info\x18\x01 \x01(\v2A.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerInfoR\n" +
 	"serverInfo\x12h\n" +
 	"\vtool_config\x18\x02 \x01(\v2G.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfigR\n" +
-	"toolConfig\"\xc8\x01\n" +
+	"toolConfig\x12O\n" +
+	"\x15max_request_body_size\x18\x03 \x01(\v2\x1c.google.protobuf.UInt32ValueR\x12maxRequestBodySize\x12Q\n" +
+	"\x16max_response_body_size\x18\x04 \x01(\v2\x1c.google.protobuf.UInt32ValueR\x13maxResponseBodySize\"\xc8\x01\n" +
 	"\n" +
 	"ServerInfo\x12>\n" +
 	"\x1bsupported_protocol_versions\x18\x01 \x03(\tR\x19supportedProtocolVersions\x12 \n" +
@@ -532,20 +566,23 @@ var file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bri
 	(*ServerToolConfig)(nil),       // 2: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig
 	(*ToolConfig)(nil),             // 3: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig
 	(*HttpRule)(nil),               // 4: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
-	(*wrapperspb.StringValue)(nil), // 5: google.protobuf.StringValue
+	(*wrapperspb.UInt32Value)(nil), // 5: google.protobuf.UInt32Value
+	(*wrapperspb.StringValue)(nil), // 6: google.protobuf.StringValue
 }
 var file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_depIdxs = []int32{
 	1, // 0: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.server_info:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerInfo
 	2, // 1: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.tool_config:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig
-	5, // 2: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerInfo.fallback_protocol_version:type_name -> google.protobuf.StringValue
-	3, // 3: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tools:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig
-	4, // 4: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tool_list_http_rule:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
-	4, // 5: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.http_rule:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
-	6, // [6:6] is the sub-list for method output_type
-	6, // [6:6] is the sub-list for method input_type
-	6, // [6:6] is the sub-list for extension type_name
-	6, // [6:6] is the sub-list for extension extendee
-	0, // [0:6] is the sub-list for field type_name
+	5, // 2: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.max_request_body_size:type_name -> google.protobuf.UInt32Value
+	5, // 3: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.max_response_body_size:type_name -> google.protobuf.UInt32Value
+	6, // 4: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerInfo.fallback_protocol_version:type_name -> google.protobuf.StringValue
+	3, // 5: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tools:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig
+	4, // 6: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tool_list_http_rule:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
+	4, // 7: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.http_rule:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
+	8, // [8:8] is the sub-list for method output_type
+	8, // [8:8] is the sub-list for method input_type
+	8, // [8:8] is the sub-list for extension type_name
+	8, // [8:8] is the sub-list for extension extendee
+	0, // [0:8] is the sub-list for field type_name
 }
 
 func init() {

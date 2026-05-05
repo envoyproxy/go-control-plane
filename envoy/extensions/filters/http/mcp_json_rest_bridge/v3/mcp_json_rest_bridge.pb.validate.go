@@ -116,6 +116,64 @@ func (m *McpJsonRestBridge) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetMaxRequestBodySize()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, McpJsonRestBridgeValidationError{
+					field:  "MaxRequestBodySize",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, McpJsonRestBridgeValidationError{
+					field:  "MaxRequestBodySize",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetMaxRequestBodySize()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return McpJsonRestBridgeValidationError{
+				field:  "MaxRequestBodySize",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetMaxResponseBodySize()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, McpJsonRestBridgeValidationError{
+					field:  "MaxResponseBodySize",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, McpJsonRestBridgeValidationError{
+					field:  "MaxResponseBodySize",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetMaxResponseBodySize()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return McpJsonRestBridgeValidationError{
+				field:  "MaxResponseBodySize",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return McpJsonRestBridgeMultiError(errors)
 	}
