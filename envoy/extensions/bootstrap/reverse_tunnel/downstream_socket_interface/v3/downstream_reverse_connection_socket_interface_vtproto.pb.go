@@ -49,6 +49,16 @@ func (m *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) Marshal
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.UseHttpUpgrade {
+		i--
+		if m.UseHttpUpgrade {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x18
+	}
 	if len(m.AdditionalHeaders) > 0 {
 		for iNdEx := len(m.AdditionalHeaders) - 1; iNdEx >= 0; iNdEx-- {
 			if vtmsg, ok := interface{}(m.AdditionalHeaders[iNdEx]).(interface {
@@ -164,6 +174,9 @@ func (m *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) SizeVT(
 			}
 			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 		}
+	}
+	if m.UseHttpUpgrade {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n

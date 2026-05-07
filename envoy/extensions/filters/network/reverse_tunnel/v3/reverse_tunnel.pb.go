@@ -164,7 +164,7 @@ func (x *Validation) GetDynamicMetadataNamespace() string {
 // Configuration for the reverse tunnel network filter.
 // This filter handles reverse tunnel connection acceptance and rejection by processing
 // HTTP requests where required identification values are provided via HTTP headers.
-// [#next-free-field: 7]
+// [#next-free-field: 8]
 type ReverseTunnel struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Ping interval for health checks on established reverse tunnel connections.
@@ -194,8 +194,14 @@ type ReverseTunnel struct {
 	// via “x-envoy-reverse-tunnel-upstream-cluster-name“ header. Connections with mismatched or missing
 	// cluster names are rejected with HTTP “400 Bad Request“. When empty, no cluster name validation is performed.
 	RequiredClusterName string `protobuf:"bytes,6,opt,name=required_cluster_name,json=requiredClusterName,proto3" json:"required_cluster_name,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	// Accept the handshake as an HTTP/1.1 “Upgrade“ exchange (“Upgrade: reverse-tunnel“,
+	// reply “101“) so HTTP proxies can route the handshake and splice the tunnel
+	// afterward. Non-upgrade requests are rejected with “426“. The initiator must set this
+	// flag to the same value.
+	// Defaults to “false“.
+	UseHttpUpgrade bool `protobuf:"varint,7,opt,name=use_http_upgrade,json=useHttpUpgrade,proto3" json:"use_http_upgrade,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *ReverseTunnel) Reset() {
@@ -270,6 +276,13 @@ func (x *ReverseTunnel) GetRequiredClusterName() string {
 	return ""
 }
 
+func (x *ReverseTunnel) GetUseHttpUpgrade() bool {
+	if x != nil {
+		return x.UseHttpUpgrade
+	}
+	return false
+}
+
 var File_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto_rawDesc = "" +
@@ -281,7 +294,7 @@ const file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_pro
 	"\x11cluster_id_format\x18\x02 \x01(\tB\b\xfaB\x05r\x03\x18\x80\bR\x0fclusterIdFormat\x122\n" +
 	"\x10tenant_id_format\x18\x05 \x01(\tB\b\xfaB\x05r\x03\x18\x80\bR\x0etenantIdFormat\x122\n" +
 	"\x15emit_dynamic_metadata\x18\x03 \x01(\bR\x13emitDynamicMetadata\x12F\n" +
-	"\x1adynamic_metadata_namespace\x18\x04 \x01(\tB\b\xfaB\x05r\x03\x18\xff\x01R\x18dynamicMetadataNamespace\"\xc1\x03\n" +
+	"\x1adynamic_metadata_namespace\x18\x04 \x01(\tB\b\xfaB\x05r\x03\x18\xff\x01R\x18dynamicMetadataNamespace\"\xeb\x03\n" +
 	"\rReverseTunnel\x12Q\n" +
 	"\rping_interval\x18\x01 \x01(\v2\x19.google.protobuf.DurationB\x11\xfaB\x0e\xaa\x01\v\"\x03\b\xac\x022\x04\x10\xc0\x84=R\fpingInterval\x124\n" +
 	"\x16auto_close_connections\x18\x02 \x01(\bR\x14autoCloseConnections\x120\n" +
@@ -291,7 +304,8 @@ const file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_pro
 	"\n" +
 	"validation\x18\x05 \x01(\v2>.envoy.extensions.filters.network.reverse_tunnel.v3.ValidationR\n" +
 	"validation\x12?\n" +
-	"\x15required_cluster_name\x18\x06 \x01(\tB\v\xfaB\br\x06\x18\xff\x01\xd0\x01\x01R\x13requiredClusterNameB\xcc\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x15required_cluster_name\x18\x06 \x01(\tB\v\xfaB\br\x06\x18\xff\x01\xd0\x01\x01R\x13requiredClusterName\x12(\n" +
+	"\x10use_http_upgrade\x18\a \x01(\bR\x0euseHttpUpgradeB\xcc\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"@io.envoyproxy.envoy.extensions.filters.network.reverse_tunnel.v3B\x12ReverseTunnelProtoP\x01Zjgithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/reverse_tunnel/v3;reverse_tunnelv3b\x06proto3"
 
 var (

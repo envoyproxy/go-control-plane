@@ -236,6 +236,8 @@ func (m *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) validat
 
 	}
 
+	// no validation rules for UseHttpUpgrade
+
 	if len(errors) > 0 {
 		return DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigMultiError(errors)
 	}

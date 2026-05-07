@@ -100,8 +100,13 @@ type DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig struct {
 	RequestPath string `protobuf:"bytes,1,opt,name=request_path,json=requestPath,proto3" json:"request_path,omitempty"`
 	// Additional headers to include in the HTTP handshake request.
 	AdditionalHeaders []*v3.HeaderValueOption `protobuf:"bytes,2,rep,name=additional_headers,json=additionalHeaders,proto3" json:"additional_headers,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	// Perform the handshake as an HTTP/1.1 “Upgrade“ exchange (“Upgrade: reverse-tunnel“,
+	// success on “101“) so HTTP proxies can route the handshake and splice the tunnel
+	// afterward. The responder must set this flag to the same value.
+	// Defaults to “false“.
+	UseHttpUpgrade bool `protobuf:"varint,3,opt,name=use_http_upgrade,json=useHttpUpgrade,proto3" json:"use_http_upgrade,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) Reset() {
@@ -148,19 +153,27 @@ func (x *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) GetAddi
 	return nil
 }
 
+func (x *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) GetUseHttpUpgrade() bool {
+	if x != nil {
+		return x.UseHttpUpgrade
+	}
+	return false
+}
+
 var File_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v3_downstream_reverse_connection_socket_interface_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v3_downstream_reverse_connection_socket_interface_proto_rawDesc = "" +
 	"\n" +
-	"}envoy/extensions/bootstrap/reverse_tunnel/downstream_socket_interface/v3/downstream_reverse_connection_socket_interface.proto\x12Henvoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a\x1dudpa/annotations/status.proto\"\xc7\x03\n" +
+	"}envoy/extensions/bootstrap/reverse_tunnel/downstream_socket_interface/v3/downstream_reverse_connection_socket_interface.proto\x12Henvoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a\x1dudpa/annotations/status.proto\"\xf1\x03\n" +
 	"*DownstreamReverseConnectionSocketInterface\x12\x1f\n" +
 	"\vstat_prefix\x18\x01 \x01(\tR\n" +
 	"statPrefix\x122\n" +
 	"\x15enable_detailed_stats\x18\x02 \x01(\bR\x13enableDetailedStats\x12\xb0\x01\n" +
-	"\x0ehttp_handshake\x18\x03 \x01(\v2\x88\x01.envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfigR\rhttpHandshake\x1a\x90\x01\n" +
+	"\x0ehttp_handshake\x18\x03 \x01(\v2\x88\x01.envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfigR\rhttpHandshake\x1a\xba\x01\n" +
 	"\x13HttpHandshakeConfig\x12!\n" +
 	"\frequest_path\x18\x01 \x01(\tR\vrequestPath\x12V\n" +
-	"\x12additional_headers\x18\x02 \x03(\v2'.envoy.config.core.v3.HeaderValueOptionR\x11additionalHeadersB\xa3\x02\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x12additional_headers\x18\x02 \x03(\v2'.envoy.config.core.v3.HeaderValueOptionR\x11additionalHeaders\x12(\n" +
+	"\x10use_http_upgrade\x18\x03 \x01(\bR\x0euseHttpUpgradeB\xa3\x02\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"Vio.envoyproxy.envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3B/DownstreamReverseConnectionSocketInterfaceProtoP\x01Z\x8d\x01github.com/envoyproxy/go-control-plane/envoy/extensions/bootstrap/reverse_tunnel/downstream_socket_interface/v3;downstream_socket_interfacev3b\x06proto3"
 
 var (

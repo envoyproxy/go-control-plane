@@ -310,6 +310,8 @@ func (m *ReverseTunnel) validate(all bool) error {
 
 	}
 
+	// no validation rules for UseHttpUpgrade
+
 	if len(errors) > 0 {
 		return ReverseTunnelMultiError(errors)
 	}
