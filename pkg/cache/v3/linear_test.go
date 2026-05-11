@@ -336,10 +336,10 @@ func TestLinearSetResources(t *testing.T) {
 	require.NoError(t, err)
 	mustBlock(t, w2)
 
-	c.SetResources(map[string]types.Resource{
+	require.NoError(t, c.SetResources(map[string]types.Resource{
 		"a": testResource("a"),
 		"b": testResource("b"),
-	})
+	}))
 	resp1 := verifyResponse(t, w1, "1", 1)
 	updateFromSotwResponse(resp1, &sub1, req1)
 	resp2 := verifyResponse(t, w2, "1", 2) // the version was only incremented once for all resources
@@ -353,11 +353,11 @@ func TestLinearSetResources(t *testing.T) {
 	require.NoError(t, err)
 	mustBlock(t, w2)
 
-	c.SetResources(map[string]types.Resource{
+	require.NoError(t, c.SetResources(map[string]types.Resource{
 		"a": testResource("aa"),
 		"b": testResource("b"),
 		"c": testResource("c"),
-	})
+	}))
 	resp1 = verifyResponse(t, w1, "2", 1)
 	updateFromSotwResponse(resp1, &sub1, req1)
 	resp2 = verifyResponse(t, w2, "2", 3)
@@ -371,10 +371,10 @@ func TestLinearSetResources(t *testing.T) {
 	require.NoError(t, err)
 	mustBlock(t, w2)
 
-	c.SetResources(map[string]types.Resource{
+	require.NoError(t, c.SetResources(map[string]types.Resource{
 		"b": testResource("b"),
 		"c": testResource("c"),
-	})
+	}))
 	mustBlock(t, w1) // removing a resource from the set does not trigger the watch for non full state resources
 	verifyResponse(t, w2, "3", 2)
 }
@@ -387,7 +387,7 @@ func TestLinearGetResources(t *testing.T) {
 		"b": testResource("b"),
 	}
 
-	c.SetResources(expectedResources)
+	require.NoError(t, c.SetResources(expectedResources))
 
 	resources := c.GetResources()
 
@@ -778,7 +778,7 @@ func TestLinearDeltaResourceDelete(t *testing.T) {
 		{Priority: 10},
 	}}
 	hashA = hashResource(t, a)
-	c.SetResources(map[string]types.Resource{"a": a})
+	require.NoError(t, c.SetResources(map[string]types.Resource{"a": a}))
 	verifyDeltaResponse(t, w, []resourceInfo{{"a", hashA}}, []string{"b"})
 }
 
