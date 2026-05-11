@@ -565,6 +565,10 @@ func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, sub Subscripti
 	return cache.trackWatch(watch), nil
 }
 
+func (cache *LinearCache) GetVersion() uint64 {
+	return cache.version
+}
+
 func (cache *LinearCache) nextWatchID() uint64 {
 	cache.currentWatchID++
 	if cache.currentWatchID == 0 {

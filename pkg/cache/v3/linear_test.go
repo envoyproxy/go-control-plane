@@ -394,6 +394,26 @@ func TestLinearGetResources(t *testing.T) {
 	assert.Truef(t, reflect.DeepEqual(expectedResources, resources), "resources are not equal. got: %v want: %v", resources, expectedResources)
 }
 
+func TestLinearGetVersion(t *testing.T) {
+	c := NewLinearCache(testType)
+	assert.Equal(t, uint64(0), c.GetVersion())
+
+	require.NoError(t, c.UpdateResource("a", testResource("a")))
+	assert.Equal(t, uint64(1), c.GetVersion())
+
+	require.NoError(t, c.UpdateResource("b", testResource("b")))
+	assert.Equal(t, uint64(2), c.GetVersion())
+
+	require.NoError(t, c.DeleteResource("a"))
+	assert.Equal(t, uint64(3), c.GetVersion())
+
+	require.NoError(t, c.UpdateResources(map[string]types.Resource{"c": testResource("c")}, []string{"b"}))
+	assert.Equal(t, uint64(4), c.GetVersion())
+
+	c.SetResources(map[string]types.Resource{"d": testResource("d")})
+	assert.Equal(t, uint64(5), c.GetVersion())
+}
+
 func TestLinearVersionPrefix(t *testing.T) {
 	c := NewLinearCache(testType, WithVersionPrefix("instance1-"))
 
