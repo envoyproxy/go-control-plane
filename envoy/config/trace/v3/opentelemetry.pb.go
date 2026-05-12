@@ -28,7 +28,7 @@ const (
 //
 //	[#extension: envoy.tracers.opentelemetry]
 //
-// [#next-free-field: 8]
+// [#next-free-field: 9]
 type OpenTelemetryConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The upstream gRPC cluster that will receive OTLP traces.
@@ -72,8 +72,11 @@ type OpenTelemetryConfig struct {
 	//
 	// If not specified, the default is to set these attributes.
 	SetTelemetrySdkResourceAttributes *wrapperspb.BoolValue `protobuf:"bytes,7,opt,name=set_telemetry_sdk_resource_attributes,json=setTelemetrySdkResourceAttributes,proto3" json:"set_telemetry_sdk_resource_attributes,omitempty"`
-	unknownFields                     protoimpl.UnknownFields
-	sizeCache                         protoimpl.SizeCache
+	// Specifies whether to set the “service.name“ resource attribute.
+	// If not specified, the default is to set this attribute.
+	SetServiceNameResourceAttribute *wrapperspb.BoolValue `protobuf:"bytes,8,opt,name=set_service_name_resource_attribute,json=setServiceNameResourceAttribute,proto3" json:"set_service_name_resource_attribute,omitempty"`
+	unknownFields                   protoimpl.UnknownFields
+	sizeCache                       protoimpl.SizeCache
 }
 
 func (x *OpenTelemetryConfig) Reset() {
@@ -155,11 +158,18 @@ func (x *OpenTelemetryConfig) GetSetTelemetrySdkResourceAttributes() *wrapperspb
 	return nil
 }
 
+func (x *OpenTelemetryConfig) GetSetServiceNameResourceAttribute() *wrapperspb.BoolValue {
+	if x != nil {
+		return x.SetServiceNameResourceAttribute
+	}
+	return nil
+}
+
 var File_envoy_config_trace_v3_opentelemetry_proto protoreflect.FileDescriptor
 
 const file_envoy_config_trace_v3_opentelemetry_proto_rawDesc = "" +
 	"\n" +
-	")envoy/config/trace/v3/opentelemetry.proto\x12\x15envoy.config.trace.v3\x1a$envoy/config/core/v3/extension.proto\x1a'envoy/config/core/v3/grpc_service.proto\x1a'envoy/config/core/v3/http_service.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1eudpa/annotations/migrate.proto\x1a\x1dudpa/annotations/status.proto\"\xc5\x04\n" +
+	")envoy/config/trace/v3/opentelemetry.proto\x12\x15envoy.config.trace.v3\x1a$envoy/config/core/v3/extension.proto\x1a'envoy/config/core/v3/grpc_service.proto\x1a'envoy/config/core/v3/http_service.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1eudpa/annotations/migrate.proto\x1a\x1dudpa/annotations/status.proto\"\xaf\x05\n" +
 	"\x13OpenTelemetryConfig\x12[\n" +
 	"\fgrpc_service\x18\x01 \x01(\v2!.envoy.config.core.v3.GrpcServiceB\x15\xf2\x98\xfe\x8f\x05\x0f\x12\rotlp_exporterR\vgrpcService\x12[\n" +
 	"\fhttp_service\x18\x03 \x01(\v2!.envoy.config.core.v3.HttpServiceB\x15\xf2\x98\xfe\x8f\x05\x0f\x12\rotlp_exporterR\vhttpService\x12!\n" +
@@ -167,7 +177,8 @@ const file_envoy_config_trace_v3_opentelemetry_proto_rawDesc = "" +
 	"\x12resource_detectors\x18\x04 \x03(\v2*.envoy.config.core.v3.TypedExtensionConfigR\x11resourceDetectors\x12D\n" +
 	"\asampler\x18\x05 \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigR\asampler\x12B\n" +
 	"\x0emax_cache_size\x18\x06 \x01(\v2\x1c.google.protobuf.UInt32ValueR\fmaxCacheSize\x12l\n" +
-	"%set_telemetry_sdk_resource_attributes\x18\a \x01(\v2\x1a.google.protobuf.BoolValueR!setTelemetrySdkResourceAttributesB\x89\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"%set_telemetry_sdk_resource_attributes\x18\a \x01(\v2\x1a.google.protobuf.BoolValueR!setTelemetrySdkResourceAttributes\x12h\n" +
+	"#set_service_name_resource_attribute\x18\b \x01(\v2\x1a.google.protobuf.BoolValueR\x1fsetServiceNameResourceAttributeB\x89\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"#io.envoyproxy.envoy.config.trace.v3B\x12OpentelemetryProtoP\x01ZDgithub.com/envoyproxy/go-control-plane/envoy/config/trace/v3;tracev3b\x06proto3"
 
 var (
@@ -198,11 +209,12 @@ var file_envoy_config_trace_v3_opentelemetry_proto_depIdxs = []int32{
 	3, // 3: envoy.config.trace.v3.OpenTelemetryConfig.sampler:type_name -> envoy.config.core.v3.TypedExtensionConfig
 	4, // 4: envoy.config.trace.v3.OpenTelemetryConfig.max_cache_size:type_name -> google.protobuf.UInt32Value
 	5, // 5: envoy.config.trace.v3.OpenTelemetryConfig.set_telemetry_sdk_resource_attributes:type_name -> google.protobuf.BoolValue
-	6, // [6:6] is the sub-list for method output_type
-	6, // [6:6] is the sub-list for method input_type
-	6, // [6:6] is the sub-list for extension type_name
-	6, // [6:6] is the sub-list for extension extendee
-	0, // [0:6] is the sub-list for field type_name
+	5, // 6: envoy.config.trace.v3.OpenTelemetryConfig.set_service_name_resource_attribute:type_name -> google.protobuf.BoolValue
+	7, // [7:7] is the sub-list for method output_type
+	7, // [7:7] is the sub-list for method input_type
+	7, // [7:7] is the sub-list for extension type_name
+	7, // [7:7] is the sub-list for extension extendee
+	0, // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_envoy_config_trace_v3_opentelemetry_proto_init() }
