@@ -2690,7 +2690,7 @@ func (*RouteAction_HostRewritePathRegex) isRouteAction_HostRewriteSpecifier() {}
 func (*RouteAction_HostRewrite) isRouteAction_HostRewriteSpecifier() {}
 
 // HTTP retry :ref:`architecture overview <arch_overview_http_routing_retry>`.
-// [#next-free-field: 14]
+// [#next-free-field: 15]
 type RetryPolicy struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Specifies the conditions under which retry takes place. These are the same
@@ -2772,8 +2772,20 @@ type RetryPolicy struct {
 	RetriableHeaders []*HeaderMatcher `protobuf:"bytes,9,rep,name=retriable_headers,json=retriableHeaders,proto3" json:"retriable_headers,omitempty"`
 	// HTTP headers which must be present in the request for retries to be attempted.
 	RetriableRequestHeaders []*HeaderMatcher `protobuf:"bytes,10,rep,name=retriable_request_headers,json=retriableRequestHeaders,proto3" json:"retriable_request_headers,omitempty"`
-	unknownFields           protoimpl.UnknownFields
-	sizeCache               protoimpl.SizeCache
+	// By default, the target upstream cluster of a retry request is the same as the original request,
+	// and Envoy will not try to refresh it when retrying.
+	// If this field is set to true, Envoy will try to refresh the target upstream cluster when
+	// retrying a request. This is useful when users want to try different upstream cluster for
+	// each retry attempt.
+	//
+	// .. note::
+	//
+	//	This currently works when the route cluster specifier support the dynamic refresh,
+	//	e.g. :ref:`matcher cluster specifier
+	//	<envoy_v3_api_msg_extensions.router.cluster_specifiers.matcher.v3.MatcherClusterSpecifier>`.
+	RefreshClusterOnRetry bool `protobuf:"varint,14,opt,name=refresh_cluster_on_retry,json=refreshClusterOnRetry,proto3" json:"refresh_cluster_on_retry,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *RetryPolicy) Reset() {
@@ -2895,6 +2907,13 @@ func (x *RetryPolicy) GetRetriableRequestHeaders() []*HeaderMatcher {
 		return x.RetriableRequestHeaders
 	}
 	return nil
+}
+
+func (x *RetryPolicy) GetRefreshClusterOnRetry() bool {
+	if x != nil {
+		return x.RefreshClusterOnRetry
+	}
+	return false
 }
 
 // HTTP request hedging :ref:`architecture overview <arch_overview_http_routing_hedging>`.
@@ -7774,7 +7793,7 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\x1eenvoy.api.v2.route.RouteActionB\x18\n" +
 	"\x11cluster_specifier\x12\x03\xf8B\x01B\x18\n" +
 	"\x16host_rewrite_specifierJ\x04\b\f\x10\rJ\x04\b\x12\x10\x13J\x04\b\x13\x10\x14J\x04\b\x10\x10\x11J\x04\b\x16\x10\x17J\x04\b\x15\x10\x16J\x04\b\n" +
-	"\x10\vR\x15request_mirror_policy\"\xbf\x10\n" +
+	"\x10\vR\x15request_mirror_policy\"\xf8\x10\n" +
 	"\vRetryPolicy\x12\x19\n" +
 	"\bretry_on\x18\x01 \x01(\tR\aretryOn\x12R\n" +
 	"\vnum_retries\x18\x02 \x01(\v2\x1c.google.protobuf.UInt32ValueB\x13\xf2\x98\xfe\x8f\x05\r\n" +
@@ -7791,7 +7810,8 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\x1brate_limited_retry_back_off\x18\v \x01(\v2:.envoy.config.route.v3.RetryPolicy.RateLimitedRetryBackOffR\x17rateLimitedRetryBackOff\x12Q\n" +
 	"\x11retriable_headers\x18\t \x03(\v2$.envoy.config.route.v3.HeaderMatcherR\x10retriableHeaders\x12`\n" +
 	"\x19retriable_request_headers\x18\n" +
-	" \x03(\v2$.envoy.config.route.v3.HeaderMatcherR\x17retriableRequestHeaders\x1a\xb9\x01\n" +
+	" \x03(\v2$.envoy.config.route.v3.HeaderMatcherR\x17retriableRequestHeaders\x127\n" +
+	"\x18refresh_cluster_on_retry\x18\x0e \x01(\bR\x15refreshClusterOnRetry\x1a\xb9\x01\n" +
 	"\rRetryPriority\x12\x1b\n" +
 	"\x04name\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x04name\x129\n" +
 	"\ftyped_config\x18\x03 \x01(\v2\x14.google.protobuf.AnyH\x00R\vtypedConfig:3\x9aň\x1e.\n" +

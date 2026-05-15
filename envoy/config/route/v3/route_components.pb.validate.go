@@ -4437,6 +4437,8 @@ func (m *RetryPolicy) validate(all bool) error {
 
 	}
 
+	// no validation rules for RefreshClusterOnRetry
+
 	if len(errors) > 0 {
 		return RetryPolicyMultiError(errors)
 	}
