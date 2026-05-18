@@ -49,6 +49,11 @@ func (m *McpJsonRestBridge) MarshalToSizedBufferVTStrict(dAtA []byte) (int, erro
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.RequestStorageMode != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.RequestStorageMode))
+		i--
+		dAtA[i] = 0x28
+	}
 	if m.MaxResponseBodySize != nil {
 		size, err := (*wrapperspb.UInt32Value)(m.MaxResponseBodySize).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -362,6 +367,9 @@ func (m *McpJsonRestBridge) SizeVT() (n int) {
 	if m.MaxResponseBodySize != nil {
 		l = (*wrapperspb.UInt32Value)(m.MaxResponseBodySize).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.RequestStorageMode != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.RequestStorageMode))
 	}
 	n += len(m.unknownFields)
 	return n

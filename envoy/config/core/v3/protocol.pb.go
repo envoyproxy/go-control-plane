@@ -769,8 +769,8 @@ type Http1ProtocolOptions struct {
 	// Envoy does not otherwise support HTTP/1.0 without a Host header.
 	// This is a no-op if “accept_http_10“ is not true.
 	DefaultHostForHttp_10 string `protobuf:"bytes,3,opt,name=default_host_for_http_10,json=defaultHostForHttp10,proto3" json:"default_host_for_http_10,omitempty"`
-	// Describes how the keys for response headers should be formatted. By default, all header keys
-	// are lower cased.
+	// Describes how the keys for headers encoded by the HTTP/1 codec should be formatted. By
+	// default, all header keys are lower cased.
 	HeaderKeyFormat *Http1ProtocolOptions_HeaderKeyFormat `protobuf:"bytes,4,opt,name=header_key_format,json=headerKeyFormat,proto3" json:"header_key_format,omitempty"`
 	// Enables trailers for HTTP/1. By default the HTTP/1 codec drops proxied trailers.
 	//

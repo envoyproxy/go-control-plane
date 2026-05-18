@@ -174,6 +174,17 @@ func (m *McpJsonRestBridge) validate(all bool) error {
 		}
 	}
 
+	if _, ok := McpJsonRestBridge_RequestStorageMode_name[int32(m.GetRequestStorageMode())]; !ok {
+		err := McpJsonRestBridgeValidationError{
+			field:  "RequestStorageMode",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if len(errors) > 0 {
 		return McpJsonRestBridgeMultiError(errors)
 	}
