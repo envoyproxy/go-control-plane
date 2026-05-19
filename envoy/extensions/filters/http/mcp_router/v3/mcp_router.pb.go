@@ -338,8 +338,14 @@ type McpRouter struct {
 	// If set, extracts a request "subject" and binds it into the MCP session.
 	// If not set, sessions are created without identity binding.
 	SessionIdentity *SessionIdentity `protobuf:"bytes,2,opt,name=session_identity,json=sessionIdentity,proto3" json:"session_identity,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// If true, backend initialization is deferred until the first request that targets each backend.
+	// The “initialize“ response is returned immediately with gateway capabilities and an empty
+	// backend session map. Each backend is initialized on-demand when a request first routes to it.
+	// This avoids blocking the client “initialize“ on slow or misbehaving backends.
+	// Default is false (eager initialization of all backends during “initialize“).
+	LazyInitialization bool `protobuf:"varint,3,opt,name=lazy_initialization,json=lazyInitialization,proto3" json:"lazy_initialization,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *McpRouter) Reset() {
@@ -384,6 +390,13 @@ func (x *McpRouter) GetSessionIdentity() *SessionIdentity {
 		return x.SessionIdentity
 	}
 	return nil
+}
+
+func (x *McpRouter) GetLazyInitialization() bool {
+	if x != nil {
+		return x.LazyInitialization
+	}
+	return false
 }
 
 // Specification of the MCP server.
@@ -543,10 +556,11 @@ const file_envoy_extensions_filters_http_mcp_router_v3_mcp_router_proto_rawDesc 
 	"\bidentity\x18\x01 \x01(\v2>.envoy.extensions.filters.http.mcp_router.v3.IdentityExtractorB\b\xfaB\x05\x8a\x01\x02\x10\x01R\bidentity\x12]\n" +
 	"\n" +
 	"validation\x18\x02 \x01(\v2=.envoy.extensions.filters.http.mcp_router.v3.ValidationPolicyR\n" +
-	"validation\"\x85\x04\n" +
+	"validation\"\xb6\x04\n" +
 	"\tMcpRouter\x12[\n" +
 	"\aservers\x18\x01 \x03(\v2A.envoy.extensions.filters.http.mcp_router.v3.McpRouter.McpBackendR\aservers\x12g\n" +
-	"\x10session_identity\x18\x02 \x01(\v2<.envoy.extensions.filters.http.mcp_router.v3.SessionIdentityR\x0fsessionIdentity\x1a\x84\x01\n" +
+	"\x10session_identity\x18\x02 \x01(\v2<.envoy.extensions.filters.http.mcp_router.v3.SessionIdentityR\x0fsessionIdentity\x12/\n" +
+	"\x13lazy_initialization\x18\x03 \x01(\bR\x12lazyInitialization\x1a\x84\x01\n" +
 	"\n" +
 	"McpBackend\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12b\n" +

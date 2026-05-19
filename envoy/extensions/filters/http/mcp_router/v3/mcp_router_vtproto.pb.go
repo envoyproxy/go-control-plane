@@ -403,6 +403,16 @@ func (m *McpRouter) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.LazyInitialization {
+		i--
+		if m.LazyInitialization {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x18
+	}
 	if m.SessionIdentity != nil {
 		size, err := m.SessionIdentity.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -570,6 +580,9 @@ func (m *McpRouter) SizeVT() (n int) {
 	if m.SessionIdentity != nil {
 		l = m.SessionIdentity.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.LazyInitialization {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n

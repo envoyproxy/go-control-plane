@@ -826,6 +826,8 @@ func (m *McpRouter) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for LazyInitialization
+
 	if len(errors) > 0 {
 		return McpRouterMultiError(errors)
 	}
