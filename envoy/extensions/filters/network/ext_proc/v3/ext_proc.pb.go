@@ -251,8 +251,16 @@ type MetadataOptions struct {
 	// Describes which typed or untyped dynamic metadata namespaces to forward to
 	// the external processing server.
 	ForwardingNamespaces *MetadataOptions_MetadataNamespaces `protobuf:"bytes,1,opt,name=forwarding_namespaces,json=forwardingNamespaces,proto3" json:"forwarding_namespaces,omitempty"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
+	// Describes which typed or untyped dynamic metadata namespaces to receive
+	// from the external processing server.
+	// Since the server returns untyped dynamic metadata, this configuration acts
+	// as a allowlist. Only metadata namespaces explicitly listed here will be
+	// ingested by Envoy from the server's response.
+	// Receiving of typed metadata is not supported.
+	// Set to empty or leave unset to disallow writing any received dynamic metadata.
+	ReceivingNamespaces *MetadataOptions_MetadataNamespaces `protobuf:"bytes,2,opt,name=receiving_namespaces,json=receivingNamespaces,proto3" json:"receiving_namespaces,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *MetadataOptions) Reset() {
@@ -288,6 +296,13 @@ func (*MetadataOptions) Descriptor() ([]byte, []int) {
 func (x *MetadataOptions) GetForwardingNamespaces() *MetadataOptions_MetadataNamespaces {
 	if x != nil {
 		return x.ForwardingNamespaces
+	}
+	return nil
+}
+
+func (x *MetadataOptions) GetReceivingNamespaces() *MetadataOptions_MetadataNamespaces {
+	if x != nil {
+		return x.ReceivingNamespaces
 	}
 	return nil
 }
@@ -369,9 +384,10 @@ const file_envoy_extensions_filters_network_ext_proc_v3_ext_proc_proto_rawDesc =
 	"\rprocess_write\x18\x02 \x01(\x0e2I.envoy.extensions.filters.network.ext_proc.v3.ProcessingMode.DataSendModeR\fprocessWrite\"&\n" +
 	"\fDataSendMode\x12\f\n" +
 	"\bSTREAMED\x10\x00\x12\b\n" +
-	"\x04SKIP\x10\x01\"\xdf\x01\n" +
+	"\x04SKIP\x10\x01\"\xe5\x02\n" +
 	"\x0fMetadataOptions\x12\x85\x01\n" +
-	"\x15forwarding_namespaces\x18\x01 \x01(\v2P.envoy.extensions.filters.network.ext_proc.v3.MetadataOptions.MetadataNamespacesR\x14forwardingNamespaces\x1aD\n" +
+	"\x15forwarding_namespaces\x18\x01 \x01(\v2P.envoy.extensions.filters.network.ext_proc.v3.MetadataOptions.MetadataNamespacesR\x14forwardingNamespaces\x12\x83\x01\n" +
+	"\x14receiving_namespaces\x18\x02 \x01(\v2P.envoy.extensions.filters.network.ext_proc.v3.MetadataOptions.MetadataNamespacesR\x13receivingNamespaces\x1aD\n" +
 	"\x12MetadataNamespaces\x12\x18\n" +
 	"\auntyped\x18\x01 \x03(\tR\auntyped\x12\x14\n" +
 	"\x05typed\x18\x02 \x03(\tR\x05typedB\xbc\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
@@ -408,11 +424,12 @@ var file_envoy_extensions_filters_network_ext_proc_v3_ext_proc_proto_depIdxs = [
 	0, // 4: envoy.extensions.filters.network.ext_proc.v3.ProcessingMode.process_read:type_name -> envoy.extensions.filters.network.ext_proc.v3.ProcessingMode.DataSendMode
 	0, // 5: envoy.extensions.filters.network.ext_proc.v3.ProcessingMode.process_write:type_name -> envoy.extensions.filters.network.ext_proc.v3.ProcessingMode.DataSendMode
 	4, // 6: envoy.extensions.filters.network.ext_proc.v3.MetadataOptions.forwarding_namespaces:type_name -> envoy.extensions.filters.network.ext_proc.v3.MetadataOptions.MetadataNamespaces
-	7, // [7:7] is the sub-list for method output_type
-	7, // [7:7] is the sub-list for method input_type
-	7, // [7:7] is the sub-list for extension type_name
-	7, // [7:7] is the sub-list for extension extendee
-	0, // [0:7] is the sub-list for field type_name
+	4, // 7: envoy.extensions.filters.network.ext_proc.v3.MetadataOptions.receiving_namespaces:type_name -> envoy.extensions.filters.network.ext_proc.v3.MetadataOptions.MetadataNamespaces
+	8, // [8:8] is the sub-list for method output_type
+	8, // [8:8] is the sub-list for method input_type
+	8, // [8:8] is the sub-list for extension type_name
+	8, // [8:8] is the sub-list for extension extendee
+	0, // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_network_ext_proc_v3_ext_proc_proto_init() }
