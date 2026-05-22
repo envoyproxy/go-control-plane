@@ -274,7 +274,7 @@ func (x *ProcessingRequest) GetMetadata() *v3.Metadata {
 // ProcessingResponse contains the response from the external processing server to Envoy.
 // Each response corresponds to a ProcessingRequest and indicates how the network
 // traffic should be handled.
-// [#next-free-field: 6]
+// [#next-free-field: 7]
 type ProcessingResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The processed ReadData containing potentially modified data for the request path.
@@ -301,8 +301,25 @@ type ProcessingResponse struct {
 	// The metadata is not automatically propagated from request to response.
 	// The external processor must include any needed metadata in its response.
 	DynamicMetadata *structpb.Struct `protobuf:"bytes,5,opt,name=dynamic_metadata,json=dynamicMetadata,proto3" json:"dynamic_metadata,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// If set to true, Envoy will close the gRPC stream to the external processor
+	// after applying this response. Subsequent data will bypass the ext_proc filter
+	// as if it were configured in SKIP mode.
+	//
+	// .. note::
+	//
+	//	This should only be used when there is a strong protocol guarantee
+	//	that no additional data chunks are in-flight on the wire. Because Envoy
+	//	immediately drains its local buffer when forwarding bytes to the external
+	//	processor, if Envoy has already dispatched subsequent data chunks before this
+	//	stream is closed, those in-flight bytes will be permanently lost and not
+	//	injected back into the filter chain.
+	//
+	// This feature is primarily designed for tightly-coupled synchronous protocols,
+	// such as reading the ClientHello during a TLS handshake, where the sender
+	// naturally halts transmission while awaiting the receiver's response.
+	CloseStreamToExtProcServer bool `protobuf:"varint,6,opt,name=close_stream_to_ext_proc_server,json=closeStreamToExtProcServer,proto3" json:"close_stream_to_ext_proc_server,omitempty"`
+	unknownFields              protoimpl.UnknownFields
+	sizeCache                  protoimpl.SizeCache
 }
 
 func (x *ProcessingResponse) Reset() {
@@ -370,6 +387,13 @@ func (x *ProcessingResponse) GetDynamicMetadata() *structpb.Struct {
 	return nil
 }
 
+func (x *ProcessingResponse) GetCloseStreamToExtProcServer() bool {
+	if x != nil {
+		return x.CloseStreamToExtProcServer
+	}
+	return false
+}
+
 var File_envoy_service_network_ext_proc_v3_network_external_processor_proto protoreflect.FileDescriptor
 
 const file_envoy_service_network_ext_proc_v3_network_external_processor_proto_rawDesc = "" +
@@ -382,14 +406,15 @@ const file_envoy_service_network_ext_proc_v3_network_external_processor_proto_ra
 	"\tread_data\x18\x01 \x01(\v2'.envoy.service.network_ext_proc.v3.DataR\breadData\x12F\n" +
 	"\n" +
 	"write_data\x18\x02 \x01(\v2'.envoy.service.network_ext_proc.v3.DataR\twriteData\x12:\n" +
-	"\bmetadata\x18\x03 \x01(\v2\x1e.envoy.config.core.v3.MetadataR\bmetadata\"\xda\x04\n" +
+	"\bmetadata\x18\x03 \x01(\v2\x1e.envoy.config.core.v3.MetadataR\bmetadata\"\x9f\x05\n" +
 	"\x12ProcessingResponse\x12D\n" +
 	"\tread_data\x18\x01 \x01(\v2'.envoy.service.network_ext_proc.v3.DataR\breadData\x12F\n" +
 	"\n" +
 	"write_data\x18\x02 \x01(\v2'.envoy.service.network_ext_proc.v3.DataR\twriteData\x12\x7f\n" +
 	"\x16data_processing_status\x18\x03 \x01(\x0e2I.envoy.service.network_ext_proc.v3.ProcessingResponse.DataProcessedStatusR\x14dataProcessingStatus\x12s\n" +
 	"\x11connection_status\x18\x04 \x01(\x0e2F.envoy.service.network_ext_proc.v3.ProcessingResponse.ConnectionStatusR\x10connectionStatus\x12B\n" +
-	"\x10dynamic_metadata\x18\x05 \x01(\v2\x17.google.protobuf.StructR\x0fdynamicMetadata\"@\n" +
+	"\x10dynamic_metadata\x18\x05 \x01(\v2\x17.google.protobuf.StructR\x0fdynamicMetadata\x12C\n" +
+	"\x1fclose_stream_to_ext_proc_server\x18\x06 \x01(\bR\x1acloseStreamToExtProcServer\"@\n" +
 	"\x13DataProcessedStatus\x12\v\n" +
 	"\aUNKNOWN\x10\x00\x12\x0e\n" +
 	"\n" +

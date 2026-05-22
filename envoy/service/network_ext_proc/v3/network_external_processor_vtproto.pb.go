@@ -175,6 +175,16 @@ func (m *ProcessingResponse) MarshalToSizedBufferVTStrict(dAtA []byte) (int, err
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.CloseStreamToExtProcServer {
+		i--
+		if m.CloseStreamToExtProcServer {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x30
+	}
 	if m.DynamicMetadata != nil {
 		size, err := (*structpb.Struct)(m.DynamicMetadata).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -286,6 +296,9 @@ func (m *ProcessingResponse) SizeVT() (n int) {
 	if m.DynamicMetadata != nil {
 		l = (*structpb.Struct)(m.DynamicMetadata).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.CloseStreamToExtProcServer {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n

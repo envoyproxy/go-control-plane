@@ -440,6 +440,8 @@ func (m *ProcessingResponse) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for CloseStreamToExtProcServer
+
 	if len(errors) > 0 {
 		return ProcessingResponseMultiError(errors)
 	}
