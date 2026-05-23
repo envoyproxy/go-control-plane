@@ -182,6 +182,13 @@ func (m *Endpoint) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.ObservabilityName) > 0 {
+		i -= len(m.ObservabilityName)
+		copy(dAtA[i:], m.ObservabilityName)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.ObservabilityName)))
+		i--
+		dAtA[i] = 0x2a
+	}
 	if len(m.AdditionalAddresses) > 0 {
 		for iNdEx := len(m.AdditionalAddresses) - 1; iNdEx >= 0; iNdEx-- {
 			size, err := m.AdditionalAddresses[iNdEx].MarshalToSizedBufferVTStrict(dAtA[:i])
@@ -772,6 +779,10 @@ func (m *Endpoint) SizeVT() (n int) {
 			l = e.SizeVT()
 			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 		}
+	}
+	l = len(m.ObservabilityName)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n

@@ -28,6 +28,7 @@ const (
 )
 
 // Upstream host identifier.
+// [#next-free-field: 6]
 type Endpoint struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The upstream host address.
@@ -59,8 +60,21 @@ type Endpoint struct {
 	// sorted by preference order of the addresses. This will only be supported
 	// for STATIC and EDS clusters.
 	AdditionalAddresses []*Endpoint_AdditionalAddress `protobuf:"bytes,4,rep,name=additional_addresses,json=additionalAddresses,proto3" json:"additional_addresses,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	// Optional alternative stat name for this endpoint. If not specified, the main address will be used
+	// as the stat name and be extracted as “envoy.endpoint_address“ tag value in generated stats.
+	// If specified, the “observability_name“ here will be used to replace the main address.
+	//
+	// .. note::
+	//
+	//	This field is ignored for logical DNS host implementation..
+	//
+	// This is useful when there are duplicate addresses in the cluster, for example when multiple
+	// endpoints share the same address but have different hostnames or metadata.
+	// In this case, the observability name can be used to differentiate between these endpoints in
+	// stats and logs.
+	ObservabilityName string `protobuf:"bytes,5,opt,name=observability_name,json=observabilityName,proto3" json:"observability_name,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *Endpoint) Reset() {
@@ -119,6 +133,13 @@ func (x *Endpoint) GetAdditionalAddresses() []*Endpoint_AdditionalAddress {
 		return x.AdditionalAddresses
 	}
 	return nil
+}
+
+func (x *Endpoint) GetObservabilityName() string {
+	if x != nil {
+		return x.ObservabilityName
+	}
+	return ""
 }
 
 // An Endpoint that Envoy can route traffic to.
@@ -712,12 +733,13 @@ var File_envoy_config_endpoint_v3_endpoint_components_proto protoreflect.FileDes
 
 const file_envoy_config_endpoint_v3_endpoint_components_proto_rawDesc = "" +
 	"\n" +
-	"2envoy/config/endpoint/v3/endpoint_components.proto\x12\x18envoy.config.endpoint.v3\x1a\"envoy/config/core/v3/address.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a'envoy/config/core/v3/health_check.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\"xds/core/v3/collection_entry.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xb0\x05\n" +
+	"2envoy/config/endpoint/v3/endpoint_components.proto\x12\x18envoy.config.endpoint.v3\x1a\"envoy/config/core/v3/address.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a'envoy/config/core/v3/health_check.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\"xds/core/v3/collection_entry.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xdf\x05\n" +
 	"\bEndpoint\x127\n" +
 	"\aaddress\x18\x01 \x01(\v2\x1d.envoy.config.core.v3.AddressR\aaddress\x12d\n" +
 	"\x13health_check_config\x18\x02 \x01(\v24.envoy.config.endpoint.v3.Endpoint.HealthCheckConfigR\x11healthCheckConfig\x12\x1a\n" +
 	"\bhostname\x18\x03 \x01(\tR\bhostname\x12g\n" +
-	"\x14additional_addresses\x18\x04 \x03(\v24.envoy.config.endpoint.v3.Endpoint.AdditionalAddressR\x13additionalAddresses\x1a\x8a\x02\n" +
+	"\x14additional_addresses\x18\x04 \x03(\v24.envoy.config.endpoint.v3.Endpoint.AdditionalAddressR\x13additionalAddresses\x12-\n" +
+	"\x12observability_name\x18\x05 \x01(\tR\x11observabilityName\x1a\x8a\x02\n" +
 	"\x11HealthCheckConfig\x12(\n" +
 	"\n" +
 	"port_value\x18\x01 \x01(\rB\t\xfaB\x06*\x04\x18\xff\xff\x03R\tportValue\x12\x1a\n" +
