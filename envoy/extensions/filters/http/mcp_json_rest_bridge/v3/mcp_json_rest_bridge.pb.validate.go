@@ -395,6 +395,106 @@ var _ interface {
 	ErrorName() string
 } = ServerInfoValidationError{}
 
+// Validate checks the field values on ToolsListLocal with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ToolsListLocal) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ToolsListLocal with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ToolsListLocalMultiError,
+// or nil if none found.
+func (m *ToolsListLocal) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ToolsListLocal) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return ToolsListLocalMultiError(errors)
+	}
+
+	return nil
+}
+
+// ToolsListLocalMultiError is an error wrapping multiple validation errors
+// returned by ToolsListLocal.ValidateAll() if the designated constraints
+// aren't met.
+type ToolsListLocalMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ToolsListLocalMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ToolsListLocalMultiError) AllErrors() []error { return m }
+
+// ToolsListLocalValidationError is the validation error returned by
+// ToolsListLocal.Validate if the designated constraints aren't met.
+type ToolsListLocalValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ToolsListLocalValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ToolsListLocalValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ToolsListLocalValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ToolsListLocalValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ToolsListLocalValidationError) ErrorName() string { return "ToolsListLocalValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ToolsListLocalValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sToolsListLocal.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ToolsListLocalValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ToolsListLocalValidationError{}
+
 // Validate checks the field values on ServerToolConfig with the rules defined
 // in the proto definition for this message. If any rules are violated, the
 // first error encountered is returned, or nil if there are no violations.
@@ -453,33 +553,91 @@ func (m *ServerToolConfig) validate(all bool) error {
 
 	// no validation rules for ListChanged
 
-	if all {
-		switch v := interface{}(m.GetToolListHttpRule()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, ServerToolConfigValidationError{
-					field:  "ToolListHttpRule",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
+	switch v := m.ToolListConfig.(type) {
+	case *ServerToolConfig_ToolListHttpRule:
+		if v == nil {
+			err := ServerToolConfigValidationError{
+				field:  "ToolListConfig",
+				reason: "oneof value cannot be a typed-nil",
 			}
-		case interface{ Validate() error }:
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetToolListHttpRule()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerToolConfigValidationError{
+						field:  "ToolListHttpRule",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerToolConfigValidationError{
+						field:  "ToolListHttpRule",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetToolListHttpRule()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				errors = append(errors, ServerToolConfigValidationError{
+				return ServerToolConfigValidationError{
 					field:  "ToolListHttpRule",
 					reason: "embedded message failed validation",
 					cause:  err,
-				})
+				}
 			}
 		}
-	} else if v, ok := interface{}(m.GetToolListHttpRule()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return ServerToolConfigValidationError{
-				field:  "ToolListHttpRule",
-				reason: "embedded message failed validation",
-				cause:  err,
+
+	case *ServerToolConfig_ToolListLocal:
+		if v == nil {
+			err := ServerToolConfigValidationError{
+				field:  "ToolListConfig",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetToolListLocal()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ServerToolConfigValidationError{
+						field:  "ToolListLocal",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ServerToolConfigValidationError{
+						field:  "ToolListLocal",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetToolListLocal()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ServerToolConfigValidationError{
+					field:  "ToolListLocal",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
+
+	default:
+		_ = v // ensures v is used
 	}
 
 	if len(errors) > 0 {
@@ -560,6 +718,123 @@ var _ interface {
 	ErrorName() string
 } = ServerToolConfigValidationError{}
 
+// Validate checks the field values on ToolsListSpecificConfig with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ToolsListSpecificConfig) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ToolsListSpecificConfig with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ToolsListSpecificConfigMultiError, or nil if none found.
+func (m *ToolsListSpecificConfig) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ToolsListSpecificConfig) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Title
+
+	if utf8.RuneCountInString(m.GetDescription()) < 1 {
+		err := ToolsListSpecificConfigValidationError{
+			field:  "Description",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	// no validation rules for InputSchema
+
+	if len(errors) > 0 {
+		return ToolsListSpecificConfigMultiError(errors)
+	}
+
+	return nil
+}
+
+// ToolsListSpecificConfigMultiError is an error wrapping multiple validation
+// errors returned by ToolsListSpecificConfig.ValidateAll() if the designated
+// constraints aren't met.
+type ToolsListSpecificConfigMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ToolsListSpecificConfigMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ToolsListSpecificConfigMultiError) AllErrors() []error { return m }
+
+// ToolsListSpecificConfigValidationError is the validation error returned by
+// ToolsListSpecificConfig.Validate if the designated constraints aren't met.
+type ToolsListSpecificConfigValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ToolsListSpecificConfigValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ToolsListSpecificConfigValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ToolsListSpecificConfigValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ToolsListSpecificConfigValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ToolsListSpecificConfigValidationError) ErrorName() string {
+	return "ToolsListSpecificConfigValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ToolsListSpecificConfigValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sToolsListSpecificConfig.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ToolsListSpecificConfigValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ToolsListSpecificConfigValidationError{}
+
 // Validate checks the field values on ToolConfig with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -616,6 +891,35 @@ func (m *ToolConfig) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return ToolConfigValidationError{
 				field:  "HttpRule",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetToolListConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ToolConfigValidationError{
+					field:  "ToolListConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ToolConfigValidationError{
+					field:  "ToolListConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetToolListConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ToolConfigValidationError{
+				field:  "ToolListConfig",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -809,3 +1113,134 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = HttpRuleValidationError{}
+
+// Validate checks the field values on McpJsonRestBridgePerRoute with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *McpJsonRestBridgePerRoute) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on McpJsonRestBridgePerRoute with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// McpJsonRestBridgePerRouteMultiError, or nil if none found.
+func (m *McpJsonRestBridgePerRoute) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *McpJsonRestBridgePerRoute) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetToolConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, McpJsonRestBridgePerRouteValidationError{
+					field:  "ToolConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, McpJsonRestBridgePerRouteValidationError{
+					field:  "ToolConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetToolConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return McpJsonRestBridgePerRouteValidationError{
+				field:  "ToolConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return McpJsonRestBridgePerRouteMultiError(errors)
+	}
+
+	return nil
+}
+
+// McpJsonRestBridgePerRouteMultiError is an error wrapping multiple validation
+// errors returned by McpJsonRestBridgePerRoute.ValidateAll() if the
+// designated constraints aren't met.
+type McpJsonRestBridgePerRouteMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m McpJsonRestBridgePerRouteMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m McpJsonRestBridgePerRouteMultiError) AllErrors() []error { return m }
+
+// McpJsonRestBridgePerRouteValidationError is the validation error returned by
+// McpJsonRestBridgePerRoute.Validate if the designated constraints aren't met.
+type McpJsonRestBridgePerRouteValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e McpJsonRestBridgePerRouteValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e McpJsonRestBridgePerRouteValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e McpJsonRestBridgePerRouteValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e McpJsonRestBridgePerRouteValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e McpJsonRestBridgePerRouteValidationError) ErrorName() string {
+	return "McpJsonRestBridgePerRouteValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e McpJsonRestBridgePerRouteValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMcpJsonRestBridgePerRoute.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = McpJsonRestBridgePerRouteValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = McpJsonRestBridgePerRouteValidationError{}

@@ -330,6 +330,44 @@ func (x *ServerInfo) GetFallbackProtocolVersion() *wrapperspb.StringValue {
 	return nil
 }
 
+// [#not-implemented-hide:]
+// Configuration for sending locally-generated responses to tools/list requests.
+type ToolsListLocal struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ToolsListLocal) Reset() {
+	*x = ToolsListLocal{}
+	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ToolsListLocal) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ToolsListLocal) ProtoMessage() {}
+
+func (x *ToolsListLocal) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ToolsListLocal.ProtoReflect.Descriptor instead.
+func (*ToolsListLocal) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_rawDescGZIP(), []int{2}
+}
+
 // Configuration for the MCP tool capability of the server.
 type ServerToolConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -339,24 +377,22 @@ type ServerToolConfig struct {
 	// [#comment:TODO(guoyilin42): Implement list_changed]
 	// Whether this server supports notifications for changes to the tool list.
 	ListChanged bool `protobuf:"varint,2,opt,name=list_changed,json=listChanged,proto3" json:"list_changed,omitempty"`
-	// Optional configuration to transcode the tools/list requests to a standard HTTP request.
+	// Optional configuration for tools/list requests. If not set: The “tools/list“ request is
+	// passed through. This allows subsequent extension or the backend itself to handle the tools/list
+	// request if they support it.
 	//
-	// Note: tools/list should be mapped to a GET request with an empty body.
+	// Types that are valid to be assigned to ToolListConfig:
 	//
-	//   - If provided: The extension transcodes the request and forwards it down the filter chain.
-	//     The response (whether from an upstream backend, a configured “direct_response“, or another
-	//     extension) MUST be a JSON body strictly matching the MCP “ListToolsResult“ schema.
-	//     Ref: https://modelcontextprotocol.io/specification/2025-11-25/schema#listtoolsresult
-	//   - If not provided: The “tools/list“ request is passed through. This allows subsequent
-	//     extension or the backend itself to handle the tools/list request if they support it.
-	ToolListHttpRule *HttpRule `protobuf:"bytes,3,opt,name=tool_list_http_rule,json=toolListHttpRule,proto3" json:"tool_list_http_rule,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	//	*ServerToolConfig_ToolListHttpRule
+	//	*ServerToolConfig_ToolListLocal
+	ToolListConfig isServerToolConfig_ToolListConfig `protobuf_oneof:"tool_list_config"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *ServerToolConfig) Reset() {
 	*x = ServerToolConfig{}
-	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[2]
+	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -368,7 +404,7 @@ func (x *ServerToolConfig) String() string {
 func (*ServerToolConfig) ProtoMessage() {}
 
 func (x *ServerToolConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[2]
+	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -381,7 +417,7 @@ func (x *ServerToolConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServerToolConfig.ProtoReflect.Descriptor instead.
 func (*ServerToolConfig) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_rawDescGZIP(), []int{2}
+	return file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ServerToolConfig) GetTools() []*ToolConfig {
@@ -398,27 +434,140 @@ func (x *ServerToolConfig) GetListChanged() bool {
 	return false
 }
 
-func (x *ServerToolConfig) GetToolListHttpRule() *HttpRule {
+func (x *ServerToolConfig) GetToolListConfig() isServerToolConfig_ToolListConfig {
 	if x != nil {
-		return x.ToolListHttpRule
+		return x.ToolListConfig
 	}
 	return nil
 }
 
-// Configuration for a specific MCP tool.
-type ToolConfig struct {
+func (x *ServerToolConfig) GetToolListHttpRule() *HttpRule {
+	if x != nil {
+		if x, ok := x.ToolListConfig.(*ServerToolConfig_ToolListHttpRule); ok {
+			return x.ToolListHttpRule
+		}
+	}
+	return nil
+}
+
+func (x *ServerToolConfig) GetToolListLocal() *ToolsListLocal {
+	if x != nil {
+		if x, ok := x.ToolListConfig.(*ServerToolConfig_ToolListLocal); ok {
+			return x.ToolListLocal
+		}
+	}
+	return nil
+}
+
+type isServerToolConfig_ToolListConfig interface {
+	isServerToolConfig_ToolListConfig()
+}
+
+type ServerToolConfig_ToolListHttpRule struct {
+	// Configuration to transcode the tools/list requests to a standard HTTP request. If provided:
+	// The extension transcodes the request and forwards it down the filter chain. The response
+	// (whether from an upstream backend, a configured “direct_response“, or another extension)
+	// MUST be a JSON body strictly matching the MCP “ListToolsResult“ schema. Ref:
+	// https://modelcontextprotocol.io/specification/2025-11-25/schema#listtoolsresult
+	ToolListHttpRule *HttpRule `protobuf:"bytes,3,opt,name=tool_list_http_rule,json=toolListHttpRule,proto3,oneof"`
+}
+
+type ServerToolConfig_ToolListLocal struct {
+	// [#not-implemented-hide:]
+	// If provided: The extension sends a local response, according to each tool's
+	// ToolsListSpecificConfig.
+	ToolListLocal *ToolsListLocal `protobuf:"bytes,4,opt,name=tool_list_local,json=toolListLocal,proto3,oneof"`
+}
+
+func (*ServerToolConfig_ToolListHttpRule) isServerToolConfig_ToolListConfig() {}
+
+func (*ServerToolConfig_ToolListLocal) isServerToolConfig_ToolListConfig() {}
+
+// [#not-implemented-hide:]
+// Configuration for a tool's entry in tools/list responses.
+type ToolsListSpecificConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Name of the tool.
-	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The HTTP configuration rules that apply to the normal backend.
-	HttpRule      *HttpRule `protobuf:"bytes,2,opt,name=http_rule,json=httpRule,proto3" json:"http_rule,omitempty"`
+	// Optional, human-readable name of the tool for display purposes.
+	Title string `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	// Human-readable description of functionality.
+	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	// A JSON Schema describing expected parameters, as a serialized JSON string, in the JSON Schema
+	// 2020-12 dialect. This should be raw JSON, including the "properties" and "required" keys, but
+	// not "type". Tools with no parameters may omit this to signify a tool with no constraints on the
+	// parameters object, or set to '"additionalProperties": false' to require empty parameters.
+	InputSchema   string `protobuf:"bytes,3,opt,name=input_schema,json=inputSchema,proto3" json:"input_schema,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
+func (x *ToolsListSpecificConfig) Reset() {
+	*x = ToolsListSpecificConfig{}
+	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ToolsListSpecificConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ToolsListSpecificConfig) ProtoMessage() {}
+
+func (x *ToolsListSpecificConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ToolsListSpecificConfig.ProtoReflect.Descriptor instead.
+func (*ToolsListSpecificConfig) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *ToolsListSpecificConfig) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *ToolsListSpecificConfig) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *ToolsListSpecificConfig) GetInputSchema() string {
+	if x != nil {
+		return x.InputSchema
+	}
+	return ""
+}
+
+type ToolConfig struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Unique identifier of the tool. Used both for tools/list and tools/call transcoding.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The HTTP configuration rules that apply to the normal backend.
+	HttpRule *HttpRule `protobuf:"bytes,2,opt,name=http_rule,json=httpRule,proto3" json:"http_rule,omitempty"`
+	// [#not-implemented-hide:]
+	// Config for this tool's entry in a local tools/list response. Used when tool_list_local is set
+	// in the ServerToolConfig.
+	ToolListConfig *ToolsListSpecificConfig `protobuf:"bytes,3,opt,name=tool_list_config,json=toolListConfig,proto3" json:"tool_list_config,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
 func (x *ToolConfig) Reset() {
 	*x = ToolConfig{}
-	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[3]
+	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -430,7 +579,7 @@ func (x *ToolConfig) String() string {
 func (*ToolConfig) ProtoMessage() {}
 
 func (x *ToolConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[3]
+	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -443,7 +592,7 @@ func (x *ToolConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ToolConfig.ProtoReflect.Descriptor instead.
 func (*ToolConfig) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_rawDescGZIP(), []int{3}
+	return file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ToolConfig) GetName() string {
@@ -456,6 +605,13 @@ func (x *ToolConfig) GetName() string {
 func (x *ToolConfig) GetHttpRule() *HttpRule {
 	if x != nil {
 		return x.HttpRule
+	}
+	return nil
+}
+
+func (x *ToolConfig) GetToolListConfig() *ToolsListSpecificConfig {
+	if x != nil {
+		return x.ToolListConfig
 	}
 	return nil
 }
@@ -510,7 +666,7 @@ type HttpRule struct {
 
 func (x *HttpRule) Reset() {
 	*x = HttpRule{}
-	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[4]
+	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -522,7 +678,7 @@ func (x *HttpRule) String() string {
 func (*HttpRule) ProtoMessage() {}
 
 func (x *HttpRule) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[4]
+	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -535,7 +691,7 @@ func (x *HttpRule) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HttpRule.ProtoReflect.Descriptor instead.
 func (*HttpRule) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_rawDescGZIP(), []int{4}
+	return file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *HttpRule) GetGet() string {
@@ -580,6 +736,51 @@ func (x *HttpRule) GetBody() string {
 	return ""
 }
 
+// Per-route override configuration for the MCP JSON REST Bridge filter.
+type McpJsonRestBridgePerRoute struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ToolConfig    *ServerToolConfig      `protobuf:"bytes,1,opt,name=tool_config,json=toolConfig,proto3" json:"tool_config,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *McpJsonRestBridgePerRoute) Reset() {
+	*x = McpJsonRestBridgePerRoute{}
+	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *McpJsonRestBridgePerRoute) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*McpJsonRestBridgePerRoute) ProtoMessage() {}
+
+func (x *McpJsonRestBridgePerRoute) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use McpJsonRestBridgePerRoute.ProtoReflect.Descriptor instead.
+func (*McpJsonRestBridgePerRoute) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *McpJsonRestBridgePerRoute) GetToolConfig() *ServerToolConfig {
+	if x != nil {
+		return x.ToolConfig
+	}
+	return nil
+}
+
 var File_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_rawDesc = "" +
@@ -600,22 +801,33 @@ const file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_b
 	"ServerInfo\x12>\n" +
 	"\x1bsupported_protocol_versions\x18\x01 \x03(\tR\x19supportedProtocolVersions\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12X\n" +
-	"\x19fallback_protocol_version\x18\x03 \x01(\v2\x1c.google.protobuf.StringValueR\x17fallbackProtocolVersion\"\xfe\x01\n" +
+	"\x19fallback_protocol_version\x18\x03 \x01(\v2\x1c.google.protobuf.StringValueR\x17fallbackProtocolVersion\"\x10\n" +
+	"\x0eToolsListLocal\"\x85\x03\n" +
 	"\x10ServerToolConfig\x12W\n" +
 	"\x05tools\x18\x01 \x03(\v2A.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfigR\x05tools\x12!\n" +
-	"\flist_changed\x18\x02 \x01(\bR\vlistChanged\x12n\n" +
-	"\x13tool_list_http_rule\x18\x03 \x01(\v2?.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRuleR\x10toolListHttpRule\"\x87\x01\n" +
+	"\flist_changed\x18\x02 \x01(\bR\vlistChanged\x12p\n" +
+	"\x13tool_list_http_rule\x18\x03 \x01(\v2?.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRuleH\x00R\x10toolListHttpRule\x12o\n" +
+	"\x0ftool_list_local\x18\x04 \x01(\v2E.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListLocalH\x00R\rtoolListLocalB\x12\n" +
+	"\x10tool_list_config\"}\n" +
+	"\x17ToolsListSpecificConfig\x12\x14\n" +
+	"\x05title\x18\x01 \x01(\tR\x05title\x12)\n" +
+	"\vdescription\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\vdescription\x12!\n" +
+	"\finput_schema\x18\x03 \x01(\tR\vinputSchema\"\x81\x02\n" +
 	"\n" +
 	"ToolConfig\x12\x1b\n" +
 	"\x04name\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x04name\x12\\\n" +
-	"\thttp_rule\x18\x02 \x01(\v2?.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRuleR\bhttpRule\"\x84\x01\n" +
+	"\thttp_rule\x18\x02 \x01(\v2?.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRuleR\bhttpRule\x12x\n" +
+	"\x10tool_list_config\x18\x03 \x01(\v2N.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListSpecificConfigR\x0etoolListConfig\"\x84\x01\n" +
 	"\bHttpRule\x12\x10\n" +
 	"\x03get\x18\x01 \x01(\tR\x03get\x12\x10\n" +
 	"\x03put\x18\x02 \x01(\tR\x03put\x12\x12\n" +
 	"\x04post\x18\x03 \x01(\tR\x04post\x12\x16\n" +
 	"\x06delete\x18\x04 \x01(\tR\x06delete\x12\x14\n" +
 	"\x05patch\x18\x05 \x01(\tR\x05patch\x12\x12\n" +
-	"\x04body\x18\x06 \x01(\tR\x04bodyB\xe4\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
+	"\x04body\x18\x06 \x01(\tR\x04body\"\x85\x01\n" +
+	"\x19McpJsonRestBridgePerRoute\x12h\n" +
+	"\vtool_config\x18\x01 \x01(\v2G.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfigR\n" +
+	"toolConfigB\xe4\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
 	"Cio.envoyproxy.envoy.extensions.filters.http.mcp_json_rest_bridge.v3B\x16McpJsonRestBridgeProtoP\x01Zsgithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/mcp_json_rest_bridge/v3;mcp_json_rest_bridgev3b\x06proto3"
 
 var (
@@ -631,32 +843,38 @@ func file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_br
 }
 
 var file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_goTypes = []any{
 	(McpJsonRestBridge_RequestStorageMode)(0), // 0: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.RequestStorageMode
 	(*McpJsonRestBridge)(nil),                 // 1: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge
 	(*ServerInfo)(nil),                        // 2: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerInfo
-	(*ServerToolConfig)(nil),                  // 3: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig
-	(*ToolConfig)(nil),                        // 4: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig
-	(*HttpRule)(nil),                          // 5: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
-	(*wrapperspb.UInt32Value)(nil),            // 6: google.protobuf.UInt32Value
-	(*wrapperspb.StringValue)(nil),            // 7: google.protobuf.StringValue
+	(*ToolsListLocal)(nil),                    // 3: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListLocal
+	(*ServerToolConfig)(nil),                  // 4: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig
+	(*ToolsListSpecificConfig)(nil),           // 5: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListSpecificConfig
+	(*ToolConfig)(nil),                        // 6: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig
+	(*HttpRule)(nil),                          // 7: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
+	(*McpJsonRestBridgePerRoute)(nil),         // 8: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridgePerRoute
+	(*wrapperspb.UInt32Value)(nil),            // 9: google.protobuf.UInt32Value
+	(*wrapperspb.StringValue)(nil),            // 10: google.protobuf.StringValue
 }
 var file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_depIdxs = []int32{
-	2, // 0: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.server_info:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerInfo
-	3, // 1: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.tool_config:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig
-	6, // 2: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.max_request_body_size:type_name -> google.protobuf.UInt32Value
-	6, // 3: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.max_response_body_size:type_name -> google.protobuf.UInt32Value
-	0, // 4: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.request_storage_mode:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.RequestStorageMode
-	7, // 5: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerInfo.fallback_protocol_version:type_name -> google.protobuf.StringValue
-	4, // 6: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tools:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig
-	5, // 7: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tool_list_http_rule:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
-	5, // 8: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.http_rule:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
-	9, // [9:9] is the sub-list for method output_type
-	9, // [9:9] is the sub-list for method input_type
-	9, // [9:9] is the sub-list for extension type_name
-	9, // [9:9] is the sub-list for extension extendee
-	0, // [0:9] is the sub-list for field type_name
+	2,  // 0: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.server_info:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerInfo
+	4,  // 1: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.tool_config:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig
+	9,  // 2: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.max_request_body_size:type_name -> google.protobuf.UInt32Value
+	9,  // 3: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.max_response_body_size:type_name -> google.protobuf.UInt32Value
+	0,  // 4: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.request_storage_mode:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.RequestStorageMode
+	10, // 5: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerInfo.fallback_protocol_version:type_name -> google.protobuf.StringValue
+	6,  // 6: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tools:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig
+	7,  // 7: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tool_list_http_rule:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
+	3,  // 8: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tool_list_local:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListLocal
+	7,  // 9: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.http_rule:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
+	5,  // 10: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.tool_list_config:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListSpecificConfig
+	4,  // 11: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridgePerRoute.tool_config:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig
+	12, // [12:12] is the sub-list for method output_type
+	12, // [12:12] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() {
@@ -666,13 +884,17 @@ func file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_br
 	if File_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto != nil {
 		return
 	}
+	file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[3].OneofWrappers = []any{
+		(*ServerToolConfig_ToolListHttpRule)(nil),
+		(*ServerToolConfig_ToolListLocal)(nil),
+	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_rawDesc), len(file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   5,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
