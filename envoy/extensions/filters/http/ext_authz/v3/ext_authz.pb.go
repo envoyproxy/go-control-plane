@@ -128,6 +128,17 @@ type ExtAuthz struct {
 	//     alter another client request header.
 	//
 	// Defaults to “false“.
+	//
+	// .. attention::
+	//
+	//	Enabling this option can cause Envoy to recompute route matching after earlier HTTP filters
+	//	have already processed the request. This can be security-sensitive when route-dependent
+	//	authorization filters, such as the RBAC filter, run before ext_authz.
+	//
+	//	Operators should avoid enabling this option for authorization services that are not fully
+	//	trusted to influence routing. When possible, filters that mutate route-matching inputs and
+	//	clear the route cache should run before route-dependent authorization filters. Operators can
+	//	also use decoder_header_mutation_rules to restrict sensitive request header mutations.
 	ClearRouteCache bool `protobuf:"varint,6,opt,name=clear_route_cache,json=clearRouteCache,proto3" json:"clear_route_cache,omitempty"`
 	// Sets the HTTP status that is returned to the client when the authorization server returns an error
 	// or cannot be reached.
