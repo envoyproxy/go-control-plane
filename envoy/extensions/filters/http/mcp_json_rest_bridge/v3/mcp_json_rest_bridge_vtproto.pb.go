@@ -388,6 +388,16 @@ func (m *ToolConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.TextContentStreamingEnabled {
+		i--
+		if m.TextContentStreamingEnabled {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x20
+	}
 	if m.ToolListConfig != nil {
 		size, err := m.ToolListConfig.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -688,6 +698,9 @@ func (m *ToolConfig) SizeVT() (n int) {
 	if m.ToolListConfig != nil {
 		l = m.ToolListConfig.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.TextContentStreamingEnabled {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n

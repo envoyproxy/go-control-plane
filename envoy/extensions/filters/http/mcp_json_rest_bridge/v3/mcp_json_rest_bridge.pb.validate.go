@@ -926,6 +926,8 @@ func (m *ToolConfig) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for TextContentStreamingEnabled
+
 	if len(errors) > 0 {
 		return ToolConfigMultiError(errors)
 	}

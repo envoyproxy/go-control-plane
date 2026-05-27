@@ -561,8 +561,22 @@ type ToolConfig struct {
 	// Config for this tool's entry in a local tools/list response. Used when tool_list_local is set
 	// in the ServerToolConfig.
 	ToolListConfig *ToolsListSpecificConfig `protobuf:"bytes,3,opt,name=tool_list_config,json=toolListConfig,proto3" json:"tool_list_config,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// Enables streaming transcoding for unstructured text responses (“content“ field of a result).
+	//
+	// When enabled, the response body is streamed directly to the client without buffering. Each
+	// chunk is JSON escaped as it arrives and wrapped with a pre-built JSON-RPC prefix and suffix.
+	//
+	// Streaming flow:
+	//
+	// .. code-block:: text
+	//
+	//	input:  [chunk1] → [chunk2] → [chunk3]
+	//	output: [prefix+escaped_chunk1] → [escaped_chunk2] → [escaped_chunk3+suffix]
+	//
+	// Disabled by default.
+	TextContentStreamingEnabled bool `protobuf:"varint,4,opt,name=text_content_streaming_enabled,json=textContentStreamingEnabled,proto3" json:"text_content_streaming_enabled,omitempty"`
+	unknownFields               protoimpl.UnknownFields
+	sizeCache                   protoimpl.SizeCache
 }
 
 func (x *ToolConfig) Reset() {
@@ -614,6 +628,13 @@ func (x *ToolConfig) GetToolListConfig() *ToolsListSpecificConfig {
 		return x.ToolListConfig
 	}
 	return nil
+}
+
+func (x *ToolConfig) GetTextContentStreamingEnabled() bool {
+	if x != nil {
+		return x.TextContentStreamingEnabled
+	}
+	return false
 }
 
 // Defines the schema of the JSON-RPC to REST mapping. It specifies how the "arguments"
@@ -812,12 +833,13 @@ const file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_b
 	"\x17ToolsListSpecificConfig\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12)\n" +
 	"\vdescription\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\vdescription\x12!\n" +
-	"\finput_schema\x18\x03 \x01(\tR\vinputSchema\"\x81\x02\n" +
+	"\finput_schema\x18\x03 \x01(\tR\vinputSchema\"\xc6\x02\n" +
 	"\n" +
 	"ToolConfig\x12\x1b\n" +
 	"\x04name\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x04name\x12\\\n" +
 	"\thttp_rule\x18\x02 \x01(\v2?.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRuleR\bhttpRule\x12x\n" +
-	"\x10tool_list_config\x18\x03 \x01(\v2N.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListSpecificConfigR\x0etoolListConfig\"\x84\x01\n" +
+	"\x10tool_list_config\x18\x03 \x01(\v2N.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListSpecificConfigR\x0etoolListConfig\x12C\n" +
+	"\x1etext_content_streaming_enabled\x18\x04 \x01(\bR\x1btextContentStreamingEnabled\"\x84\x01\n" +
 	"\bHttpRule\x12\x10\n" +
 	"\x03get\x18\x01 \x01(\tR\x03get\x12\x10\n" +
 	"\x03put\x18\x02 \x01(\tR\x03put\x12\x12\n" +
