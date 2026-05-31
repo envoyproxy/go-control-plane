@@ -120,6 +120,16 @@ func (m *ReverseTunnel) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.SkipRebalancing {
+		i--
+		if m.SkipRebalancing {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x40
+	}
 	if m.UseHttpUpgrade {
 		i--
 		if m.UseHttpUpgrade {
@@ -240,6 +250,9 @@ func (m *ReverseTunnel) SizeVT() (n int) {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	if m.UseHttpUpgrade {
+		n += 2
+	}
+	if m.SkipRebalancing {
 		n += 2
 	}
 	n += len(m.unknownFields)

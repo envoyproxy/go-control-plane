@@ -164,7 +164,7 @@ func (x *Validation) GetDynamicMetadataNamespace() string {
 // Configuration for the reverse tunnel network filter.
 // This filter handles reverse tunnel connection acceptance and rejection by processing
 // HTTP requests where required identification values are provided via HTTP headers.
-// [#next-free-field: 8]
+// [#next-free-field: 9]
 type ReverseTunnel struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Ping interval for health checks on established reverse tunnel connections.
@@ -200,8 +200,12 @@ type ReverseTunnel struct {
 	// flag to the same value.
 	// Defaults to “false“.
 	UseHttpUpgrade bool `protobuf:"varint,7,opt,name=use_http_upgrade,json=useHttpUpgrade,proto3" json:"use_http_upgrade,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// When true, skip worker-thread rebalancing for accepted reverse tunnel connections.
+	// This avoids the cross-worker lock in pickLeastLoadedSocketManager.
+	// Default: false (rebalancing enabled).
+	SkipRebalancing bool `protobuf:"varint,8,opt,name=skip_rebalancing,json=skipRebalancing,proto3" json:"skip_rebalancing,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *ReverseTunnel) Reset() {
@@ -283,6 +287,13 @@ func (x *ReverseTunnel) GetUseHttpUpgrade() bool {
 	return false
 }
 
+func (x *ReverseTunnel) GetSkipRebalancing() bool {
+	if x != nil {
+		return x.SkipRebalancing
+	}
+	return false
+}
+
 var File_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto_rawDesc = "" +
@@ -294,7 +305,7 @@ const file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_pro
 	"\x11cluster_id_format\x18\x02 \x01(\tB\b\xfaB\x05r\x03\x18\x80\bR\x0fclusterIdFormat\x122\n" +
 	"\x10tenant_id_format\x18\x05 \x01(\tB\b\xfaB\x05r\x03\x18\x80\bR\x0etenantIdFormat\x122\n" +
 	"\x15emit_dynamic_metadata\x18\x03 \x01(\bR\x13emitDynamicMetadata\x12F\n" +
-	"\x1adynamic_metadata_namespace\x18\x04 \x01(\tB\b\xfaB\x05r\x03\x18\xff\x01R\x18dynamicMetadataNamespace\"\xeb\x03\n" +
+	"\x1adynamic_metadata_namespace\x18\x04 \x01(\tB\b\xfaB\x05r\x03\x18\xff\x01R\x18dynamicMetadataNamespace\"\x96\x04\n" +
 	"\rReverseTunnel\x12Q\n" +
 	"\rping_interval\x18\x01 \x01(\v2\x19.google.protobuf.DurationB\x11\xfaB\x0e\xaa\x01\v\"\x03\b\xac\x022\x04\x10\xc0\x84=R\fpingInterval\x124\n" +
 	"\x16auto_close_connections\x18\x02 \x01(\bR\x14autoCloseConnections\x120\n" +
@@ -305,7 +316,8 @@ const file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_pro
 	"validation\x18\x05 \x01(\v2>.envoy.extensions.filters.network.reverse_tunnel.v3.ValidationR\n" +
 	"validation\x12?\n" +
 	"\x15required_cluster_name\x18\x06 \x01(\tB\v\xfaB\br\x06\x18\xff\x01\xd0\x01\x01R\x13requiredClusterName\x12(\n" +
-	"\x10use_http_upgrade\x18\a \x01(\bR\x0euseHttpUpgradeB\xcc\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x10use_http_upgrade\x18\a \x01(\bR\x0euseHttpUpgrade\x12)\n" +
+	"\x10skip_rebalancing\x18\b \x01(\bR\x0fskipRebalancingB\xcc\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"@io.envoyproxy.envoy.extensions.filters.network.reverse_tunnel.v3B\x12ReverseTunnelProtoP\x01Zjgithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/reverse_tunnel/v3;reverse_tunnelv3b\x06proto3"
 
 var (

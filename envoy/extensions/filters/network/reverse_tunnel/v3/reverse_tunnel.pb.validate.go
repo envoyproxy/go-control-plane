@@ -312,6 +312,8 @@ func (m *ReverseTunnel) validate(all bool) error {
 
 	// no validation rules for UseHttpUpgrade
 
+	// no validation rules for SkipRebalancing
+
 	if len(errors) > 0 {
 		return ReverseTunnelMultiError(errors)
 	}
