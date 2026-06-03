@@ -28,7 +28,7 @@ jobs:
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@7211b7c8077ea37d8641b6271f6a365a22a5fbfa  # 4.36.0
+      uses: github/codeql-action/init@87557b9c84dde89fdd9b10e88954ac2f4248e463  # 4.36.1
       with:
         languages: go
 
@@ -36,6 +36,6 @@ jobs:
       run: make build
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@7211b7c8077ea37d8641b6271f6a365a22a5fbfa  # 4.36.0
+      uses: github/codeql-action/analyze@87557b9c84dde89fdd9b10e88954ac2f4248e463  # 4.36.1
       with:
         category: "/language:go"
