@@ -143,7 +143,10 @@ type Audience struct {
 	Url string `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
 	// If defined, the filter will fetch unbound Access Token instead of JWT.
 	// It takes precedence over “url“.
-	AccessToken   *Audience_AccessToken `protobuf:"bytes,2,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
+	AccessToken *Audience_AccessToken `protobuf:"bytes,2,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
+	// If defined, the filter will fetch bound JWT token instead of unbound.
+	// It takes precedence over “access_token“ and “url“.
+	BoundJwt      *Audience_BoundJwt `protobuf:"bytes,3,opt,name=bound_jwt,json=boundJwt,proto3" json:"bound_jwt,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -188,6 +191,13 @@ func (x *Audience) GetUrl() string {
 func (x *Audience) GetAccessToken() *Audience_AccessToken {
 	if x != nil {
 		return x.AccessToken
+	}
+	return nil
+}
+
+func (x *Audience) GetBoundJwt() *Audience_BoundJwt {
+	if x != nil {
+		return x.BoundJwt
 	}
 	return nil
 }
@@ -331,6 +341,51 @@ func (*Audience_AccessToken) Descriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_rawDescGZIP(), []int{1, 0}
 }
 
+type Audience_BoundJwt struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The audience URL, used for fetching bound JWT token.
+	Url           string `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Audience_BoundJwt) Reset() {
+	*x = Audience_BoundJwt{}
+	mi := &file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Audience_BoundJwt) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Audience_BoundJwt) ProtoMessage() {}
+
+func (x *Audience_BoundJwt) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Audience_BoundJwt.ProtoReflect.Descriptor instead.
+func (*Audience_BoundJwt) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_rawDescGZIP(), []int{1, 1}
+}
+
+func (x *Audience_BoundJwt) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
 var File_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_rawDesc = "" +
@@ -343,11 +398,14 @@ const file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_rawDesc = 
 	"\ftoken_header\x18\x04 \x01(\v27.envoy.extensions.filters.http.gcp_authn.v3.TokenHeaderR\vtokenHeader\x12\x18\n" +
 	"\acluster\x18\x05 \x01(\tR\acluster\x12E\n" +
 	"\atimeout\x18\x06 \x01(\v2\x19.google.protobuf.DurationB\x10\xfaB\r\xaa\x01\n" +
-	"\x1a\x06\b\x80\x80\x80\x80\x102\x00R\atimeout\"\x90\x01\n" +
+	"\x1a\x06\b\x80\x80\x80\x80\x102\x00R\atimeout\"\x93\x02\n" +
 	"\bAudience\x12\x10\n" +
 	"\x03url\x18\x01 \x01(\tR\x03url\x12c\n" +
-	"\faccess_token\x18\x02 \x01(\v2@.envoy.extensions.filters.http.gcp_authn.v3.Audience.AccessTokenR\vaccessToken\x1a\r\n" +
-	"\vAccessToken\"`\n" +
+	"\faccess_token\x18\x02 \x01(\v2@.envoy.extensions.filters.http.gcp_authn.v3.Audience.AccessTokenR\vaccessToken\x12Z\n" +
+	"\tbound_jwt\x18\x03 \x01(\v2=.envoy.extensions.filters.http.gcp_authn.v3.Audience.BoundJwtR\bboundJwt\x1a\r\n" +
+	"\vAccessToken\x1a%\n" +
+	"\bBoundJwt\x12\x19\n" +
+	"\x03url\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x03url\"`\n" +
 	"\x10TokenCacheConfig\x12L\n" +
 	"\n" +
 	"cache_size\x18\x01 \x01(\v2\x1c.google.protobuf.UInt64ValueB\x0f\xfaB\f2\n" +
@@ -370,31 +428,33 @@ func file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_rawDescGZIP
 	return file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_rawDescData
 }
 
-var file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_goTypes = []any{
 	(*GcpAuthnFilterConfig)(nil),   // 0: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig
 	(*Audience)(nil),               // 1: envoy.extensions.filters.http.gcp_authn.v3.Audience
 	(*TokenCacheConfig)(nil),       // 2: envoy.extensions.filters.http.gcp_authn.v3.TokenCacheConfig
 	(*TokenHeader)(nil),            // 3: envoy.extensions.filters.http.gcp_authn.v3.TokenHeader
 	(*Audience_AccessToken)(nil),   // 4: envoy.extensions.filters.http.gcp_authn.v3.Audience.AccessToken
-	(*v3.HttpUri)(nil),             // 5: envoy.config.core.v3.HttpUri
-	(*v3.RetryPolicy)(nil),         // 6: envoy.config.core.v3.RetryPolicy
-	(*durationpb.Duration)(nil),    // 7: google.protobuf.Duration
-	(*wrapperspb.UInt64Value)(nil), // 8: google.protobuf.UInt64Value
+	(*Audience_BoundJwt)(nil),      // 5: envoy.extensions.filters.http.gcp_authn.v3.Audience.BoundJwt
+	(*v3.HttpUri)(nil),             // 6: envoy.config.core.v3.HttpUri
+	(*v3.RetryPolicy)(nil),         // 7: envoy.config.core.v3.RetryPolicy
+	(*durationpb.Duration)(nil),    // 8: google.protobuf.Duration
+	(*wrapperspb.UInt64Value)(nil), // 9: google.protobuf.UInt64Value
 }
 var file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_depIdxs = []int32{
-	5, // 0: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig.http_uri:type_name -> envoy.config.core.v3.HttpUri
-	6, // 1: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig.retry_policy:type_name -> envoy.config.core.v3.RetryPolicy
+	6, // 0: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig.http_uri:type_name -> envoy.config.core.v3.HttpUri
+	7, // 1: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig.retry_policy:type_name -> envoy.config.core.v3.RetryPolicy
 	2, // 2: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig.cache_config:type_name -> envoy.extensions.filters.http.gcp_authn.v3.TokenCacheConfig
 	3, // 3: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig.token_header:type_name -> envoy.extensions.filters.http.gcp_authn.v3.TokenHeader
-	7, // 4: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig.timeout:type_name -> google.protobuf.Duration
+	8, // 4: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig.timeout:type_name -> google.protobuf.Duration
 	4, // 5: envoy.extensions.filters.http.gcp_authn.v3.Audience.access_token:type_name -> envoy.extensions.filters.http.gcp_authn.v3.Audience.AccessToken
-	8, // 6: envoy.extensions.filters.http.gcp_authn.v3.TokenCacheConfig.cache_size:type_name -> google.protobuf.UInt64Value
-	7, // [7:7] is the sub-list for method output_type
-	7, // [7:7] is the sub-list for method input_type
-	7, // [7:7] is the sub-list for extension type_name
-	7, // [7:7] is the sub-list for extension extendee
-	0, // [0:7] is the sub-list for field type_name
+	5, // 6: envoy.extensions.filters.http.gcp_authn.v3.Audience.bound_jwt:type_name -> envoy.extensions.filters.http.gcp_authn.v3.Audience.BoundJwt
+	9, // 7: envoy.extensions.filters.http.gcp_authn.v3.TokenCacheConfig.cache_size:type_name -> google.protobuf.UInt64Value
+	8, // [8:8] is the sub-list for method output_type
+	8, // [8:8] is the sub-list for method input_type
+	8, // [8:8] is the sub-list for extension type_name
+	8, // [8:8] is the sub-list for extension extendee
+	0, // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_init() }
@@ -408,7 +468,7 @@ func file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_rawDesc), len(file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
