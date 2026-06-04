@@ -138,7 +138,7 @@ func (Mcp_RequestStorageMode) EnumDescriptor() ([]byte, []int) {
 }
 
 // This filter will inspect and get attributes from MCP traffic.
-// [#next-free-field: 8]
+// [#next-free-field: 9]
 type Mcp struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Configures how the filter handles non-MCP traffic.
@@ -147,9 +147,12 @@ type Mcp struct {
 	// This allows the route to be re-selected based on the MCP metadata (e.g., method, params).
 	// Defaults to false.
 	ClearRouteCache bool `protobuf:"varint,2,opt,name=clear_route_cache,json=clearRouteCache,proto3" json:"clear_route_cache,omitempty"`
-	// Maximum size of the request body to buffer for JSON-RPC validation.
-	// If the request body exceeds this size, the request is rejected with “413 Payload Too Large“.
-	// This limit applies to both “REJECT_NO_MCP“ and “PASS_THROUGH“ modes to prevent unbounded buffering.
+	// Maximum size of the request body to buffer for JSON-RPC parsing.
+	// Only the first “max_request_body_size“ bytes are parsed for MCP attribute extraction.
+	//
+	// When the body exceeds this limit:
+	// - In “PASS_THROUGH“ mode: the request is allowed through with an “is_exceeding_limit“ marker in the dynamic metadata, indicating that the MCP payload was only partially parsed.
+	// - In “REJECT_NO_MCP“ mode: the request is rejected with “400 Bad Request“ because the complete root JSON object must fit within the size limit.
 	//
 	// It defaults to 8KB (8192 bytes) and the maximum allowed value is 10MB (10485760 bytes).
 	//
@@ -176,8 +179,12 @@ type Mcp struct {
 	//
 	// If unset (default), do not extract or inject baggage.
 	PropagateBaggage *Mcp_BaggagePropagationConfig `protobuf:"bytes,7,opt,name=propagate_baggage,json=propagateBaggage,proto3" json:"propagate_baggage,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// When true, reject requests that contain duplicate JSON keys at any
+	// nesting level. RFC 8259 Section 4 states that names within an object SHOULD be
+	// unique. Defaults to false (last-key-wins / last-win).
+	RejectDuplicateKeys *wrapperspb.BoolValue `protobuf:"bytes,8,opt,name=reject_duplicate_keys,json=rejectDuplicateKeys,proto3" json:"reject_duplicate_keys,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *Mcp) Reset() {
@@ -255,6 +262,13 @@ func (x *Mcp) GetPropagateTraceContext() *Mcp_TraceContextPropagationConfig {
 func (x *Mcp) GetPropagateBaggage() *Mcp_BaggagePropagationConfig {
 	if x != nil {
 		return x.PropagateBaggage
+	}
+	return nil
+}
+
+func (x *Mcp) GetRejectDuplicateKeys() *wrapperspb.BoolValue {
+	if x != nil {
+		return x.RejectDuplicateKeys
 	}
 	return nil
 }
@@ -568,7 +582,7 @@ var File_envoy_extensions_filters_http_mcp_v3_mcp_proto protoreflect.FileDescrip
 
 const file_envoy_extensions_filters_http_mcp_v3_mcp_proto_rawDesc = "" +
 	"\n" +
-	".envoy/extensions/filters/http/mcp/v3/mcp.proto\x12$envoy.extensions.filters.http.mcp.v3\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xb7\a\n" +
+	".envoy/extensions/filters/http/mcp/v3/mcp.proto\x12$envoy.extensions.filters.http.mcp.v3\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x87\b\n" +
 	"\x03Mcp\x12b\n" +
 	"\ftraffic_mode\x18\x01 \x01(\x0e25.envoy.extensions.filters.http.mcp.v3.Mcp.TrafficModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\vtrafficMode\x12*\n" +
 	"\x11clear_route_cache\x18\x02 \x01(\bR\x0fclearRouteCache\x12[\n" +
@@ -577,7 +591,8 @@ const file_envoy_extensions_filters_http_mcp_v3_mcp_proto_rawDesc = "" +
 	"\rparser_config\x18\x04 \x01(\v22.envoy.extensions.filters.http.mcp.v3.ParserConfigR\fparserConfig\x12x\n" +
 	"\x14request_storage_mode\x18\x05 \x01(\x0e2<.envoy.extensions.filters.http.mcp.v3.Mcp.RequestStorageModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\x12requestStorageMode\x12\x7f\n" +
 	"\x17propagate_trace_context\x18\x06 \x01(\v2G.envoy.extensions.filters.http.mcp.v3.Mcp.TraceContextPropagationConfigR\x15propagateTraceContext\x12o\n" +
-	"\x11propagate_baggage\x18\a \x01(\v2B.envoy.extensions.filters.http.mcp.v3.Mcp.BaggagePropagationConfigR\x10propagateBaggage\x1a)\n" +
+	"\x11propagate_baggage\x18\a \x01(\v2B.envoy.extensions.filters.http.mcp.v3.Mcp.BaggagePropagationConfigR\x10propagateBaggage\x12N\n" +
+	"\x15reject_duplicate_keys\x18\b \x01(\v2\x1a.google.protobuf.BoolValueR\x13rejectDuplicateKeys\x1a)\n" +
 	"\x1dTraceContextPropagationConfig:\b\xd2Ƥ\xe1\x06\x02\b\x01\x1a$\n" +
 	"\x18BaggagePropagationConfig:\b\xd2Ƥ\xe1\x06\x02\b\x01\"2\n" +
 	"\vTrafficMode\x12\x10\n" +
@@ -628,6 +643,7 @@ var file_envoy_extensions_filters_http_mcp_v3_mcp_proto_goTypes = []any{
 	(*ParserConfig_AttributeExtractionRule)(nil), // 7: envoy.extensions.filters.http.mcp.v3.ParserConfig.AttributeExtractionRule
 	(*ParserConfig_MethodConfig)(nil),            // 8: envoy.extensions.filters.http.mcp.v3.ParserConfig.MethodConfig
 	(*wrapperspb.UInt32Value)(nil),               // 9: google.protobuf.UInt32Value
+	(*wrapperspb.BoolValue)(nil),                 // 10: google.protobuf.BoolValue
 }
 var file_envoy_extensions_filters_http_mcp_v3_mcp_proto_depIdxs = []int32{
 	0,  // 0: envoy.extensions.filters.http.mcp.v3.Mcp.traffic_mode:type_name -> envoy.extensions.filters.http.mcp.v3.Mcp.TrafficMode
@@ -636,15 +652,16 @@ var file_envoy_extensions_filters_http_mcp_v3_mcp_proto_depIdxs = []int32{
 	1,  // 3: envoy.extensions.filters.http.mcp.v3.Mcp.request_storage_mode:type_name -> envoy.extensions.filters.http.mcp.v3.Mcp.RequestStorageMode
 	5,  // 4: envoy.extensions.filters.http.mcp.v3.Mcp.propagate_trace_context:type_name -> envoy.extensions.filters.http.mcp.v3.Mcp.TraceContextPropagationConfig
 	6,  // 5: envoy.extensions.filters.http.mcp.v3.Mcp.propagate_baggage:type_name -> envoy.extensions.filters.http.mcp.v3.Mcp.BaggagePropagationConfig
-	8,  // 6: envoy.extensions.filters.http.mcp.v3.ParserConfig.methods:type_name -> envoy.extensions.filters.http.mcp.v3.ParserConfig.MethodConfig
-	0,  // 7: envoy.extensions.filters.http.mcp.v3.McpOverride.traffic_mode:type_name -> envoy.extensions.filters.http.mcp.v3.Mcp.TrafficMode
-	9,  // 8: envoy.extensions.filters.http.mcp.v3.McpOverride.max_request_body_size:type_name -> google.protobuf.UInt32Value
-	7,  // 9: envoy.extensions.filters.http.mcp.v3.ParserConfig.MethodConfig.extraction_rules:type_name -> envoy.extensions.filters.http.mcp.v3.ParserConfig.AttributeExtractionRule
-	10, // [10:10] is the sub-list for method output_type
-	10, // [10:10] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	10, // 6: envoy.extensions.filters.http.mcp.v3.Mcp.reject_duplicate_keys:type_name -> google.protobuf.BoolValue
+	8,  // 7: envoy.extensions.filters.http.mcp.v3.ParserConfig.methods:type_name -> envoy.extensions.filters.http.mcp.v3.ParserConfig.MethodConfig
+	0,  // 8: envoy.extensions.filters.http.mcp.v3.McpOverride.traffic_mode:type_name -> envoy.extensions.filters.http.mcp.v3.Mcp.TrafficMode
+	9,  // 9: envoy.extensions.filters.http.mcp.v3.McpOverride.max_request_body_size:type_name -> google.protobuf.UInt32Value
+	7,  // 10: envoy.extensions.filters.http.mcp.v3.ParserConfig.MethodConfig.extraction_rules:type_name -> envoy.extensions.filters.http.mcp.v3.ParserConfig.AttributeExtractionRule
+	11, // [11:11] is the sub-list for method output_type
+	11, // [11:11] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_http_mcp_v3_mcp_proto_init() }
