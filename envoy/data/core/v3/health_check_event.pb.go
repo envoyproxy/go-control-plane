@@ -342,9 +342,14 @@ func (*HealthCheckEvent_NoLongerDegradedHost) isHealthCheckEvent_Event() {}
 type HealthCheckEjectUnhealthy struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The type of failure that caused this ejection.
-	FailureType   HealthCheckFailureType `protobuf:"varint,1,opt,name=failure_type,json=failureType,proto3,enum=envoy.data.core.v3.HealthCheckFailureType" json:"failure_type,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	FailureType HealthCheckFailureType `protobuf:"varint,1,opt,name=failure_type,json=failureType,proto3,enum=envoy.data.core.v3.HealthCheckFailureType" json:"failure_type,omitempty"`
+	// HTTP status code observed on the response associated with the failure.
+	// Only set when the health checker type is HTTP and the failure type is “ACTIVE“.
+	// A value of “0“ indicates that no HTTP status code was recorded (e.g., network-level failures
+	// or non-HTTP health checkers).
+	HttpStatusCode uint32 `protobuf:"varint,2,opt,name=http_status_code,json=httpStatusCode,proto3" json:"http_status_code,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *HealthCheckEjectUnhealthy) Reset() {
@@ -382,6 +387,13 @@ func (x *HealthCheckEjectUnhealthy) GetFailureType() HealthCheckFailureType {
 		return x.FailureType
 	}
 	return HealthCheckFailureType_ACTIVE
+}
+
+func (x *HealthCheckEjectUnhealthy) GetHttpStatusCode() uint32 {
+	if x != nil {
+		return x.HttpStatusCode
+	}
+	return 0
 }
 
 type HealthCheckAddHealthy struct {
@@ -472,9 +484,14 @@ type HealthCheckFailure struct {
 	// The type of failure that caused this event.
 	FailureType HealthCheckFailureType `protobuf:"varint,1,opt,name=failure_type,json=failureType,proto3,enum=envoy.data.core.v3.HealthCheckFailureType" json:"failure_type,omitempty"`
 	// Whether this event is the result of the first ever health check on a host.
-	FirstCheck    bool `protobuf:"varint,2,opt,name=first_check,json=firstCheck,proto3" json:"first_check,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	FirstCheck bool `protobuf:"varint,2,opt,name=first_check,json=firstCheck,proto3" json:"first_check,omitempty"`
+	// HTTP status code observed on the response associated with the failure.
+	// Only set when the health checker type is HTTP and the failure type is “ACTIVE“.
+	// A value of “0“ indicates that no HTTP status code was recorded (e.g., network-level failures
+	// or non-HTTP health checkers).
+	HttpStatusCode uint32 `protobuf:"varint,3,opt,name=http_status_code,json=httpStatusCode,proto3" json:"http_status_code,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *HealthCheckFailure) Reset() {
@@ -519,6 +536,13 @@ func (x *HealthCheckFailure) GetFirstCheck() bool {
 		return x.FirstCheck
 	}
 	return false
+}
+
+func (x *HealthCheckFailure) GetHttpStatusCode() uint32 {
+	if x != nil {
+		return x.HttpStatusCode
+	}
+	return 0
 }
 
 type DegradedHealthyHost struct {
@@ -613,19 +637,21 @@ const file_envoy_data_core_v3_health_check_event_proto_rawDesc = "" +
 	" \x01(\v2\x1e.envoy.config.core.v3.MetadataR\bmetadata\x12:\n" +
 	"\blocality\x18\v \x01(\v2\x1e.envoy.config.core.v3.LocalityR\blocality:/\x9aň\x1e*\n" +
 	"(envoy.data.core.v2alpha.HealthCheckEventB\f\n" +
-	"\x05event\x12\x03\xf8B\x01\"\xae\x01\n" +
+	"\x05event\x12\x03\xf8B\x01\"\xd8\x01\n" +
 	"\x19HealthCheckEjectUnhealthy\x12W\n" +
-	"\ffailure_type\x18\x01 \x01(\x0e2*.envoy.data.core.v3.HealthCheckFailureTypeB\b\xfaB\x05\x82\x01\x02\x10\x01R\vfailureType:8\x9aň\x1e3\n" +
+	"\ffailure_type\x18\x01 \x01(\x0e2*.envoy.data.core.v3.HealthCheckFailureTypeB\b\xfaB\x05\x82\x01\x02\x10\x01R\vfailureType\x12(\n" +
+	"\x10http_status_code\x18\x02 \x01(\rR\x0ehttpStatusCode:8\x9aň\x1e3\n" +
 	"1envoy.data.core.v2alpha.HealthCheckEjectUnhealthy\"n\n" +
 	"\x15HealthCheckAddHealthy\x12\x1f\n" +
 	"\vfirst_check\x18\x01 \x01(\bR\n" +
 	"firstCheck:4\x9aň\x1e/\n" +
 	"-envoy.data.core.v2alpha.HealthCheckAddHealthy\"\x17\n" +
-	"\x15HealthCheckSuccessful\"\xc1\x01\n" +
+	"\x15HealthCheckSuccessful\"\xeb\x01\n" +
 	"\x12HealthCheckFailure\x12W\n" +
 	"\ffailure_type\x18\x01 \x01(\x0e2*.envoy.data.core.v3.HealthCheckFailureTypeB\b\xfaB\x05\x82\x01\x02\x10\x01R\vfailureType\x12\x1f\n" +
 	"\vfirst_check\x18\x02 \x01(\bR\n" +
-	"firstCheck:1\x9aň\x1e,\n" +
+	"firstCheck\x12(\n" +
+	"\x10http_status_code\x18\x03 \x01(\rR\x0ehttpStatusCode:1\x9aň\x1e,\n" +
 	"*envoy.data.core.v2alpha.HealthCheckFailure\"I\n" +
 	"\x13DegradedHealthyHost:2\x9aň\x1e-\n" +
 	"+envoy.data.core.v2alpha.DegradedHealthyHost\"K\n" +
