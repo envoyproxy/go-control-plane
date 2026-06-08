@@ -358,6 +358,53 @@ func (m *ToolsListSpecificConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int
 	return len(dAtA) - i, nil
 }
 
+func (m *McpServerInfo) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *McpServerInfo) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *McpServerInfo) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if len(m.Host) > 0 {
+		i -= len(m.Host)
+		copy(dAtA[i:], m.Host)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.Host)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Path) > 0 {
+		i -= len(m.Path)
+		copy(dAtA[i:], m.Path)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.Path)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *ToolConfig) MarshalVTStrict() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
@@ -387,6 +434,18 @@ func (m *ToolConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if len(m.ServerInfo) > 0 {
+		for iNdEx := len(m.ServerInfo) - 1; iNdEx >= 0; iNdEx-- {
+			size, err := m.ServerInfo[iNdEx].MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+			i--
+			dAtA[i] = 0x2a
+		}
 	}
 	if m.TextContentStreamingEnabled {
 		i--
@@ -681,6 +740,24 @@ func (m *ToolsListSpecificConfig) SizeVT() (n int) {
 	return n
 }
 
+func (m *McpServerInfo) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Path)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.Host)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
 func (m *ToolConfig) SizeVT() (n int) {
 	if m == nil {
 		return 0
@@ -701,6 +778,12 @@ func (m *ToolConfig) SizeVT() (n int) {
 	}
 	if m.TextContentStreamingEnabled {
 		n += 2
+	}
+	if len(m.ServerInfo) > 0 {
+		for _, e := range m.ServerInfo {
+			l = e.SizeVT()
+			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+		}
 	}
 	n += len(m.unknownFields)
 	return n

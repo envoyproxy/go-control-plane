@@ -551,6 +551,61 @@ func (x *ToolsListSpecificConfig) GetInputSchema() string {
 	return ""
 }
 
+type McpServerInfo struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The path to the endpoint hosting this tool.
+	Path string `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	// The host hosting this tool.
+	Host          string `protobuf:"bytes,2,opt,name=host,proto3" json:"host,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *McpServerInfo) Reset() {
+	*x = McpServerInfo{}
+	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *McpServerInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*McpServerInfo) ProtoMessage() {}
+
+func (x *McpServerInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use McpServerInfo.ProtoReflect.Descriptor instead.
+func (*McpServerInfo) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *McpServerInfo) GetPath() string {
+	if x != nil {
+		return x.Path
+	}
+	return ""
+}
+
+func (x *McpServerInfo) GetHost() string {
+	if x != nil {
+		return x.Host
+	}
+	return ""
+}
+
+// [#next-free-field: 6]
 type ToolConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Unique identifier of the tool. Used both for tools/list and tools/call transcoding.
@@ -575,13 +630,16 @@ type ToolConfig struct {
 	//
 	// Disabled by default.
 	TextContentStreamingEnabled bool `protobuf:"varint,4,opt,name=text_content_streaming_enabled,json=textContentStreamingEnabled,proto3" json:"text_content_streaming_enabled,omitempty"`
-	unknownFields               protoimpl.UnknownFields
-	sizeCache                   protoimpl.SizeCache
+	// [#not-implemented-hide:]
+	// Path and host of the MCP server that hosts this tool.
+	ServerInfo    []*McpServerInfo `protobuf:"bytes,5,rep,name=server_info,json=serverInfo,proto3" json:"server_info,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ToolConfig) Reset() {
 	*x = ToolConfig{}
-	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[5]
+	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -593,7 +651,7 @@ func (x *ToolConfig) String() string {
 func (*ToolConfig) ProtoMessage() {}
 
 func (x *ToolConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[5]
+	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -606,7 +664,7 @@ func (x *ToolConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ToolConfig.ProtoReflect.Descriptor instead.
 func (*ToolConfig) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_rawDescGZIP(), []int{5}
+	return file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ToolConfig) GetName() string {
@@ -635,6 +693,13 @@ func (x *ToolConfig) GetTextContentStreamingEnabled() bool {
 		return x.TextContentStreamingEnabled
 	}
 	return false
+}
+
+func (x *ToolConfig) GetServerInfo() []*McpServerInfo {
+	if x != nil {
+		return x.ServerInfo
+	}
+	return nil
 }
 
 // Defines the schema of the JSON-RPC to REST mapping. It specifies how the "arguments"
@@ -687,7 +752,7 @@ type HttpRule struct {
 
 func (x *HttpRule) Reset() {
 	*x = HttpRule{}
-	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[6]
+	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -699,7 +764,7 @@ func (x *HttpRule) String() string {
 func (*HttpRule) ProtoMessage() {}
 
 func (x *HttpRule) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[6]
+	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -712,7 +777,7 @@ func (x *HttpRule) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HttpRule.ProtoReflect.Descriptor instead.
 func (*HttpRule) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_rawDescGZIP(), []int{6}
+	return file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *HttpRule) GetGet() string {
@@ -767,7 +832,7 @@ type McpJsonRestBridgePerRoute struct {
 
 func (x *McpJsonRestBridgePerRoute) Reset() {
 	*x = McpJsonRestBridgePerRoute{}
-	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[7]
+	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -779,7 +844,7 @@ func (x *McpJsonRestBridgePerRoute) String() string {
 func (*McpJsonRestBridgePerRoute) ProtoMessage() {}
 
 func (x *McpJsonRestBridgePerRoute) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[7]
+	mi := &file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -792,7 +857,7 @@ func (x *McpJsonRestBridgePerRoute) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use McpJsonRestBridgePerRoute.ProtoReflect.Descriptor instead.
 func (*McpJsonRestBridgePerRoute) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_rawDescGZIP(), []int{7}
+	return file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *McpJsonRestBridgePerRoute) GetToolConfig() *ServerToolConfig {
@@ -833,13 +898,18 @@ const file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_b
 	"\x17ToolsListSpecificConfig\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12)\n" +
 	"\vdescription\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\vdescription\x12!\n" +
-	"\finput_schema\x18\x03 \x01(\tR\vinputSchema\"\xc6\x02\n" +
+	"\finput_schema\x18\x03 \x01(\tR\vinputSchema\"7\n" +
+	"\rMcpServerInfo\x12\x12\n" +
+	"\x04path\x18\x01 \x01(\tR\x04path\x12\x12\n" +
+	"\x04host\x18\x02 \x01(\tR\x04host\"\xad\x03\n" +
 	"\n" +
 	"ToolConfig\x12\x1b\n" +
 	"\x04name\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x04name\x12\\\n" +
 	"\thttp_rule\x18\x02 \x01(\v2?.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRuleR\bhttpRule\x12x\n" +
 	"\x10tool_list_config\x18\x03 \x01(\v2N.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListSpecificConfigR\x0etoolListConfig\x12C\n" +
-	"\x1etext_content_streaming_enabled\x18\x04 \x01(\bR\x1btextContentStreamingEnabled\"\x84\x01\n" +
+	"\x1etext_content_streaming_enabled\x18\x04 \x01(\bR\x1btextContentStreamingEnabled\x12e\n" +
+	"\vserver_info\x18\x05 \x03(\v2D.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpServerInfoR\n" +
+	"serverInfo\"\x84\x01\n" +
 	"\bHttpRule\x12\x10\n" +
 	"\x03get\x18\x01 \x01(\tR\x03get\x12\x10\n" +
 	"\x03put\x18\x02 \x01(\tR\x03put\x12\x12\n" +
@@ -865,7 +935,7 @@ func file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_br
 }
 
 var file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_goTypes = []any{
 	(McpJsonRestBridge_RequestStorageMode)(0), // 0: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.RequestStorageMode
 	(*McpJsonRestBridge)(nil),                 // 1: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge
@@ -873,30 +943,32 @@ var file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bri
 	(*ToolsListLocal)(nil),                    // 3: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListLocal
 	(*ServerToolConfig)(nil),                  // 4: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig
 	(*ToolsListSpecificConfig)(nil),           // 5: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListSpecificConfig
-	(*ToolConfig)(nil),                        // 6: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig
-	(*HttpRule)(nil),                          // 7: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
-	(*McpJsonRestBridgePerRoute)(nil),         // 8: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridgePerRoute
-	(*wrapperspb.UInt32Value)(nil),            // 9: google.protobuf.UInt32Value
-	(*wrapperspb.StringValue)(nil),            // 10: google.protobuf.StringValue
+	(*McpServerInfo)(nil),                     // 6: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpServerInfo
+	(*ToolConfig)(nil),                        // 7: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig
+	(*HttpRule)(nil),                          // 8: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
+	(*McpJsonRestBridgePerRoute)(nil),         // 9: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridgePerRoute
+	(*wrapperspb.UInt32Value)(nil),            // 10: google.protobuf.UInt32Value
+	(*wrapperspb.StringValue)(nil),            // 11: google.protobuf.StringValue
 }
 var file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_depIdxs = []int32{
 	2,  // 0: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.server_info:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerInfo
 	4,  // 1: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.tool_config:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig
-	9,  // 2: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.max_request_body_size:type_name -> google.protobuf.UInt32Value
-	9,  // 3: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.max_response_body_size:type_name -> google.protobuf.UInt32Value
+	10, // 2: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.max_request_body_size:type_name -> google.protobuf.UInt32Value
+	10, // 3: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.max_response_body_size:type_name -> google.protobuf.UInt32Value
 	0,  // 4: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.request_storage_mode:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.RequestStorageMode
-	10, // 5: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerInfo.fallback_protocol_version:type_name -> google.protobuf.StringValue
-	6,  // 6: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tools:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig
-	7,  // 7: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tool_list_http_rule:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
+	11, // 5: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerInfo.fallback_protocol_version:type_name -> google.protobuf.StringValue
+	7,  // 6: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tools:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig
+	8,  // 7: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tool_list_http_rule:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
 	3,  // 8: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tool_list_local:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListLocal
-	7,  // 9: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.http_rule:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
+	8,  // 9: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.http_rule:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
 	5,  // 10: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.tool_list_config:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListSpecificConfig
-	4,  // 11: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridgePerRoute.tool_config:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig
-	12, // [12:12] is the sub-list for method output_type
-	12, // [12:12] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	6,  // 11: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.server_info:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpServerInfo
+	4,  // 12: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridgePerRoute.tool_config:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig
+	13, // [13:13] is the sub-list for method output_type
+	13, // [13:13] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() {
@@ -916,7 +988,7 @@ func file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_br
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_rawDesc), len(file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   8,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
