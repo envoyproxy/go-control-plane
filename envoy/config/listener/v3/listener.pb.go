@@ -915,7 +915,9 @@ type Listener_ConnectionBalanceConfig_ExactBalance_ struct {
 type Listener_ConnectionBalanceConfig_ExtendBalance struct {
 	// The listener will use the connection balancer according to “type_url“. If “type_url“ is invalid,
 	// Envoy will not attempt to balance active connections between worker threads.
-	// [#extension-category: envoy.network.connection_balance]
+	// The “envoy.network.connection_balance“ extension category is currently empty
+	// because the only registered member (“envoy.network.connection_balance.dlb“)
+	// is disabled. See https://github.com/envoyproxy/envoy/issues/45491.
 	ExtendBalance *v3.TypedExtensionConfig `protobuf:"bytes,2,opt,name=extend_balance,json=extendBalance,proto3,oneof"`
 }
 
