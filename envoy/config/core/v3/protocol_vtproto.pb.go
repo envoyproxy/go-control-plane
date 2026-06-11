@@ -576,6 +576,28 @@ func (m *HttpProtocolOptions) MarshalToSizedBufferVTStrict(dAtA []byte) (int, er
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.MaxConnectionDurationJitter != nil {
+		if vtmsg, ok := interface{}(m.MaxConnectionDurationJitter).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.MaxConnectionDurationJitter)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+		}
+		i--
+		dAtA[i] = 0x42
+	}
 	if m.MaxResponseHeadersKb != nil {
 		size, err := (*wrapperspb.UInt32Value)(m.MaxResponseHeadersKb).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -1741,6 +1763,16 @@ func (m *HttpProtocolOptions) SizeVT() (n int) {
 	}
 	if m.MaxResponseHeadersKb != nil {
 		l = (*wrapperspb.UInt32Value)(m.MaxResponseHeadersKb).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.MaxConnectionDurationJitter != nil {
+		if size, ok := interface{}(m.MaxConnectionDurationJitter).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.MaxConnectionDurationJitter)
+		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
