@@ -4825,6 +4825,18 @@ func (m *RedirectAction) validate(all bool) error {
 			}
 		}
 
+	case *RedirectAction_PathRewrite:
+		if v == nil {
+			err := RedirectActionValidationError{
+				field:  "PathRewriteSpecifier",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for PathRewrite
 	default:
 		_ = v // ensures v is used
 	}

@@ -3882,6 +3882,13 @@ func (m *RedirectAction) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) 
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if msg, ok := m.PathRewriteSpecifier.(*RedirectAction_PathRewrite); ok {
+		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+	}
 	if msg, ok := m.PathRewriteSpecifier.(*RedirectAction_RegexRewrite); ok {
 		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -4039,6 +4046,20 @@ func (m *RedirectAction_RegexRewrite) MarshalToSizedBufferVTStrict(dAtA []byte) 
 		i--
 		dAtA[i] = 0x4a
 	}
+	return len(dAtA) - i, nil
+}
+func (m *RedirectAction_PathRewrite) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *RedirectAction_PathRewrite) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i -= len(m.PathRewrite)
+	copy(dAtA[i:], m.PathRewrite)
+	i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.PathRewrite)))
+	i--
+	dAtA[i] = 0x52
 	return len(dAtA) - i, nil
 }
 func (m *DirectResponseAction) MarshalVTStrict() (dAtA []byte, err error) {
@@ -8146,6 +8167,16 @@ func (m *RedirectAction_RegexRewrite) SizeVT() (n int) {
 	} else {
 		n += 2
 	}
+	return n
+}
+func (m *RedirectAction_PathRewrite) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.PathRewrite)
+	n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	return n
 }
 func (m *DirectResponseAction) SizeVT() (n int) {

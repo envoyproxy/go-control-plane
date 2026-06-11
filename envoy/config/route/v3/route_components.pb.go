@@ -3002,7 +3002,7 @@ func (x *HedgePolicy) GetHedgeOnPerTryTimeout() bool {
 	return false
 }
 
-// [#next-free-field: 10]
+// [#next-free-field: 11]
 type RedirectAction struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// When the scheme redirection take place, the following rules apply:
@@ -3025,6 +3025,7 @@ type RedirectAction struct {
 	//	*RedirectAction_PathRedirect
 	//	*RedirectAction_PrefixRewrite
 	//	*RedirectAction_RegexRewrite
+	//	*RedirectAction_PathRewrite
 	PathRewriteSpecifier isRedirectAction_PathRewriteSpecifier `protobuf_oneof:"path_rewrite_specifier"`
 	// The HTTP status code to use in the redirect response. The default response
 	// code is MOVED_PERMANENTLY (301).
@@ -3139,6 +3140,15 @@ func (x *RedirectAction) GetRegexRewrite() *v32.RegexMatchAndSubstitute {
 	return nil
 }
 
+func (x *RedirectAction) GetPathRewrite() string {
+	if x != nil {
+		if x, ok := x.PathRewriteSpecifier.(*RedirectAction_PathRewrite); ok {
+			return x.PathRewrite
+		}
+	}
+	return ""
+}
+
 func (x *RedirectAction) GetResponseCode() RedirectAction_RedirectResponseCode {
 	if x != nil {
 		return x.ResponseCode
@@ -3234,11 +3244,30 @@ type RedirectAction_RegexRewrite struct {
 	RegexRewrite *v32.RegexMatchAndSubstitute `protobuf:"bytes,9,opt,name=regex_rewrite,json=regexRewrite,proto3,oneof"`
 }
 
+type RedirectAction_PathRewrite struct {
+	// The path portion of the URL will be set to this value and supports
+	// :ref:`substitution format specifiers <config_access_log_format>` and CEL
+	// expressions.
+	//
+	// For example, with the following config:
+	//
+	// .. code-block:: yaml
+	//
+	//	path_rewrite: "/new/%REQ(x-version)%"
+	//
+	// Would redirect to “/new/v2“ given a request header “x-version: v2“.
+	// If the substitution produces an empty string the path redirect is ignored
+	// and the original path is preserved.
+	PathRewrite string `protobuf:"bytes,10,opt,name=path_rewrite,json=pathRewrite,proto3,oneof"`
+}
+
 func (*RedirectAction_PathRedirect) isRedirectAction_PathRewriteSpecifier() {}
 
 func (*RedirectAction_PrefixRewrite) isRedirectAction_PathRewriteSpecifier() {}
 
 func (*RedirectAction_RegexRewrite) isRedirectAction_PathRewriteSpecifier() {}
+
+func (*RedirectAction_PathRewrite) isRedirectAction_PathRewriteSpecifier() {}
 
 type DirectResponseAction struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -7842,7 +7871,7 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\x10initial_requests\x18\x01 \x01(\v2\x1c.google.protobuf.UInt32ValueB\a\xfaB\x04*\x02(\x01R\x0finitialRequests\x12\\\n" +
 	"\x19additional_request_chance\x18\x02 \x01(\v2 .envoy.type.v3.FractionalPercentR\x17additionalRequestChance\x126\n" +
 	"\x18hedge_on_per_try_timeout\x18\x03 \x01(\bR\x14hedgeOnPerTryTimeout:%\x9aň\x1e \n" +
-	"\x1eenvoy.api.v2.route.HedgePolicy\"\xe1\x05\n" +
+	"\x1eenvoy.api.v2.route.HedgePolicy\"\x86\x06\n" +
 	"\x0eRedirectAction\x12'\n" +
 	"\x0ehttps_redirect\x18\x04 \x01(\bH\x00R\rhttpsRedirect\x12)\n" +
 	"\x0fscheme_redirect\x18\a \x01(\tH\x00R\x0eschemeRedirect\x120\n" +
@@ -7850,7 +7879,9 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\rport_redirect\x18\b \x01(\rR\fportRedirect\x122\n" +
 	"\rpath_redirect\x18\x02 \x01(\tB\v\xfaB\br\x06\xc8\x01\x00\xc0\x01\x02H\x01R\fpathRedirect\x124\n" +
 	"\x0eprefix_rewrite\x18\x05 \x01(\tB\v\xfaB\br\x06\xc8\x01\x00\xc0\x01\x02H\x01R\rprefixRewrite\x12U\n" +
-	"\rregex_rewrite\x18\t \x01(\v2..envoy.type.matcher.v3.RegexMatchAndSubstituteH\x01R\fregexRewrite\x12i\n" +
+	"\rregex_rewrite\x18\t \x01(\v2..envoy.type.matcher.v3.RegexMatchAndSubstituteH\x01R\fregexRewrite\x12#\n" +
+	"\fpath_rewrite\x18\n" +
+	" \x01(\tH\x01R\vpathRewrite\x12i\n" +
 	"\rresponse_code\x18\x03 \x01(\x0e2:.envoy.config.route.v3.RedirectAction.RedirectResponseCodeB\b\xfaB\x05\x82\x01\x02\x10\x01R\fresponseCode\x12\x1f\n" +
 	"\vstrip_query\x18\x06 \x01(\bR\n" +
 	"stripQuery\"w\n" +
@@ -8375,6 +8406,7 @@ func file_envoy_config_route_v3_route_components_proto_init() {
 		(*RedirectAction_PathRedirect)(nil),
 		(*RedirectAction_PrefixRewrite)(nil),
 		(*RedirectAction_RegexRewrite)(nil),
+		(*RedirectAction_PathRewrite)(nil),
 	}
 	file_envoy_config_route_v3_route_components_proto_msgTypes[18].OneofWrappers = []any{
 		(*HeaderMatcher_ExactMatch)(nil),
