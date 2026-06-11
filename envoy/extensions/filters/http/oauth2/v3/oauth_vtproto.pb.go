@@ -412,6 +412,26 @@ func (m *OAuth2Config) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.AllowedRedirectDomains) > 0 {
+		for iNdEx := len(m.AllowedRedirectDomains) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.AllowedRedirectDomains[iNdEx])
+			copy(dAtA[i:], m.AllowedRedirectDomains[iNdEx])
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.AllowedRedirectDomains[iNdEx])))
+			i--
+			dAtA[i] = 0x1
+			i--
+			dAtA[i] = 0xea
+		}
+	}
+	if len(m.OriginalRequestUri) > 0 {
+		i -= len(m.OriginalRequestUri)
+		copy(dAtA[i:], m.OriginalRequestUri)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.OriginalRequestUri)))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xe2
+	}
 	if len(m.AllowFailedMatcher) > 0 {
 		for iNdEx := len(m.AllowFailedMatcher) - 1; iNdEx >= 0; iNdEx-- {
 			if vtmsg, ok := interface{}(m.AllowFailedMatcher[iNdEx]).(interface {
@@ -1173,6 +1193,16 @@ func (m *OAuth2Config) SizeVT() (n int) {
 			} else {
 				l = proto.Size(e)
 			}
+			n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+		}
+	}
+	l = len(m.OriginalRequestUri)
+	if l > 0 {
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if len(m.AllowedRedirectDomains) > 0 {
+		for _, s := range m.AllowedRedirectDomains {
+			l = len(s)
 			n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 		}
 	}

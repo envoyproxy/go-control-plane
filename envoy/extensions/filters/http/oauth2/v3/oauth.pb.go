@@ -431,7 +431,7 @@ func (*OAuth2Credentials_HmacSecret) isOAuth2Credentials_TokenFormation() {}
 
 // OAuth config
 //
-// [#next-free-field: 28]
+// [#next-free-field: 30]
 type OAuth2Config struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Endpoint on the authorization server to retrieve the access token from.
@@ -541,8 +541,44 @@ type OAuth2Config struct {
 	// Note: If a request matches pass_through_matcher, it bypasses OAuth validation and this matcher won't be evaluated.
 	// This matcher takes precedence over deny_redirect_matcher.
 	AllowFailedMatcher []*v33.HeaderMatcher `protobuf:"bytes,27,rep,name=allow_failed_matcher,json=allowFailedMatcher,proto3" json:"allow_failed_matcher,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	// Optional base URI (scheme + host, e.g. “https://app.example.com“) used to build the
+	// original request URI that is encoded into the OAuth2 “state“ parameter.
+	// This URI will be used later to redirect users on a successful OAuth.
+	//
+	// This is useful when Envoy sits behind a gateway or load balancer that terminates the
+	// user-facing hostname: In that case, the post-authentication redirect derived from “state“ would
+	// send the user to an internal host they didn't request.
+	//
+	// Supports request header formatting tokens.
+	//
+	// Example:
+	//
+	//	original_request_uri: "%REQ(x-forwarded-proto?:scheme)%://%REQ(x-forwarded-host?:authority)%"
+	//
+	// If not set, defaults to “<:scheme>://<:authority>“ of the incoming request.
+	OriginalRequestUri string `protobuf:"bytes,28,opt,name=original_request_uri,json=originalRequestUri,proto3" json:"original_request_uri,omitempty"`
+	// Optional list of domains that are allowed as
+	// 1. redirect_uri: which is what the IdP calls after OAuth
+	// 2. original_request_uri: the one extracted from the state of an OAuth callback (where should the request go after OAuth)
+	//
+	// This mitigates:
+	// - injecting a malicious x-forwarded-host or any header that is used to template the redirect urls
+	// - open redirect attacks where an attacker crafts a “state“ value pointing to an untrusted host.
+	//
+	// Each entry is matched against the host (with any port stripped) extracted from the
+	// formatted “redirect_uri“, the formatted “original_request_uri“, and the URL decoded from
+	// the “state“ parameter on callback. Matching is case-insensitive and supports two forms:
+	//
+	//   - Exact match, e.g. “example.com“ matches only “example.com“.
+	//   - Wildcard subdomain match using a leading “*.“, e.g. “*.example.com“ matches
+	//     “foo.example.com“ and “bar.baz.example.com“ but not “example.com“ itself.
+	//
+	// IPv6 literals must be configured without surrounding brackets (e.g. “::1“, not “[::1]“).
+	//
+	// If this list is empty (the default), all hosts are allowed and no validation is performed.
+	AllowedRedirectDomains []string `protobuf:"bytes,29,rep,name=allowed_redirect_domains,json=allowedRedirectDomains,proto3" json:"allowed_redirect_domains,omitempty"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *OAuth2Config) Reset() {
@@ -760,6 +796,20 @@ func (x *OAuth2Config) GetDisableTokenEncryption() bool {
 func (x *OAuth2Config) GetAllowFailedMatcher() []*v33.HeaderMatcher {
 	if x != nil {
 		return x.AllowFailedMatcher
+	}
+	return nil
+}
+
+func (x *OAuth2Config) GetOriginalRequestUri() string {
+	if x != nil {
+		return x.OriginalRequestUri
+	}
+	return ""
+}
+
+func (x *OAuth2Config) GetAllowedRedirectDomains() []string {
+	if x != nil {
+		return x.AllowedRedirectDomains
 	}
 	return nil
 }
@@ -1004,7 +1054,7 @@ const file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDesc = "" +
 	"\voauth_nonce\x18\x06 \x01(\tB\v\xfaB\br\x06\xd0\x01\x01\xc0\x01\x01R\n" +
 	"oauthNonce\x120\n" +
 	"\rcode_verifier\x18\a \x01(\tB\v\xfaB\br\x06\xd0\x01\x01\xc0\x01\x01R\fcodeVerifierB\x16\n" +
-	"\x0ftoken_formation\x12\x03\xf8B\x01\"\xe7\x0f\n" +
+	"\x0ftoken_formation\x12\x03\xf8B\x01\"\xd3\x10\n" +
 	"\fOAuth2Config\x12D\n" +
 	"\x0etoken_endpoint\x18\x01 \x01(\v2\x1d.envoy.config.core.v3.HttpUriR\rtokenEndpoint\x12D\n" +
 	"\fretry_policy\x18\x12 \x01(\v2!.envoy.config.core.v3.RetryPolicyR\vretryPolicy\x12>\n" +
@@ -1035,7 +1085,9 @@ const file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDesc = "" +
 	"\x15csrf_token_expires_in\x18\x18 \x01(\v2\x19.google.protobuf.DurationR\x12csrfTokenExpiresIn\x12]\n" +
 	"\x1ecode_verifier_token_expires_in\x18\x19 \x01(\v2\x19.google.protobuf.DurationR\x1acodeVerifierTokenExpiresIn\x128\n" +
 	"\x18disable_token_encryption\x18\x1a \x01(\bR\x16disableTokenEncryption\x12V\n" +
-	"\x14allow_failed_matcher\x18\x1b \x03(\v2$.envoy.config.route.v3.HeaderMatcherR\x12allowFailedMatcher\"E\n" +
+	"\x14allow_failed_matcher\x18\x1b \x03(\v2$.envoy.config.route.v3.HeaderMatcherR\x12allowFailedMatcher\x120\n" +
+	"\x14original_request_uri\x18\x1c \x01(\tR\x12originalRequestUri\x128\n" +
+	"\x18allowed_redirect_domains\x18\x1d \x03(\tR\x16allowedRedirectDomains\"E\n" +
 	"\bAuthType\x12\x14\n" +
 	"\x10URL_ENCODED_BODY\x10\x00\x12\x0e\n" +
 	"\n" +
