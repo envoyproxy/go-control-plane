@@ -412,6 +412,18 @@ func (m *OAuth2Config) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.UseAccessTokenExpiryForIdTokenCookie {
+		i--
+		if m.UseAccessTokenExpiryForIdTokenCookie {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xf0
+	}
 	if len(m.AllowedRedirectDomains) > 0 {
 		for iNdEx := len(m.AllowedRedirectDomains) - 1; iNdEx >= 0; iNdEx-- {
 			i -= len(m.AllowedRedirectDomains[iNdEx])
@@ -1205,6 +1217,9 @@ func (m *OAuth2Config) SizeVT() (n int) {
 			l = len(s)
 			n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 		}
+	}
+	if m.UseAccessTokenExpiryForIdTokenCookie {
+		n += 3
 	}
 	n += len(m.unknownFields)
 	return n

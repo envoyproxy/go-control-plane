@@ -431,7 +431,7 @@ func (*OAuth2Credentials_HmacSecret) isOAuth2Credentials_TokenFormation() {}
 
 // OAuth config
 //
-// [#next-free-field: 30]
+// [#next-free-field: 31]
 type OAuth2Config struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Endpoint on the authorization server to retrieve the access token from.
@@ -577,8 +577,14 @@ type OAuth2Config struct {
 	//
 	// If this list is empty (the default), all hosts are allowed and no validation is performed.
 	AllowedRedirectDomains []string `protobuf:"bytes,29,rep,name=allowed_redirect_domains,json=allowedRedirectDomains,proto3" json:"allowed_redirect_domains,omitempty"`
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	// If set to true, the expiration time for the ID token cookie will always be derived from the
+	// “expires_in“ field of the access token response rather than from the “exp“ claim in the
+	// ID token JWT. This is useful when the access token response advertises a longer lifetime than
+	// the ID token and you want the ID token cookie to remain valid for that full duration.
+	// Default is false (use the ID token's own “exp“ claim when available).
+	UseAccessTokenExpiryForIdTokenCookie bool `protobuf:"varint,30,opt,name=use_access_token_expiry_for_id_token_cookie,json=useAccessTokenExpiryForIdTokenCookie,proto3" json:"use_access_token_expiry_for_id_token_cookie,omitempty"`
+	unknownFields                        protoimpl.UnknownFields
+	sizeCache                            protoimpl.SizeCache
 }
 
 func (x *OAuth2Config) Reset() {
@@ -812,6 +818,13 @@ func (x *OAuth2Config) GetAllowedRedirectDomains() []string {
 		return x.AllowedRedirectDomains
 	}
 	return nil
+}
+
+func (x *OAuth2Config) GetUseAccessTokenExpiryForIdTokenCookie() bool {
+	if x != nil {
+		return x.UseAccessTokenExpiryForIdTokenCookie
+	}
+	return false
 }
 
 // Per-route OAuth2 config.
@@ -1054,7 +1067,7 @@ const file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDesc = "" +
 	"\voauth_nonce\x18\x06 \x01(\tB\v\xfaB\br\x06\xd0\x01\x01\xc0\x01\x01R\n" +
 	"oauthNonce\x120\n" +
 	"\rcode_verifier\x18\a \x01(\tB\v\xfaB\br\x06\xd0\x01\x01\xc0\x01\x01R\fcodeVerifierB\x16\n" +
-	"\x0ftoken_formation\x12\x03\xf8B\x01\"\xd3\x10\n" +
+	"\x0ftoken_formation\x12\x03\xf8B\x01\"\xae\x11\n" +
 	"\fOAuth2Config\x12D\n" +
 	"\x0etoken_endpoint\x18\x01 \x01(\v2\x1d.envoy.config.core.v3.HttpUriR\rtokenEndpoint\x12D\n" +
 	"\fretry_policy\x18\x12 \x01(\v2!.envoy.config.core.v3.RetryPolicyR\vretryPolicy\x12>\n" +
@@ -1087,7 +1100,8 @@ const file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDesc = "" +
 	"\x18disable_token_encryption\x18\x1a \x01(\bR\x16disableTokenEncryption\x12V\n" +
 	"\x14allow_failed_matcher\x18\x1b \x03(\v2$.envoy.config.route.v3.HeaderMatcherR\x12allowFailedMatcher\x120\n" +
 	"\x14original_request_uri\x18\x1c \x01(\tR\x12originalRequestUri\x128\n" +
-	"\x18allowed_redirect_domains\x18\x1d \x03(\tR\x16allowedRedirectDomains\"E\n" +
+	"\x18allowed_redirect_domains\x18\x1d \x03(\tR\x16allowedRedirectDomains\x12Y\n" +
+	"+use_access_token_expiry_for_id_token_cookie\x18\x1e \x01(\bR$useAccessTokenExpiryForIdTokenCookie\"E\n" +
 	"\bAuthType\x12\x14\n" +
 	"\x10URL_ENCODED_BODY\x10\x00\x12\x0e\n" +
 	"\n" +
