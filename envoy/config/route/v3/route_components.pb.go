@@ -3690,9 +3690,13 @@ type RateLimit struct {
 	//
 	// .. note::
 	//
-	//	This is not supported if the rate limit action is configured in the ``typed_per_filter_config`` like
-	//	:ref:`VirtualHost.typed_per_filter_config<envoy_v3_api_field_config.route.v3.VirtualHost.typed_per_filter_config>` or
-	//	:ref:`Route.typed_per_filter_config<envoy_v3_api_field_config.route.v3.Route.typed_per_filter_config>`, etc.
+	//	For the global HTTP :ref:`rate limit filter
+	//	<config_http_filters_rate_limit>`, this is supported both at the route/virtual host
+	//	level and when the rate limit configuration is supplied via the filter's
+	//	``rate_limits`` field or the ``typed_per_filter_config``
+	//	(:ref:`RateLimitPerRoute <envoy_v3_api_msg_extensions.filters.http.ratelimit.v3.RateLimitPerRoute>`).
+	//	This is not supported by the :ref:`local rate limit filter
+	//	<config_http_filters_local_rate_limit>`.
 	Limit *RateLimit_Override `protobuf:"bytes,4,opt,name=limit,proto3" json:"limit,omitempty"`
 	// An optional hits addend to be appended to the descriptor produced by this rate limit
 	// configuration.
