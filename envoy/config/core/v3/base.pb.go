@@ -1654,7 +1654,14 @@ func (x *HeaderMap) GetHeaders() []*HeaderValue {
 type WatchedDirectory struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Directory path to watch.
-	Path          string `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	Path string `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	// If set to true, the watcher will also subscribe to file modification events
+	// (“IN_MODIFY“ on Linux) in addition to move events (“IN_MOVED_TO“). This allows
+	// in-place file writes to trigger reload callbacks. Use this when the writing process
+	// cannot use atomic rename (e.g. certain secret managers that write certificate files
+	// directly). By default, only move/rename events are watched, which is the safe choice
+	// for atomic updates (e.g. Kubernetes ConfigMap symlink swaps).
+	WatchModify   bool `protobuf:"varint,2,opt,name=watch_modify,json=watchModify,proto3" json:"watch_modify,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1694,6 +1701,13 @@ func (x *WatchedDirectory) GetPath() string {
 		return x.Path
 	}
 	return ""
+}
+
+func (x *WatchedDirectory) GetWatchModify() bool {
+	if x != nil {
+		return x.WatchModify
+	}
+	return false
 }
 
 // Data source consisting of a file, an inline value, or an environment variable.
@@ -2547,9 +2561,10 @@ const file_envoy_config_core_v3_base_proto_rawDesc = "" +
 	"#envoy.api.v2.core.HeaderValueOption\"l\n" +
 	"\tHeaderMap\x12;\n" +
 	"\aheaders\x18\x01 \x03(\v2!.envoy.config.core.v3.HeaderValueR\aheaders:\"\x9aň\x1e\x1d\n" +
-	"\x1benvoy.api.v2.core.HeaderMap\"/\n" +
+	"\x1benvoy.api.v2.core.HeaderMap\"R\n" +
 	"\x10WatchedDirectory\x12\x1b\n" +
-	"\x04path\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x04path\"\xc9\x02\n" +
+	"\x04path\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x04path\x12!\n" +
+	"\fwatch_modify\x18\x02 \x01(\bR\vwatchModify\"\xc9\x02\n" +
 	"\n" +
 	"DataSource\x12%\n" +
 	"\bfilename\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01H\x00R\bfilename\x12#\n" +
