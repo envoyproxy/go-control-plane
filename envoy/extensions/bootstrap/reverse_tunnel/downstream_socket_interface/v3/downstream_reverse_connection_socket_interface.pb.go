@@ -118,8 +118,13 @@ type DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig struct {
 	// afterward. The responder must set this flag to the same value.
 	// Defaults to “false“.
 	UseHttpUpgrade bool `protobuf:"varint,3,opt,name=use_http_upgrade,json=useHttpUpgrade,proto3" json:"use_http_upgrade,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// Formatter extensions usable in “additional_headers“ substitution. See the formatter
+	// extensions documentation for details. When set, “additional_headers“ values are evaluated
+	// as substitution format strings; when empty, the values are sent literally.
+	// [#extension-category: envoy.formatter]
+	Formatters    []*v31.TypedExtensionConfig `protobuf:"bytes,4,rep,name=formatters,proto3" json:"formatters,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) Reset() {
@@ -173,22 +178,32 @@ func (x *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) GetUseH
 	return false
 }
 
+func (x *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) GetFormatters() []*v31.TypedExtensionConfig {
+	if x != nil {
+		return x.Formatters
+	}
+	return nil
+}
+
 var File_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v3_downstream_reverse_connection_socket_interface_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v3_downstream_reverse_connection_socket_interface_proto_rawDesc = "" +
 	"\n" +
-	"}envoy/extensions/bootstrap/reverse_tunnel/downstream_socket_interface/v3/downstream_reverse_connection_socket_interface.proto\x12Henvoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a\x1dudpa/annotations/status.proto\"\xb6\x04\n" +
+	"}envoy/extensions/bootstrap/reverse_tunnel/downstream_socket_interface/v3/downstream_reverse_connection_socket_interface.proto\x12Henvoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a$envoy/config/core/v3/extension.proto\x1a\x1dudpa/annotations/status.proto\"\x82\x05\n" +
 	"*DownstreamReverseConnectionSocketInterface\x12\x1f\n" +
 	"\vstat_prefix\x18\x01 \x01(\tR\n" +
 	"statPrefix\x122\n" +
 	"\x15enable_detailed_stats\x18\x02 \x01(\bR\x13enableDetailedStats\x12\xb0\x01\n" +
 	"\x0ehttp_handshake\x18\x03 \x01(\v2\x88\x01.envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfigR\rhttpHandshake\x12C\n" +
 	"\n" +
-	"access_log\x18\x04 \x03(\v2$.envoy.config.accesslog.v3.AccessLogR\taccessLog\x1a\xba\x01\n" +
+	"access_log\x18\x04 \x03(\v2$.envoy.config.accesslog.v3.AccessLogR\taccessLog\x1a\x86\x02\n" +
 	"\x13HttpHandshakeConfig\x12!\n" +
 	"\frequest_path\x18\x01 \x01(\tR\vrequestPath\x12V\n" +
 	"\x12additional_headers\x18\x02 \x03(\v2'.envoy.config.core.v3.HeaderValueOptionR\x11additionalHeaders\x12(\n" +
-	"\x10use_http_upgrade\x18\x03 \x01(\bR\x0euseHttpUpgradeB\xa3\x02\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x10use_http_upgrade\x18\x03 \x01(\bR\x0euseHttpUpgrade\x12J\n" +
+	"\n" +
+	"formatters\x18\x04 \x03(\v2*.envoy.config.core.v3.TypedExtensionConfigR\n" +
+	"formattersB\xa3\x02\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"Vio.envoyproxy.envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3B/DownstreamReverseConnectionSocketInterfaceProtoP\x01Z\x8d\x01github.com/envoyproxy/go-control-plane/envoy/extensions/bootstrap/reverse_tunnel/downstream_socket_interface/v3;downstream_socket_interfacev3b\x06proto3"
 
 var (
@@ -207,18 +222,20 @@ var file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v
 var file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v3_downstream_reverse_connection_socket_interface_proto_goTypes = []any{
 	(*DownstreamReverseConnectionSocketInterface)(nil),                     // 0: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface
 	(*DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig)(nil), // 1: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfig
-	(*v3.AccessLog)(nil),          // 2: envoy.config.accesslog.v3.AccessLog
-	(*v31.HeaderValueOption)(nil), // 3: envoy.config.core.v3.HeaderValueOption
+	(*v3.AccessLog)(nil),             // 2: envoy.config.accesslog.v3.AccessLog
+	(*v31.HeaderValueOption)(nil),    // 3: envoy.config.core.v3.HeaderValueOption
+	(*v31.TypedExtensionConfig)(nil), // 4: envoy.config.core.v3.TypedExtensionConfig
 }
 var file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v3_downstream_reverse_connection_socket_interface_proto_depIdxs = []int32{
 	1, // 0: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.http_handshake:type_name -> envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfig
 	2, // 1: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.access_log:type_name -> envoy.config.accesslog.v3.AccessLog
 	3, // 2: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfig.additional_headers:type_name -> envoy.config.core.v3.HeaderValueOption
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	4, // 3: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfig.formatters:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() {
