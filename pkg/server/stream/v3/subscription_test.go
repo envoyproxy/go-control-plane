@@ -268,3 +268,15 @@ func TestDeltaSubscriptionsWithDeactivatedLegacyWildcardForTypes(t *testing.T) {
 		assert.True(t, subRoute.IsWildcard())
 	})
 }
+
+func TestDeltaSubscriptionsSetReturnedResourcesNilDoesNotPanicOnWildcardUnsubscribe(t *testing.T) {
+	sub := NewDeltaSubscription([]string{"*", "resource"}, nil, map[string]string{"resource": "version"}, false)
+	assert.True(t, sub.IsWildcard())
+
+	sub.SetReturnedResources(nil)
+
+	assert.NotPanics(t, func() {
+		sub.UpdateResourceSubscriptions(nil, []string{"resource"})
+	})
+	assert.Equal(t, map[string]string{"resource": ""}, sub.ReturnedResources())
+}
