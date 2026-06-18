@@ -1058,7 +1058,7 @@ func (x *KeepaliveSettings) GetConnectionIdleInterval() *durationpb.Duration {
 	return nil
 }
 
-// [#next-free-field: 21]
+// [#next-free-field: 23]
 type Http2ProtocolOptions struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// `Maximum table size <https://httpwg.org/specs/rfc7541.html#rfc.section.4.2>`_
@@ -1255,6 +1255,24 @@ type Http2ProtocolOptions struct {
 	// From RFC 9110, https://www.rfc-editor.org/rfc/rfc9110.html#section-5.5:
 	// obs-text = %x80-FF
 	DisallowObsText *wrapperspb.BoolValue `protobuf:"bytes,20,opt,name=disallow_obs_text,json=disallowObsText,proto3" json:"disallow_obs_text,omitempty"`
+	// Configures the initial token count for the RST_STREAM rate limiter used by the “nghttp2“
+	// server-side connection. This uses a token-bucket algorithm where each received RST_STREAM
+	// frame consumes one token, and tokens are replenished at :ref:`stream_reset_rate
+	// <envoy_v3_api_field_config.core.v3.Http2ProtocolOptions.stream_reset_rate>` per second.
+	// When no tokens remain, “nghttp2“ sends GOAWAY with “INTERNAL_ERROR“ to close the
+	// connection, protecting against CVE-2023-44487 (HTTP/2 Rapid Reset). Defaults to “1000“.
+	//
+	// This option only applies when using “nghttp2“ as a server. It has no effect on “oghttp2“
+	// or on client-side connections.
+	StreamResetBurst *wrapperspb.UInt64Value `protobuf:"bytes,21,opt,name=stream_reset_burst,json=streamResetBurst,proto3" json:"stream_reset_burst,omitempty"`
+	// Configures the token replenishment rate (tokens per second) for the RST_STREAM rate limiter
+	// used by the “nghttp2“ server-side connection. See :ref:`stream_reset_burst
+	// <envoy_v3_api_field_config.core.v3.Http2ProtocolOptions.stream_reset_burst>` for details.
+	// Defaults to “33“.
+	//
+	// This option only applies when using “nghttp2“ as a server. It has no effect on “oghttp2“
+	// or on client-side connections.
+	StreamResetRate *wrapperspb.UInt64Value `protobuf:"bytes,22,opt,name=stream_reset_rate,json=streamResetRate,proto3" json:"stream_reset_rate,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -1426,6 +1444,20 @@ func (x *Http2ProtocolOptions) GetMaxHeaderFieldSizeKb() *wrapperspb.UInt32Value
 func (x *Http2ProtocolOptions) GetDisallowObsText() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.DisallowObsText
+	}
+	return nil
+}
+
+func (x *Http2ProtocolOptions) GetStreamResetBurst() *wrapperspb.UInt64Value {
+	if x != nil {
+		return x.StreamResetBurst
+	}
+	return nil
+}
+
+func (x *Http2ProtocolOptions) GetStreamResetRate() *wrapperspb.UInt64Value {
+	if x != nil {
+		return x.StreamResetRate
 	}
 	return nil
 }
@@ -2141,7 +2173,7 @@ const file_envoy_config_core_v3_protocol_proto_rawDesc = "" +
 	"\binterval\x18\x01 \x01(\v2\x19.google.protobuf.DurationB\f\xfaB\t\xaa\x01\x062\x04\x10\xc0\x84=R\binterval\x12C\n" +
 	"\atimeout\x18\x02 \x01(\v2\x19.google.protobuf.DurationB\x0e\xfaB\v\xaa\x01\b\b\x012\x04\x10\xc0\x84=R\atimeout\x12?\n" +
 	"\x0finterval_jitter\x18\x03 \x01(\v2\x16.envoy.type.v3.PercentR\x0eintervalJitter\x12a\n" +
-	"\x18connection_idle_interval\x18\x04 \x01(\v2\x19.google.protobuf.DurationB\f\xfaB\t\xaa\x01\x062\x04\x10\xc0\x84=R\x16connectionIdleInterval\"\x98\x11\n" +
+	"\x18connection_idle_interval\x18\x04 \x01(\v2\x19.google.protobuf.DurationB\f\xfaB\t\xaa\x01\x062\x04\x10\xc0\x84=R\x16connectionIdleInterval\"\xae\x12\n" +
 	"\x14Http2ProtocolOptions\x12F\n" +
 	"\x10hpack_table_size\x18\x01 \x01(\v2\x1c.google.protobuf.UInt32ValueR\x0ehpackTableSize\x12a\n" +
 	"\x16max_concurrent_streams\x18\x02 \x01(\v2\x1c.google.protobuf.UInt32ValueB\r\xfaB\n" +
@@ -2167,7 +2199,9 @@ const file_envoy_config_core_v3_protocol_proto_rawDesc = "" +
 	"\x17enable_huffman_encoding\x18\x12 \x01(\v2\x1a.google.protobuf.BoolValueR\x15enableHuffmanEncoding\x12`\n" +
 	"\x18max_header_field_size_kb\x18\x13 \x01(\v2\x1c.google.protobuf.UInt32ValueB\n" +
 	"\xfaB\a*\x05\x18\x80\x02(@R\x14maxHeaderFieldSizeKb\x12F\n" +
-	"\x11disallow_obs_text\x18\x14 \x01(\v2\x1a.google.protobuf.BoolValueR\x0fdisallowObsText\x1a\xe2\x01\n" +
+	"\x11disallow_obs_text\x18\x14 \x01(\v2\x1a.google.protobuf.BoolValueR\x0fdisallowObsText\x12J\n" +
+	"\x12stream_reset_burst\x18\x15 \x01(\v2\x1c.google.protobuf.UInt64ValueR\x10streamResetBurst\x12H\n" +
+	"\x11stream_reset_rate\x18\x16 \x01(\v2\x1c.google.protobuf.UInt64ValueR\x0fstreamResetRate\x1a\xe2\x01\n" +
 	"\x11SettingsParameter\x12N\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\x1c.google.protobuf.UInt32ValueB\x10\xfaB\r\x8a\x01\x02\x10\x01*\x06\x18\xff\xff\x03(\x00R\n" +
@@ -2285,22 +2319,24 @@ var file_envoy_config_core_v3_protocol_proto_depIdxs = []int32{
 	23, // 47: envoy.config.core.v3.Http2ProtocolOptions.enable_huffman_encoding:type_name -> google.protobuf.BoolValue
 	20, // 48: envoy.config.core.v3.Http2ProtocolOptions.max_header_field_size_kb:type_name -> google.protobuf.UInt32Value
 	23, // 49: envoy.config.core.v3.Http2ProtocolOptions.disallow_obs_text:type_name -> google.protobuf.BoolValue
-	9,  // 50: envoy.config.core.v3.GrpcProtocolOptions.http2_protocol_options:type_name -> envoy.config.core.v3.Http2ProtocolOptions
-	3,  // 51: envoy.config.core.v3.Http3ProtocolOptions.quic_protocol_options:type_name -> envoy.config.core.v3.QuicProtocolOptions
-	23, // 52: envoy.config.core.v3.Http3ProtocolOptions.override_stream_error_on_invalid_http_message:type_name -> google.protobuf.BoolValue
-	23, // 53: envoy.config.core.v3.Http3ProtocolOptions.disallow_obs_text:type_name -> google.protobuf.BoolValue
-	14, // 54: envoy.config.core.v3.QuicProtocolOptions.ConnectionMigrationSettings.migrate_idle_connections:type_name -> envoy.config.core.v3.QuicProtocolOptions.ConnectionMigrationSettings.MigrateIdleConnectionSettings
-	19, // 55: envoy.config.core.v3.QuicProtocolOptions.ConnectionMigrationSettings.max_time_on_non_default_network:type_name -> google.protobuf.Duration
-	19, // 56: envoy.config.core.v3.QuicProtocolOptions.ConnectionMigrationSettings.MigrateIdleConnectionSettings.max_idle_time_before_migration:type_name -> google.protobuf.Duration
-	17, // 57: envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.proper_case_words:type_name -> envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.ProperCaseWords
-	22, // 58: envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.stateful_formatter:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	20, // 59: envoy.config.core.v3.Http2ProtocolOptions.SettingsParameter.identifier:type_name -> google.protobuf.UInt32Value
-	20, // 60: envoy.config.core.v3.Http2ProtocolOptions.SettingsParameter.value:type_name -> google.protobuf.UInt32Value
-	61, // [61:61] is the sub-list for method output_type
-	61, // [61:61] is the sub-list for method input_type
-	61, // [61:61] is the sub-list for extension type_name
-	61, // [61:61] is the sub-list for extension extendee
-	0,  // [0:61] is the sub-list for field type_name
+	21, // 50: envoy.config.core.v3.Http2ProtocolOptions.stream_reset_burst:type_name -> google.protobuf.UInt64Value
+	21, // 51: envoy.config.core.v3.Http2ProtocolOptions.stream_reset_rate:type_name -> google.protobuf.UInt64Value
+	9,  // 52: envoy.config.core.v3.GrpcProtocolOptions.http2_protocol_options:type_name -> envoy.config.core.v3.Http2ProtocolOptions
+	3,  // 53: envoy.config.core.v3.Http3ProtocolOptions.quic_protocol_options:type_name -> envoy.config.core.v3.QuicProtocolOptions
+	23, // 54: envoy.config.core.v3.Http3ProtocolOptions.override_stream_error_on_invalid_http_message:type_name -> google.protobuf.BoolValue
+	23, // 55: envoy.config.core.v3.Http3ProtocolOptions.disallow_obs_text:type_name -> google.protobuf.BoolValue
+	14, // 56: envoy.config.core.v3.QuicProtocolOptions.ConnectionMigrationSettings.migrate_idle_connections:type_name -> envoy.config.core.v3.QuicProtocolOptions.ConnectionMigrationSettings.MigrateIdleConnectionSettings
+	19, // 57: envoy.config.core.v3.QuicProtocolOptions.ConnectionMigrationSettings.max_time_on_non_default_network:type_name -> google.protobuf.Duration
+	19, // 58: envoy.config.core.v3.QuicProtocolOptions.ConnectionMigrationSettings.MigrateIdleConnectionSettings.max_idle_time_before_migration:type_name -> google.protobuf.Duration
+	17, // 59: envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.proper_case_words:type_name -> envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.ProperCaseWords
+	22, // 60: envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.stateful_formatter:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	20, // 61: envoy.config.core.v3.Http2ProtocolOptions.SettingsParameter.identifier:type_name -> google.protobuf.UInt32Value
+	20, // 62: envoy.config.core.v3.Http2ProtocolOptions.SettingsParameter.value:type_name -> google.protobuf.UInt32Value
+	63, // [63:63] is the sub-list for method output_type
+	63, // [63:63] is the sub-list for method input_type
+	63, // [63:63] is the sub-list for extension type_name
+	63, // [63:63] is the sub-list for extension extendee
+	0,  // [0:63] is the sub-list for field type_name
 }
 
 func init() { file_envoy_config_core_v3_protocol_proto_init() }
