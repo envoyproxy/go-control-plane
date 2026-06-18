@@ -262,6 +262,16 @@ func (m *ServerToolConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.DefaultServerInfo != nil {
+		size, err := m.DefaultServerInfo.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x2a
+	}
 	if msg, ok := m.ToolListConfig.(*ServerToolConfig_ToolListLocal); ok {
 		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -635,15 +645,17 @@ func (m *McpJsonRestBridgePerRoute) MarshalToSizedBufferVTStrict(dAtA []byte) (i
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if m.ToolConfig != nil {
-		size, err := m.ToolConfig.MarshalToSizedBufferVTStrict(dAtA[:i])
-		if err != nil {
-			return 0, err
+	if len(m.ToolConfig) > 0 {
+		for iNdEx := len(m.ToolConfig) - 1; iNdEx >= 0; iNdEx-- {
+			size, err := m.ToolConfig[iNdEx].MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+			i--
+			dAtA[i] = 0xa
 		}
-		i -= size
-		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
-		i--
-		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -742,6 +754,10 @@ func (m *ServerToolConfig) SizeVT() (n int) {
 	}
 	if vtmsg, ok := m.ToolListConfig.(interface{ SizeVT() int }); ok {
 		n += vtmsg.SizeVT()
+	}
+	if m.DefaultServerInfo != nil {
+		l = m.DefaultServerInfo.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
@@ -886,9 +902,11 @@ func (m *McpJsonRestBridgePerRoute) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
-	if m.ToolConfig != nil {
-		l = m.ToolConfig.SizeVT()
-		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	if len(m.ToolConfig) > 0 {
+		for _, e := range m.ToolConfig {
+			l = e.SizeVT()
+			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+		}
 	}
 	n += len(m.unknownFields)
 	return n

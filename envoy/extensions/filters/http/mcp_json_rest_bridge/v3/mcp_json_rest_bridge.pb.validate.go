@@ -685,6 +685,35 @@ func (m *ServerToolConfig) validate(all bool) error {
 
 	// no validation rules for ListChanged
 
+	if all {
+		switch v := interface{}(m.GetDefaultServerInfo()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ServerToolConfigValidationError{
+					field:  "DefaultServerInfo",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ServerToolConfigValidationError{
+					field:  "DefaultServerInfo",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDefaultServerInfo()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ServerToolConfigValidationError{
+				field:  "DefaultServerInfo",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch v := m.ToolListConfig.(type) {
 	case *ServerToolConfig_ToolListHttpRule:
 		if v == nil {
@@ -1408,33 +1437,38 @@ func (m *McpJsonRestBridgePerRoute) validate(all bool) error {
 
 	var errors []error
 
-	if all {
-		switch v := interface{}(m.GetToolConfig()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, McpJsonRestBridgePerRouteValidationError{
-					field:  "ToolConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
+	for idx, item := range m.GetToolConfig() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, McpJsonRestBridgePerRouteValidationError{
+						field:  fmt.Sprintf("ToolConfig[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, McpJsonRestBridgePerRouteValidationError{
+						field:  fmt.Sprintf("ToolConfig[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
 			}
-		case interface{ Validate() error }:
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				errors = append(errors, McpJsonRestBridgePerRouteValidationError{
-					field:  "ToolConfig",
+				return McpJsonRestBridgePerRouteValidationError{
+					field:  fmt.Sprintf("ToolConfig[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
-				})
+				}
 			}
 		}
-	} else if v, ok := interface{}(m.GetToolConfig()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return McpJsonRestBridgePerRouteValidationError{
-				field:  "ToolConfig",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
+
 	}
 
 	if len(errors) > 0 {

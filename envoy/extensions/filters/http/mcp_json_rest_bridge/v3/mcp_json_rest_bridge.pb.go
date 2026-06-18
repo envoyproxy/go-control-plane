@@ -418,6 +418,7 @@ func (*ToolsListLocal) Descriptor() ([]byte, []int) {
 }
 
 // Configuration for the MCP tool capability of the server.
+// [#next-free-field: 6]
 type ServerToolConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// List of MCP tools configurations.
@@ -435,8 +436,11 @@ type ServerToolConfig struct {
 	//	*ServerToolConfig_ToolListHttpRule
 	//	*ServerToolConfig_ToolListLocal
 	ToolListConfig isServerToolConfig_ToolListConfig `protobuf_oneof:"tool_list_config"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// [#not-implemented-hide:]
+	// Default server info for tools without specific ones.
+	DefaultServerInfo *McpServerInfo `protobuf:"bytes,5,opt,name=default_server_info,json=defaultServerInfo,proto3" json:"default_server_info,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *ServerToolConfig) Reset() {
@@ -504,6 +508,13 @@ func (x *ServerToolConfig) GetToolListLocal() *ToolsListLocal {
 		if x, ok := x.ToolListConfig.(*ServerToolConfig_ToolListLocal); ok {
 			return x.ToolListLocal
 		}
+	}
+	return nil
+}
+
+func (x *ServerToolConfig) GetDefaultServerInfo() *McpServerInfo {
+	if x != nil {
+		return x.DefaultServerInfo
 	}
 	return nil
 }
@@ -874,7 +885,7 @@ func (x *HttpRule) GetBody() string {
 // Per-route override configuration for the MCP JSON REST Bridge filter.
 type McpJsonRestBridgePerRoute struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ToolConfig    *ServerToolConfig      `protobuf:"bytes,1,opt,name=tool_config,json=toolConfig,proto3" json:"tool_config,omitempty"`
+	ToolConfig    []*ServerToolConfig    `protobuf:"bytes,1,rep,name=tool_config,json=toolConfig,proto3" json:"tool_config,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -909,7 +920,7 @@ func (*McpJsonRestBridgePerRoute) Descriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_rawDescGZIP(), []int{9}
 }
 
-func (x *McpJsonRestBridgePerRoute) GetToolConfig() *ServerToolConfig {
+func (x *McpJsonRestBridgePerRoute) GetToolConfig() []*ServerToolConfig {
 	if x != nil {
 		return x.ToolConfig
 	}
@@ -939,12 +950,13 @@ const file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_b
 	"\x1bsupported_protocol_versions\x18\x01 \x03(\tR\x19supportedProtocolVersions\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12X\n" +
 	"\x19fallback_protocol_version\x18\x03 \x01(\v2\x1c.google.protobuf.StringValueR\x17fallbackProtocolVersion\"\x10\n" +
-	"\x0eToolsListLocal\"\x85\x03\n" +
+	"\x0eToolsListLocal\"\xfb\x03\n" +
 	"\x10ServerToolConfig\x12W\n" +
 	"\x05tools\x18\x01 \x03(\v2A.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfigR\x05tools\x12!\n" +
 	"\flist_changed\x18\x02 \x01(\bR\vlistChanged\x12p\n" +
 	"\x13tool_list_http_rule\x18\x03 \x01(\v2?.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRuleH\x00R\x10toolListHttpRule\x12o\n" +
-	"\x0ftool_list_local\x18\x04 \x01(\v2E.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListLocalH\x00R\rtoolListLocalB\x12\n" +
+	"\x0ftool_list_local\x18\x04 \x01(\v2E.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListLocalH\x00R\rtoolListLocal\x12t\n" +
+	"\x13default_server_info\x18\x05 \x01(\v2D.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpServerInfoR\x11defaultServerInfoB\x12\n" +
 	"\x10tool_list_config\"}\n" +
 	"\x17ToolsListSpecificConfig\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12)\n" +
@@ -969,7 +981,7 @@ const file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_b
 	"\x05patch\x18\x05 \x01(\tR\x05patch\x12\x12\n" +
 	"\x04body\x18\x06 \x01(\tR\x04body\"\x85\x01\n" +
 	"\x19McpJsonRestBridgePerRoute\x12h\n" +
-	"\vtool_config\x18\x01 \x01(\v2G.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfigR\n" +
+	"\vtool_config\x18\x01 \x03(\v2G.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfigR\n" +
 	"toolConfigB\xe4\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
 	"Cio.envoyproxy.envoy.extensions.filters.http.mcp_json_rest_bridge.v3B\x16McpJsonRestBridgeProtoP\x01Zsgithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/mcp_json_rest_bridge/v3;mcp_json_rest_bridgev3b\x06proto3"
 
@@ -1013,15 +1025,16 @@ var file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bri
 	8,  // 7: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tools:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig
 	9,  // 8: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tool_list_http_rule:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
 	4,  // 9: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tool_list_local:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListLocal
-	9,  // 10: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.http_rule:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
-	6,  // 11: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.tool_list_config:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListSpecificConfig
-	7,  // 12: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.server_info:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpServerInfo
-	5,  // 13: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridgePerRoute.tool_config:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig
-	14, // [14:14] is the sub-list for method output_type
-	14, // [14:14] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	7,  // 10: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.default_server_info:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpServerInfo
+	9,  // 11: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.http_rule:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
+	6,  // 12: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.tool_list_config:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListSpecificConfig
+	7,  // 13: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.server_info:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpServerInfo
+	5,  // 14: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridgePerRoute.tool_config:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig
+	15, // [15:15] is the sub-list for method output_type
+	15, // [15:15] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() {
