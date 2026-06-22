@@ -379,7 +379,6 @@ func (x *ServerInfo) GetFallbackProtocolVersion() *wrapperspb.StringValue {
 	return nil
 }
 
-// [#not-implemented-hide:]
 // Configuration for sending locally-generated responses to tools/list requests.
 type ToolsListLocal struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -533,7 +532,6 @@ type ServerToolConfig_ToolListHttpRule struct {
 }
 
 type ServerToolConfig_ToolListLocal struct {
-	// [#not-implemented-hide:]
 	// If provided: The extension sends a local response, according to each tool's
 	// ToolsListSpecificConfig.
 	ToolListLocal *ToolsListLocal `protobuf:"bytes,4,opt,name=tool_list_local,json=toolListLocal,proto3,oneof"`
@@ -543,7 +541,6 @@ func (*ServerToolConfig_ToolListHttpRule) isServerToolConfig_ToolListConfig() {}
 
 func (*ServerToolConfig_ToolListLocal) isServerToolConfig_ToolListConfig() {}
 
-// [#not-implemented-hide:]
 // Configuration for a tool's entry in tools/list responses.
 type ToolsListSpecificConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -672,7 +669,6 @@ type ToolConfig struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The HTTP configuration rules that apply to the normal backend.
 	HttpRule *HttpRule `protobuf:"bytes,2,opt,name=http_rule,json=httpRule,proto3" json:"http_rule,omitempty"`
-	// [#not-implemented-hide:]
 	// Config for this tool's entry in a local tools/list response. Used when tool_list_local is set
 	// in the ServerToolConfig.
 	ToolListConfig *ToolsListSpecificConfig `protobuf:"bytes,3,opt,name=tool_list_config,json=toolListConfig,proto3" json:"tool_list_config,omitempty"`
