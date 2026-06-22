@@ -4,7 +4,7 @@
 // 	protoc        v6.33.2
 // source: contrib/envoy/extensions/filters/network/peer_metadata/v3/peer_metadata.proto
 
-package peer_metadatav3
+package peer_metadata
 
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
@@ -29,9 +29,25 @@ const (
 // filter.
 type Config struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Filter state key under which the baggage value encoding the proxy workload
-	// is stored. The upstream filter that populates the baggage header in the
-	// HBONE request should use the same key.
+	// What filter state to use to save the baggage value that encodes the proxy
+	// workload.
+	//
+	// The upstream filter that will populate the baggage header in the HBONE
+	// request should be configured to use the same key.
+	//
+	// Why share baggage value via filter state instead of to configure upstream
+	// filter to use the baggage key value directly?
+	//
+	// ztunnel and waypoint have to be aware of the baggage header format,
+	// because they should be able to parse baggage headers to extract the
+	// metadata and report the metrics. However, pilot does not need to be aware
+	// of the baggage encoding yet.
+	//
+	// If instead of using custom filter to generate baggage header value we just
+	// let pilot generate it, it would spread the logic for generating baggage to
+	// the pilot as well. While not a big deal, if there is no clear reason to do
+	// it, let's not duplicate the implementation of baggage logic in pilot and
+	// just re-use the logic we already have in Envoy.
 	BaggageKey    string `protobuf:"bytes,1,opt,name=baggage_key,json=baggageKey,proto3" json:"baggage_key,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -118,12 +134,12 @@ var File_contrib_envoy_extensions_filters_network_peer_metadata_v3_peer_metadata
 
 const file_contrib_envoy_extensions_filters_network_peer_metadata_v3_peer_metadata_proto_rawDesc = "" +
 	"\n" +
-	"Mcontrib/envoy/extensions/filters/network/peer_metadata/v3/peer_metadata.proto\x121envoy.extensions.filters.network.peer_metadata.v3\x1a\x1dudpa/annotations/status.proto\")\n" +
+	"Mcontrib/envoy/extensions/filters/network/peer_metadata/v3/peer_metadata.proto\x12.envoy.extensions.network_filters.peer_metadata\x1a\x1dudpa/annotations/status.proto\")\n" +
 	"\x06Config\x12\x1f\n" +
 	"\vbaggage_key\x18\x01 \x01(\tR\n" +
 	"baggageKey\"\x10\n" +
-	"\x0eUpstreamConfigB\xd0\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
-	"?io.envoyproxy.envoy.extensions.filters.network.peer_metadata.v3B\x11PeerMetadataProtoP\x01Zpgithub.com/envoyproxy/go-control-plane/contrib/envoy/extensions/filters/network/peer_metadata/v3;peer_metadatav3b\x06proto3"
+	"\x0eUpstreamConfigB\xba\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"<io.envoyproxy.envoy.extensions.network_filters.peer_metadataB\x11PeerMetadataProtoP\x01Z]github.com/envoyproxy/go-control-plane/contrib/envoy/extensions/network_filters/peer_metadatab\x06proto3"
 
 var (
 	file_contrib_envoy_extensions_filters_network_peer_metadata_v3_peer_metadata_proto_rawDescOnce sync.Once
@@ -139,8 +155,8 @@ func file_contrib_envoy_extensions_filters_network_peer_metadata_v3_peer_metadat
 
 var file_contrib_envoy_extensions_filters_network_peer_metadata_v3_peer_metadata_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_contrib_envoy_extensions_filters_network_peer_metadata_v3_peer_metadata_proto_goTypes = []any{
-	(*Config)(nil),         // 0: envoy.extensions.filters.network.peer_metadata.v3.Config
-	(*UpstreamConfig)(nil), // 1: envoy.extensions.filters.network.peer_metadata.v3.UpstreamConfig
+	(*Config)(nil),         // 0: envoy.extensions.network_filters.peer_metadata.Config
+	(*UpstreamConfig)(nil), // 1: envoy.extensions.network_filters.peer_metadata.UpstreamConfig
 }
 var file_contrib_envoy_extensions_filters_network_peer_metadata_v3_peer_metadata_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
