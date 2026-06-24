@@ -717,6 +717,132 @@ var _ interface {
 
 var _OAuth2Credentials_CookieDomain_Pattern = regexp.MustCompile("^$|^[^\\x00-\\x1f\\x7f \",;<>\\\\]+$")
 
+// Validate checks the field values on OAuth2TokenForwarding with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *OAuth2TokenForwarding) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on OAuth2TokenForwarding with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// OAuth2TokenForwardingMultiError, or nil if none found.
+func (m *OAuth2TokenForwarding) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *OAuth2TokenForwarding) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if utf8.RuneCountInString(m.GetHeader()) < 1 {
+		err := OAuth2TokenForwardingValidationError{
+			field:  "Header",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if !_OAuth2TokenForwarding_Header_Pattern.MatchString(m.GetHeader()) {
+		err := OAuth2TokenForwardingValidationError{
+			field:  "Header",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return OAuth2TokenForwardingMultiError(errors)
+	}
+
+	return nil
+}
+
+// OAuth2TokenForwardingMultiError is an error wrapping multiple validation
+// errors returned by OAuth2TokenForwarding.ValidateAll() if the designated
+// constraints aren't met.
+type OAuth2TokenForwardingMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m OAuth2TokenForwardingMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m OAuth2TokenForwardingMultiError) AllErrors() []error { return m }
+
+// OAuth2TokenForwardingValidationError is the validation error returned by
+// OAuth2TokenForwarding.Validate if the designated constraints aren't met.
+type OAuth2TokenForwardingValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e OAuth2TokenForwardingValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e OAuth2TokenForwardingValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e OAuth2TokenForwardingValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e OAuth2TokenForwardingValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e OAuth2TokenForwardingValidationError) ErrorName() string {
+	return "OAuth2TokenForwardingValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e OAuth2TokenForwardingValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sOAuth2TokenForwarding.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = OAuth2TokenForwardingValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = OAuth2TokenForwardingValidationError{}
+
+var _OAuth2TokenForwarding_Header_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
 // Validate checks the field values on OAuth2Config with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -942,6 +1068,35 @@ func (m *OAuth2Config) validate(all bool) error {
 	}
 
 	// no validation rules for ForwardBearerToken
+
+	if all {
+		switch v := interface{}(m.GetForwardIdToken()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, OAuth2ConfigValidationError{
+					field:  "ForwardIdToken",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, OAuth2ConfigValidationError{
+					field:  "ForwardIdToken",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetForwardIdToken()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return OAuth2ConfigValidationError{
+				field:  "ForwardIdToken",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	// no validation rules for PreserveAuthorizationHeader
 
