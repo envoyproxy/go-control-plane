@@ -903,7 +903,7 @@ func (x *SubjectAltNameMatcher) GetOid() string {
 	return ""
 }
 
-// [#next-free-field: 18]
+// [#next-free-field: 19]
 type CertificateValidationContext struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// TLS certificate data containing certificate authority certificates to use in verifying
@@ -1090,8 +1090,31 @@ type CertificateValidationContext struct {
 	// in OpenSSL 1.1.x and newer versions of BoringSSL in that the trust anchor is included.
 	// Trusted issues are specified by setting :ref:`trusted_ca <envoy_v3_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.trusted_ca>`
 	MaxVerifyDepth *wrapperspb.UInt32Value `protobuf:"bytes,16,opt,name=max_verify_depth,json=maxVerifyDepth,proto3" json:"max_verify_depth,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// If true, the server does not include the trusted-CA distinguished names in the
+	// TLS “CertificateRequest“ message. CAs from :ref:`trusted_ca
+	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.trusted_ca>`
+	// are still used to validate presented client certificates; only the wire
+	// advertisement changes.
+	//
+	// This is useful when the configured CA set is large enough that the
+	// “CertificateRequest“ would exceed client-side TLS record limits, or when
+	// clients mishandle the CA set in some way.
+	//
+	// .. attention::
+	//
+	//	When enabled, clients that rely on the advertised CA list to select among
+	//	multiple client certificates may now send no certificate or the wrong one;
+	//	validation will then fail with the standard TLS alert.
+	//
+	// This option only affects downstream (server) TLS connections where Envoy sends a
+	// “CertificateRequest“ to clients. It has no effect on upstream connections.
+	//
+	// Honored by the built-in validator and the SPIFFE validator. Validators that do
+	// not set a client CA list themselves (e.g., the dynamic-modules validator) are
+	// unaffected. Defaults to false.
+	SuppressClientCaList bool `protobuf:"varint,18,opt,name=suppress_client_ca_list,json=suppressClientCaList,proto3" json:"suppress_client_ca_list,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *CertificateValidationContext) Reset() {
@@ -1230,6 +1253,13 @@ func (x *CertificateValidationContext) GetMaxVerifyDepth() *wrapperspb.UInt32Val
 	return nil
 }
 
+func (x *CertificateValidationContext) GetSuppressClientCaList() bool {
+	if x != nil {
+		return x.SuppressClientCaList
+	}
+	return false
+}
+
 type CertificateValidationContext_SystemRootCerts struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -1325,7 +1355,7 @@ const file_envoy_extensions_transport_sockets_tls_v3_common_proto_rawDesc = "" +
 	"\n" +
 	"IP_ADDRESS\x10\x04\x12\x0e\n" +
 	"\n" +
-	"OTHER_NAME\x10\x05\"\xa9\r\n" +
+	"OTHER_NAME\x10\x05\"\xe0\r\n" +
 	"\x1cCertificateValidationContext\x12W\n" +
 	"\n" +
 	"trusted_ca\x18\x01 \x01(\v2 .envoy.config.core.v3.DataSourceB\x16\xf2\x98\xfe\x8f\x05\x10\x12\x0eca_cert_sourceR\ttrustedCa\x12\xad\x01\n" +
@@ -1343,7 +1373,8 @@ const file_envoy_extensions_transport_sockets_tls_v3_common_proto_rawDesc = "" +
 	" \x01(\x0e2^.envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext.TrustChainVerificationB\b\xfaB\x05\x82\x01\x02\x10\x01R\x16trustChainVerification\x12b\n" +
 	"\x17custom_validator_config\x18\f \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigR\x15customValidatorConfig\x128\n" +
 	"\x19only_verify_leaf_cert_crl\x18\x0e \x01(\bR\x15onlyVerifyLeafCertCrl\x12O\n" +
-	"\x10max_verify_depth\x18\x10 \x01(\v2\x1c.google.protobuf.UInt32ValueB\a\xfaB\x04*\x02\x18dR\x0emaxVerifyDepth\x1a\x11\n" +
+	"\x10max_verify_depth\x18\x10 \x01(\v2\x1c.google.protobuf.UInt32ValueB\a\xfaB\x04*\x02\x18dR\x0emaxVerifyDepth\x125\n" +
+	"\x17suppress_client_ca_list\x18\x12 \x01(\bR\x14suppressClientCaList\x1a\x11\n" +
 	"\x0fSystemRootCerts\"F\n" +
 	"\x16TrustChainVerification\x12\x16\n" +
 	"\x12VERIFY_TRUST_CHAIN\x10\x00\x12\x14\n" +
