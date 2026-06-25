@@ -199,7 +199,7 @@ func (ApiListenerManager_ThreadingModel) EnumDescriptor() ([]byte, []int) {
 }
 
 // Bootstrap :ref:`configuration overview <config_overview_bootstrap>`.
-// [#next-free-field: 43]
+// [#next-free-field: 44]
 type Bootstrap struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Node identity to present to the management server and for instance
@@ -440,8 +440,18 @@ type Bootstrap struct {
 	// Optional configuration for memory allocation manager.
 	// Memory releasing is only supported for `tcmalloc allocator <https://github.com/google/tcmalloc>`_.
 	MemoryAllocatorManager *MemoryAllocatorManager `protobuf:"bytes,41,opt,name=memory_allocator_manager,json=memoryAllocatorManager,proto3" json:"memory_allocator_manager,omitempty"`
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	// When enabled, Envoy pins each worker thread to a distinct CPU from the process affinity mask,
+	// worker “i“ to the “i-th“ CPU in ascending order. This improves CPU cache and “NUMA“
+	// locality for high concurrency deployments on bare metal. It is available on Linux only and is
+	// ignored on other platforms. Pinning requires a worker count no greater than the number of CPUs
+	// in the process affinity mask. When the worker count exceeds the available CPUs no worker is
+	// pinned. Pinning is applied once when the workers start, so a later change to the process
+	// affinity mask does not re-pin.
+	//
+	// Defaults to “false“.
+	EnableWorkerCpuAffinity bool `protobuf:"varint,43,opt,name=enable_worker_cpu_affinity,json=enableWorkerCpuAffinity,proto3" json:"enable_worker_cpu_affinity,omitempty"`
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
 }
 
 func (x *Bootstrap) Reset() {
@@ -774,6 +784,13 @@ func (x *Bootstrap) GetMemoryAllocatorManager() *MemoryAllocatorManager {
 		return x.MemoryAllocatorManager
 	}
 	return nil
+}
+
+func (x *Bootstrap) GetEnableWorkerCpuAffinity() bool {
+	if x != nil {
+		return x.EnableWorkerCpuAffinity
+	}
+	return false
 }
 
 type isBootstrap_StatsFlush interface {
@@ -2501,7 +2518,7 @@ var File_envoy_config_bootstrap_v3_bootstrap_proto protoreflect.FileDescriptor
 
 const file_envoy_config_bootstrap_v3_bootstrap_proto_rawDesc = "" +
 	"\n" +
-	")envoy/config/bootstrap/v3/bootstrap.proto\x12\x19envoy.config.bootstrap.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a%envoy/config/cluster/v3/cluster.proto\x1a\"envoy/config/core/v3/address.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a/envoy/config/core/v3/event_service_config.proto\x1a$envoy/config/core/v3/extension.proto\x1a#envoy/config/core/v3/resolver.proto\x1a(envoy/config/core/v3/socket_option.proto\x1a'envoy/config/listener/v3/listener.proto\x1a#envoy/config/metrics/v3/stats.proto\x1a'envoy/config/overload/v3/overload.proto\x1a'envoy/config/trace/v3/http_tracer.proto\x1a6envoy/extensions/transport_sockets/tls/v3/secret.proto\x1a\"envoy/type/matcher/v3/string.proto\x1a\x1benvoy/type/v3/percent.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1eudpa/annotations/migrate.proto\x1a\x1fudpa/annotations/security.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\x8e%\n" +
+	")envoy/config/bootstrap/v3/bootstrap.proto\x12\x19envoy.config.bootstrap.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a%envoy/config/cluster/v3/cluster.proto\x1a\"envoy/config/core/v3/address.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a/envoy/config/core/v3/event_service_config.proto\x1a$envoy/config/core/v3/extension.proto\x1a#envoy/config/core/v3/resolver.proto\x1a(envoy/config/core/v3/socket_option.proto\x1a'envoy/config/listener/v3/listener.proto\x1a#envoy/config/metrics/v3/stats.proto\x1a'envoy/config/overload/v3/overload.proto\x1a'envoy/config/trace/v3/http_tracer.proto\x1a6envoy/extensions/transport_sockets/tls/v3/secret.proto\x1a\"envoy/type/matcher/v3/string.proto\x1a\x1benvoy/type/v3/percent.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1eudpa/annotations/migrate.proto\x1a\x1fudpa/annotations/security.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xcb%\n" +
 	"\tBootstrap\x12.\n" +
 	"\x04node\x18\x01 \x01(\v2\x1a.envoy.config.core.v3.NodeR\x04node\x12.\n" +
 	"\x13node_context_params\x18\x1a \x03(\tR\x11nodeContextParams\x12_\n" +
@@ -2545,7 +2562,8 @@ const file_envoy_config_bootstrap_v3_bootstrap_proto_rawDesc = "" +
 	"\x10listener_manager\x18% \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigR\x0flistenerManager\x12o\n" +
 	"\x16application_log_config\x18& \x01(\v29.envoy.config.bootstrap.v3.Bootstrap.ApplicationLogConfigR\x14applicationLogConfig\x12\x89\x01\n" +
 	" grpc_async_client_manager_config\x18( \x01(\v2A.envoy.config.bootstrap.v3.Bootstrap.GrpcAsyncClientManagerConfigR\x1cgrpcAsyncClientManagerConfig\x12k\n" +
-	"\x18memory_allocator_manager\x18) \x01(\v21.envoy.config.bootstrap.v3.MemoryAllocatorManagerR\x16memoryAllocatorManager\x1a\x9a\x02\n" +
+	"\x18memory_allocator_manager\x18) \x01(\v21.envoy.config.bootstrap.v3.MemoryAllocatorManagerR\x16memoryAllocatorManager\x12;\n" +
+	"\x1aenable_worker_cpu_affinity\x18+ \x01(\bR\x17enableWorkerCpuAffinity\x1a\x9a\x02\n" +
 	"\x0fStaticResources\x12@\n" +
 	"\tlisteners\x18\x01 \x03(\v2\".envoy.config.listener.v3.ListenerR\tlisteners\x12<\n" +
 	"\bclusters\x18\x02 \x03(\v2 .envoy.config.cluster.v3.ClusterR\bclusters\x12K\n" +

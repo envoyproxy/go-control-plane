@@ -1013,6 +1013,8 @@ func (m *Bootstrap) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for EnableWorkerCpuAffinity
+
 	switch v := m.StatsFlush.(type) {
 	case *Bootstrap_StatsFlushOnAdmin:
 		if v == nil {
