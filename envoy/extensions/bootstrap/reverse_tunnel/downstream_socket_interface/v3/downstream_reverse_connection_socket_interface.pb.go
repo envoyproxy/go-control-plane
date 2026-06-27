@@ -10,8 +10,10 @@ import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/accesslog/v3"
 	v31 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -27,6 +29,7 @@ const (
 // Configuration for the downstream reverse connection socket interface.
 // This interface initiates reverse connections to upstream Envoys and provides
 // them as socket connections for downstream requests.
+// [#next-free-field: 6]
 type DownstreamReverseConnectionSocketInterface struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Stat prefix to be used for downstream reverse connection socket interface stats.
@@ -42,9 +45,13 @@ type DownstreamReverseConnectionSocketInterface struct {
 	// Logs are emitted on handshake success, handshake failure, and connection close.
 	// Reverse tunnel metadata (“node_id“, “cluster_id“, “tenant_id“, upstream cluster, etc.)
 	// is available via “%DYNAMIC_METADATA(envoy.reverse_tunnel.initiator:*)%“ substitutions.
-	AccessLog     []*v3.AccessLog `protobuf:"bytes,4,rep,name=access_log,json=accessLog,proto3" json:"access_log,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	AccessLog []*v3.AccessLog `protobuf:"bytes,4,rep,name=access_log,json=accessLog,proto3" json:"access_log,omitempty"`
+	// Upper bound on the per-host reconnect backoff. The initiator retries a failed handshake on a
+	// deterministic exponential schedule (1s, 2s, 4s, ...) with small upward jitter; this value caps
+	// that schedule.
+	MaxReconnectBackoff *durationpb.Duration `protobuf:"bytes,5,opt,name=max_reconnect_backoff,json=maxReconnectBackoff,proto3" json:"max_reconnect_backoff,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *DownstreamReverseConnectionSocketInterface) Reset() {
@@ -101,6 +108,13 @@ func (x *DownstreamReverseConnectionSocketInterface) GetHttpHandshake() *Downstr
 func (x *DownstreamReverseConnectionSocketInterface) GetAccessLog() []*v3.AccessLog {
 	if x != nil {
 		return x.AccessLog
+	}
+	return nil
+}
+
+func (x *DownstreamReverseConnectionSocketInterface) GetMaxReconnectBackoff() *durationpb.Duration {
+	if x != nil {
+		return x.MaxReconnectBackoff
 	}
 	return nil
 }
@@ -189,14 +203,16 @@ var File_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v
 
 const file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v3_downstream_reverse_connection_socket_interface_proto_rawDesc = "" +
 	"\n" +
-	"}envoy/extensions/bootstrap/reverse_tunnel/downstream_socket_interface/v3/downstream_reverse_connection_socket_interface.proto\x12Henvoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a$envoy/config/core/v3/extension.proto\x1a\x1dudpa/annotations/status.proto\"\x82\x05\n" +
+	"}envoy/extensions/bootstrap/reverse_tunnel/downstream_socket_interface/v3/downstream_reverse_connection_socket_interface.proto\x12Henvoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a$envoy/config/core/v3/extension.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xdd\x05\n" +
 	"*DownstreamReverseConnectionSocketInterface\x12\x1f\n" +
 	"\vstat_prefix\x18\x01 \x01(\tR\n" +
 	"statPrefix\x122\n" +
 	"\x15enable_detailed_stats\x18\x02 \x01(\bR\x13enableDetailedStats\x12\xb0\x01\n" +
 	"\x0ehttp_handshake\x18\x03 \x01(\v2\x88\x01.envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfigR\rhttpHandshake\x12C\n" +
 	"\n" +
-	"access_log\x18\x04 \x03(\v2$.envoy.config.accesslog.v3.AccessLogR\taccessLog\x1a\x86\x02\n" +
+	"access_log\x18\x04 \x03(\v2$.envoy.config.accesslog.v3.AccessLogR\taccessLog\x12Y\n" +
+	"\x15max_reconnect_backoff\x18\x05 \x01(\v2\x19.google.protobuf.DurationB\n" +
+	"\xfaB\a\xaa\x01\x042\x02\b\x01R\x13maxReconnectBackoff\x1a\x86\x02\n" +
 	"\x13HttpHandshakeConfig\x12!\n" +
 	"\frequest_path\x18\x01 \x01(\tR\vrequestPath\x12V\n" +
 	"\x12additional_headers\x18\x02 \x03(\v2'.envoy.config.core.v3.HeaderValueOptionR\x11additionalHeaders\x12(\n" +
@@ -223,19 +239,21 @@ var file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v
 	(*DownstreamReverseConnectionSocketInterface)(nil),                     // 0: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface
 	(*DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig)(nil), // 1: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfig
 	(*v3.AccessLog)(nil),             // 2: envoy.config.accesslog.v3.AccessLog
-	(*v31.HeaderValueOption)(nil),    // 3: envoy.config.core.v3.HeaderValueOption
-	(*v31.TypedExtensionConfig)(nil), // 4: envoy.config.core.v3.TypedExtensionConfig
+	(*durationpb.Duration)(nil),      // 3: google.protobuf.Duration
+	(*v31.HeaderValueOption)(nil),    // 4: envoy.config.core.v3.HeaderValueOption
+	(*v31.TypedExtensionConfig)(nil), // 5: envoy.config.core.v3.TypedExtensionConfig
 }
 var file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v3_downstream_reverse_connection_socket_interface_proto_depIdxs = []int32{
 	1, // 0: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.http_handshake:type_name -> envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfig
 	2, // 1: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.access_log:type_name -> envoy.config.accesslog.v3.AccessLog
-	3, // 2: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfig.additional_headers:type_name -> envoy.config.core.v3.HeaderValueOption
-	4, // 3: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfig.formatters:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	4, // [4:4] is the sub-list for method output_type
-	4, // [4:4] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	3, // 2: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.max_reconnect_backoff:type_name -> google.protobuf.Duration
+	4, // 3: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfig.additional_headers:type_name -> envoy.config.core.v3.HeaderValueOption
+	5, // 4: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfig.formatters:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	5, // [5:5] is the sub-list for method output_type
+	5, // [5:5] is the sub-list for method input_type
+	5, // [5:5] is the sub-list for extension type_name
+	5, // [5:5] is the sub-list for extension extendee
+	0, // [0:5] is the sub-list for field type_name
 }
 
 func init() {

@@ -8,6 +8,7 @@ package downstream_socket_interfacev3
 
 import (
 	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
+	durationpb "github.com/planetscale/vtprotobuf/types/known/durationpb"
 	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
@@ -147,6 +148,16 @@ func (m *DownstreamReverseConnectionSocketInterface) MarshalToSizedBufferVTStric
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.MaxReconnectBackoff != nil {
+		size, err := (*durationpb.Duration)(m.MaxReconnectBackoff).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x2a
+	}
 	if len(m.AccessLog) > 0 {
 		for iNdEx := len(m.AccessLog) - 1; iNdEx >= 0; iNdEx-- {
 			if vtmsg, ok := interface{}(m.AccessLog[iNdEx]).(interface {
@@ -270,6 +281,10 @@ func (m *DownstreamReverseConnectionSocketInterface) SizeVT() (n int) {
 			}
 			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 		}
+	}
+	if m.MaxReconnectBackoff != nil {
+		l = (*durationpb.Duration)(m.MaxReconnectBackoff).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n

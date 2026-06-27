@@ -127,6 +127,36 @@ func (m *DownstreamReverseConnectionSocketInterface) validate(all bool) error {
 
 	}
 
+	if d := m.GetMaxReconnectBackoff(); d != nil {
+		dur, err := d.AsDuration(), d.CheckValid()
+		if err != nil {
+			err = DownstreamReverseConnectionSocketInterfaceValidationError{
+				field:  "MaxReconnectBackoff",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		} else {
+
+			gte := time.Duration(1*time.Second + 0*time.Nanosecond)
+
+			if dur < gte {
+				err := DownstreamReverseConnectionSocketInterfaceValidationError{
+					field:  "MaxReconnectBackoff",
+					reason: "value must be greater than or equal to 1s",
+				}
+				if !all {
+					return err
+				}
+				errors = append(errors, err)
+			}
+
+		}
+	}
+
 	if len(errors) > 0 {
 		return DownstreamReverseConnectionSocketInterfaceMultiError(errors)
 	}
