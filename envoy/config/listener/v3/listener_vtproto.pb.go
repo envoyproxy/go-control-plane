@@ -253,6 +253,39 @@ func (m *Listener_ConnectionBalanceConfig_ExactBalance) MarshalToSizedBufferVTSt
 	return len(dAtA) - i, nil
 }
 
+func (m *Listener_ConnectionBalanceConfig_CpuLocalityBalance) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Listener_ConnectionBalanceConfig_CpuLocalityBalance) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *Listener_ConnectionBalanceConfig_CpuLocalityBalance) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *Listener_ConnectionBalanceConfig) MarshalVTStrict() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
@@ -282,6 +315,13 @@ func (m *Listener_ConnectionBalanceConfig) MarshalToSizedBufferVTStrict(dAtA []b
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if msg, ok := m.BalanceType.(*Listener_ConnectionBalanceConfig_CpuLocalityBalance_); ok {
+		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
 	}
 	if msg, ok := m.BalanceType.(*Listener_ConnectionBalanceConfig_ExtendBalance); ok {
 		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
@@ -355,6 +395,29 @@ func (m *Listener_ConnectionBalanceConfig_ExtendBalance) MarshalToSizedBufferVTS
 		i = protohelpers.EncodeVarint(dAtA, i, 0)
 		i--
 		dAtA[i] = 0x12
+	}
+	return len(dAtA) - i, nil
+}
+func (m *Listener_ConnectionBalanceConfig_CpuLocalityBalance_) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *Listener_ConnectionBalanceConfig_CpuLocalityBalance_) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.CpuLocalityBalance != nil {
+		size, err := m.CpuLocalityBalance.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1a
+	} else {
+		i = protohelpers.EncodeVarint(dAtA, i, 0)
+		i--
+		dAtA[i] = 0x1a
 	}
 	return len(dAtA) - i, nil
 }
@@ -1064,6 +1127,16 @@ func (m *Listener_ConnectionBalanceConfig_ExactBalance) SizeVT() (n int) {
 	return n
 }
 
+func (m *Listener_ConnectionBalanceConfig_CpuLocalityBalance) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	n += len(m.unknownFields)
+	return n
+}
+
 func (m *Listener_ConnectionBalanceConfig) SizeVT() (n int) {
 	if m == nil {
 		return 0
@@ -1105,6 +1178,20 @@ func (m *Listener_ConnectionBalanceConfig_ExtendBalance) SizeVT() (n int) {
 		} else {
 			l = proto.Size(m.ExtendBalance)
 		}
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	} else {
+		n += 2
+	}
+	return n
+}
+func (m *Listener_ConnectionBalanceConfig_CpuLocalityBalance_) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.CpuLocalityBalance != nil {
+		l = m.CpuLocalityBalance.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
 		n += 2
