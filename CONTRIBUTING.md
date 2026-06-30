@@ -226,7 +226,7 @@ make multimod/push-tags MODSET={part to release}
 
 ## Goals
 
-* Keep Envoy code consistent and high-quality.
+* Keep go-control-plane code consistent and high-quality.
 * Save reviewers time. Reviewers are often in short supply and time, so try to avoid wasted time.
 
 ## What is allowed
@@ -246,7 +246,7 @@ All of the following are required for AI assisted code:
   ensuring issues are addressed, even if your AI assistant is unable.
 * You are transparent about your AI usage. It is often helpful to a reviewer to know that an AI tool
   was used; please include that information in the PR description.
-* All generated code must be released under the same [license](LICENSE) as Envoy. You are responsible
+* All generated code must be released under the same [license](LICENSE) as go-control-plane. You are responsible
   for ensuring that the tools you use to generate code do not add any additional licensing restrictions.
 
 All of the following are required for AI assisted PR reviews:
