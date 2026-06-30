@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 	"sync/atomic"
 
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
@@ -124,6 +125,15 @@ func (s *streamWrapper) send(resp cache.Response) error {
 		return errors.New("missing response")
 	}
 
+	typeURL := resp.GetRequest().GetTypeUrl()
+	w, ok := s.watches.responders[typeURL]
+	if !ok {
+		return fmt.Errorf("no current watch for %s", typeURL)
+	}
+	if !responseMatchesCurrentSubscription(resp, w.sub) {
+		return nil
+	}
+
 	out, err := resp.GetDiscoveryResponse()
 	if err != nil {
 		return err
@@ -131,12 +141,6 @@ func (s *streamWrapper) send(resp cache.Response) error {
 
 	// increment nonce and convert it to base10
 	out.Nonce = strconv.FormatInt(s.nonce.Add(1), 10)
-
-	typeURL := resp.GetRequest().GetTypeUrl()
-	w, ok := s.watches.responders[typeURL]
-	if !ok {
-		return fmt.Errorf("no current watch for %s", typeURL)
-	}
 
 	// Track in the type subcription the nonce and objects returned to the client.
 	w.sub.SetReturnedResources(resp.GetReturnedResources())
@@ -148,6 +152,42 @@ func (s *streamWrapper) send(resp cache.Response) error {
 	}
 
 	return s.stream.Send(out)
+}
+
+func responseMatchesCurrentSubscription(resp cache.Response, sub stream.Subscription) bool {
+	if sub.IsWildcard() {
+		return true
+	}
+
+	returnedResources := resp.GetReturnedResources()
+	if len(returnedResources) == 0 {
+		return true
+	}
+
+	for name := range returnedResources {
+		if _, ok := sub.SubscribedResources()[name]; ok {
+			continue
+		}
+
+		matchedPrefix := false
+		for prefix := range sub.SubscribedPrefixes() {
+			if strings.HasPrefix(name, prefix) {
+				matchedPrefix = true
+				break
+			}
+		}
+		if matchedPrefix {
+			continue
+		}
+
+		// In ordered ADS all resource types share one response channel, so a
+		// response from a superseded watch can be queued after the client has
+		// unsubscribed from those resources. Envoy treats that type as unwatched;
+		// drop the stale response instead of sending it on the stream.
+		return false
+	}
+
+	return true
 }
 
 // Shutdown closes all open watches, and notifies API consumers the stream has closed.
