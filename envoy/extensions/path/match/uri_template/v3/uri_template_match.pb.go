@@ -40,6 +40,10 @@ const (
 //
 // * “{name=**}“ : A named variable matching zero or more path segments.
 //
+//   - “prefix{name}suffix“ : A named variable with surrounding literal text within a single path
+//     segment. For example, “v{version}“ or “{id}.json“. The variable captures only the
+//     dynamic portion; the prefix and suffix must match literally.
+//
 // For example:
 //
 // * “/videos/*/*/*.m4s“ would match “videos/123414/hls/1080p5000_00001.m4s“
@@ -47,6 +51,9 @@ const (
 // * “/videos/{file}“ would match “/videos/1080p5000_00001.m4s“
 //
 // * “/**.mpd“ would match “/content/123/india/dash/55/manifest.mpd“
+//
+//   - “/api/v{version}/users/{id}.json“ would match “/api/v2/users/456.json“ and
+//     capture “version=2“ and “id=456“.
 type UriTemplateMatchConfig struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PathTemplate  string                 `protobuf:"bytes,1,opt,name=path_template,json=pathTemplate,proto3" json:"path_template,omitempty"`
