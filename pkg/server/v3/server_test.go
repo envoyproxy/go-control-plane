@@ -26,6 +26,7 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/anypb"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -608,6 +609,62 @@ func TestAggregatedHandlers(t *testing.T) {
 			t.Fatalf("got %d messages on the stream, not %d", count, expectedCount)
 		}
 	}
+}
+
+type staleSotwResponseWatcher struct {
+	staleResponse cache.Response
+	watchCount    int
+}
+
+func (config *staleSotwResponseWatcher) CreateWatch(_ *discovery.DiscoveryRequest, _ cache.Subscription, out chan cache.Response) (func(), error) {
+	config.watchCount++
+	if config.watchCount == 2 {
+		out <- config.staleResponse
+	}
+	return func() {}, nil
+}
+
+func (config *staleSotwResponseWatcher) CreateDeltaWatch(_ *discovery.DeltaDiscoveryRequest, _ cache.Subscription, _ chan cache.DeltaResponse) (func(), error) {
+	return func() {}, nil
+}
+
+func (config *staleSotwResponseWatcher) Fetch(context.Context, *discovery.DiscoveryRequest) (cache.Response, error) {
+	return nil, errors.New("missing")
+}
+
+func TestAggregatedHandlersDropStaleResponseAfterUnsubscribe(t *testing.T) {
+	secretResource, err := anypb.New(secret)
+	require.NoError(t, err)
+
+	initialReq := &discovery.DiscoveryRequest{
+		Node:          node,
+		TypeUrl:       rsrc.SecretType,
+		ResourceNames: []string{secretName},
+	}
+	config := &staleSotwResponseWatcher{
+		staleResponse: &cache.PassthroughResponse{
+			Request: initialReq,
+			DiscoveryResponse: &discovery.DiscoveryResponse{
+				VersionInfo: "1",
+				TypeUrl:     rsrc.SecretType,
+				Resources:   []*anypb.Any{secretResource},
+			},
+			ReturnedResources: map[string]string{secretName: "1"},
+		},
+	}
+
+	resp := makeMockStream(t)
+	resp.recv <- initialReq
+	resp.recv <- &discovery.DiscoveryRequest{
+		Node:    node,
+		TypeUrl: rsrc.SecretType,
+	}
+	close(resp.recv)
+
+	s := server.NewServer(t.Context(), config, server.CallbackFuncs{}, sotw.WithOrderedADS(), sotw.WithLogger(log.NewTestLogger(t)))
+	require.NoError(t, s.StreamAggregatedResources(resp))
+	assert.Equal(t, 2, config.watchCount)
+	assert.Empty(t, resp.sent)
 }
 
 func TestAggregateRequestType(t *testing.T) {
