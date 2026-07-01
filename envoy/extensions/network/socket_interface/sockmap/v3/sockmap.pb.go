@@ -8,6 +8,7 @@ package sockmapv3
 
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
+	v3 "github.com/envoyproxy/go-control-plane/envoy/type/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -33,32 +34,38 @@ const (
 // eBPF network programs (“CAP_SYS_ADMIN“, or “CAP_BPF“ and “CAP_NET_ADMIN“ on newer kernels).
 // When the programs cannot be loaded or attached, the interface logs the failure and every socket
 // falls back to the standard datapath, so traffic is never interrupted.
+// [#next-free-field: 6]
 type Sockmap struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Filesystem path to the compiled eBPF object that holds the “sock_ops“ and “sk_msg“
-	// programs and the “sockhash“ map. Envoy does not ship this object and there is no well-known
-	// program to reuse: the program source is part of this extension at
-	// :repo:`sockmap_kern.c <source/extensions/network/socket_interface/sockmap/bpf/sockmap_kern.c>`
-	// and Envoy provides a build rule that compiles it into “sockmap_kern.o“. Point this field at
-	// the result, or at a custom build that exports the “envoy_sockops“ and “envoy_sk_msg“
-	// programs and the “envoy_sockhash“ map under those names with a matching key layout. If not
-	// specified, acceleration is disabled and all sockets use the standard datapath.
+	// programs and the “sockhash“ map. Envoy does not ship this object. Build it from the
+	// extension's “sockmap_kern.c“ source, or supply a custom build that exports the
+	// “envoy_sockops“ and “envoy_sk_msg“ programs and the “envoy_sockhash“ map with a matching
+	// key layout. If not specified, acceleration is disabled and all sockets use the standard
+	// datapath.
 	BpfProgramPath string `protobuf:"bytes,1,opt,name=bpf_program_path,json=bpfProgramPath,proto3" json:"bpf_program_path,omitempty"`
 	// Path to the cgroup v2 directory the “sock_ops“ program is attached to. While attached, every
 	// socket that reaches the established state inside this cgroup is added to the “sockhash“,
-	// which is what accelerates application-to-proxy hops. If not specified, the “sock_ops“ program
+	// which accelerates application-to-proxy hops. If not specified, the “sock_ops“ program
 	// is not attached and only sockets accepted or connected by Envoy are registered, which still
 	// accelerates proxy-to-proxy hops on the same host.
 	CgroupPath string `protobuf:"bytes,2,opt,name=cgroup_path,json=cgroupPath,proto3" json:"cgroup_path,omitempty"`
 	// Maximum number of entries in the “sockhash“ map. Each accelerated socket consumes one entry.
-	// If not specified, defaults to 65536.
+	// If not specified, defaults to “65536“.
 	SockhashMaxEntries *wrapperspb.UInt32Value `protobuf:"bytes,3,opt,name=sockhash_max_entries,json=sockhashMaxEntries,proto3" json:"sockhash_max_entries,omitempty"`
 	// Whether sockets accepted or connected by Envoy are registered into the “sockhash“ from user
 	// space. This is independent of “cgroup_path“ and lets proxy-to-proxy hops be accelerated
-	// without attaching the “sock_ops“ program. If not specified, defaults to true.
+	// without attaching the “sock_ops“ program. If not specified, defaults to “true“.
 	RegisterUserSpaceSockets *wrapperspb.BoolValue `protobuf:"bytes,4,opt,name=register_user_space_sockets,json=registerUserSpaceSockets,proto3" json:"register_user_space_sockets,omitempty"`
-	unknownFields            protoimpl.UnknownFields
-	sizeCache                protoimpl.SizeCache
+	// Proxy listener port ranges that scope which connections the “sock_ops“ program adds to the
+	// “sockhash“. Each range is half-open “[start, end)“ with “1 <= start < end <= 65536“, so a
+	// single port “P“ is “{ start: P, end: P + 1 }“. When set, only a connection whose local or
+	// peer port falls in one of these ranges is registered, so other same-host connections in the
+	// cgroup stay on the standard datapath. This applies only when “cgroup_path“ is set. If empty,
+	// every such connection is registered. At most “128“ ranges are allowed.
+	AcceleratedPorts []*v3.Int64Range `protobuf:"bytes,5,rep,name=accelerated_ports,json=acceleratedPorts,proto3" json:"accelerated_ports,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *Sockmap) Reset() {
@@ -119,17 +126,25 @@ func (x *Sockmap) GetRegisterUserSpaceSockets() *wrapperspb.BoolValue {
 	return nil
 }
 
+func (x *Sockmap) GetAcceleratedPorts() []*v3.Int64Range {
+	if x != nil {
+		return x.AcceleratedPorts
+	}
+	return nil
+}
+
 var File_envoy_extensions_network_socket_interface_sockmap_v3_sockmap_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_network_socket_interface_sockmap_v3_sockmap_proto_rawDesc = "" +
 	"\n" +
-	"Benvoy/extensions/network/socket_interface/sockmap/v3/sockmap.proto\x124envoy.extensions.network.socket_interface.sockmap.v3\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x88\x02\n" +
+	"Benvoy/extensions/network/socket_interface/sockmap/v3/sockmap.proto\x124envoy.extensions.network.socket_interface.sockmap.v3\x1a\x19envoy/type/v3/range.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xdb\x02\n" +
 	"\aSockmap\x12(\n" +
 	"\x10bpf_program_path\x18\x01 \x01(\tR\x0ebpfProgramPath\x12\x1f\n" +
 	"\vcgroup_path\x18\x02 \x01(\tR\n" +
 	"cgroupPath\x12W\n" +
 	"\x14sockhash_max_entries\x18\x03 \x01(\v2\x1c.google.protobuf.UInt32ValueB\a\xfaB\x04*\x02(\x01R\x12sockhashMaxEntries\x12Y\n" +
-	"\x1bregister_user_space_sockets\x18\x04 \x01(\v2\x1a.google.protobuf.BoolValueR\x18registerUserSpaceSocketsB\xc3\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x1bregister_user_space_sockets\x18\x04 \x01(\v2\x1a.google.protobuf.BoolValueR\x18registerUserSpaceSockets\x12Q\n" +
+	"\x11accelerated_ports\x18\x05 \x03(\v2\x19.envoy.type.v3.Int64RangeB\t\xfaB\x06\x92\x01\x03\x10\x80\x01R\x10acceleratedPortsB\xc3\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"Bio.envoyproxy.envoy.extensions.network.socket_interface.sockmap.v3B\fSockmapProtoP\x01Zegithub.com/envoyproxy/go-control-plane/envoy/extensions/network/socket_interface/sockmap/v3;sockmapv3b\x06proto3"
 
 var (
@@ -149,15 +164,17 @@ var file_envoy_extensions_network_socket_interface_sockmap_v3_sockmap_proto_goTy
 	(*Sockmap)(nil),                // 0: envoy.extensions.network.socket_interface.sockmap.v3.Sockmap
 	(*wrapperspb.UInt32Value)(nil), // 1: google.protobuf.UInt32Value
 	(*wrapperspb.BoolValue)(nil),   // 2: google.protobuf.BoolValue
+	(*v3.Int64Range)(nil),          // 3: envoy.type.v3.Int64Range
 }
 var file_envoy_extensions_network_socket_interface_sockmap_v3_sockmap_proto_depIdxs = []int32{
 	1, // 0: envoy.extensions.network.socket_interface.sockmap.v3.Sockmap.sockhash_max_entries:type_name -> google.protobuf.UInt32Value
 	2, // 1: envoy.extensions.network.socket_interface.sockmap.v3.Sockmap.register_user_space_sockets:type_name -> google.protobuf.BoolValue
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	3, // 2: envoy.extensions.network.socket_interface.sockmap.v3.Sockmap.accelerated_ports:type_name -> envoy.type.v3.Int64Range
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_network_socket_interface_sockmap_v3_sockmap_proto_init() }

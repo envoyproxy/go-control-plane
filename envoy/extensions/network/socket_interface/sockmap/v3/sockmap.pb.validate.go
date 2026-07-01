@@ -105,6 +105,51 @@ func (m *Sockmap) validate(all bool) error {
 		}
 	}
 
+	if len(m.GetAcceleratedPorts()) > 128 {
+		err := SockmapValidationError{
+			field:  "AcceleratedPorts",
+			reason: "value must contain no more than 128 item(s)",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	for idx, item := range m.GetAcceleratedPorts() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, SockmapValidationError{
+						field:  fmt.Sprintf("AcceleratedPorts[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, SockmapValidationError{
+						field:  fmt.Sprintf("AcceleratedPorts[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return SockmapValidationError{
+					field:  fmt.Sprintf("AcceleratedPorts[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return SockmapMultiError(errors)
 	}
