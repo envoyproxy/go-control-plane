@@ -15,7 +15,7 @@ jobs:
     name: ACK Gemini command
     runs-on: ubuntu-24.04
     if: >-
-      ${{
+      
          github.event.issue.pull_request
          && startsWith(github.event.comment.body, '/gemini')
          && github.actor != 'gemini-code-assist[bot]'
