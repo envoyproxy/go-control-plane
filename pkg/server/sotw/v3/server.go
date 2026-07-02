@@ -125,7 +125,11 @@ func (s *streamWrapper) send(resp cache.Response) error {
 		return errors.New("missing response")
 	}
 
-	typeURL := resp.GetRequest().GetTypeUrl()
+	req := resp.GetRequest()
+	if req == nil {
+		return errors.New("missing request in response")
+	}
+	typeURL := req.GetTypeUrl()
 	w, ok := s.watches.responders[typeURL]
 	if !ok {
 		return fmt.Errorf("no current watch for %s", typeURL)
