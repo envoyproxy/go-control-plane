@@ -12,3 +12,4 @@ right place.
 * Valerian Roche ([valerian-roche](https://github.com/valerian-roche))(valerian.roche@datadoghq.com)
 * Ryan Northey ([phlax](https://github.com/phlax)) (ryan@synca.io)
 * Kateryna Nezdolii ([nezdolik](https://github.com/nezdolik)) (kateryna.nezdolii@gmail.com)
+* Anton Kanugalawattage ([antonkanug](https://github.com/antonkanug)) (antonk@palantir.com)
