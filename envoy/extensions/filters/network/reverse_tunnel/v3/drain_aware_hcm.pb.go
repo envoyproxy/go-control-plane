@@ -30,9 +30,14 @@ const (
 type DrainAwareHttpConnectionManager struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The underlying HCM configuration to apply.
-	HcmConfig     *v3.HttpConnectionManager `protobuf:"bytes,1,opt,name=hcm_config,json=hcmConfig,proto3" json:"hcm_config,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	HcmConfig *v3.HttpConnectionManager `protobuf:"bytes,1,opt,name=hcm_config,json=hcmConfig,proto3" json:"hcm_config,omitempty"`
+	// When true, a peer-initiated GOAWAY on a reverse tunnel makes the initiator drop the draining
+	// tunnel and dial a replacement, so capacity is restored before the old tunnel closes while its
+	// in-flight streams finish. Default false, so the behavior is opt-in and unconfigured listeners
+	// are unaffected.
+	EnableDrainWithGoaway bool `protobuf:"varint,2,opt,name=enable_drain_with_goaway,json=enableDrainWithGoaway,proto3" json:"enable_drain_with_goaway,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *DrainAwareHttpConnectionManager) Reset() {
@@ -72,14 +77,22 @@ func (x *DrainAwareHttpConnectionManager) GetHcmConfig() *v3.HttpConnectionManag
 	return nil
 }
 
+func (x *DrainAwareHttpConnectionManager) GetEnableDrainWithGoaway() bool {
+	if x != nil {
+		return x.EnableDrainWithGoaway
+	}
+	return false
+}
+
 var File_envoy_extensions_filters_network_reverse_tunnel_v3_drain_aware_hcm_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_filters_network_reverse_tunnel_v3_drain_aware_hcm_proto_rawDesc = "" +
 	"\n" +
-	"Henvoy/extensions/filters/network/reverse_tunnel/v3/drain_aware_hcm.proto\x122envoy.extensions.filters.network.reverse_tunnel.v3\x1aYenvoy/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto\x1a\x1dudpa/annotations/status.proto\"\x94\x01\n" +
+	"Henvoy/extensions/filters/network/reverse_tunnel/v3/drain_aware_hcm.proto\x122envoy.extensions.filters.network.reverse_tunnel.v3\x1aYenvoy/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto\x1a\x1dudpa/annotations/status.proto\"\xcd\x01\n" +
 	"\x1fDrainAwareHttpConnectionManager\x12q\n" +
 	"\n" +
-	"hcm_config\x18\x01 \x01(\v2R.envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManagerR\thcmConfigB\xcc\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"hcm_config\x18\x01 \x01(\v2R.envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManagerR\thcmConfig\x127\n" +
+	"\x18enable_drain_with_goaway\x18\x02 \x01(\bR\x15enableDrainWithGoawayB\xcc\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"@io.envoyproxy.envoy.extensions.filters.network.reverse_tunnel.v3B\x12DrainAwareHcmProtoP\x01Zjgithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/reverse_tunnel/v3;reverse_tunnelv3b\x06proto3"
 
 var (

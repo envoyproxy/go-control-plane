@@ -49,6 +49,16 @@ func (m *DrainAwareHttpConnectionManager) MarshalToSizedBufferVTStrict(dAtA []by
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.EnableDrainWithGoaway {
+		i--
+		if m.EnableDrainWithGoaway {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x10
+	}
 	if m.HcmConfig != nil {
 		if vtmsg, ok := interface{}(m.HcmConfig).(interface {
 			MarshalToSizedBufferVTStrict([]byte) (int, error)
@@ -89,6 +99,9 @@ func (m *DrainAwareHttpConnectionManager) SizeVT() (n int) {
 			l = proto.Size(m.HcmConfig)
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.EnableDrainWithGoaway {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n
