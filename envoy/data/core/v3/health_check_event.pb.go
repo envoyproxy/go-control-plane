@@ -80,11 +80,12 @@ func (HealthCheckFailureType) EnumDescriptor() ([]byte, []int) {
 type HealthCheckerType int32
 
 const (
-	HealthCheckerType_HTTP   HealthCheckerType = 0
-	HealthCheckerType_TCP    HealthCheckerType = 1
-	HealthCheckerType_GRPC   HealthCheckerType = 2
-	HealthCheckerType_REDIS  HealthCheckerType = 3
-	HealthCheckerType_THRIFT HealthCheckerType = 4
+	HealthCheckerType_HTTP           HealthCheckerType = 0
+	HealthCheckerType_TCP            HealthCheckerType = 1
+	HealthCheckerType_GRPC           HealthCheckerType = 2
+	HealthCheckerType_REDIS          HealthCheckerType = 3
+	HealthCheckerType_THRIFT         HealthCheckerType = 4
+	HealthCheckerType_DYNAMIC_MODULE HealthCheckerType = 5
 )
 
 // Enum value maps for HealthCheckerType.
@@ -95,13 +96,15 @@ var (
 		2: "GRPC",
 		3: "REDIS",
 		4: "THRIFT",
+		5: "DYNAMIC_MODULE",
 	}
 	HealthCheckerType_value = map[string]int32{
-		"HTTP":   0,
-		"TCP":    1,
-		"GRPC":   2,
-		"REDIS":  3,
-		"THRIFT": 4,
+		"HTTP":           0,
+		"TCP":            1,
+		"GRPC":           2,
+		"REDIS":          3,
+		"THRIFT":         4,
+		"DYNAMIC_MODULE": 5,
 	}
 )
 
@@ -662,14 +665,15 @@ const file_envoy_data_core_v3_health_check_event_proto_rawDesc = "" +
 	"\x06ACTIVE\x10\x00\x12\v\n" +
 	"\aPASSIVE\x10\x01\x12\v\n" +
 	"\aNETWORK\x10\x02\x12\x13\n" +
-	"\x0fNETWORK_TIMEOUT\x10\x03*G\n" +
+	"\x0fNETWORK_TIMEOUT\x10\x03*[\n" +
 	"\x11HealthCheckerType\x12\b\n" +
 	"\x04HTTP\x10\x00\x12\a\n" +
 	"\x03TCP\x10\x01\x12\b\n" +
 	"\x04GRPC\x10\x02\x12\t\n" +
 	"\x05REDIS\x10\x03\x12\n" +
 	"\n" +
-	"\x06THRIFT\x10\x04B\x85\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x06THRIFT\x10\x04\x12\x12\n" +
+	"\x0eDYNAMIC_MODULE\x10\x05B\x85\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	" io.envoyproxy.envoy.data.core.v3B\x15HealthCheckEventProtoP\x01Z@github.com/envoyproxy/go-control-plane/envoy/data/core/v3;corev3b\x06proto3"
 
 var (
