@@ -9,6 +9,7 @@ right place.
 * Ryan Northey ([phlax](https://github.com/phlax)) (ryan@synca.io)
 * Kateryna Nezdolii ([nezdolik](https://github.com/nezdolik)) (kateryna.nezdolii@gmail.com)
 * Anton Kanugalawattage ([antonkanug](https://github.com/antonkanug)) (antonk@palantir.com)
+* Yan Avlasov ([yanavlasov](https://github.com/yanavlasov)) (yavlasov@google.com)
 
 # Emeritus Maintainers
 * Sunjay Bhatia ([sunjayBhatia](https://github.com/sunjayBhatia))(sunjayb@vmware.com)
