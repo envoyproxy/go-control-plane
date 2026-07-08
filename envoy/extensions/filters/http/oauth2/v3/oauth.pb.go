@@ -208,7 +208,7 @@ func (x OAuth2Config_AuthType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use OAuth2Config_AuthType.Descriptor instead.
 func (OAuth2Config_AuthType) EnumDescriptor() ([]byte, []int) {
-	return file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDescGZIP(), []int{5, 0}
+	return file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDescGZIP(), []int{6, 0}
 }
 
 // OAuth cookie configuration attributes.
@@ -610,9 +610,100 @@ func (x *OAuth2TokenForwarding) GetHeader() string {
 	return ""
 }
 
+// Configuration for the “post_logout_redirect_uri“ parameter used in OpenID Connect
+// `RP-Initiated Logout requests <https://openid.net/specs/openid-connect-rpinitiated-1_0.html>`_.
+// This configuration is ignored if “end_session_endpoint“ is not set.
+type PostLogoutRedirectUri struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Config:
+	//
+	//	*PostLogoutRedirectUri_Disabled
+	//	*PostLogoutRedirectUri_Uri
+	Config        isPostLogoutRedirectUri_Config `protobuf_oneof:"config"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PostLogoutRedirectUri) Reset() {
+	*x = PostLogoutRedirectUri{}
+	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PostLogoutRedirectUri) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PostLogoutRedirectUri) ProtoMessage() {}
+
+func (x *PostLogoutRedirectUri) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PostLogoutRedirectUri.ProtoReflect.Descriptor instead.
+func (*PostLogoutRedirectUri) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *PostLogoutRedirectUri) GetConfig() isPostLogoutRedirectUri_Config {
+	if x != nil {
+		return x.Config
+	}
+	return nil
+}
+
+func (x *PostLogoutRedirectUri) GetDisabled() bool {
+	if x != nil {
+		if x, ok := x.Config.(*PostLogoutRedirectUri_Disabled); ok {
+			return x.Disabled
+		}
+	}
+	return false
+}
+
+func (x *PostLogoutRedirectUri) GetUri() string {
+	if x != nil {
+		if x, ok := x.Config.(*PostLogoutRedirectUri_Uri); ok {
+			return x.Uri
+		}
+	}
+	return ""
+}
+
+type isPostLogoutRedirectUri_Config interface {
+	isPostLogoutRedirectUri_Config()
+}
+
+type PostLogoutRedirectUri_Disabled struct {
+	// Do not include the “post_logout_redirect_uri“ parameter in requests to the
+	// configured “end_session_endpoint“.
+	Disabled bool `protobuf:"varint,1,opt,name=disabled,proto3,oneof"`
+}
+
+type PostLogoutRedirectUri_Uri struct {
+	// URI to send as the “post_logout_redirect_uri“ parameter. Supports header formatting
+	// tokens, and will be percent-encoded automatically when building the logout URL.
+	//
+	// The URI should be registered with the authorization server.
+	Uri string `protobuf:"bytes,2,opt,name=uri,proto3,oneof"`
+}
+
+func (*PostLogoutRedirectUri_Disabled) isPostLogoutRedirectUri_Config() {}
+
+func (*PostLogoutRedirectUri_Uri) isPostLogoutRedirectUri_Config() {}
+
 // OAuth config
 //
-// [#next-free-field: 33]
+// [#next-free-field: 34]
 type OAuth2Config struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Endpoint on the authorization server to retrieve the access token from.
@@ -628,6 +719,14 @@ type OAuth2Config struct {
 	//
 	// If configured, the OAuth2 filter will redirect users to this endpoint when they access the signout_path.
 	EndSessionEndpoint string `protobuf:"bytes,23,opt,name=end_session_endpoint,json=endSessionEndpoint,proto3" json:"end_session_endpoint,omitempty"`
+	// Optional control for the “post_logout_redirect_uri“ parameter sent to the “end_session_endpoint“ when a user
+	// accesses the “signout_path“.
+	// This field should be set only if “openid“ is in the “auth_scopes“, the “end_session_endpoint“ is configured,
+	// and the authorization server supports the OpenID Connect RP-Initiated Logout specification.
+	//
+	// If unset, Envoy preserves the historical behavior and sends “<scheme>://<host>/“, constructed from the inbound
+	// request, as “post_logout_redirect_uri“.
+	PostLogoutRedirectUri *PostLogoutRedirectUri `protobuf:"bytes,33,opt,name=post_logout_redirect_uri,json=postLogoutRedirectUri,proto3" json:"post_logout_redirect_uri,omitempty"`
 	// Credentials used for OAuth.
 	Credentials *OAuth2Credentials `protobuf:"bytes,3,opt,name=credentials,proto3" json:"credentials,omitempty"`
 	// The redirect URI passed to the authorization endpoint. Supports header formatting
@@ -786,7 +885,7 @@ type OAuth2Config struct {
 
 func (x *OAuth2Config) Reset() {
 	*x = OAuth2Config{}
-	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[5]
+	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -798,7 +897,7 @@ func (x *OAuth2Config) String() string {
 func (*OAuth2Config) ProtoMessage() {}
 
 func (x *OAuth2Config) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[5]
+	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -811,7 +910,7 @@ func (x *OAuth2Config) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use OAuth2Config.ProtoReflect.Descriptor instead.
 func (*OAuth2Config) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDescGZIP(), []int{5}
+	return file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *OAuth2Config) GetTokenEndpoint() *v31.HttpUri {
@@ -840,6 +939,13 @@ func (x *OAuth2Config) GetEndSessionEndpoint() string {
 		return x.EndSessionEndpoint
 	}
 	return ""
+}
+
+func (x *OAuth2Config) GetPostLogoutRedirectUri() *PostLogoutRedirectUri {
+	if x != nil {
+		return x.PostLogoutRedirectUri
+	}
+	return nil
 }
 
 func (x *OAuth2Config) GetCredentials() *OAuth2Credentials {
@@ -1053,7 +1159,7 @@ type OAuth2PerRoute struct {
 
 func (x *OAuth2PerRoute) Reset() {
 	*x = OAuth2PerRoute{}
-	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[6]
+	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1065,7 +1171,7 @@ func (x *OAuth2PerRoute) String() string {
 func (*OAuth2PerRoute) ProtoMessage() {}
 
 func (x *OAuth2PerRoute) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[6]
+	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1078,7 +1184,7 @@ func (x *OAuth2PerRoute) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use OAuth2PerRoute.ProtoReflect.Descriptor instead.
 func (*OAuth2PerRoute) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDescGZIP(), []int{6}
+	return file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *OAuth2PerRoute) GetConfig() *OAuth2Config {
@@ -1099,7 +1205,7 @@ type OAuth2 struct {
 
 func (x *OAuth2) Reset() {
 	*x = OAuth2{}
-	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[7]
+	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1111,7 +1217,7 @@ func (x *OAuth2) String() string {
 func (*OAuth2) ProtoMessage() {}
 
 func (x *OAuth2) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[7]
+	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1124,7 +1230,7 @@ func (x *OAuth2) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use OAuth2.ProtoReflect.Descriptor instead.
 func (*OAuth2) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDescGZIP(), []int{7}
+	return file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *OAuth2) GetConfig() *OAuth2Config {
@@ -1161,7 +1267,7 @@ type OAuth2Credentials_CookieNames struct {
 
 func (x *OAuth2Credentials_CookieNames) Reset() {
 	*x = OAuth2Credentials_CookieNames{}
-	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[8]
+	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1173,7 +1279,7 @@ func (x *OAuth2Credentials_CookieNames) String() string {
 func (*OAuth2Credentials_CookieNames) ProtoMessage() {}
 
 func (x *OAuth2Credentials_CookieNames) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[8]
+	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1292,12 +1398,17 @@ const file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDesc = "" +
 	"\x05ES512\x10\x05\">\n" +
 	"\x15OAuth2TokenForwarding\x12%\n" +
 	"\x06header\x18\x01 \x01(\tB\r\xfaB\n" +
-	"r\b\x10\x01\xc8\x01\x00\xc0\x01\x01R\x06header\"\xa0\x13\n" +
+	"r\b\x10\x01\xc8\x01\x00\xc0\x01\x01R\x06header\"j\n" +
+	"\x15PostLogoutRedirectUri\x12%\n" +
+	"\bdisabled\x18\x01 \x01(\bB\a\xfaB\x04j\x02\b\x01H\x00R\bdisabled\x12\x1b\n" +
+	"\x03uri\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x01H\x00R\x03uriB\r\n" +
+	"\x06config\x12\x03\xf8B\x01\"\x99\x14\n" +
 	"\fOAuth2Config\x12D\n" +
 	"\x0etoken_endpoint\x18\x01 \x01(\v2\x1d.envoy.config.core.v3.HttpUriR\rtokenEndpoint\x12D\n" +
 	"\fretry_policy\x18\x12 \x01(\v2!.envoy.config.core.v3.RetryPolicyR\vretryPolicy\x12>\n" +
 	"\x16authorization_endpoint\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x15authorizationEndpoint\x120\n" +
-	"\x14end_session_endpoint\x18\x17 \x01(\tR\x12endSessionEndpoint\x12f\n" +
+	"\x14end_session_endpoint\x18\x17 \x01(\tR\x12endSessionEndpoint\x12w\n" +
+	"\x18post_logout_redirect_uri\x18! \x01(\v2>.envoy.extensions.filters.http.oauth2.v3.PostLogoutRedirectUriR\x15postLogoutRedirectUri\x12f\n" +
 	"\vcredentials\x18\x03 \x01(\v2:.envoy.extensions.filters.http.oauth2.v3.OAuth2CredentialsB\b\xfaB\x05\x8a\x01\x02\x10\x01R\vcredentials\x12*\n" +
 	"\fredirect_uri\x18\x04 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\vredirectUri\x12`\n" +
 	"\x15redirect_path_matcher\x18\x05 \x01(\v2\".envoy.type.matcher.v3.PathMatcherB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x13redirectPathMatcher\x12O\n" +
@@ -1355,7 +1466,7 @@ func file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDescGZIP() []by
 }
 
 var file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_goTypes = []any{
 	(CookieConfig_SameSite)(0),                // 0: envoy.extensions.filters.http.oauth2.v3.CookieConfig.SameSite
 	(PrivateKeyJwtConfig_SigningAlgorithm)(0), // 1: envoy.extensions.filters.http.oauth2.v3.PrivateKeyJwtConfig.SigningAlgorithm
@@ -1365,17 +1476,18 @@ var file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_goTypes = []any{
 	(*OAuth2Credentials)(nil),                 // 5: envoy.extensions.filters.http.oauth2.v3.OAuth2Credentials
 	(*PrivateKeyJwtConfig)(nil),               // 6: envoy.extensions.filters.http.oauth2.v3.PrivateKeyJwtConfig
 	(*OAuth2TokenForwarding)(nil),             // 7: envoy.extensions.filters.http.oauth2.v3.OAuth2TokenForwarding
-	(*OAuth2Config)(nil),                      // 8: envoy.extensions.filters.http.oauth2.v3.OAuth2Config
-	(*OAuth2PerRoute)(nil),                    // 9: envoy.extensions.filters.http.oauth2.v3.OAuth2PerRoute
-	(*OAuth2)(nil),                            // 10: envoy.extensions.filters.http.oauth2.v3.OAuth2
-	(*OAuth2Credentials_CookieNames)(nil),     // 11: envoy.extensions.filters.http.oauth2.v3.OAuth2Credentials.CookieNames
-	(*v3.SdsSecretConfig)(nil),                // 12: envoy.extensions.transport_sockets.tls.v3.SdsSecretConfig
-	(*durationpb.Duration)(nil),               // 13: google.protobuf.Duration
-	(*v31.HttpUri)(nil),                       // 14: envoy.config.core.v3.HttpUri
-	(*v31.RetryPolicy)(nil),                   // 15: envoy.config.core.v3.RetryPolicy
-	(*v32.PathMatcher)(nil),                   // 16: envoy.type.matcher.v3.PathMatcher
-	(*v33.HeaderMatcher)(nil),                 // 17: envoy.config.route.v3.HeaderMatcher
-	(*wrapperspb.BoolValue)(nil),              // 18: google.protobuf.BoolValue
+	(*PostLogoutRedirectUri)(nil),             // 8: envoy.extensions.filters.http.oauth2.v3.PostLogoutRedirectUri
+	(*OAuth2Config)(nil),                      // 9: envoy.extensions.filters.http.oauth2.v3.OAuth2Config
+	(*OAuth2PerRoute)(nil),                    // 10: envoy.extensions.filters.http.oauth2.v3.OAuth2PerRoute
+	(*OAuth2)(nil),                            // 11: envoy.extensions.filters.http.oauth2.v3.OAuth2
+	(*OAuth2Credentials_CookieNames)(nil),     // 12: envoy.extensions.filters.http.oauth2.v3.OAuth2Credentials.CookieNames
+	(*v3.SdsSecretConfig)(nil),                // 13: envoy.extensions.transport_sockets.tls.v3.SdsSecretConfig
+	(*durationpb.Duration)(nil),               // 14: google.protobuf.Duration
+	(*v31.HttpUri)(nil),                       // 15: envoy.config.core.v3.HttpUri
+	(*v31.RetryPolicy)(nil),                   // 16: envoy.config.core.v3.RetryPolicy
+	(*v32.PathMatcher)(nil),                   // 17: envoy.type.matcher.v3.PathMatcher
+	(*v33.HeaderMatcher)(nil),                 // 18: envoy.config.route.v3.HeaderMatcher
+	(*wrapperspb.BoolValue)(nil),              // 19: google.protobuf.BoolValue
 }
 var file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_depIdxs = []int32{
 	0,  // 0: envoy.extensions.filters.http.oauth2.v3.CookieConfig.same_site:type_name -> envoy.extensions.filters.http.oauth2.v3.CookieConfig.SameSite
@@ -1386,35 +1498,36 @@ var file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_depIdxs = []int32{
 	3,  // 5: envoy.extensions.filters.http.oauth2.v3.CookieConfigs.refresh_token_cookie_config:type_name -> envoy.extensions.filters.http.oauth2.v3.CookieConfig
 	3,  // 6: envoy.extensions.filters.http.oauth2.v3.CookieConfigs.oauth_nonce_cookie_config:type_name -> envoy.extensions.filters.http.oauth2.v3.CookieConfig
 	3,  // 7: envoy.extensions.filters.http.oauth2.v3.CookieConfigs.code_verifier_cookie_config:type_name -> envoy.extensions.filters.http.oauth2.v3.CookieConfig
-	12, // 8: envoy.extensions.filters.http.oauth2.v3.OAuth2Credentials.token_secret:type_name -> envoy.extensions.transport_sockets.tls.v3.SdsSecretConfig
-	12, // 9: envoy.extensions.filters.http.oauth2.v3.OAuth2Credentials.hmac_secret:type_name -> envoy.extensions.transport_sockets.tls.v3.SdsSecretConfig
-	11, // 10: envoy.extensions.filters.http.oauth2.v3.OAuth2Credentials.cookie_names:type_name -> envoy.extensions.filters.http.oauth2.v3.OAuth2Credentials.CookieNames
+	13, // 8: envoy.extensions.filters.http.oauth2.v3.OAuth2Credentials.token_secret:type_name -> envoy.extensions.transport_sockets.tls.v3.SdsSecretConfig
+	13, // 9: envoy.extensions.filters.http.oauth2.v3.OAuth2Credentials.hmac_secret:type_name -> envoy.extensions.transport_sockets.tls.v3.SdsSecretConfig
+	12, // 10: envoy.extensions.filters.http.oauth2.v3.OAuth2Credentials.cookie_names:type_name -> envoy.extensions.filters.http.oauth2.v3.OAuth2Credentials.CookieNames
 	1,  // 11: envoy.extensions.filters.http.oauth2.v3.PrivateKeyJwtConfig.signing_algorithm:type_name -> envoy.extensions.filters.http.oauth2.v3.PrivateKeyJwtConfig.SigningAlgorithm
-	13, // 12: envoy.extensions.filters.http.oauth2.v3.PrivateKeyJwtConfig.assertion_lifetime:type_name -> google.protobuf.Duration
-	14, // 13: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.token_endpoint:type_name -> envoy.config.core.v3.HttpUri
-	15, // 14: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.retry_policy:type_name -> envoy.config.core.v3.RetryPolicy
-	5,  // 15: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.credentials:type_name -> envoy.extensions.filters.http.oauth2.v3.OAuth2Credentials
-	16, // 16: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.redirect_path_matcher:type_name -> envoy.type.matcher.v3.PathMatcher
-	16, // 17: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.signout_path:type_name -> envoy.type.matcher.v3.PathMatcher
-	7,  // 18: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.forward_id_token:type_name -> envoy.extensions.filters.http.oauth2.v3.OAuth2TokenForwarding
-	17, // 19: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.pass_through_matcher:type_name -> envoy.config.route.v3.HeaderMatcher
-	2,  // 20: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.auth_type:type_name -> envoy.extensions.filters.http.oauth2.v3.OAuth2Config.AuthType
-	18, // 21: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.use_refresh_token:type_name -> google.protobuf.BoolValue
-	13, // 22: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.default_expires_in:type_name -> google.protobuf.Duration
-	17, // 23: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.deny_redirect_matcher:type_name -> envoy.config.route.v3.HeaderMatcher
-	13, // 24: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.default_refresh_token_expires_in:type_name -> google.protobuf.Duration
-	4,  // 25: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.cookie_configs:type_name -> envoy.extensions.filters.http.oauth2.v3.CookieConfigs
-	13, // 26: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.csrf_token_expires_in:type_name -> google.protobuf.Duration
-	13, // 27: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.code_verifier_token_expires_in:type_name -> google.protobuf.Duration
-	17, // 28: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.allow_failed_matcher:type_name -> envoy.config.route.v3.HeaderMatcher
-	6,  // 29: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.private_key_jwt_config:type_name -> envoy.extensions.filters.http.oauth2.v3.PrivateKeyJwtConfig
-	8,  // 30: envoy.extensions.filters.http.oauth2.v3.OAuth2PerRoute.config:type_name -> envoy.extensions.filters.http.oauth2.v3.OAuth2Config
-	8,  // 31: envoy.extensions.filters.http.oauth2.v3.OAuth2.config:type_name -> envoy.extensions.filters.http.oauth2.v3.OAuth2Config
-	32, // [32:32] is the sub-list for method output_type
-	32, // [32:32] is the sub-list for method input_type
-	32, // [32:32] is the sub-list for extension type_name
-	32, // [32:32] is the sub-list for extension extendee
-	0,  // [0:32] is the sub-list for field type_name
+	14, // 12: envoy.extensions.filters.http.oauth2.v3.PrivateKeyJwtConfig.assertion_lifetime:type_name -> google.protobuf.Duration
+	15, // 13: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.token_endpoint:type_name -> envoy.config.core.v3.HttpUri
+	16, // 14: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.retry_policy:type_name -> envoy.config.core.v3.RetryPolicy
+	8,  // 15: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.post_logout_redirect_uri:type_name -> envoy.extensions.filters.http.oauth2.v3.PostLogoutRedirectUri
+	5,  // 16: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.credentials:type_name -> envoy.extensions.filters.http.oauth2.v3.OAuth2Credentials
+	17, // 17: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.redirect_path_matcher:type_name -> envoy.type.matcher.v3.PathMatcher
+	17, // 18: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.signout_path:type_name -> envoy.type.matcher.v3.PathMatcher
+	7,  // 19: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.forward_id_token:type_name -> envoy.extensions.filters.http.oauth2.v3.OAuth2TokenForwarding
+	18, // 20: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.pass_through_matcher:type_name -> envoy.config.route.v3.HeaderMatcher
+	2,  // 21: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.auth_type:type_name -> envoy.extensions.filters.http.oauth2.v3.OAuth2Config.AuthType
+	19, // 22: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.use_refresh_token:type_name -> google.protobuf.BoolValue
+	14, // 23: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.default_expires_in:type_name -> google.protobuf.Duration
+	18, // 24: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.deny_redirect_matcher:type_name -> envoy.config.route.v3.HeaderMatcher
+	14, // 25: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.default_refresh_token_expires_in:type_name -> google.protobuf.Duration
+	4,  // 26: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.cookie_configs:type_name -> envoy.extensions.filters.http.oauth2.v3.CookieConfigs
+	14, // 27: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.csrf_token_expires_in:type_name -> google.protobuf.Duration
+	14, // 28: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.code_verifier_token_expires_in:type_name -> google.protobuf.Duration
+	18, // 29: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.allow_failed_matcher:type_name -> envoy.config.route.v3.HeaderMatcher
+	6,  // 30: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.private_key_jwt_config:type_name -> envoy.extensions.filters.http.oauth2.v3.PrivateKeyJwtConfig
+	9,  // 31: envoy.extensions.filters.http.oauth2.v3.OAuth2PerRoute.config:type_name -> envoy.extensions.filters.http.oauth2.v3.OAuth2Config
+	9,  // 32: envoy.extensions.filters.http.oauth2.v3.OAuth2.config:type_name -> envoy.extensions.filters.http.oauth2.v3.OAuth2Config
+	33, // [33:33] is the sub-list for method output_type
+	33, // [33:33] is the sub-list for method input_type
+	33, // [33:33] is the sub-list for extension type_name
+	33, // [33:33] is the sub-list for extension extendee
+	0,  // [0:33] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_init() }
@@ -1425,13 +1538,17 @@ func file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_init() {
 	file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[2].OneofWrappers = []any{
 		(*OAuth2Credentials_HmacSecret)(nil),
 	}
+	file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[5].OneofWrappers = []any{
+		(*PostLogoutRedirectUri_Disabled)(nil),
+		(*PostLogoutRedirectUri_Uri)(nil),
+	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDesc), len(file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   9,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

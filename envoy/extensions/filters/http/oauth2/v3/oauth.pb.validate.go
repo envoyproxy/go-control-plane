@@ -986,6 +986,172 @@ var _ interface {
 
 var _OAuth2TokenForwarding_Header_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
+// Validate checks the field values on PostLogoutRedirectUri with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *PostLogoutRedirectUri) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PostLogoutRedirectUri with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PostLogoutRedirectUriMultiError, or nil if none found.
+func (m *PostLogoutRedirectUri) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PostLogoutRedirectUri) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	oneofConfigPresent := false
+	switch v := m.Config.(type) {
+	case *PostLogoutRedirectUri_Disabled:
+		if v == nil {
+			err := PostLogoutRedirectUriValidationError{
+				field:  "Config",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		oneofConfigPresent = true
+
+		if m.GetDisabled() != true {
+			err := PostLogoutRedirectUriValidationError{
+				field:  "Disabled",
+				reason: "value must equal true",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	case *PostLogoutRedirectUri_Uri:
+		if v == nil {
+			err := PostLogoutRedirectUriValidationError{
+				field:  "Config",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		oneofConfigPresent = true
+
+		if utf8.RuneCountInString(m.GetUri()) < 1 {
+			err := PostLogoutRedirectUriValidationError{
+				field:  "Uri",
+				reason: "value length must be at least 1 runes",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	default:
+		_ = v // ensures v is used
+	}
+	if !oneofConfigPresent {
+		err := PostLogoutRedirectUriValidationError{
+			field:  "Config",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return PostLogoutRedirectUriMultiError(errors)
+	}
+
+	return nil
+}
+
+// PostLogoutRedirectUriMultiError is an error wrapping multiple validation
+// errors returned by PostLogoutRedirectUri.ValidateAll() if the designated
+// constraints aren't met.
+type PostLogoutRedirectUriMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PostLogoutRedirectUriMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PostLogoutRedirectUriMultiError) AllErrors() []error { return m }
+
+// PostLogoutRedirectUriValidationError is the validation error returned by
+// PostLogoutRedirectUri.Validate if the designated constraints aren't met.
+type PostLogoutRedirectUriValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PostLogoutRedirectUriValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PostLogoutRedirectUriValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PostLogoutRedirectUriValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PostLogoutRedirectUriValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PostLogoutRedirectUriValidationError) ErrorName() string {
+	return "PostLogoutRedirectUriValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PostLogoutRedirectUriValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPostLogoutRedirectUri.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PostLogoutRedirectUriValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PostLogoutRedirectUriValidationError{}
+
 // Validate checks the field values on OAuth2Config with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -1078,6 +1244,35 @@ func (m *OAuth2Config) validate(all bool) error {
 	}
 
 	// no validation rules for EndSessionEndpoint
+
+	if all {
+		switch v := interface{}(m.GetPostLogoutRedirectUri()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, OAuth2ConfigValidationError{
+					field:  "PostLogoutRedirectUri",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, OAuth2ConfigValidationError{
+					field:  "PostLogoutRedirectUri",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPostLogoutRedirectUri()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return OAuth2ConfigValidationError{
+				field:  "PostLogoutRedirectUri",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if m.GetCredentials() == nil {
 		err := OAuth2ConfigValidationError{
