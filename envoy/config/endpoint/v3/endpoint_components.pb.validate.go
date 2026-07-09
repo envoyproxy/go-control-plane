@@ -460,33 +460,38 @@ func (m *LbEndpointCollection) validate(all bool) error {
 
 	var errors []error
 
-	if all {
-		switch v := interface{}(m.GetEntries()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LbEndpointCollectionValidationError{
-					field:  "Entries",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
+	for idx, item := range m.GetEntries() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, LbEndpointCollectionValidationError{
+						field:  fmt.Sprintf("Entries[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, LbEndpointCollectionValidationError{
+						field:  fmt.Sprintf("Entries[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
 			}
-		case interface{ Validate() error }:
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				errors = append(errors, LbEndpointCollectionValidationError{
-					field:  "Entries",
+				return LbEndpointCollectionValidationError{
+					field:  fmt.Sprintf("Entries[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
-				})
+				}
 			}
 		}
-	} else if v, ok := interface{}(m.GetEntries()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LbEndpointCollectionValidationError{
-				field:  "Entries",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
+
 	}
 
 	if len(errors) > 0 {

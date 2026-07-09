@@ -274,7 +274,7 @@ func (*LbEndpoint_EndpointName) isLbEndpoint_HostIdentifier() {}
 // [#not-implemented-hide:]
 type LbEndpointCollection struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Entries       *v31.CollectionEntry   `protobuf:"bytes,1,opt,name=entries,proto3" json:"entries,omitempty"`
+	Entries       []*v31.CollectionEntry `protobuf:"bytes,1,rep,name=entries,proto3" json:"entries,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -309,7 +309,7 @@ func (*LbEndpointCollection) Descriptor() ([]byte, []int) {
 	return file_envoy_config_endpoint_v3_endpoint_components_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *LbEndpointCollection) GetEntries() *v31.CollectionEntry {
+func (x *LbEndpointCollection) GetEntries() []*v31.CollectionEntry {
 	if x != nil {
 		return x.Entries
 	}
@@ -760,7 +760,7 @@ const file_envoy_config_endpoint_v3_endpoint_components_proto_rawDesc = "" +
 	" envoy.api.v2.endpoint.LbEndpointB\x11\n" +
 	"\x0fhost_identifier\"N\n" +
 	"\x14LbEndpointCollection\x126\n" +
-	"\aentries\x18\x01 \x01(\v2\x1c.xds.core.v3.CollectionEntryR\aentries\"\x92\x01\n" +
+	"\aentries\x18\x01 \x03(\v2\x1c.xds.core.v3.CollectionEntryR\aentries\"\x92\x01\n" +
 	"\x19LedsClusterLocalityConfig\x12C\n" +
 	"\vleds_config\x18\x01 \x01(\v2\".envoy.config.core.v3.ConfigSourceR\n" +
 	"ledsConfig\x120\n" +
