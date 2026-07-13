@@ -149,7 +149,7 @@ func (McpJsonRestBridge_RequestStorageMode) EnumDescriptor() ([]byte, []int) {
 //	  (Only the "payload" field from arguments is used as the body. Other arguments not in the
 //	  path, like 'resource_id', become query parameters.)
 //
-// [#next-free-field: 7]
+// [#next-free-field: 8]
 type McpJsonRestBridge struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// General server information.
@@ -185,6 +185,9 @@ type McpJsonRestBridge struct {
 	// will be extracted from “_meta“.
 	// Ref: `Request Meta SEP <https://modelcontextprotocol.io/seps/414-request-meta>`_
 	TraceContextExtraction *TraceContextExtractionOptions `protobuf:"bytes,6,opt,name=trace_context_extraction,json=traceContextExtraction,proto3" json:"trace_context_extraction,omitempty"`
+	// When set to true, the filter will not clear the route cache after transcoding.
+	// This allows the route to be re-selected based on the updated request path or method.
+	DisableClearRouteCache bool `protobuf:"varint,7,opt,name=disable_clear_route_cache,json=disableClearRouteCache,proto3" json:"disable_clear_route_cache,omitempty"`
 	unknownFields          protoimpl.UnknownFields
 	sizeCache              protoimpl.SizeCache
 }
@@ -259,6 +262,13 @@ func (x *McpJsonRestBridge) GetTraceContextExtraction() *TraceContextExtractionO
 		return x.TraceContextExtraction
 	}
 	return nil
+}
+
+func (x *McpJsonRestBridge) GetDisableClearRouteCache() bool {
+	if x != nil {
+		return x.DisableClearRouteCache
+	}
+	return false
 }
 
 // Options for trace context extraction.
@@ -927,7 +937,7 @@ var File_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bri
 
 const file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_rawDesc = "" +
 	"\n" +
-	"Penvoy/extensions/filters/http/mcp_json_rest_bridge/v3/mcp_json_rest_bridge.proto\x125envoy.extensions.filters.http.mcp_json_rest_bridge.v3\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xf2\x05\n" +
+	"Penvoy/extensions/filters/http/mcp_json_rest_bridge/v3/mcp_json_rest_bridge.proto\x125envoy.extensions.filters.http.mcp_json_rest_bridge.v3\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xad\x06\n" +
 	"\x11McpJsonRestBridge\x12b\n" +
 	"\vserver_info\x18\x01 \x01(\v2A.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerInfoR\n" +
 	"serverInfo\x12h\n" +
@@ -936,7 +946,8 @@ const file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_b
 	"\x15max_request_body_size\x18\x03 \x01(\v2\x1c.google.protobuf.UInt32ValueR\x12maxRequestBodySize\x12Q\n" +
 	"\x16max_response_body_size\x18\x04 \x01(\v2\x1c.google.protobuf.UInt32ValueR\x13maxResponseBodySize\x12\x97\x01\n" +
 	"\x14request_storage_mode\x18\x05 \x01(\x0e2[.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.RequestStorageModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\x12requestStorageMode\x12\x8e\x01\n" +
-	"\x18trace_context_extraction\x18\x06 \x01(\v2T.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.TraceContextExtractionOptionsR\x16traceContextExtraction\"@\n" +
+	"\x18trace_context_extraction\x18\x06 \x01(\v2T.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.TraceContextExtractionOptionsR\x16traceContextExtraction\x129\n" +
+	"\x19disable_clear_route_cache\x18\a \x01(\bR\x16disableClearRouteCache\"@\n" +
 	"\x12RequestStorageMode\x12\x14\n" +
 	"\x10MODE_UNSPECIFIED\x10\x00\x12\x14\n" +
 	"\x10DYNAMIC_METADATA\x10\x01\"\x1f\n" +

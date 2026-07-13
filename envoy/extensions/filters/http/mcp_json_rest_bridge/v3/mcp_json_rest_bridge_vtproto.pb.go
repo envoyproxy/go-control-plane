@@ -49,6 +49,16 @@ func (m *McpJsonRestBridge) MarshalToSizedBufferVTStrict(dAtA []byte) (int, erro
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.DisableClearRouteCache {
+		i--
+		if m.DisableClearRouteCache {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x38
+	}
 	if m.TraceContextExtraction != nil {
 		size, err := m.TraceContextExtraction.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -688,6 +698,9 @@ func (m *McpJsonRestBridge) SizeVT() (n int) {
 	if m.TraceContextExtraction != nil {
 		l = m.TraceContextExtraction.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.DisableClearRouteCache {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n
