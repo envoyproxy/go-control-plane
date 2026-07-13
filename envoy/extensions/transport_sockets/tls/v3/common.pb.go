@@ -121,6 +121,23 @@ const (
 	//	Please refer to the `BoringSSL CNSA2_202603 compliance policy <https://boringssl.googlesource.com/boringssl/+/refs/tags/0.20260413.0/include/openssl/ssl.h#6293>`_
 	//	for details.
 	TlsParameters_CNSA2_202603 TlsParameters_CompliancePolicy = 1
+	// CNSA1_202603 configures a TLS connection to use:
+	//   - TLS 1.2 or TLS 1.3.
+	//   - For TLS 1.2, only TLS_ECDHE_[ECDSA|RSA]_WITH_AES_256_GCM_SHA384.
+	//   - For TLS 1.3, only AES-256-GCM.
+	//   - ML-KEM-1024 or P-384 for key agreement, preferring ML-KEM-1024 if the
+	//     client supports it.
+	//   - For handshake signatures, only ECDSA with P-384 and SHA-384, or RSA
+	//     with SHA-384.
+	//
+	// Note: this setting aids with compliance with CNSA requirements but does not
+	// guarantee it. Careful reading of RFC 9151 is recommended.
+	//
+	// .. attention::
+	//
+	//	Please refer to the `BoringSSL CNSA1_202603 compliance policy <https://boringssl.googlesource.com/boringssl/+/refs/tags/0.20260413.0/include/openssl/ssl.h#6280>`_
+	//	for details.
+	TlsParameters_CNSA1_202603 TlsParameters_CompliancePolicy = 2
 )
 
 // Enum value maps for TlsParameters_CompliancePolicy.
@@ -128,10 +145,12 @@ var (
 	TlsParameters_CompliancePolicy_name = map[int32]string{
 		0: "FIPS_202205",
 		1: "CNSA2_202603",
+		2: "CNSA1_202603",
 	}
 	TlsParameters_CompliancePolicy_value = map[string]int32{
 		"FIPS_202205":  0,
 		"CNSA2_202603": 1,
+		"CNSA1_202603": 2,
 	}
 )
 
@@ -1318,7 +1337,7 @@ var File_envoy_extensions_transport_sockets_tls_v3_common_proto protoreflect.Fil
 
 const file_envoy_extensions_transport_sockets_tls_v3_common_proto_rawDesc = "" +
 	"\n" +
-	"6envoy/extensions/transport_sockets/tls/v3/common.proto\x12)envoy.extensions.transport_sockets.tls.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a$envoy/config/core/v3/extension.proto\x1a\"envoy/type/matcher/v3/string.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1eudpa/annotations/migrate.proto\x1a udpa/annotations/sensitive.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xe3\x05\n" +
+	"6envoy/extensions/transport_sockets/tls/v3/common.proto\x12)envoy.extensions.transport_sockets.tls.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a$envoy/config/core/v3/extension.proto\x1a\"envoy/type/matcher/v3/string.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1eudpa/annotations/migrate.proto\x1a udpa/annotations/sensitive.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xf5\x05\n" +
 	"\rTlsParameters\x12\x8f\x01\n" +
 	"\x1ctls_minimum_protocol_version\x18\x01 \x01(\x0e2D.envoy.extensions.transport_sockets.tls.v3.TlsParameters.TlsProtocolB\b\xfaB\x05\x82\x01\x02\x10\x01R\x19tlsMinimumProtocolVersion\x12\x8f\x01\n" +
 	"\x1ctls_maximum_protocol_version\x18\x02 \x01(\x0e2D.envoy.extensions.transport_sockets.tls.v3.TlsParameters.TlsProtocolB\b\xfaB\x05\x82\x01\x02\x10\x01R\x19tlsMaximumProtocolVersion\x12#\n" +
@@ -1332,10 +1351,11 @@ const file_envoy_extensions_transport_sockets_tls_v3_common_proto_rawDesc = "" +
 	"\aTLSv1_0\x10\x01\x12\v\n" +
 	"\aTLSv1_1\x10\x02\x12\v\n" +
 	"\aTLSv1_2\x10\x03\x12\v\n" +
-	"\aTLSv1_3\x10\x04\"5\n" +
+	"\aTLSv1_3\x10\x04\"G\n" +
 	"\x10CompliancePolicy\x12\x0f\n" +
 	"\vFIPS_202205\x10\x00\x12\x10\n" +
-	"\fCNSA2_202603\x10\x01:&\x9aň\x1e!\n" +
+	"\fCNSA2_202603\x10\x01\x12\x10\n" +
+	"\fCNSA1_202603\x10\x02:&\x9aň\x1e!\n" +
 	"\x1fenvoy.api.v2.auth.TlsParameters\"\xeb\x01\n" +
 	"\x12PrivateKeyProvider\x12,\n" +
 	"\rprovider_name\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\fproviderName\x12A\n" +
