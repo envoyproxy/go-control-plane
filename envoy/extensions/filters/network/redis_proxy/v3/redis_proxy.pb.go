@@ -29,6 +29,67 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// RESP protocol version supported on this listener.
+type RedisProxy_ProtocolVersion int32
+
+const (
+	// Default. The listener speaks RESP2 on both downstream connections and
+	// every routed upstream conn pool: no “HELLO 3“ is sent upstream and a
+	// downstream “HELLO 3“ is rejected with “-NOPROTO“. (RESP3-aware
+	// handling such as the local “HELLO“ reply, “CLIENT SETINFO“ /
+	// “SETNAME“ acceptance, and the RESP3 decoder is always present; this
+	// value only controls the negotiated wire version.)
+	RedisProxy_RESP2 RedisProxy_ProtocolVersion = 0
+	// The listener speaks RESP3 on both downstream connections and every
+	// routed upstream conn pool. Upstream conn pools negotiate “HELLO 3“
+	// (combined with “AUTH“ when credentials or AWS IAM authentication are
+	// configured) on each new connection; “upstream_resp3_hello_failure“
+	// tracks negotiation failures. Downstream clients must perform an
+	// explicit “HELLO 3“ handshake before any data command — bare “HELLO“
+	// on a fresh connection or any non-HELLO/AUTH/QUIT command before
+	// “HELLO 3“ is rejected with “-NOPROTO“.
+	RedisProxy_RESP3 RedisProxy_ProtocolVersion = 1
+)
+
+// Enum value maps for RedisProxy_ProtocolVersion.
+var (
+	RedisProxy_ProtocolVersion_name = map[int32]string{
+		0: "RESP2",
+		1: "RESP3",
+	}
+	RedisProxy_ProtocolVersion_value = map[string]int32{
+		"RESP2": 0,
+		"RESP3": 1,
+	}
+)
+
+func (x RedisProxy_ProtocolVersion) Enum() *RedisProxy_ProtocolVersion {
+	p := new(RedisProxy_ProtocolVersion)
+	*p = x
+	return p
+}
+
+func (x RedisProxy_ProtocolVersion) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (RedisProxy_ProtocolVersion) Descriptor() protoreflect.EnumDescriptor {
+	return file_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto_enumTypes[0].Descriptor()
+}
+
+func (RedisProxy_ProtocolVersion) Type() protoreflect.EnumType {
+	return &file_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto_enumTypes[0]
+}
+
+func (x RedisProxy_ProtocolVersion) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use RedisProxy_ProtocolVersion.Descriptor instead.
+func (RedisProxy_ProtocolVersion) EnumDescriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto_rawDescGZIP(), []int{0, 0}
+}
+
 // ReadPolicy controls how Envoy routes read commands to Redis nodes. This is currently
 // supported for Redis Cluster. All ReadPolicy settings except MASTER may return stale data
 // because replication is asynchronous and requires some delay. You need to ensure that your
@@ -99,11 +160,11 @@ func (x RedisProxy_ConnPoolSettings_ReadPolicy) String() string {
 }
 
 func (RedisProxy_ConnPoolSettings_ReadPolicy) Descriptor() protoreflect.EnumDescriptor {
-	return file_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto_enumTypes[0].Descriptor()
+	return file_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto_enumTypes[1].Descriptor()
 }
 
 func (RedisProxy_ConnPoolSettings_ReadPolicy) Type() protoreflect.EnumType {
-	return &file_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto_enumTypes[0]
+	return &file_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto_enumTypes[1]
 }
 
 func (x RedisProxy_ConnPoolSettings_ReadPolicy) Number() protoreflect.EnumNumber {
@@ -147,11 +208,11 @@ func (x RedisProxy_RedisFault_RedisFaultType) String() string {
 }
 
 func (RedisProxy_RedisFault_RedisFaultType) Descriptor() protoreflect.EnumDescriptor {
-	return file_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto_enumTypes[1].Descriptor()
+	return file_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto_enumTypes[2].Descriptor()
 }
 
 func (RedisProxy_RedisFault_RedisFaultType) Type() protoreflect.EnumType {
-	return &file_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto_enumTypes[1]
+	return &file_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto_enumTypes[2]
 }
 
 func (x RedisProxy_RedisFault_RedisFaultType) Number() protoreflect.EnumNumber {
@@ -163,7 +224,7 @@ func (RedisProxy_RedisFault_RedisFaultType) EnumDescriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto_rawDescGZIP(), []int{0, 2, 0}
 }
 
-// [#next-free-field: 12]
+// [#next-free-field: 13]
 type RedisProxy struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The prefix to use when emitting :ref:`statistics <config_network_filters_redis_proxy_stats>`.
@@ -280,8 +341,21 @@ type RedisProxy struct {
 	//	The is to support redis's feature wherein new commands can be added using redis' modules api:
 	//	https://redis.io/docs/latest/develop/reference/modules/
 	CustomCommands []string `protobuf:"bytes,11,rep,name=custom_commands,json=customCommands,proto3" json:"custom_commands,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// RESP protocol version enforced for both downstream connections and every
+	// routed upstream conn pool for this listener. Mismatched negotiation is
+	// rejected at HELLO (“HELLO N“ where “N“ does not match returns
+	// “-NOPROTO“) and, when set to “RESP3“, at every non-HELLO/AUTH/QUIT
+	// command on a connection that has not yet negotiated RESP3 (so clients
+	// must perform an explicit “HELLO 3“ handshake before any data command).
+	//
+	// When “protocol_version“ is “RESP3“, every routed upstream
+	// Redis-compatible backend must support “HELLO 3“ / RESP3 (e.g.
+	// Redis 6.0+, where RESP3 was introduced). Misconfigured upstreams will
+	// fail every connection's HELLO 3 negotiation, surfaced as
+	// “upstream_resp3_hello_failure“ stat increments.
+	ProtocolVersion RedisProxy_ProtocolVersion `protobuf:"varint,12,opt,name=protocol_version,json=protocolVersion,proto3,enum=envoy.extensions.filters.network.redis_proxy.v3.RedisProxy_ProtocolVersion" json:"protocol_version,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *RedisProxy) Reset() {
@@ -383,6 +457,13 @@ func (x *RedisProxy) GetCustomCommands() []string {
 		return x.CustomCommands
 	}
 	return nil
+}
+
+func (x *RedisProxy) GetProtocolVersion() RedisProxy_ProtocolVersion {
+	if x != nil {
+		return x.ProtocolVersion
+	}
+	return RedisProxy_RESP2
 }
 
 // RedisProtocolOptions specifies Redis upstream protocol options. This object is used in
@@ -1256,7 +1337,7 @@ var File_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto proto
 
 const file_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto_rawDesc = "" +
 	"\n" +
-	"Aenvoy/extensions/filters/network/redis_proxy/v3/redis_proxy.proto\x12/envoy.extensions.filters.network.redis_proxy.v3\x1a\"envoy/config/core/v3/address.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a'envoy/config/core/v3/grpc_service.proto\x1a8envoy/extensions/common/aws/v3/credential_provider.proto\x1a@envoy/extensions/common/dynamic_forward_proxy/v3/dns_cache.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1eudpa/annotations/migrate.proto\x1a udpa/annotations/sensitive.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\x84\x1e\n" +
+	"Aenvoy/extensions/filters/network/redis_proxy/v3/redis_proxy.proto\x12/envoy.extensions.filters.network.redis_proxy.v3\x1a\"envoy/config/core/v3/address.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a'envoy/config/core/v3/grpc_service.proto\x1a8envoy/extensions/common/aws/v3/credential_provider.proto\x1a@envoy/extensions/common/dynamic_forward_proxy/v3/dns_cache.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1eudpa/annotations/migrate.proto\x1a udpa/annotations/sensitive.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xb0\x1f\n" +
 	"\n" +
 	"RedisProxy\x12(\n" +
 	"\vstat_prefix\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\n" +
@@ -1270,7 +1351,8 @@ const file_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto_raw
 	"\x18downstream_auth_username\x18\a \x01(\v2 .envoy.config.core.v3.DataSourceB\x06\xb8\xb7\x8b\xa4\x02\x01R\x16downstreamAuthUsername\x12\x80\x01\n" +
 	"\x16external_auth_provider\x18\n" +
 	" \x01(\v2J.envoy.extensions.filters.network.redis_proxy.v3.RedisExternalAuthProviderR\x14externalAuthProvider\x12'\n" +
-	"\x0fcustom_commands\x18\v \x03(\tR\x0ecustomCommands\x1a\xe8\b\n" +
+	"\x0fcustom_commands\x18\v \x03(\tR\x0ecustomCommands\x12\x80\x01\n" +
+	"\x10protocol_version\x18\f \x01(\x0e2K.envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.ProtocolVersionB\b\xfaB\x05\x82\x01\x02\x10\x01R\x0fprotocolVersion\x1a\xe8\b\n" +
 	"\x10ConnPoolSettings\x12B\n" +
 	"\n" +
 	"op_timeout\x18\x01 \x01(\v2\x19.google.protobuf.DurationB\b\xfaB\x05\xaa\x01\x02\b\x01R\topTimeout\x12-\n" +
@@ -1328,7 +1410,10 @@ const file_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto_raw
 	"\x05DELAY\x10\x00\x12\t\n" +
 	"\x05ERROR\x10\x01\x1a`\n" +
 	"\x13ConnectionRateLimit\x12I\n" +
-	"\x1dconnection_rate_limit_per_sec\x18\x01 \x01(\rB\a\xfaB\x04*\x02 \x00R\x19connectionRateLimitPerSec:<\x9aň\x1e7\n" +
+	"\x1dconnection_rate_limit_per_sec\x18\x01 \x01(\rB\a\xfaB\x04*\x02 \x00R\x19connectionRateLimitPerSec\"'\n" +
+	"\x0fProtocolVersion\x12\t\n" +
+	"\x05RESP2\x10\x00\x12\t\n" +
+	"\x05RESP3\x10\x01:<\x9aň\x1e7\n" +
 	"5envoy.config.filter.network.redis_proxy.v2.RedisProxyJ\x04\b\x02\x10\x03R\acluster\"\xa8\x05\n" +
 	"\x14RedisProtocolOptions\x12M\n" +
 	"\rauth_password\x18\x01 \x01(\v2 .envoy.config.core.v3.DataSourceB\x06\xb8\xb7\x8b\xa4\x02\x01R\fauthPassword\x12M\n" +
@@ -1366,69 +1451,71 @@ func file_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto_rawD
 	return file_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto_rawDescData
 }
 
-var file_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
 var file_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto_goTypes = []any{
-	(RedisProxy_ConnPoolSettings_ReadPolicy)(0),               // 0: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.ConnPoolSettings.ReadPolicy
-	(RedisProxy_RedisFault_RedisFaultType)(0),                 // 1: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.RedisFault.RedisFaultType
-	(*RedisProxy)(nil),                                        // 2: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy
-	(*RedisProtocolOptions)(nil),                              // 3: envoy.extensions.filters.network.redis_proxy.v3.RedisProtocolOptions
-	(*AwsIam)(nil),                                            // 4: envoy.extensions.filters.network.redis_proxy.v3.AwsIam
-	(*RedisExternalAuthProvider)(nil),                         // 5: envoy.extensions.filters.network.redis_proxy.v3.RedisExternalAuthProvider
-	(*RedisProxy_ConnPoolSettings)(nil),                       // 6: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.ConnPoolSettings
-	(*RedisProxy_PrefixRoutes)(nil),                           // 7: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes
-	(*RedisProxy_RedisFault)(nil),                             // 8: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.RedisFault
-	(*RedisProxy_ConnectionRateLimit)(nil),                    // 9: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.ConnectionRateLimit
-	(*RedisProxy_PrefixRoutes_Route)(nil),                     // 10: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.Route
-	(*RedisProxy_PrefixRoutes_Route_RequestMirrorPolicy)(nil), // 11: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.Route.RequestMirrorPolicy
-	(*RedisProxy_PrefixRoutes_Route_ReadCommandPolicy)(nil),   // 12: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.Route.ReadCommandPolicy
-	(*RedisProtocolOptions_Credential)(nil),                   // 13: envoy.extensions.filters.network.redis_proxy.v3.RedisProtocolOptions.Credential
-	(*v3.DataSource)(nil),                                     // 14: envoy.config.core.v3.DataSource
-	(*v31.AwsCredentialProvider)(nil),                         // 15: envoy.extensions.common.aws.v3.AwsCredentialProvider
-	(*durationpb.Duration)(nil),                               // 16: google.protobuf.Duration
-	(*v3.GrpcService)(nil),                                    // 17: envoy.config.core.v3.GrpcService
-	(*v32.DnsCacheConfig)(nil),                                // 18: envoy.extensions.common.dynamic_forward_proxy.v3.DnsCacheConfig
-	(*wrapperspb.UInt32Value)(nil),                            // 19: google.protobuf.UInt32Value
-	(*v3.RuntimeFractionalPercent)(nil),                       // 20: envoy.config.core.v3.RuntimeFractionalPercent
-	(*v3.Address)(nil),                                        // 21: envoy.config.core.v3.Address
+	(RedisProxy_ProtocolVersion)(0),                           // 0: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.ProtocolVersion
+	(RedisProxy_ConnPoolSettings_ReadPolicy)(0),               // 1: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.ConnPoolSettings.ReadPolicy
+	(RedisProxy_RedisFault_RedisFaultType)(0),                 // 2: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.RedisFault.RedisFaultType
+	(*RedisProxy)(nil),                                        // 3: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy
+	(*RedisProtocolOptions)(nil),                              // 4: envoy.extensions.filters.network.redis_proxy.v3.RedisProtocolOptions
+	(*AwsIam)(nil),                                            // 5: envoy.extensions.filters.network.redis_proxy.v3.AwsIam
+	(*RedisExternalAuthProvider)(nil),                         // 6: envoy.extensions.filters.network.redis_proxy.v3.RedisExternalAuthProvider
+	(*RedisProxy_ConnPoolSettings)(nil),                       // 7: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.ConnPoolSettings
+	(*RedisProxy_PrefixRoutes)(nil),                           // 8: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes
+	(*RedisProxy_RedisFault)(nil),                             // 9: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.RedisFault
+	(*RedisProxy_ConnectionRateLimit)(nil),                    // 10: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.ConnectionRateLimit
+	(*RedisProxy_PrefixRoutes_Route)(nil),                     // 11: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.Route
+	(*RedisProxy_PrefixRoutes_Route_RequestMirrorPolicy)(nil), // 12: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.Route.RequestMirrorPolicy
+	(*RedisProxy_PrefixRoutes_Route_ReadCommandPolicy)(nil),   // 13: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.Route.ReadCommandPolicy
+	(*RedisProtocolOptions_Credential)(nil),                   // 14: envoy.extensions.filters.network.redis_proxy.v3.RedisProtocolOptions.Credential
+	(*v3.DataSource)(nil),                                     // 15: envoy.config.core.v3.DataSource
+	(*v31.AwsCredentialProvider)(nil),                         // 16: envoy.extensions.common.aws.v3.AwsCredentialProvider
+	(*durationpb.Duration)(nil),                               // 17: google.protobuf.Duration
+	(*v3.GrpcService)(nil),                                    // 18: envoy.config.core.v3.GrpcService
+	(*v32.DnsCacheConfig)(nil),                                // 19: envoy.extensions.common.dynamic_forward_proxy.v3.DnsCacheConfig
+	(*wrapperspb.UInt32Value)(nil),                            // 20: google.protobuf.UInt32Value
+	(*v3.RuntimeFractionalPercent)(nil),                       // 21: envoy.config.core.v3.RuntimeFractionalPercent
+	(*v3.Address)(nil),                                        // 22: envoy.config.core.v3.Address
 }
 var file_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto_depIdxs = []int32{
-	6,  // 0: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.settings:type_name -> envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.ConnPoolSettings
-	7,  // 1: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.prefix_routes:type_name -> envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes
-	14, // 2: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.downstream_auth_password:type_name -> envoy.config.core.v3.DataSource
-	14, // 3: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.downstream_auth_passwords:type_name -> envoy.config.core.v3.DataSource
-	8,  // 4: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.faults:type_name -> envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.RedisFault
-	14, // 5: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.downstream_auth_username:type_name -> envoy.config.core.v3.DataSource
-	5,  // 6: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.external_auth_provider:type_name -> envoy.extensions.filters.network.redis_proxy.v3.RedisExternalAuthProvider
-	14, // 7: envoy.extensions.filters.network.redis_proxy.v3.RedisProtocolOptions.auth_password:type_name -> envoy.config.core.v3.DataSource
-	14, // 8: envoy.extensions.filters.network.redis_proxy.v3.RedisProtocolOptions.auth_username:type_name -> envoy.config.core.v3.DataSource
-	4,  // 9: envoy.extensions.filters.network.redis_proxy.v3.RedisProtocolOptions.aws_iam:type_name -> envoy.extensions.filters.network.redis_proxy.v3.AwsIam
-	13, // 10: envoy.extensions.filters.network.redis_proxy.v3.RedisProtocolOptions.credentials:type_name -> envoy.extensions.filters.network.redis_proxy.v3.RedisProtocolOptions.Credential
-	15, // 11: envoy.extensions.filters.network.redis_proxy.v3.AwsIam.credential_provider:type_name -> envoy.extensions.common.aws.v3.AwsCredentialProvider
-	16, // 12: envoy.extensions.filters.network.redis_proxy.v3.AwsIam.expiration_time:type_name -> google.protobuf.Duration
-	17, // 13: envoy.extensions.filters.network.redis_proxy.v3.RedisExternalAuthProvider.grpc_service:type_name -> envoy.config.core.v3.GrpcService
-	16, // 14: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.ConnPoolSettings.op_timeout:type_name -> google.protobuf.Duration
-	18, // 15: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.ConnPoolSettings.dns_cache_config:type_name -> envoy.extensions.common.dynamic_forward_proxy.v3.DnsCacheConfig
-	16, // 16: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.ConnPoolSettings.buffer_flush_timeout:type_name -> google.protobuf.Duration
-	19, // 17: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.ConnPoolSettings.max_upstream_unknown_connections:type_name -> google.protobuf.UInt32Value
-	0,  // 18: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.ConnPoolSettings.read_policy:type_name -> envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.ConnPoolSettings.ReadPolicy
-	9,  // 19: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.ConnPoolSettings.connection_rate_limit:type_name -> envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.ConnectionRateLimit
-	10, // 20: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.routes:type_name -> envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.Route
-	10, // 21: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.catch_all_route:type_name -> envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.Route
-	1,  // 22: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.RedisFault.fault_type:type_name -> envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.RedisFault.RedisFaultType
-	20, // 23: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.RedisFault.fault_enabled:type_name -> envoy.config.core.v3.RuntimeFractionalPercent
-	16, // 24: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.RedisFault.delay:type_name -> google.protobuf.Duration
-	11, // 25: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.Route.request_mirror_policy:type_name -> envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.Route.RequestMirrorPolicy
-	12, // 26: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.Route.read_command_policy:type_name -> envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.Route.ReadCommandPolicy
-	20, // 27: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.Route.RequestMirrorPolicy.runtime_fraction:type_name -> envoy.config.core.v3.RuntimeFractionalPercent
-	21, // 28: envoy.extensions.filters.network.redis_proxy.v3.RedisProtocolOptions.Credential.address:type_name -> envoy.config.core.v3.Address
-	14, // 29: envoy.extensions.filters.network.redis_proxy.v3.RedisProtocolOptions.Credential.auth_password:type_name -> envoy.config.core.v3.DataSource
-	14, // 30: envoy.extensions.filters.network.redis_proxy.v3.RedisProtocolOptions.Credential.auth_username:type_name -> envoy.config.core.v3.DataSource
-	31, // [31:31] is the sub-list for method output_type
-	31, // [31:31] is the sub-list for method input_type
-	31, // [31:31] is the sub-list for extension type_name
-	31, // [31:31] is the sub-list for extension extendee
-	0,  // [0:31] is the sub-list for field type_name
+	7,  // 0: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.settings:type_name -> envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.ConnPoolSettings
+	8,  // 1: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.prefix_routes:type_name -> envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes
+	15, // 2: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.downstream_auth_password:type_name -> envoy.config.core.v3.DataSource
+	15, // 3: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.downstream_auth_passwords:type_name -> envoy.config.core.v3.DataSource
+	9,  // 4: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.faults:type_name -> envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.RedisFault
+	15, // 5: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.downstream_auth_username:type_name -> envoy.config.core.v3.DataSource
+	6,  // 6: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.external_auth_provider:type_name -> envoy.extensions.filters.network.redis_proxy.v3.RedisExternalAuthProvider
+	0,  // 7: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.protocol_version:type_name -> envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.ProtocolVersion
+	15, // 8: envoy.extensions.filters.network.redis_proxy.v3.RedisProtocolOptions.auth_password:type_name -> envoy.config.core.v3.DataSource
+	15, // 9: envoy.extensions.filters.network.redis_proxy.v3.RedisProtocolOptions.auth_username:type_name -> envoy.config.core.v3.DataSource
+	5,  // 10: envoy.extensions.filters.network.redis_proxy.v3.RedisProtocolOptions.aws_iam:type_name -> envoy.extensions.filters.network.redis_proxy.v3.AwsIam
+	14, // 11: envoy.extensions.filters.network.redis_proxy.v3.RedisProtocolOptions.credentials:type_name -> envoy.extensions.filters.network.redis_proxy.v3.RedisProtocolOptions.Credential
+	16, // 12: envoy.extensions.filters.network.redis_proxy.v3.AwsIam.credential_provider:type_name -> envoy.extensions.common.aws.v3.AwsCredentialProvider
+	17, // 13: envoy.extensions.filters.network.redis_proxy.v3.AwsIam.expiration_time:type_name -> google.protobuf.Duration
+	18, // 14: envoy.extensions.filters.network.redis_proxy.v3.RedisExternalAuthProvider.grpc_service:type_name -> envoy.config.core.v3.GrpcService
+	17, // 15: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.ConnPoolSettings.op_timeout:type_name -> google.protobuf.Duration
+	19, // 16: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.ConnPoolSettings.dns_cache_config:type_name -> envoy.extensions.common.dynamic_forward_proxy.v3.DnsCacheConfig
+	17, // 17: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.ConnPoolSettings.buffer_flush_timeout:type_name -> google.protobuf.Duration
+	20, // 18: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.ConnPoolSettings.max_upstream_unknown_connections:type_name -> google.protobuf.UInt32Value
+	1,  // 19: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.ConnPoolSettings.read_policy:type_name -> envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.ConnPoolSettings.ReadPolicy
+	10, // 20: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.ConnPoolSettings.connection_rate_limit:type_name -> envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.ConnectionRateLimit
+	11, // 21: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.routes:type_name -> envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.Route
+	11, // 22: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.catch_all_route:type_name -> envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.Route
+	2,  // 23: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.RedisFault.fault_type:type_name -> envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.RedisFault.RedisFaultType
+	21, // 24: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.RedisFault.fault_enabled:type_name -> envoy.config.core.v3.RuntimeFractionalPercent
+	17, // 25: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.RedisFault.delay:type_name -> google.protobuf.Duration
+	12, // 26: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.Route.request_mirror_policy:type_name -> envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.Route.RequestMirrorPolicy
+	13, // 27: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.Route.read_command_policy:type_name -> envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.Route.ReadCommandPolicy
+	21, // 28: envoy.extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.Route.RequestMirrorPolicy.runtime_fraction:type_name -> envoy.config.core.v3.RuntimeFractionalPercent
+	22, // 29: envoy.extensions.filters.network.redis_proxy.v3.RedisProtocolOptions.Credential.address:type_name -> envoy.config.core.v3.Address
+	15, // 30: envoy.extensions.filters.network.redis_proxy.v3.RedisProtocolOptions.Credential.auth_password:type_name -> envoy.config.core.v3.DataSource
+	15, // 31: envoy.extensions.filters.network.redis_proxy.v3.RedisProtocolOptions.Credential.auth_username:type_name -> envoy.config.core.v3.DataSource
+	32, // [32:32] is the sub-list for method output_type
+	32, // [32:32] is the sub-list for method input_type
+	32, // [32:32] is the sub-list for extension type_name
+	32, // [32:32] is the sub-list for extension extendee
+	0,  // [0:32] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto_init() }
@@ -1441,7 +1528,7 @@ func file_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto_init
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto_rawDesc), len(file_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto_rawDesc)),
-			NumEnums:      2,
+			NumEnums:      3,
 			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   0,
