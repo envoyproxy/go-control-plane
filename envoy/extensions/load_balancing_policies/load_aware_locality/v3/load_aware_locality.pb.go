@@ -36,17 +36,20 @@ type LoadAwareLocality struct {
 	// How frequently ORCA weights and locality utilization are recomputed on the
 	// main thread. Must be at least 100ms. Defaults to 1s.
 	WeightUpdatePeriod *durationpb.Duration `protobuf:"bytes,2,opt,name=weight_update_period,json=weightUpdatePeriod,proto3" json:"weight_update_period,omitempty"`
-	// By default, endpoint utilization is computed based on the
-	// :ref:`application_utilization <envoy_v3_api_field_.xds.data.orca.v3.OrcaLoadReport.application_utilization>`
-	// field reported by the endpoint. If that field is not set, then utilization
-	// will instead be computed by taking the max of the values of the metrics
-	// specified here. For map fields in the ORCA proto, the string will be of
-	// the form “<map_field_name>.<map_key>“. For example, the string
+	// Specifies the metrics used to compute endpoint utilization. For map
+	// fields in the ORCA proto, the string will be of the form
+	// “<map_field_name>.<map_key>“. For example, the string
 	// “named_metrics.foo“ will mean to look for the key “foo“ in the ORCA
 	// :ref:`named_metrics <envoy_v3_api_field_.xds.data.orca.v3.OrcaLoadReport.named_metrics>`
-	// field. If none of the specified metrics are present in the load report,
-	// then :ref:`cpu_utilization <envoy_v3_api_field_.xds.data.orca.v3.OrcaLoadReport.cpu_utilization>`
-	// is used instead.
+	// field. Utilization is the max of the values of the metrics specified
+	// here, when that max is greater than 0. Otherwise
+	// :ref:`application_utilization <envoy_v3_api_field_.xds.data.orca.v3.OrcaLoadReport.application_utilization>`
+	// is used if greater than 0, with
+	// :ref:`cpu_utilization <envoy_v3_api_field_.xds.data.orca.v3.OrcaLoadReport.cpu_utilization>`
+	// as the final fallback. Disabling the runtime flag
+	// “envoy.reloadable_features.orca_weight_manager_use_named_metrics_first“
+	// restores the legacy order, preferring “application_utilization“ over
+	// these metrics.
 	MetricNamesForComputingUtilization []string `protobuf:"bytes,3,rep,name=metric_names_for_computing_utilization,json=metricNamesForComputingUtilization,proto3" json:"metric_names_for_computing_utilization,omitempty"`
 	// When the local locality's utilization is at most this threshold above the
 	// remote average, route 100% of traffic to the local locality. This avoids
