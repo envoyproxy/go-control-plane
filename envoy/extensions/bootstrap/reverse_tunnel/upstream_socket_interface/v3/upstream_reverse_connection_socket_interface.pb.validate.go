@@ -171,6 +171,8 @@ func (m *UpstreamReverseConnectionSocketInterface) validate(all bool) error {
 
 	}
 
+	// no validation rules for MaxConnectionsPerNode
+
 	if len(errors) > 0 {
 		return UpstreamReverseConnectionSocketInterfaceMultiError(errors)
 	}

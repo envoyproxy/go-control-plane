@@ -120,6 +120,16 @@ func (m *ReverseTunnel) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.EnableConnectionLimit {
+		i--
+		if m.EnableConnectionLimit {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x48
+	}
 	if m.SkipRebalancing {
 		i--
 		if m.SkipRebalancing {
@@ -253,6 +263,9 @@ func (m *ReverseTunnel) SizeVT() (n int) {
 		n += 2
 	}
 	if m.SkipRebalancing {
+		n += 2
+	}
+	if m.EnableConnectionLimit {
 		n += 2
 	}
 	n += len(m.unknownFields)

@@ -27,7 +27,7 @@ const (
 )
 
 // Configuration for the upstream reverse connection socket interface.
-// [#next-free-field: 7]
+// [#next-free-field: 8]
 type UpstreamReverseConnectionSocketInterface struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Stat prefix for upstream reverse connection socket interface stats.
@@ -51,9 +51,17 @@ type UpstreamReverseConnectionSocketInterface struct {
 	EnableTenantIsolation *wrapperspb.BoolValue `protobuf:"bytes,5,opt,name=enable_tenant_isolation,json=enableTenantIsolation,proto3" json:"enable_tenant_isolation,omitempty"`
 	// Access logs emitted for reverse tunnel lifecycle events. Entries are generated for tunnel setup,
 	// socket handoff, tunnel close, and post-handoff HTTP/2 keepalive timeout observations.
-	AccessLog     []*v31.AccessLog `protobuf:"bytes,6,rep,name=access_log,json=accessLog,proto3" json:"access_log,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	AccessLog []*v31.AccessLog `protobuf:"bytes,6,rep,name=access_log,json=accessLog,proto3" json:"access_log,omitempty"`
+	// Maximum number of concurrently accepted reverse connections per node (and per tenant
+	// when tenant isolation is enabled). The cap is only consulted for reverse tunnel network
+	// filters that opt in via “enable_connection_limit“; filters that leave it disabled ignore it.
+	// The cap is enforced per worker thread, so the effective ceiling is roughly this value
+	// multiplied by the number of workers; it is also only approximate when rebalancing is enabled.
+	// Defaults to 0; combined with “enable_connection_limit: true“ a value of 0 rejects all
+	// connections, so set a non-zero value whenever a filter enables the limit.
+	MaxConnectionsPerNode uint32 `protobuf:"varint,7,opt,name=max_connections_per_node,json=maxConnectionsPerNode,proto3" json:"max_connections_per_node,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *UpstreamReverseConnectionSocketInterface) Reset() {
@@ -128,11 +136,18 @@ func (x *UpstreamReverseConnectionSocketInterface) GetAccessLog() []*v31.AccessL
 	return nil
 }
 
+func (x *UpstreamReverseConnectionSocketInterface) GetMaxConnectionsPerNode() uint32 {
+	if x != nil {
+		return x.MaxConnectionsPerNode
+	}
+	return 0
+}
+
 var File_envoy_extensions_bootstrap_reverse_tunnel_upstream_socket_interface_v3_upstream_reverse_connection_socket_interface_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_bootstrap_reverse_tunnel_upstream_socket_interface_v3_upstream_reverse_connection_socket_interface_proto_rawDesc = "" +
 	"\n" +
-	"yenvoy/extensions/bootstrap/reverse_tunnel/upstream_socket_interface/v3/upstream_reverse_connection_socket_interface.proto\x12Fenvoy.extensions.bootstrap.reverse_tunnel.upstream_socket_interface.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a$envoy/config/core/v3/extension.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xca\x03\n" +
+	"yenvoy/extensions/bootstrap/reverse_tunnel/upstream_socket_interface/v3/upstream_reverse_connection_socket_interface.proto\x12Fenvoy.extensions.bootstrap.reverse_tunnel.upstream_socket_interface.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a$envoy/config/core/v3/extension.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x83\x04\n" +
 	"(UpstreamReverseConnectionSocketInterface\x12\x1f\n" +
 	"\vstat_prefix\x18\x01 \x01(\tR\n" +
 	"statPrefix\x12[\n" +
@@ -141,7 +156,8 @@ const file_envoy_extensions_bootstrap_reverse_tunnel_upstream_socket_interface_v
 	"\x0freporter_config\x18\x04 \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigR\x0ereporterConfig\x12R\n" +
 	"\x17enable_tenant_isolation\x18\x05 \x01(\v2\x1a.google.protobuf.BoolValueR\x15enableTenantIsolation\x12C\n" +
 	"\n" +
-	"access_log\x18\x06 \x03(\v2$.envoy.config.accesslog.v3.AccessLogR\taccessLogB\x9b\x02\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"access_log\x18\x06 \x03(\v2$.envoy.config.accesslog.v3.AccessLogR\taccessLog\x127\n" +
+	"\x18max_connections_per_node\x18\a \x01(\rR\x15maxConnectionsPerNodeB\x9b\x02\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"Tio.envoyproxy.envoy.extensions.bootstrap.reverse_tunnel.upstream_socket_interface.v3B-UpstreamReverseConnectionSocketInterfaceProtoP\x01Z\x89\x01github.com/envoyproxy/go-control-plane/envoy/extensions/bootstrap/reverse_tunnel/upstream_socket_interface/v3;upstream_socket_interfacev3b\x06proto3"
 
 var (

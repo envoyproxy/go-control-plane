@@ -50,6 +50,11 @@ func (m *UpstreamReverseConnectionSocketInterface) MarshalToSizedBufferVTStrict(
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.MaxConnectionsPerNode != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.MaxConnectionsPerNode))
+		i--
+		dAtA[i] = 0x38
+	}
 	if len(m.AccessLog) > 0 {
 		for iNdEx := len(m.AccessLog) - 1; iNdEx >= 0; iNdEx-- {
 			if vtmsg, ok := interface{}(m.AccessLog[iNdEx]).(interface {
@@ -178,6 +183,9 @@ func (m *UpstreamReverseConnectionSocketInterface) SizeVT() (n int) {
 			}
 			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 		}
+	}
+	if m.MaxConnectionsPerNode != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.MaxConnectionsPerNode))
 	}
 	n += len(m.unknownFields)
 	return n

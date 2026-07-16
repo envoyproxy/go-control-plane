@@ -314,6 +314,8 @@ func (m *ReverseTunnel) validate(all bool) error {
 
 	// no validation rules for SkipRebalancing
 
+	// no validation rules for EnableConnectionLimit
+
 	if len(errors) > 0 {
 		return ReverseTunnelMultiError(errors)
 	}
