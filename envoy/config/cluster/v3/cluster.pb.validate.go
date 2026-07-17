@@ -265,6 +265,35 @@ func (m *Cluster) validate(all bool) error {
 	// no validation rules for AltStatName
 
 	if all {
+		switch v := interface{}(m.GetStatsMatcher()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ClusterValidationError{
+					field:  "StatsMatcher",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ClusterValidationError{
+					field:  "StatsMatcher",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetStatsMatcher()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClusterValidationError{
+				field:  "StatsMatcher",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
 		switch v := interface{}(m.GetEdsClusterConfig()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
