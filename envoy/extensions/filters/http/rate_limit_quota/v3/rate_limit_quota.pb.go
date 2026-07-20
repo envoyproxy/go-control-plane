@@ -8,7 +8,6 @@ package rate_limit_quotav3
 
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
-	_ "github.com/cncf/xds/go/xds/annotations/v3"
 	v31 "github.com/cncf/xds/go/xds/type/matcher/v3"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	v32 "github.com/envoyproxy/go-control-plane/envoy/type/v3"
@@ -954,7 +953,7 @@ var File_envoy_extensions_filters_http_rate_limit_quota_v3_rate_limit_quota_prot
 
 const file_envoy_extensions_filters_http_rate_limit_quota_v3_rate_limit_quota_proto_rawDesc = "" +
 	"\n" +
-	"Henvoy/extensions/filters/http/rate_limit_quota/v3/rate_limit_quota.proto\x121envoy.extensions.filters.http.rate_limit_quota.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a$envoy/config/core/v3/extension.proto\x1a'envoy/config/core/v3/grpc_service.proto\x1a\x1fenvoy/type/v3/http_status.proto\x1a&envoy/type/v3/ratelimit_strategy.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x17google/rpc/status.proto\x1a\x1fxds/annotations/v3/status.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x96\x04\n" +
+	"Henvoy/extensions/filters/http/rate_limit_quota/v3/rate_limit_quota.proto\x121envoy.extensions.filters.http.rate_limit_quota.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a$envoy/config/core/v3/extension.proto\x1a'envoy/config/core/v3/grpc_service.proto\x1a\x1fenvoy/type/v3/http_status.proto\x1a&envoy/type/v3/ratelimit_strategy.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x17google/rpc/status.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x96\x04\n" +
 	"\x1aRateLimitQuotaFilterConfig\x12L\n" +
 	"\vrlqs_server\x18\x01 \x01(\v2!.envoy.config.core.v3.GrpcServiceB\b\xfaB\x05\x8a\x01\x02\x10\x01R\n" +
 	"rlqsServer\x12\x1f\n" +
@@ -998,7 +997,7 @@ const file_envoy_extensions_filters_http_rate_limit_quota_v3_rate_limit_quota_pr
 	"\x0fvalue_specifier\x12\x03\xf8B\x01\x1a\xb1\x01\n" +
 	"\x14BucketIdBuilderEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x82\x01\n" +
-	"\x05value\x18\x02 \x01(\v2l.envoy.extensions.filters.http.rate_limit_quota.v3.RateLimitQuotaBucketSettings.BucketIdBuilder.ValueBuilderR\x05value:\x028\x01B\xd5\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
+	"\x05value\x18\x02 \x01(\v2l.envoy.extensions.filters.http.rate_limit_quota.v3.RateLimitQuotaBucketSettings.BucketIdBuilder.ValueBuilderR\x05value:\x028\x01B\xcd\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"?io.envoyproxy.envoy.extensions.filters.http.rate_limit_quota.v3B\x13RateLimitQuotaProtoP\x01Zkgithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/rate_limit_quota/v3;rate_limit_quotav3b\x06proto3"
 
 var (

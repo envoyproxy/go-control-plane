@@ -8,7 +8,6 @@ package rate_limit_quotav3
 
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
-	_ "github.com/cncf/xds/go/xds/annotations/v3"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/type/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -564,7 +563,7 @@ var File_envoy_service_rate_limit_quota_v3_rlqs_proto protoreflect.FileDescripto
 
 const file_envoy_service_rate_limit_quota_v3_rlqs_proto_rawDesc = "" +
 	"\n" +
-	",envoy/service/rate_limit_quota/v3/rlqs.proto\x12!envoy.service.rate_limit_quota.v3\x1a&envoy/type/v3/ratelimit_strategy.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xdd\x03\n" +
+	",envoy/service/rate_limit_quota/v3/rlqs.proto\x12!envoy.service.rate_limit_quota.v3\x1a&envoy/type/v3/ratelimit_strategy.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xdd\x03\n" +
 	"\x1aRateLimitQuotaUsageReports\x12\x1f\n" +
 	"\x06domain\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x06domain\x12\x88\x01\n" +
 	"\x13bucket_quota_usages\x18\x02 \x03(\v2N.envoy.service.rate_limit_quota.v3.RateLimitQuotaUsageReports.BucketQuotaUsageB\b\xfaB\x05\x92\x01\x02\b\x01R\x11bucketQuotaUsages\x1a\x92\x02\n" +
@@ -591,7 +590,7 @@ const file_envoy_service_rate_limit_quota_v3_rlqs_proto_rawDesc = "" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x012\xb1\x01\n" +
 	"\x15RateLimitQuotaService\x12\x97\x01\n" +
-	"\x15StreamRateLimitQuotas\x12=.envoy.service.rate_limit_quota.v3.RateLimitQuotaUsageReports\x1a9.envoy.service.rate_limit_quota.v3.RateLimitQuotaResponse\"\x00(\x010\x01B\xab\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
+	"\x15StreamRateLimitQuotas\x12=.envoy.service.rate_limit_quota.v3.RateLimitQuotaUsageReports\x1a9.envoy.service.rate_limit_quota.v3.RateLimitQuotaResponse\"\x00(\x010\x01B\xa3\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"/io.envoyproxy.envoy.service.rate_limit_quota.v3B\tRlqsProtoP\x01Z[github.com/envoyproxy/go-control-plane/envoy/service/rate_limit_quota/v3;rate_limit_quotav3b\x06proto3"
 
 var (
