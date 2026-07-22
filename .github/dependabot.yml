@@ -15,6 +15,10 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    groups:
+      codeql-action:
+          patterns:
+            - "github/codeql-action/*"
   - package-ecosystem: gomod
     directories: 
       - /
@@ -29,6 +33,9 @@ updates:
       k8s.io:
           patterns:
             - "k8s.io/*"
+      grpc:
+          patterns:
+            - "google.golang.org/grpc"
   - package-ecosystem: gomod
     directory: /internal/tools
     allow:
