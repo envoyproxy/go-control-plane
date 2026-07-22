@@ -93,13 +93,11 @@ type SubstitutionFormatString struct {
 	//
 	//   - for “text_format“, the output of the empty operator is changed from “-“ to an
 	//     empty string, so that empty values are omitted entirely.
-	//   - for “json_format“ the keys with null values are omitted in the output structure.
+	//   - for “json_format“, the keys with null values are omitted in the output structure. Nested
+	//     objects whose values are all omitted are removed as well, while empty arrays are preserved.
+	//     The root object is always emitted, so a fully empty structure is rendered as “{}“.
 	//
-	// .. note::
-	//
-	//	This option does not work perfectly with ``json_format`` as keys with ``null`` values
-	//	will still be included in the output. See https://github.com/envoyproxy/envoy/issues/37941
-	//	for more details.
+	// Defaults to false.
 	OmitEmptyValues bool `protobuf:"varint,3,opt,name=omit_empty_values,json=omitEmptyValues,proto3" json:"omit_empty_values,omitempty"`
 	// Specify a “content_type“ field.
 	// If this field is not set then “text/plain“ is used for “text_format“ and
