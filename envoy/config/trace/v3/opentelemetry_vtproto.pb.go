@@ -50,6 +50,16 @@ func (m *OpenTelemetryConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, er
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.SetInstrumentationScope != nil {
+		size, err := (*wrapperspb.BoolValue)(m.SetInstrumentationScope).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x4a
+	}
 	if m.SetServiceNameResourceAttribute != nil {
 		size, err := (*wrapperspb.BoolValue)(m.SetServiceNameResourceAttribute).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -242,6 +252,10 @@ func (m *OpenTelemetryConfig) SizeVT() (n int) {
 	}
 	if m.SetServiceNameResourceAttribute != nil {
 		l = (*wrapperspb.BoolValue)(m.SetServiceNameResourceAttribute).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.SetInstrumentationScope != nil {
+		l = (*wrapperspb.BoolValue)(m.SetInstrumentationScope).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
