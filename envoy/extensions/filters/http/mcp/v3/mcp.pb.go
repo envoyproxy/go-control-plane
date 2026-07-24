@@ -38,6 +38,10 @@ const (
 	// - GET requests for SSE streams (with Accept: text/event-stream)
 	// - DELETE requests for session termination (with MCP-Session-Id header)
 	Mcp_REJECT_NO_MCP Mcp_TrafficMode = 1
+	// Disables MCP processing entirely. The filter performs no inspection,
+	// attribute extraction, trace context propagation, or rejection; all
+	// traffic is proxied as-is.
+	Mcp_NOOP Mcp_TrafficMode = 2
 )
 
 // Enum value maps for Mcp_TrafficMode.
@@ -45,10 +49,12 @@ var (
 	Mcp_TrafficMode_name = map[int32]string{
 		0: "PASS_THROUGH",
 		1: "REJECT_NO_MCP",
+		2: "NOOP",
 	}
 	Mcp_TrafficMode_value = map[string]int32{
 		"PASS_THROUGH":  0,
 		"REJECT_NO_MCP": 1,
+		"NOOP":          2,
 	}
 )
 
@@ -582,7 +588,7 @@ var File_envoy_extensions_filters_http_mcp_v3_mcp_proto protoreflect.FileDescrip
 
 const file_envoy_extensions_filters_http_mcp_v3_mcp_proto_rawDesc = "" +
 	"\n" +
-	".envoy/extensions/filters/http/mcp/v3/mcp.proto\x12$envoy.extensions.filters.http.mcp.v3\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x87\b\n" +
+	".envoy/extensions/filters/http/mcp/v3/mcp.proto\x12$envoy.extensions.filters.http.mcp.v3\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x91\b\n" +
 	"\x03Mcp\x12b\n" +
 	"\ftraffic_mode\x18\x01 \x01(\x0e25.envoy.extensions.filters.http.mcp.v3.Mcp.TrafficModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\vtrafficMode\x12*\n" +
 	"\x11clear_route_cache\x18\x02 \x01(\bR\x0fclearRouteCache\x12[\n" +
@@ -594,10 +600,11 @@ const file_envoy_extensions_filters_http_mcp_v3_mcp_proto_rawDesc = "" +
 	"\x11propagate_baggage\x18\a \x01(\v2B.envoy.extensions.filters.http.mcp.v3.Mcp.BaggagePropagationConfigR\x10propagateBaggage\x12N\n" +
 	"\x15reject_duplicate_keys\x18\b \x01(\v2\x1a.google.protobuf.BoolValueR\x13rejectDuplicateKeys\x1a)\n" +
 	"\x1dTraceContextPropagationConfig:\b\xd2Ƥ\xe1\x06\x02\b\x01\x1a$\n" +
-	"\x18BaggagePropagationConfig:\b\xd2Ƥ\xe1\x06\x02\b\x01\"2\n" +
+	"\x18BaggagePropagationConfig:\b\xd2Ƥ\xe1\x06\x02\b\x01\"<\n" +
 	"\vTrafficMode\x12\x10\n" +
 	"\fPASS_THROUGH\x10\x00\x12\x11\n" +
-	"\rREJECT_NO_MCP\x10\x01\"y\n" +
+	"\rREJECT_NO_MCP\x10\x01\x12\b\n" +
+	"\x04NOOP\x10\x02\"y\n" +
 	"\x12RequestStorageMode\x12\x14\n" +
 	"\x10MODE_UNSPECIFIED\x10\x00\x12\x14\n" +
 	"\x10DYNAMIC_METADATA\x10\x01\x12\x10\n" +
