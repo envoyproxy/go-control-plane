@@ -9,6 +9,7 @@ package reverse_tunnelv3
 import (
 	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
 	durationpb "github.com/planetscale/vtprotobuf/types/known/durationpb"
+	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
@@ -90,6 +91,126 @@ func (m *Validation) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *JwtHandshakeValidation) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *JwtHandshakeValidation) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *JwtHandshakeValidation) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.ClockSkewSeconds != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.ClockSkewSeconds))
+		i--
+		dAtA[i] = 0x38
+	}
+	if m.AllowMissingOrFailed {
+		i--
+		if m.AllowMissingOrFailed {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x30
+	}
+	if len(m.ClaimsMetadataNamespace) > 0 {
+		i -= len(m.ClaimsMetadataNamespace)
+		copy(dAtA[i:], m.ClaimsMetadataNamespace)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.ClaimsMetadataNamespace)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if len(m.TokenHeader) > 0 {
+		i -= len(m.TokenHeader)
+		copy(dAtA[i:], m.TokenHeader)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.TokenHeader)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if msg, ok := m.JwksSourceSpecifier.(*JwtHandshakeValidation_LocalJwks); ok {
+		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+	}
+	if len(m.Audiences) > 0 {
+		for iNdEx := len(m.Audiences) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Audiences[iNdEx])
+			copy(dAtA[i:], m.Audiences[iNdEx])
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.Audiences[iNdEx])))
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if len(m.Issuer) > 0 {
+		i -= len(m.Issuer)
+		copy(dAtA[i:], m.Issuer)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.Issuer)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *JwtHandshakeValidation_LocalJwks) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *JwtHandshakeValidation_LocalJwks) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.LocalJwks != nil {
+		if vtmsg, ok := interface{}(m.LocalJwks).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.LocalJwks)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+		}
+		i--
+		dAtA[i] = 0x1a
+	} else {
+		i = protohelpers.EncodeVarint(dAtA, i, 0)
+		i--
+		dAtA[i] = 0x1a
+	}
+	return len(dAtA) - i, nil
+}
 func (m *ReverseTunnel) MarshalVTStrict() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
@@ -119,6 +240,16 @@ func (m *ReverseTunnel) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.JwtValidation != nil {
+		size, err := m.JwtValidation.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x52
 	}
 	if m.EnableConnectionLimit {
 		i--
@@ -231,6 +362,63 @@ func (m *Validation) SizeVT() (n int) {
 	return n
 }
 
+func (m *JwtHandshakeValidation) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Issuer)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if len(m.Audiences) > 0 {
+		for _, s := range m.Audiences {
+			l = len(s)
+			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+		}
+	}
+	if vtmsg, ok := m.JwksSourceSpecifier.(interface{ SizeVT() int }); ok {
+		n += vtmsg.SizeVT()
+	}
+	l = len(m.TokenHeader)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.ClaimsMetadataNamespace)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.AllowMissingOrFailed {
+		n += 2
+	}
+	if m.ClockSkewSeconds != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.ClockSkewSeconds))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *JwtHandshakeValidation_LocalJwks) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.LocalJwks != nil {
+		if size, ok := interface{}(m.LocalJwks).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.LocalJwks)
+		}
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	} else {
+		n += 2
+	}
+	return n
+}
 func (m *ReverseTunnel) SizeVT() (n int) {
 	if m == nil {
 		return 0
@@ -267,6 +455,10 @@ func (m *ReverseTunnel) SizeVT() (n int) {
 	}
 	if m.EnableConnectionLimit {
 		n += 2
+	}
+	if m.JwtValidation != nil {
+		l = m.JwtValidation.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
