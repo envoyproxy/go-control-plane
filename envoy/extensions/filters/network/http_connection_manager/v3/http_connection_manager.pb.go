@@ -2498,7 +2498,7 @@ func (x *HttpConnectionManager_InternalAddressConfig) GetCidrRanges() []*v3.Cidr
 	return nil
 }
 
-// [#next-free-field: 8]
+// [#next-free-field: 9]
 type HttpConnectionManager_SetCurrentClientCertDetails struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Whether to forward the subject of the client cert. Defaults to false.
@@ -2518,6 +2518,8 @@ type HttpConnectionManager_SetCurrentClientCertDetails struct {
 	// Whether to forward the URI type Subject Alternative Name of the client cert. Defaults to
 	// false.
 	Uri bool `protobuf:"varint,5,opt,name=uri,proto3" json:"uri,omitempty"`
+	// Whether to forward the issuer of the client cert. Defaults to false.
+	Issuer bool `protobuf:"varint,8,opt,name=issuer,proto3" json:"issuer,omitempty"`
 	// The format for the header. When the :ref:`forward_client_cert_details
 	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.forward_client_cert_details>`
 	// is APPEND_FORWARD and an existing XFCC header is present, the format of the existing header
@@ -2589,6 +2591,13 @@ func (x *HttpConnectionManager_SetCurrentClientCertDetails) GetDns() bool {
 func (x *HttpConnectionManager_SetCurrentClientCertDetails) GetUri() bool {
 	if x != nil {
 		return x.Uri
+	}
+	return false
+}
+
+func (x *HttpConnectionManager_SetCurrentClientCertDetails) GetIssuer() bool {
+	if x != nil {
+		return x.Issuer
 	}
 	return false
 }
@@ -3364,7 +3373,7 @@ var File_envoy_extensions_filters_network_http_connection_manager_v3_http_connec
 
 const file_envoy_extensions_filters_network_http_connection_manager_v3_http_connection_manager_proto_rawDesc = "" +
 	"\n" +
-	"Yenvoy/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto\x12;envoy.extensions.filters.network.http_connection_manager.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a\"envoy/config/core/v3/address.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a$envoy/config/core/v3/extension.proto\x1a#envoy/config/core/v3/protocol.proto\x1a5envoy/config/core/v3/substitution_format_string.proto\x1a!envoy/config/route/v3/route.proto\x1a(envoy/config/route/v3/scoped_route.proto\x1a'envoy/config/trace/v3/http_tracer.proto\x1a,envoy/type/http/v3/path_transformation.proto\x1a&envoy/type/tracing/v3/custom_tag.proto\x1a\x1benvoy/type/v3/percent.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1eudpa/annotations/migrate.proto\x1a\x1fudpa/annotations/security.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xcdJ\n" +
+	"Yenvoy/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto\x12;envoy.extensions.filters.network.http_connection_manager.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a\"envoy/config/core/v3/address.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a$envoy/config/core/v3/extension.proto\x1a#envoy/config/core/v3/protocol.proto\x1a5envoy/config/core/v3/substitution_format_string.proto\x1a!envoy/config/route/v3/route.proto\x1a(envoy/config/route/v3/scoped_route.proto\x1a'envoy/config/trace/v3/http_tracer.proto\x1a,envoy/type/http/v3/path_transformation.proto\x1a&envoy/type/tracing/v3/custom_tag.proto\x1a\x1benvoy/type/v3/percent.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1eudpa/annotations/migrate.proto\x1a\x1fudpa/annotations/security.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xe5J\n" +
 	"\x15HttpConnectionManager\x12\x85\x01\n" +
 	"\n" +
 	"codec_type\x18\x01 \x01(\x0e2\\.envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.CodecTypeB\b\xfaB\x05\x82\x01\x02\x10\x01R\tcodecType\x12(\n" +
@@ -3455,13 +3464,14 @@ const file_envoy_extensions_filters_network_http_connection_manager_v3_http_conn
 	"\funix_sockets\x18\x01 \x01(\bR\vunixSockets\x12@\n" +
 	"\vcidr_ranges\x18\x02 \x03(\v2\x1f.envoy.config.core.v3.CidrRangeR\n" +
 	"cidrRanges:i\x9aň\x1ed\n" +
-	"benvoy.config.filter.network.http_connection_manager.v2.HttpConnectionManager.InternalAddressConfig\x1a\x9d\x03\n" +
+	"benvoy.config.filter.network.http_connection_manager.v2.HttpConnectionManager.InternalAddressConfig\x1a\xb5\x03\n" +
 	"\x1bSetCurrentClientCertDetails\x124\n" +
 	"\asubject\x18\x01 \x01(\v2\x1a.google.protobuf.BoolValueR\asubject\x12\x12\n" +
 	"\x04cert\x18\x03 \x01(\bR\x04cert\x12\x14\n" +
 	"\x05chain\x18\x06 \x01(\bR\x05chain\x12\x10\n" +
 	"\x03dns\x18\x04 \x01(\bR\x03dns\x12\x10\n" +
-	"\x03uri\x18\x05 \x01(\bR\x03uri\x12\x82\x01\n" +
+	"\x03uri\x18\x05 \x01(\bR\x03uri\x12\x16\n" +
+	"\x06issuer\x18\b \x01(\bR\x06issuer\x12\x82\x01\n" +
 	"\x06format\x18\a \x01(\x0e2j.envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.ForwardClientCertFormatR\x06format:o\x9aň\x1ej\n" +
 	"henvoy.config.filter.network.http_connection_manager.v2.HttpConnectionManager.SetCurrentClientCertDetailsJ\x04\b\x02\x10\x03\x1a\xfd\x02\n" +
 	"\x17ForwardClientCertConfig\x12\xaa\x01\n" +

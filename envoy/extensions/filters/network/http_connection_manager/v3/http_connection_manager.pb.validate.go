@@ -3659,6 +3659,8 @@ func (m *HttpConnectionManager_SetCurrentClientCertDetails) validate(all bool) e
 
 	// no validation rules for Uri
 
+	// no validation rules for Issuer
+
 	// no validation rules for Format
 
 	if len(errors) > 0 {

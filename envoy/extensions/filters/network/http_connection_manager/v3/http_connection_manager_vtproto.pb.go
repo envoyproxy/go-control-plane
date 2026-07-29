@@ -318,6 +318,16 @@ func (m *HttpConnectionManager_SetCurrentClientCertDetails) MarshalToSizedBuffer
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.Issuer {
+		i--
+		if m.Issuer {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x40
+	}
 	if m.Format != 0 {
 		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.Format))
 		i--
@@ -2853,6 +2863,9 @@ func (m *HttpConnectionManager_SetCurrentClientCertDetails) SizeVT() (n int) {
 	}
 	if m.Format != 0 {
 		n += 1 + protohelpers.SizeOfVarint(uint64(m.Format))
+	}
+	if m.Issuer {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n
