@@ -8,7 +8,6 @@ package quic_lbv3
 
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
-	_ "github.com/cncf/xds/go/xds/annotations/v3"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	v31 "github.com/envoyproxy/go-control-plane/envoy/extensions/transport_sockets/tls/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
@@ -33,10 +32,6 @@ const (
 // https://datatracker.ietf.org/doc/html/draft-ietf-quic-load-balancers#name-length-self-description.
 //
 // See https://datatracker.ietf.org/doc/html/draft-ietf-quic-load-balancers for details.
-//
-// .. warning::
-//
-//	This is still a work in progress. Interoperability testing has not yet been performed.
 //
 // [#next-free-field: 7]
 type Config struct {
@@ -157,14 +152,14 @@ var File_envoy_extensions_quic_connection_id_generator_quic_lb_v3_quic_lb_proto 
 
 const file_envoy_extensions_quic_connection_id_generator_quic_lb_v3_quic_lb_proto_rawDesc = "" +
 	"\n" +
-	"Fenvoy/extensions/quic/connection_id_generator/quic_lb/v3/quic_lb.proto\x128envoy.extensions.quic.connection_id_generator.quic_lb.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a6envoy/extensions/transport_sockets/tls/v3/secret.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xb7\x03\n" +
+	"Fenvoy/extensions/quic/connection_id_generator/quic_lb/v3/quic_lb.proto\x128envoy.extensions.quic.connection_id_generator.quic_lb.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a6envoy/extensions/transport_sockets/tls/v3/secret.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xad\x03\n" +
 	"\x06Config\x12G\n" +
 	"\tserver_id\x18\x02 \x01(\v2 .envoy.config.core.v3.DataSourceB\b\xfaB\x05\x8a\x01\x02\x10\x01R\bserverId\x127\n" +
 	"\x18server_id_base64_encoded\x18\x06 \x01(\bR\x15serverIdBase64Encoded\x12B\n" +
 	"\x19expected_server_id_length\x18\x03 \x01(\rB\a\xfaB\x04*\x02\x18\x12R\x16expectedServerIdLength\x127\n" +
 	"\x12nonce_length_bytes\x18\x04 \x01(\rB\t\xfaB\x06*\x04\x18\x10(\x04R\x10nonceLengthBytes\x12y\n" +
 	"\x15encryption_parameters\x18\x05 \x01(\v2:.envoy.extensions.transport_sockets.tls.v3.SdsSecretConfigB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x14encryptionParameters\x12)\n" +
-	"\x10unencrypted_mode\x18\x01 \x01(\bR\x0funencryptedMode:\b\xd2Ƥ\xe1\x06\x02\b\x01B\xca\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x10unencrypted_mode\x18\x01 \x01(\bR\x0funencryptedModeB\xca\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"Fio.envoyproxy.envoy.extensions.quic.connection_id_generator.quic_lb.v3B\vQuicLbProtoP\x01Zigithub.com/envoyproxy/go-control-plane/envoy/extensions/quic/connection_id_generator/quic_lb/v3;quic_lbv3b\x06proto3"
 
 var (
