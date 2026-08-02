@@ -216,6 +216,8 @@ func (m *McpJsonRestBridge) validate(all bool) error {
 
 	// no validation rules for DisableClearRouteCache
 
+	// no validation rules for PerRouteOnly
+
 	if len(errors) > 0 {
 		return McpJsonRestBridgeMultiError(errors)
 	}

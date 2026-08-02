@@ -49,6 +49,16 @@ func (m *McpJsonRestBridge) MarshalToSizedBufferVTStrict(dAtA []byte) (int, erro
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.PerRouteOnly {
+		i--
+		if m.PerRouteOnly {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x40
+	}
 	if m.DisableClearRouteCache {
 		i--
 		if m.DisableClearRouteCache {
@@ -700,6 +710,9 @@ func (m *McpJsonRestBridge) SizeVT() (n int) {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	if m.DisableClearRouteCache {
+		n += 2
+	}
+	if m.PerRouteOnly {
 		n += 2
 	}
 	n += len(m.unknownFields)
