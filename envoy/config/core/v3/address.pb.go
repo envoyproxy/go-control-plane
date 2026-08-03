@@ -247,7 +247,7 @@ type SocketAddress struct {
 	//
 	// .. note::
 	//
-	//	Setting this parameter requires Envoy to run with the ``CAP_NET_ADMIN`` capability.
+	//	Setting this parameter requires Envoy to run with the ``CAP_SYS_ADMIN`` capability.
 	//
 	// .. attention::
 	//
