@@ -29,6 +29,7 @@ const (
 )
 
 // Configuration for the DNS filter.
+// [#next-free-field: 6]
 type DnsFilterConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The stat prefix used when emitting DNS filter statistics
@@ -55,9 +56,12 @@ type DnsFilterConfig struct {
 	// - “ANSWER_COUNT“: Number of answers in the response
 	// - “RESPONSE_CODE“: DNS response code
 	// - “PARSE_STATUS“: Whether the query was successfully parsed
-	AccessLog     []*v3.AccessLog `protobuf:"bytes,4,rep,name=access_log,json=accessLog,proto3" json:"access_log,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	AccessLog []*v3.AccessLog `protobuf:"bytes,4,rep,name=access_log,json=accessLog,proto3" json:"access_log,omitempty"`
+	// When true, virtual domain names are matched case-insensitively. The response echoes the
+	// client's original query-name case. Defaults to false.
+	CaseInsensitive bool `protobuf:"varint,5,opt,name=case_insensitive,json=caseInsensitive,proto3" json:"case_insensitive,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *DnsFilterConfig) Reset() {
@@ -116,6 +120,13 @@ func (x *DnsFilterConfig) GetAccessLog() []*v3.AccessLog {
 		return x.AccessLog
 	}
 	return nil
+}
+
+func (x *DnsFilterConfig) GetCaseInsensitive() bool {
+	if x != nil {
+		return x.CaseInsensitive
+	}
+	return false
 }
 
 // This message contains the configuration for the DNS Filter operating
@@ -331,14 +342,15 @@ var File_envoy_extensions_filters_udp_dns_filter_v3_dns_filter_proto protoreflec
 
 const file_envoy_extensions_filters_udp_dns_filter_v3_dns_filter_proto_rawDesc = "" +
 	"\n" +
-	";envoy/extensions/filters/udp/dns_filter/v3/dns_filter.proto\x12*envoy.extensions.filters.udp.dns_filter.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a\"envoy/config/core/v3/address.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a$envoy/config/core/v3/extension.proto\x1a#envoy/config/core/v3/resolver.proto\x1a!envoy/data/dns/v3/dns_table.proto\x1a\x1egoogle/protobuf/duration.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x86\b\n" +
+	";envoy/extensions/filters/udp/dns_filter/v3/dns_filter.proto\x12*envoy.extensions.filters.udp.dns_filter.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a\"envoy/config/core/v3/address.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a$envoy/config/core/v3/extension.proto\x1a#envoy/config/core/v3/resolver.proto\x1a!envoy/data/dns/v3/dns_table.proto\x1a\x1egoogle/protobuf/duration.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xb1\b\n" +
 	"\x0fDnsFilterConfig\x12(\n" +
 	"\vstat_prefix\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\n" +
 	"statPrefix\x12t\n" +
 	"\rserver_config\x18\x02 \x01(\v2O.envoy.extensions.filters.udp.dns_filter.v3.DnsFilterConfig.ServerContextConfigR\fserverConfig\x12t\n" +
 	"\rclient_config\x18\x03 \x01(\v2O.envoy.extensions.filters.udp.dns_filter.v3.DnsFilterConfig.ClientContextConfigR\fclientConfig\x12C\n" +
 	"\n" +
-	"access_log\x18\x04 \x03(\v2$.envoy.config.accesslog.v3.AccessLogR\taccessLog\x1a\xc6\x01\n" +
+	"access_log\x18\x04 \x03(\v2$.envoy.config.accesslog.v3.AccessLogR\taccessLog\x12)\n" +
+	"\x10case_insensitive\x18\x05 \x01(\bR\x0fcaseInsensitive\x1a\xc6\x01\n" +
 	"\x13ServerContextConfig\x12G\n" +
 	"\x10inline_dns_table\x18\x01 \x01(\v2\x1b.envoy.data.dns.v3.DnsTableH\x00R\x0einlineDnsTable\x12P\n" +
 	"\x12external_dns_table\x18\x02 \x01(\v2 .envoy.config.core.v3.DataSourceH\x00R\x10externalDnsTableB\x14\n" +

@@ -283,6 +283,16 @@ func (m *DnsFilterConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error)
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.CaseInsensitive {
+		i--
+		if m.CaseInsensitive {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x28
+	}
 	if len(m.AccessLog) > 0 {
 		for iNdEx := len(m.AccessLog) - 1; iNdEx >= 0; iNdEx-- {
 			if vtmsg, ok := interface{}(m.AccessLog[iNdEx]).(interface {
@@ -468,6 +478,9 @@ func (m *DnsFilterConfig) SizeVT() (n int) {
 			}
 			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 		}
+	}
+	if m.CaseInsensitive {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n
