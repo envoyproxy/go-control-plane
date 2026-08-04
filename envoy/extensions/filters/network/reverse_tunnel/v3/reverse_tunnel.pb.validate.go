@@ -185,211 +185,6 @@ var _ interface {
 	ErrorName() string
 } = ValidationValidationError{}
 
-// Validate checks the field values on JwtHandshakeValidation with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *JwtHandshakeValidation) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on JwtHandshakeValidation with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// JwtHandshakeValidationMultiError, or nil if none found.
-func (m *JwtHandshakeValidation) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *JwtHandshakeValidation) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if utf8.RuneCountInString(m.GetIssuer()) > 1024 {
-		err := JwtHandshakeValidationValidationError{
-			field:  "Issuer",
-			reason: "value length must be at most 1024 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if m.GetTokenHeader() != "" {
-
-		if utf8.RuneCountInString(m.GetTokenHeader()) > 255 {
-			err := JwtHandshakeValidationValidationError{
-				field:  "TokenHeader",
-				reason: "value length must be at most 255 runes",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-	}
-
-	if m.GetClaimsMetadataNamespace() != "" {
-
-		if utf8.RuneCountInString(m.GetClaimsMetadataNamespace()) > 255 {
-			err := JwtHandshakeValidationValidationError{
-				field:  "ClaimsMetadataNamespace",
-				reason: "value length must be at most 255 runes",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-	}
-
-	// no validation rules for AllowMissingOrFailed
-
-	// no validation rules for ClockSkewSeconds
-
-	oneofJwksSourceSpecifierPresent := false
-	switch v := m.JwksSourceSpecifier.(type) {
-	case *JwtHandshakeValidation_LocalJwks:
-		if v == nil {
-			err := JwtHandshakeValidationValidationError{
-				field:  "JwksSourceSpecifier",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-		oneofJwksSourceSpecifierPresent = true
-
-		if all {
-			switch v := interface{}(m.GetLocalJwks()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, JwtHandshakeValidationValidationError{
-						field:  "LocalJwks",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, JwtHandshakeValidationValidationError{
-						field:  "LocalJwks",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetLocalJwks()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return JwtHandshakeValidationValidationError{
-					field:  "LocalJwks",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	default:
-		_ = v // ensures v is used
-	}
-	if !oneofJwksSourceSpecifierPresent {
-		err := JwtHandshakeValidationValidationError{
-			field:  "JwksSourceSpecifier",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if len(errors) > 0 {
-		return JwtHandshakeValidationMultiError(errors)
-	}
-
-	return nil
-}
-
-// JwtHandshakeValidationMultiError is an error wrapping multiple validation
-// errors returned by JwtHandshakeValidation.ValidateAll() if the designated
-// constraints aren't met.
-type JwtHandshakeValidationMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m JwtHandshakeValidationMultiError) Error() string {
-	msgs := make([]string, 0, len(m))
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m JwtHandshakeValidationMultiError) AllErrors() []error { return m }
-
-// JwtHandshakeValidationValidationError is the validation error returned by
-// JwtHandshakeValidation.Validate if the designated constraints aren't met.
-type JwtHandshakeValidationValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e JwtHandshakeValidationValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e JwtHandshakeValidationValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e JwtHandshakeValidationValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e JwtHandshakeValidationValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e JwtHandshakeValidationValidationError) ErrorName() string {
-	return "JwtHandshakeValidationValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e JwtHandshakeValidationValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sJwtHandshakeValidation.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = JwtHandshakeValidationValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = JwtHandshakeValidationValidationError{}
-
 // Validate checks the field values on ReverseTunnel with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -520,11 +315,11 @@ func (m *ReverseTunnel) validate(all bool) error {
 	// no validation rules for SkipRebalancing
 
 	if all {
-		switch v := interface{}(m.GetJwtValidation()).(type) {
+		switch v := interface{}(m.GetJwtValidator()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, ReverseTunnelValidationError{
-					field:  "JwtValidation",
+					field:  "JwtValidator",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -532,16 +327,16 @@ func (m *ReverseTunnel) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, ReverseTunnelValidationError{
-					field:  "JwtValidation",
+					field:  "JwtValidator",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetJwtValidation()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetJwtValidator()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ReverseTunnelValidationError{
-				field:  "JwtValidation",
+				field:  "JwtValidator",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

@@ -9,6 +9,7 @@ package reverse_tunnelv3
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
+	v31 "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/common/jwks/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -161,183 +162,6 @@ func (x *Validation) GetDynamicMetadataNamespace() string {
 	return ""
 }
 
-// Inline authentication of the reverse tunnel handshake against a verifiable JWT.
-// When configured on the :ref:`ReverseTunnel
-// <envoy_v3_api_msg_extensions.filters.network.reverse_tunnel.v3.ReverseTunnel>` filter, the bearer
-// token carried in the handshake request is verified **before** the connection is accepted and its
-// socket registered for reuse. A missing or invalid token rejects the handshake with HTTP
-// “401 Unauthorized“ (unless “allow_missing_or_failed“ is set), so a forged or expired token can
-// never produce a usable reverse tunnel.
-//
-// On success, the verified claims are emitted as dynamic metadata under
-// “claims_metadata_namespace“ so the existing :ref:`Validation
-// <envoy_v3_api_msg_extensions.filters.network.reverse_tunnel.v3.Validation>` block can bind a
-// claimed handshake identifier to a verified claim, e.g.::
-//
-//	tenant_id_format: "%DYNAMIC_METADATA(envoy.filters.network.reverse_tunnel.jwt:tenant)%"
-//
-// forces the “x-envoy-reverse-tunnel-tenant-id“ header to equal the verified “tenant“ claim.
-//
-// .. note::
-//
-//	Experimental, minimal implementation: only inline ``local_jwks`` (synchronous verification) is
-//	supported; asynchronous ``remote_jwks`` fetching is a planned follow-up. The configuration is
-//	deliberately scoped rather than reusing
-//	:ref:`JwtProvider <envoy_v3_api_msg_extensions.filters.http.jwt_authn.v3.JwtProvider>`, whose
-//	remote-fetch, request-param/cookie extraction and upstream-forwarding fields are not meaningful
-//	for an L4 pre-registration handshake; the security-relevant semantics below mirror ``jwt_authn``.
-//
-// .. attention::
-//
-//	Verifying the token proves only that the caller *holds* a valid token; it does **not** by itself
-//	prove the caller is the node/cluster/tenant it claims. To authenticate the claimed identity,
-//	reference a verified claim from the :ref:`validation
-//	<envoy_v3_api_msg_extensions.filters.network.reverse_tunnel.v3.Validation>` block, e.g.
-//	``tenant_id_format: "%DYNAMIC_METADATA(envoy.filters.network.reverse_tunnel.jwt:tenant)%"``.
-//	Without such a binding, a token minted for one tenant can open a tunnel claiming another. Tokens
-//	without an ``exp`` claim are rejected. All top-level claims are published as dynamic metadata
-//	(see ``claims_metadata_namespace``), so do not put secrets in the token.
-//
-// [#next-free-field: 8]
-type JwtHandshakeValidation struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Required. Expected token issuer; the JWT “iss“ claim must equal this value. A
-	// “jwt_validation“ block with an empty “issuer“ is rejected at config load, so a validly
-	// signed token from an unexpected issuer is never accepted.
-	Issuer string `protobuf:"bytes,1,opt,name=issuer,proto3" json:"issuer,omitempty"`
-	// Allowed audiences. If non-empty, the JWT must carry at least one of these in its “aud“ claim;
-	// matching is normalized (scheme and trailing slash) exactly as in “jwt_authn“. If empty, the
-	// audience is not checked.
-	Audiences []string `protobuf:"bytes,2,rep,name=audiences,proto3" json:"audiences,omitempty"`
-	// Source of the JSON Web Key Set (JWKS) used to verify the signature of the handshake token.
-	// Exactly one source must be configured.
-	//
-	// Types that are valid to be assigned to JwksSourceSpecifier:
-	//
-	//	*JwtHandshakeValidation_LocalJwks
-	JwksSourceSpecifier isJwtHandshakeValidation_JwksSourceSpecifier `protobuf_oneof:"jwks_source_specifier"`
-	// Name of the header carrying the token. Defaults to “authorization“, and a leading “Bearer“
-	// prefix (with its trailing space) is stripped when present.
-	TokenHeader string `protobuf:"bytes,4,opt,name=token_header,json=tokenHeader,proto3" json:"token_header,omitempty"`
-	// Namespace under which verified claims are emitted as dynamic metadata. Defaults to
-	// “envoy.filters.network.reverse_tunnel.jwt“. Each top-level JWT claim is written as a field in
-	// this namespace so it can be referenced via “%DYNAMIC_METADATA(namespace:claim)%“ in the
-	// “validation“ block.
-	ClaimsMetadataNamespace string `protobuf:"bytes,5,opt,name=claims_metadata_namespace,json=claimsMetadataNamespace,proto3" json:"claims_metadata_namespace,omitempty"`
-	// If “true“, a missing or invalid token does **not** reject the handshake (verified claims are
-	// simply not published). Useful for a staged rollout / audit mode: rejections that *would* have
-	// occurred are counted by the “jwt_would_deny“ stat without closing the connection. Defaults to
-	// “false“ (enforce: a missing or invalid token is rejected with “401“ and counted by
-	// “jwt_denied“).
-	AllowMissingOrFailed bool `protobuf:"varint,6,opt,name=allow_missing_or_failed,json=allowMissingOrFailed,proto3" json:"allow_missing_or_failed,omitempty"`
-	// Clock skew, in seconds, allowed when checking the “exp“ and “nbf“ time constraints. Mirrors
-	// “jwt_authn“'s field of the same name. Defaults to 60 seconds when unset (“0“).
-	ClockSkewSeconds uint32 `protobuf:"varint,7,opt,name=clock_skew_seconds,json=clockSkewSeconds,proto3" json:"clock_skew_seconds,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
-}
-
-func (x *JwtHandshakeValidation) Reset() {
-	*x = JwtHandshakeValidation{}
-	mi := &file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *JwtHandshakeValidation) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*JwtHandshakeValidation) ProtoMessage() {}
-
-func (x *JwtHandshakeValidation) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use JwtHandshakeValidation.ProtoReflect.Descriptor instead.
-func (*JwtHandshakeValidation) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *JwtHandshakeValidation) GetIssuer() string {
-	if x != nil {
-		return x.Issuer
-	}
-	return ""
-}
-
-func (x *JwtHandshakeValidation) GetAudiences() []string {
-	if x != nil {
-		return x.Audiences
-	}
-	return nil
-}
-
-func (x *JwtHandshakeValidation) GetJwksSourceSpecifier() isJwtHandshakeValidation_JwksSourceSpecifier {
-	if x != nil {
-		return x.JwksSourceSpecifier
-	}
-	return nil
-}
-
-func (x *JwtHandshakeValidation) GetLocalJwks() *v3.DataSource {
-	if x != nil {
-		if x, ok := x.JwksSourceSpecifier.(*JwtHandshakeValidation_LocalJwks); ok {
-			return x.LocalJwks
-		}
-	}
-	return nil
-}
-
-func (x *JwtHandshakeValidation) GetTokenHeader() string {
-	if x != nil {
-		return x.TokenHeader
-	}
-	return ""
-}
-
-func (x *JwtHandshakeValidation) GetClaimsMetadataNamespace() string {
-	if x != nil {
-		return x.ClaimsMetadataNamespace
-	}
-	return ""
-}
-
-func (x *JwtHandshakeValidation) GetAllowMissingOrFailed() bool {
-	if x != nil {
-		return x.AllowMissingOrFailed
-	}
-	return false
-}
-
-func (x *JwtHandshakeValidation) GetClockSkewSeconds() uint32 {
-	if x != nil {
-		return x.ClockSkewSeconds
-	}
-	return 0
-}
-
-type isJwtHandshakeValidation_JwksSourceSpecifier interface {
-	isJwtHandshakeValidation_JwksSourceSpecifier()
-}
-
-type JwtHandshakeValidation_LocalJwks struct {
-	// The JWKS provided inline as a data source: an “inline_string“, “inline_bytes“, or a
-	// “filename“ loaded from disk. The keys are read once when the configuration is loaded, which
-	// keeps token verification during the handshake fully synchronous.
-	LocalJwks *v3.DataSource `protobuf:"bytes,3,opt,name=local_jwks,json=localJwks,proto3,oneof"`
-}
-
-func (*JwtHandshakeValidation_LocalJwks) isJwtHandshakeValidation_JwksSourceSpecifier() {}
-
 // Configuration for the reverse tunnel network filter.
 // This filter handles reverse tunnel connection acceptance and rejection by processing
 // HTTP requests where required identification values are provided via HTTP headers.
@@ -381,12 +205,31 @@ type ReverseTunnel struct {
 	// This avoids the cross-worker lock in pickLeastLoadedSocketManager.
 	// Default: false (rebalancing enabled).
 	SkipRebalancing bool `protobuf:"varint,8,opt,name=skip_rebalancing,json=skipRebalancing,proto3" json:"skip_rebalancing,omitempty"`
-	// Optional inline JWT authentication for the handshake. When set, the bearer token carried in the
-	// handshake request is verified before the connection is accepted or its socket registered. This
-	// runs on the real accepted socket, before registration, so it does not interfere with socket
-	// reuse. See :ref:`JwtHandshakeValidation
-	// <envoy_v3_api_msg_extensions.filters.network.reverse_tunnel.v3.JwtHandshakeValidation>`.
-	JwtValidation *JwtHandshakeValidation `protobuf:"bytes,10,opt,name=jwt_validation,json=jwtValidation,proto3" json:"jwt_validation,omitempty"`
+	// Optional JWT authentication for the handshake. When set, the bearer token carried in the
+	// handshake request is verified before the connection is accepted or its socket registered, so a
+	// forged or expired token can never produce a usable reverse tunnel. This runs on the real
+	// accepted socket, before registration, so it does not interfere with socket reuse. A missing or
+	// invalid token rejects the handshake with HTTP “401 Unauthorized“ unless
+	// “allow_missing_or_failed“ is set.
+	//
+	// On success, the verified claims are published as dynamic metadata (default namespace
+	// “envoy.filters.network.reverse_tunnel.jwt“) so the :ref:`Validation
+	// <envoy_v3_api_msg_extensions.filters.network.reverse_tunnel.v3.Validation>` block can bind a
+	// claimed handshake identifier to a verified claim, e.g.::
+	//
+	//	tenant_id_format: "%DYNAMIC_METADATA(envoy.filters.network.reverse_tunnel.jwt:tenant)%"
+	//
+	// forces the “x-envoy-reverse-tunnel-tenant-id“ header to equal the verified “tenant“ claim.
+	// Without such a binding, a token minted for one tenant can open a tunnel claiming another.
+	//
+	// Token verification is synchronous. With “remote_jwks“ the keys are fetched and refreshed in the
+	// background (at startup and every “cache_duration“) and cached, never on the accept path. Before
+	// the first successful fetch, or while a refresh is failing with nothing cached, every token is
+	// rejected. “token_header“ defaults to “authorization“ and “clock_skew_seconds“ to 60.
+	//
+	// See :ref:`JwtHandshakeValidator
+	// <envoy_v3_api_msg_extensions.filters.common.jwks.v3.JwtHandshakeValidator>`.
+	JwtValidator *v31.JwtHandshakeValidator `protobuf:"bytes,10,opt,name=jwt_validator,json=jwtValidator,proto3" json:"jwt_validator,omitempty"`
 	// Enforces the per-node concurrent connection cap (“max_connections_per_node“, configured on
 	// the “UpstreamReverseConnectionSocketInterface“ bootstrap extension) for tunnels accepted by
 	// this filter. The cap is checked on the accepting worker but the connection is counted on the
@@ -399,7 +242,7 @@ type ReverseTunnel struct {
 
 func (x *ReverseTunnel) Reset() {
 	*x = ReverseTunnel{}
-	mi := &file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto_msgTypes[2]
+	mi := &file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -411,7 +254,7 @@ func (x *ReverseTunnel) String() string {
 func (*ReverseTunnel) ProtoMessage() {}
 
 func (x *ReverseTunnel) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto_msgTypes[2]
+	mi := &file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -424,7 +267,7 @@ func (x *ReverseTunnel) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReverseTunnel.ProtoReflect.Descriptor instead.
 func (*ReverseTunnel) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto_rawDescGZIP(), []int{2}
+	return file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *ReverseTunnel) GetPingInterval() *durationpb.Duration {
@@ -483,9 +326,9 @@ func (x *ReverseTunnel) GetSkipRebalancing() bool {
 	return false
 }
 
-func (x *ReverseTunnel) GetJwtValidation() *JwtHandshakeValidation {
+func (x *ReverseTunnel) GetJwtValidator() *v31.JwtHandshakeValidator {
 	if x != nil {
-		return x.JwtValidation
+		return x.JwtValidator
 	}
 	return nil
 }
@@ -501,24 +344,14 @@ var File_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto
 
 const file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto_rawDesc = "" +
 	"\n" +
-	"Genvoy/extensions/filters/network/reverse_tunnel/v3/reverse_tunnel.proto\x122envoy.extensions.filters.network.reverse_tunnel.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xa2\x02\n" +
+	"Genvoy/extensions/filters/network/reverse_tunnel/v3/reverse_tunnel.proto\x122envoy.extensions.filters.network.reverse_tunnel.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a;envoy/extensions/filters/common/jwks/v3/jwt_handshake.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xa2\x02\n" +
 	"\n" +
 	"Validation\x12.\n" +
 	"\x0enode_id_format\x18\x01 \x01(\tB\b\xfaB\x05r\x03\x18\x80\bR\fnodeIdFormat\x124\n" +
 	"\x11cluster_id_format\x18\x02 \x01(\tB\b\xfaB\x05r\x03\x18\x80\bR\x0fclusterIdFormat\x122\n" +
 	"\x10tenant_id_format\x18\x05 \x01(\tB\b\xfaB\x05r\x03\x18\x80\bR\x0etenantIdFormat\x122\n" +
 	"\x15emit_dynamic_metadata\x18\x03 \x01(\bR\x13emitDynamicMetadata\x12F\n" +
-	"\x1adynamic_metadata_namespace\x18\x04 \x01(\tB\b\xfaB\x05r\x03\x18\xff\x01R\x18dynamicMetadataNamespace\"\x97\x03\n" +
-	"\x16JwtHandshakeValidation\x12 \n" +
-	"\x06issuer\x18\x01 \x01(\tB\b\xfaB\x05r\x03\x18\x80\bR\x06issuer\x12\x1c\n" +
-	"\taudiences\x18\x02 \x03(\tR\taudiences\x12A\n" +
-	"\n" +
-	"local_jwks\x18\x03 \x01(\v2 .envoy.config.core.v3.DataSourceH\x00R\tlocalJwks\x12.\n" +
-	"\ftoken_header\x18\x04 \x01(\tB\v\xfaB\br\x06\x18\xff\x01\xd0\x01\x01R\vtokenHeader\x12G\n" +
-	"\x19claims_metadata_namespace\x18\x05 \x01(\tB\v\xfaB\br\x06\x18\xff\x01\xd0\x01\x01R\x17claimsMetadataNamespace\x125\n" +
-	"\x17allow_missing_or_failed\x18\x06 \x01(\bR\x14allowMissingOrFailed\x12,\n" +
-	"\x12clock_skew_seconds\x18\a \x01(\rR\x10clockSkewSecondsB\x1c\n" +
-	"\x15jwks_source_specifier\x12\x03\xf8B\x01\"\xc1\x05\n" +
+	"\x1adynamic_metadata_namespace\x18\x04 \x01(\tB\b\xfaB\x05r\x03\x18\xff\x01R\x18dynamicMetadataNamespace\"\xb3\x05\n" +
 	"\rReverseTunnel\x12Q\n" +
 	"\rping_interval\x18\x01 \x01(\v2\x19.google.protobuf.DurationB\x11\xfaB\x0e\xaa\x01\v\"\x03\b\xac\x022\x04\x10\xc0\x84=R\fpingInterval\x124\n" +
 	"\x16auto_close_connections\x18\x02 \x01(\bR\x14autoCloseConnections\x120\n" +
@@ -530,9 +363,9 @@ const file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_pro
 	"validation\x12?\n" +
 	"\x15required_cluster_name\x18\x06 \x01(\tB\v\xfaB\br\x06\x18\xff\x01\xd0\x01\x01R\x13requiredClusterName\x12(\n" +
 	"\x10use_http_upgrade\x18\a \x01(\bR\x0euseHttpUpgrade\x12)\n" +
-	"\x10skip_rebalancing\x18\b \x01(\bR\x0fskipRebalancing\x12q\n" +
-	"\x0ejwt_validation\x18\n" +
-	" \x01(\v2J.envoy.extensions.filters.network.reverse_tunnel.v3.JwtHandshakeValidationR\rjwtValidation\x126\n" +
+	"\x10skip_rebalancing\x18\b \x01(\bR\x0fskipRebalancing\x12c\n" +
+	"\rjwt_validator\x18\n" +
+	" \x01(\v2>.envoy.extensions.filters.common.jwks.v3.JwtHandshakeValidatorR\fjwtValidator\x126\n" +
 	"\x17enable_connection_limit\x18\t \x01(\bR\x15enableConnectionLimitB\xcc\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"@io.envoyproxy.envoy.extensions.filters.network.reverse_tunnel.v3B\x12ReverseTunnelProtoP\x01Zjgithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/reverse_tunnel/v3;reverse_tunnelv3b\x06proto3"
 
@@ -548,26 +381,24 @@ func file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_prot
 	return file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto_rawDescData
 }
 
-var file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto_goTypes = []any{
-	(*Validation)(nil),             // 0: envoy.extensions.filters.network.reverse_tunnel.v3.Validation
-	(*JwtHandshakeValidation)(nil), // 1: envoy.extensions.filters.network.reverse_tunnel.v3.JwtHandshakeValidation
-	(*ReverseTunnel)(nil),          // 2: envoy.extensions.filters.network.reverse_tunnel.v3.ReverseTunnel
-	(*v3.DataSource)(nil),          // 3: envoy.config.core.v3.DataSource
-	(*durationpb.Duration)(nil),    // 4: google.protobuf.Duration
-	(v3.RequestMethod)(0),          // 5: envoy.config.core.v3.RequestMethod
+	(*Validation)(nil),                // 0: envoy.extensions.filters.network.reverse_tunnel.v3.Validation
+	(*ReverseTunnel)(nil),             // 1: envoy.extensions.filters.network.reverse_tunnel.v3.ReverseTunnel
+	(*durationpb.Duration)(nil),       // 2: google.protobuf.Duration
+	(v3.RequestMethod)(0),             // 3: envoy.config.core.v3.RequestMethod
+	(*v31.JwtHandshakeValidator)(nil), // 4: envoy.extensions.filters.common.jwks.v3.JwtHandshakeValidator
 }
 var file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto_depIdxs = []int32{
-	3, // 0: envoy.extensions.filters.network.reverse_tunnel.v3.JwtHandshakeValidation.local_jwks:type_name -> envoy.config.core.v3.DataSource
-	4, // 1: envoy.extensions.filters.network.reverse_tunnel.v3.ReverseTunnel.ping_interval:type_name -> google.protobuf.Duration
-	5, // 2: envoy.extensions.filters.network.reverse_tunnel.v3.ReverseTunnel.request_method:type_name -> envoy.config.core.v3.RequestMethod
-	0, // 3: envoy.extensions.filters.network.reverse_tunnel.v3.ReverseTunnel.validation:type_name -> envoy.extensions.filters.network.reverse_tunnel.v3.Validation
-	1, // 4: envoy.extensions.filters.network.reverse_tunnel.v3.ReverseTunnel.jwt_validation:type_name -> envoy.extensions.filters.network.reverse_tunnel.v3.JwtHandshakeValidation
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	2, // 0: envoy.extensions.filters.network.reverse_tunnel.v3.ReverseTunnel.ping_interval:type_name -> google.protobuf.Duration
+	3, // 1: envoy.extensions.filters.network.reverse_tunnel.v3.ReverseTunnel.request_method:type_name -> envoy.config.core.v3.RequestMethod
+	0, // 2: envoy.extensions.filters.network.reverse_tunnel.v3.ReverseTunnel.validation:type_name -> envoy.extensions.filters.network.reverse_tunnel.v3.Validation
+	4, // 3: envoy.extensions.filters.network.reverse_tunnel.v3.ReverseTunnel.jwt_validator:type_name -> envoy.extensions.filters.common.jwks.v3.JwtHandshakeValidator
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto_init() }
@@ -575,16 +406,13 @@ func file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_prot
 	if File_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto != nil {
 		return
 	}
-	file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto_msgTypes[1].OneofWrappers = []any{
-		(*JwtHandshakeValidation_LocalJwks)(nil),
-	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto_rawDesc), len(file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
