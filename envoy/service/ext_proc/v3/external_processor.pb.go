@@ -16,6 +16,7 @@ import (
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	anypb "google.golang.org/protobuf/types/known/anypb"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	structpb "google.golang.org/protobuf/types/known/structpb"
 	reflect "reflect"
@@ -400,7 +401,7 @@ func (*ProcessingRequest_ResponseTrailers) isProcessingRequest_Request() {}
 //   - If it is set to “FULL_DUPLEX_STREAMED“, the server must follow the API defined
 //     for this mode to send the “ProcessingResponse“ messages.
 //
-// [#next-free-field: 13]
+// [#next-free-field: 14]
 type ProcessingResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The response type that is sent by the server.
@@ -420,6 +421,13 @@ type ProcessingResponse struct {
 	// following filters. This metadata will be placed in the namespace(s) specified by the top-level
 	// field name(s) of the struct.
 	DynamicMetadata *structpb.Struct `protobuf:"bytes,8,opt,name=dynamic_metadata,json=dynamicMetadata,proto3" json:"dynamic_metadata,omitempty"`
+	// Optional typed metadata that will be emitted as dynamic metadata to be consumed by
+	// following filters. This metadata will be placed in the namespace(s) specified by the
+	// keys of the map.
+	//
+	// Typed dynamic metadata should be preferred over untyped dynamic metadata (“dynamic_metadata“)
+	// because it is more efficient and more type-safe.
+	TypedDynamicMetadata map[string]*anypb.Any `protobuf:"bytes,13,rep,name=typed_dynamic_metadata,json=typedDynamicMetadata,proto3" json:"typed_dynamic_metadata,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// Override how parts of the HTTP request and response are processed for the duration of this
 	// particular request/response only. Servers may use this to intelligently control how requests
 	// are processed based on the headers and other metadata that they see.
@@ -584,6 +592,13 @@ func (x *ProcessingResponse) GetStreamedImmediateResponse() *StreamedImmediateRe
 func (x *ProcessingResponse) GetDynamicMetadata() *structpb.Struct {
 	if x != nil {
 		return x.DynamicMetadata
+	}
+	return nil
+}
+
+func (x *ProcessingResponse) GetTypedDynamicMetadata() map[string]*anypb.Any {
+	if x != nil {
+		return x.TypedDynamicMetadata
 	}
 	return nil
 }
@@ -1645,7 +1660,7 @@ var File_envoy_service_ext_proc_v3_external_processor_proto protoreflect.FileDes
 
 const file_envoy_service_ext_proc_v3_external_processor_proto_rawDesc = "" +
 	"\n" +
-	"2envoy/service/ext_proc/v3/external_processor.proto\x12\x19envoy.service.ext_proc.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a?envoy/extensions/filters/http/ext_proc/v3/processing_mode.proto\x1a\x1fenvoy/type/v3/http_status.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fxds/annotations/v3/status.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xf5\x02\n" +
+	"2envoy/service/ext_proc/v3/external_processor.proto\x12\x19envoy.service.ext_proc.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a?envoy/extensions/filters/http/ext_proc/v3/processing_mode.proto\x1a\x1fenvoy/type/v3/http_status.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fxds/annotations/v3/status.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xf5\x02\n" +
 	"\x15ProtocolConfiguration\x12|\n" +
 	"\x11request_body_mode\x18\x01 \x01(\x0e2F.envoy.extensions.filters.http.ext_proc.v3.ProcessingMode.BodySendModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\x0frequestBodyMode\x12~\n" +
 	"\x12response_body_mode\x18\x02 \x01(\x0e2F.envoy.extensions.filters.http.ext_proc.v3.ProcessingMode.BodySendModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\x10responseBodyMode\x12^\n" +
@@ -1668,7 +1683,7 @@ const file_envoy_service_ext_proc_v3_external_processor_proto_rawDesc = "" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12-\n" +
 	"\x05value\x18\x02 \x01(\v2\x17.google.protobuf.StructR\x05value:\x028\x01B\x0e\n" +
 	"\arequest\x12\x03\xf8B\x01J\x04\b\x01\x10\x02R\n" +
-	"async_mode\"\x9e\b\n" +
+	"async_mode\"\xfc\t\n" +
 	"\x12ProcessingResponse\x12U\n" +
 	"\x0frequest_headers\x18\x01 \x01(\v2*.envoy.service.ext_proc.v3.HeadersResponseH\x00R\x0erequestHeaders\x12W\n" +
 	"\x10response_headers\x18\x02 \x01(\v2*.envoy.service.ext_proc.v3.HeadersResponseH\x00R\x0fresponseHeaders\x12L\n" +
@@ -1678,11 +1693,15 @@ const file_envoy_service_ext_proc_v3_external_processor_proto_rawDesc = "" +
 	"\x11response_trailers\x18\x06 \x01(\v2+.envoy.service.ext_proc.v3.TrailersResponseH\x00R\x10responseTrailers\x12]\n" +
 	"\x12immediate_response\x18\a \x01(\v2,.envoy.service.ext_proc.v3.ImmediateResponseH\x00R\x11immediateResponse\x12v\n" +
 	"\x1bstreamed_immediate_response\x18\v \x01(\v24.envoy.service.ext_proc.v3.StreamedImmediateResponseH\x00R\x19streamedImmediateResponse\x12B\n" +
-	"\x10dynamic_metadata\x18\b \x01(\v2\x17.google.protobuf.StructR\x0fdynamicMetadata\x12^\n" +
+	"\x10dynamic_metadata\x18\b \x01(\v2\x17.google.protobuf.StructR\x0fdynamicMetadata\x12}\n" +
+	"\x16typed_dynamic_metadata\x18\r \x03(\v2G.envoy.service.ext_proc.v3.ProcessingResponse.TypedDynamicMetadataEntryR\x14typedDynamicMetadata\x12^\n" +
 	"\rmode_override\x18\t \x01(\v29.envoy.extensions.filters.http.ext_proc.v3.ProcessingModeR\fmodeOverride\x12#\n" +
 	"\rrequest_drain\x18\f \x01(\bR\frequestDrain\x12S\n" +
 	"\x18override_message_timeout\x18\n" +
-	" \x01(\v2\x19.google.protobuf.DurationR\x16overrideMessageTimeoutB\x0f\n" +
+	" \x01(\v2\x19.google.protobuf.DurationR\x16overrideMessageTimeout\x1a]\n" +
+	"\x19TypedDynamicMetadataEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12*\n" +
+	"\x05value\x18\x02 \x01(\v2\x14.google.protobuf.AnyR\x05value:\x028\x01B\x0f\n" +
 	"\bresponse\x12\x03\xf8B\x01\"\xa9\x02\n" +
 	"\vHttpHeaders\x129\n" +
 	"\aheaders\x18\x01 \x01(\v2\x1f.envoy.config.core.v3.HeaderMapR\aheaders\x12c\n" +
@@ -1764,7 +1783,7 @@ func file_envoy_service_ext_proc_v3_external_processor_proto_rawDescGZIP() []byt
 }
 
 var file_envoy_service_ext_proc_v3_external_processor_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_envoy_service_ext_proc_v3_external_processor_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
+var file_envoy_service_ext_proc_v3_external_processor_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_envoy_service_ext_proc_v3_external_processor_proto_goTypes = []any{
 	(CommonResponse_ResponseStatus)(0),  // 0: envoy.service.ext_proc.v3.CommonResponse.ResponseStatus
 	(*ProtocolConfiguration)(nil),       // 1: envoy.service.ext_proc.v3.ProtocolConfiguration
@@ -1784,26 +1803,28 @@ var file_envoy_service_ext_proc_v3_external_processor_proto_goTypes = []any{
 	(*StreamedBodyResponse)(nil),        // 15: envoy.service.ext_proc.v3.StreamedBodyResponse
 	(*BodyMutation)(nil),                // 16: envoy.service.ext_proc.v3.BodyMutation
 	nil,                                 // 17: envoy.service.ext_proc.v3.ProcessingRequest.AttributesEntry
-	nil,                                 // 18: envoy.service.ext_proc.v3.HttpHeaders.AttributesEntry
-	(v3.ProcessingMode_BodySendMode)(0), // 19: envoy.extensions.filters.http.ext_proc.v3.ProcessingMode.BodySendMode
-	(*v31.Metadata)(nil),                // 20: envoy.config.core.v3.Metadata
-	(*structpb.Struct)(nil),             // 21: google.protobuf.Struct
-	(*v3.ProcessingMode)(nil),           // 22: envoy.extensions.filters.http.ext_proc.v3.ProcessingMode
-	(*durationpb.Duration)(nil),         // 23: google.protobuf.Duration
-	(*v31.HeaderMap)(nil),               // 24: envoy.config.core.v3.HeaderMap
-	(*v32.HttpStatus)(nil),              // 25: envoy.type.v3.HttpStatus
-	(*v31.HeaderValueOption)(nil),       // 26: envoy.config.core.v3.HeaderValueOption
+	nil,                                 // 18: envoy.service.ext_proc.v3.ProcessingResponse.TypedDynamicMetadataEntry
+	nil,                                 // 19: envoy.service.ext_proc.v3.HttpHeaders.AttributesEntry
+	(v3.ProcessingMode_BodySendMode)(0), // 20: envoy.extensions.filters.http.ext_proc.v3.ProcessingMode.BodySendMode
+	(*v31.Metadata)(nil),                // 21: envoy.config.core.v3.Metadata
+	(*structpb.Struct)(nil),             // 22: google.protobuf.Struct
+	(*v3.ProcessingMode)(nil),           // 23: envoy.extensions.filters.http.ext_proc.v3.ProcessingMode
+	(*durationpb.Duration)(nil),         // 24: google.protobuf.Duration
+	(*v31.HeaderMap)(nil),               // 25: envoy.config.core.v3.HeaderMap
+	(*v32.HttpStatus)(nil),              // 26: envoy.type.v3.HttpStatus
+	(*v31.HeaderValueOption)(nil),       // 27: envoy.config.core.v3.HeaderValueOption
+	(*anypb.Any)(nil),                   // 28: google.protobuf.Any
 }
 var file_envoy_service_ext_proc_v3_external_processor_proto_depIdxs = []int32{
-	19, // 0: envoy.service.ext_proc.v3.ProtocolConfiguration.request_body_mode:type_name -> envoy.extensions.filters.http.ext_proc.v3.ProcessingMode.BodySendMode
-	19, // 1: envoy.service.ext_proc.v3.ProtocolConfiguration.response_body_mode:type_name -> envoy.extensions.filters.http.ext_proc.v3.ProcessingMode.BodySendMode
+	20, // 0: envoy.service.ext_proc.v3.ProtocolConfiguration.request_body_mode:type_name -> envoy.extensions.filters.http.ext_proc.v3.ProcessingMode.BodySendMode
+	20, // 1: envoy.service.ext_proc.v3.ProtocolConfiguration.response_body_mode:type_name -> envoy.extensions.filters.http.ext_proc.v3.ProcessingMode.BodySendMode
 	4,  // 2: envoy.service.ext_proc.v3.ProcessingRequest.request_headers:type_name -> envoy.service.ext_proc.v3.HttpHeaders
 	4,  // 3: envoy.service.ext_proc.v3.ProcessingRequest.response_headers:type_name -> envoy.service.ext_proc.v3.HttpHeaders
 	5,  // 4: envoy.service.ext_proc.v3.ProcessingRequest.request_body:type_name -> envoy.service.ext_proc.v3.HttpBody
 	5,  // 5: envoy.service.ext_proc.v3.ProcessingRequest.response_body:type_name -> envoy.service.ext_proc.v3.HttpBody
 	6,  // 6: envoy.service.ext_proc.v3.ProcessingRequest.request_trailers:type_name -> envoy.service.ext_proc.v3.HttpTrailers
 	6,  // 7: envoy.service.ext_proc.v3.ProcessingRequest.response_trailers:type_name -> envoy.service.ext_proc.v3.HttpTrailers
-	20, // 8: envoy.service.ext_proc.v3.ProcessingRequest.metadata_context:type_name -> envoy.config.core.v3.Metadata
+	21, // 8: envoy.service.ext_proc.v3.ProcessingRequest.metadata_context:type_name -> envoy.config.core.v3.Metadata
 	17, // 9: envoy.service.ext_proc.v3.ProcessingRequest.attributes:type_name -> envoy.service.ext_proc.v3.ProcessingRequest.AttributesEntry
 	1,  // 10: envoy.service.ext_proc.v3.ProcessingRequest.protocol_config:type_name -> envoy.service.ext_proc.v3.ProtocolConfiguration
 	7,  // 11: envoy.service.ext_proc.v3.ProcessingResponse.request_headers:type_name -> envoy.service.ext_proc.v3.HeadersResponse
@@ -1814,36 +1835,38 @@ var file_envoy_service_ext_proc_v3_external_processor_proto_depIdxs = []int32{
 	9,  // 16: envoy.service.ext_proc.v3.ProcessingResponse.response_trailers:type_name -> envoy.service.ext_proc.v3.TrailersResponse
 	12, // 17: envoy.service.ext_proc.v3.ProcessingResponse.immediate_response:type_name -> envoy.service.ext_proc.v3.ImmediateResponse
 	10, // 18: envoy.service.ext_proc.v3.ProcessingResponse.streamed_immediate_response:type_name -> envoy.service.ext_proc.v3.StreamedImmediateResponse
-	21, // 19: envoy.service.ext_proc.v3.ProcessingResponse.dynamic_metadata:type_name -> google.protobuf.Struct
-	22, // 20: envoy.service.ext_proc.v3.ProcessingResponse.mode_override:type_name -> envoy.extensions.filters.http.ext_proc.v3.ProcessingMode
-	23, // 21: envoy.service.ext_proc.v3.ProcessingResponse.override_message_timeout:type_name -> google.protobuf.Duration
-	24, // 22: envoy.service.ext_proc.v3.HttpHeaders.headers:type_name -> envoy.config.core.v3.HeaderMap
-	18, // 23: envoy.service.ext_proc.v3.HttpHeaders.attributes:type_name -> envoy.service.ext_proc.v3.HttpHeaders.AttributesEntry
-	24, // 24: envoy.service.ext_proc.v3.HttpTrailers.trailers:type_name -> envoy.config.core.v3.HeaderMap
-	11, // 25: envoy.service.ext_proc.v3.HeadersResponse.response:type_name -> envoy.service.ext_proc.v3.CommonResponse
-	11, // 26: envoy.service.ext_proc.v3.BodyResponse.response:type_name -> envoy.service.ext_proc.v3.CommonResponse
-	14, // 27: envoy.service.ext_proc.v3.TrailersResponse.header_mutation:type_name -> envoy.service.ext_proc.v3.HeaderMutation
-	4,  // 28: envoy.service.ext_proc.v3.StreamedImmediateResponse.headers_response:type_name -> envoy.service.ext_proc.v3.HttpHeaders
-	15, // 29: envoy.service.ext_proc.v3.StreamedImmediateResponse.body_response:type_name -> envoy.service.ext_proc.v3.StreamedBodyResponse
-	24, // 30: envoy.service.ext_proc.v3.StreamedImmediateResponse.trailers_response:type_name -> envoy.config.core.v3.HeaderMap
-	0,  // 31: envoy.service.ext_proc.v3.CommonResponse.status:type_name -> envoy.service.ext_proc.v3.CommonResponse.ResponseStatus
-	14, // 32: envoy.service.ext_proc.v3.CommonResponse.header_mutation:type_name -> envoy.service.ext_proc.v3.HeaderMutation
-	16, // 33: envoy.service.ext_proc.v3.CommonResponse.body_mutation:type_name -> envoy.service.ext_proc.v3.BodyMutation
-	24, // 34: envoy.service.ext_proc.v3.CommonResponse.trailers:type_name -> envoy.config.core.v3.HeaderMap
-	25, // 35: envoy.service.ext_proc.v3.ImmediateResponse.status:type_name -> envoy.type.v3.HttpStatus
-	14, // 36: envoy.service.ext_proc.v3.ImmediateResponse.headers:type_name -> envoy.service.ext_proc.v3.HeaderMutation
-	13, // 37: envoy.service.ext_proc.v3.ImmediateResponse.grpc_status:type_name -> envoy.service.ext_proc.v3.GrpcStatus
-	26, // 38: envoy.service.ext_proc.v3.HeaderMutation.set_headers:type_name -> envoy.config.core.v3.HeaderValueOption
-	15, // 39: envoy.service.ext_proc.v3.BodyMutation.streamed_response:type_name -> envoy.service.ext_proc.v3.StreamedBodyResponse
-	21, // 40: envoy.service.ext_proc.v3.ProcessingRequest.AttributesEntry.value:type_name -> google.protobuf.Struct
-	21, // 41: envoy.service.ext_proc.v3.HttpHeaders.AttributesEntry.value:type_name -> google.protobuf.Struct
-	2,  // 42: envoy.service.ext_proc.v3.ExternalProcessor.Process:input_type -> envoy.service.ext_proc.v3.ProcessingRequest
-	3,  // 43: envoy.service.ext_proc.v3.ExternalProcessor.Process:output_type -> envoy.service.ext_proc.v3.ProcessingResponse
-	43, // [43:44] is the sub-list for method output_type
-	42, // [42:43] is the sub-list for method input_type
-	42, // [42:42] is the sub-list for extension type_name
-	42, // [42:42] is the sub-list for extension extendee
-	0,  // [0:42] is the sub-list for field type_name
+	22, // 19: envoy.service.ext_proc.v3.ProcessingResponse.dynamic_metadata:type_name -> google.protobuf.Struct
+	18, // 20: envoy.service.ext_proc.v3.ProcessingResponse.typed_dynamic_metadata:type_name -> envoy.service.ext_proc.v3.ProcessingResponse.TypedDynamicMetadataEntry
+	23, // 21: envoy.service.ext_proc.v3.ProcessingResponse.mode_override:type_name -> envoy.extensions.filters.http.ext_proc.v3.ProcessingMode
+	24, // 22: envoy.service.ext_proc.v3.ProcessingResponse.override_message_timeout:type_name -> google.protobuf.Duration
+	25, // 23: envoy.service.ext_proc.v3.HttpHeaders.headers:type_name -> envoy.config.core.v3.HeaderMap
+	19, // 24: envoy.service.ext_proc.v3.HttpHeaders.attributes:type_name -> envoy.service.ext_proc.v3.HttpHeaders.AttributesEntry
+	25, // 25: envoy.service.ext_proc.v3.HttpTrailers.trailers:type_name -> envoy.config.core.v3.HeaderMap
+	11, // 26: envoy.service.ext_proc.v3.HeadersResponse.response:type_name -> envoy.service.ext_proc.v3.CommonResponse
+	11, // 27: envoy.service.ext_proc.v3.BodyResponse.response:type_name -> envoy.service.ext_proc.v3.CommonResponse
+	14, // 28: envoy.service.ext_proc.v3.TrailersResponse.header_mutation:type_name -> envoy.service.ext_proc.v3.HeaderMutation
+	4,  // 29: envoy.service.ext_proc.v3.StreamedImmediateResponse.headers_response:type_name -> envoy.service.ext_proc.v3.HttpHeaders
+	15, // 30: envoy.service.ext_proc.v3.StreamedImmediateResponse.body_response:type_name -> envoy.service.ext_proc.v3.StreamedBodyResponse
+	25, // 31: envoy.service.ext_proc.v3.StreamedImmediateResponse.trailers_response:type_name -> envoy.config.core.v3.HeaderMap
+	0,  // 32: envoy.service.ext_proc.v3.CommonResponse.status:type_name -> envoy.service.ext_proc.v3.CommonResponse.ResponseStatus
+	14, // 33: envoy.service.ext_proc.v3.CommonResponse.header_mutation:type_name -> envoy.service.ext_proc.v3.HeaderMutation
+	16, // 34: envoy.service.ext_proc.v3.CommonResponse.body_mutation:type_name -> envoy.service.ext_proc.v3.BodyMutation
+	25, // 35: envoy.service.ext_proc.v3.CommonResponse.trailers:type_name -> envoy.config.core.v3.HeaderMap
+	26, // 36: envoy.service.ext_proc.v3.ImmediateResponse.status:type_name -> envoy.type.v3.HttpStatus
+	14, // 37: envoy.service.ext_proc.v3.ImmediateResponse.headers:type_name -> envoy.service.ext_proc.v3.HeaderMutation
+	13, // 38: envoy.service.ext_proc.v3.ImmediateResponse.grpc_status:type_name -> envoy.service.ext_proc.v3.GrpcStatus
+	27, // 39: envoy.service.ext_proc.v3.HeaderMutation.set_headers:type_name -> envoy.config.core.v3.HeaderValueOption
+	15, // 40: envoy.service.ext_proc.v3.BodyMutation.streamed_response:type_name -> envoy.service.ext_proc.v3.StreamedBodyResponse
+	22, // 41: envoy.service.ext_proc.v3.ProcessingRequest.AttributesEntry.value:type_name -> google.protobuf.Struct
+	28, // 42: envoy.service.ext_proc.v3.ProcessingResponse.TypedDynamicMetadataEntry.value:type_name -> google.protobuf.Any
+	22, // 43: envoy.service.ext_proc.v3.HttpHeaders.AttributesEntry.value:type_name -> google.protobuf.Struct
+	2,  // 44: envoy.service.ext_proc.v3.ExternalProcessor.Process:input_type -> envoy.service.ext_proc.v3.ProcessingRequest
+	3,  // 45: envoy.service.ext_proc.v3.ExternalProcessor.Process:output_type -> envoy.service.ext_proc.v3.ProcessingResponse
+	45, // [45:46] is the sub-list for method output_type
+	44, // [44:45] is the sub-list for method input_type
+	44, // [44:44] is the sub-list for extension type_name
+	44, // [44:44] is the sub-list for extension extendee
+	0,  // [0:44] is the sub-list for field type_name
 }
 
 func init() { file_envoy_service_ext_proc_v3_external_processor_proto_init() }
@@ -1885,7 +1908,7 @@ func file_envoy_service_ext_proc_v3_external_processor_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_service_ext_proc_v3_external_processor_proto_rawDesc), len(file_envoy_service_ext_proc_v3_external_processor_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   18,
+			NumMessages:   19,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

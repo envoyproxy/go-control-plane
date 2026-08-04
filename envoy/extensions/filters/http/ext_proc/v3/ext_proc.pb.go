@@ -647,7 +647,7 @@ type MetadataOptions struct {
 	ForwardingNamespaces *MetadataOptions_MetadataNamespaces `protobuf:"bytes,1,opt,name=forwarding_namespaces,json=forwardingNamespaces,proto3" json:"forwarding_namespaces,omitempty"`
 	// Describes which typed or untyped filter dynamic metadata namespaces to accept from
 	// the external processing server. Set to empty or leave unset to disallow writing
-	// any received dynamic metadata. Receiving of typed metadata is not supported.
+	// any received dynamic metadata.
 	ReceivingNamespaces *MetadataOptions_MetadataNamespaces `protobuf:"bytes,2,opt,name=receiving_namespaces,json=receivingNamespaces,proto3" json:"receiving_namespaces,omitempty"`
 	// Describes which cluster metadata namespaces to forward to
 	// the external processing server.
