@@ -14,6 +14,7 @@ import (
 	v34 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	v33 "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
 	v32 "github.com/envoyproxy/go-control-plane/envoy/config/metrics/v3"
+	v37 "github.com/envoyproxy/go-control-plane/envoy/type/matcher/v3"
 	v36 "github.com/envoyproxy/go-control-plane/envoy/type/metadata/v3"
 	v35 "github.com/envoyproxy/go-control-plane/envoy/type/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
@@ -2969,6 +2970,10 @@ type Cluster_PreconnectPolicy struct {
 	// This is limited somewhat arbitrarily to 3 because preconnecting too aggressively can
 	// harm latency more than the preconnecting helps.
 	PredictivePreconnectRatio *wrapperspb.DoubleValue `protobuf:"bytes,2,opt,name=predictive_preconnect_ratio,json=predictivePreconnectRatio,proto3" json:"predictive_preconnect_ratio,omitempty"`
+	// Restricts anticipatory connections to hosts whose endpoint metadata matches this matcher.
+	// Non-matching hosts are never preconnected, and instead get connections only on demand, as they
+	// serve real requests. If unset, all healthy hosts are eligible.
+	PreconnectEnabledMetadata *v37.MetadataMatcher `protobuf:"bytes,3,opt,name=preconnect_enabled_metadata,json=preconnectEnabledMetadata,proto3" json:"preconnect_enabled_metadata,omitempty"`
 	unknownFields             protoimpl.UnknownFields
 	sizeCache                 protoimpl.SizeCache
 }
@@ -3013,6 +3018,13 @@ func (x *Cluster_PreconnectPolicy) GetPerUpstreamPreconnectRatio() *wrapperspb.D
 func (x *Cluster_PreconnectPolicy) GetPredictivePreconnectRatio() *wrapperspb.DoubleValue {
 	if x != nil {
 		return x.PredictivePreconnectRatio
+	}
+	return nil
+}
+
+func (x *Cluster_PreconnectPolicy) GetPreconnectEnabledMetadata() *v37.MetadataMatcher {
+	if x != nil {
+		return x.PreconnectEnabledMetadata
 	}
 	return nil
 }
@@ -3398,9 +3410,9 @@ var File_envoy_config_cluster_v3_cluster_proto protoreflect.FileDescriptor
 
 const file_envoy_config_cluster_v3_cluster_proto_rawDesc = "" +
 	"\n" +
-	"%envoy/config/cluster/v3/cluster.proto\x12\x17envoy.config.cluster.v3\x1a-envoy/config/cluster/v3/circuit_breaker.proto\x1a$envoy/config/cluster/v3/filter.proto\x1a/envoy/config/cluster/v3/outlier_detection.proto\x1a\"envoy/config/core/v3/address.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a$envoy/config/core/v3/extension.proto\x1a'envoy/config/core/v3/health_check.proto\x1a#envoy/config/core/v3/protocol.proto\x1a#envoy/config/core/v3/resolver.proto\x1a'envoy/config/endpoint/v3/endpoint.proto\x1a#envoy/config/metrics/v3/stats.proto\x1a%envoy/type/metadata/v3/metadata.proto\x1a\x1benvoy/type/v3/percent.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\"xds/core/v3/collection_entry.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1eudpa/annotations/migrate.proto\x1a\x1fudpa/annotations/security.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"K\n" +
+	"%envoy/config/cluster/v3/cluster.proto\x12\x17envoy.config.cluster.v3\x1a-envoy/config/cluster/v3/circuit_breaker.proto\x1a$envoy/config/cluster/v3/filter.proto\x1a/envoy/config/cluster/v3/outlier_detection.proto\x1a\"envoy/config/core/v3/address.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a$envoy/config/core/v3/extension.proto\x1a'envoy/config/core/v3/health_check.proto\x1a#envoy/config/core/v3/protocol.proto\x1a#envoy/config/core/v3/resolver.proto\x1a'envoy/config/endpoint/v3/endpoint.proto\x1a#envoy/config/metrics/v3/stats.proto\x1a$envoy/type/matcher/v3/metadata.proto\x1a%envoy/type/metadata/v3/metadata.proto\x1a\x1benvoy/type/v3/percent.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\"xds/core/v3/collection_entry.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1eudpa/annotations/migrate.proto\x1a\x1fudpa/annotations/security.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"K\n" +
 	"\x11ClusterCollection\x126\n" +
-	"\aentries\x18\x01 \x01(\v2\x1c.xds.core.v3.CollectionEntryR\aentries\"\xf3V\n" +
+	"\aentries\x18\x01 \x01(\v2\x1c.xds.core.v3.CollectionEntryR\aentries\"\xdbW\n" +
 	"\aCluster\x12o\n" +
 	"\x18transport_socket_matches\x18+ \x03(\v25.envoy.config.cluster.v3.Cluster.TransportSocketMatchR\x16transportSocketMatches\x12V\n" +
 	"\x18transport_socket_matcher\x18; \x01(\v2\x1c.xds.type.matcher.v3.MatcherR\x16transportSocketMatcher\x12\x1b\n" +
@@ -3564,10 +3576,11 @@ const file_envoy_config_cluster_v3_cluster_proto_rawDesc = "" +
 	"\vRefreshRate\x12N\n" +
 	"\rbase_interval\x18\x01 \x01(\v2\x19.google.protobuf.DurationB\x0e\xfaB\v\xaa\x01\b\b\x01*\x04\x10\xc0\x84=R\fbaseInterval\x12J\n" +
 	"\fmax_interval\x18\x02 \x01(\v2\x19.google.protobuf.DurationB\f\xfaB\t\xaa\x01\x06*\x04\x10\xc0\x84=R\vmaxInterval:'\x9aň\x1e\"\n" +
-	" envoy.api.v2.Cluster.RefreshRate\x1a\x83\x02\n" +
+	" envoy.api.v2.Cluster.RefreshRate\x1a\xeb\x02\n" +
 	"\x10PreconnectPolicy\x12x\n" +
 	"\x1dper_upstream_preconnect_ratio\x18\x01 \x01(\v2\x1c.google.protobuf.DoubleValueB\x17\xfaB\x14\x12\x12\x19\x00\x00\x00\x00\x00\x00\b@)\x00\x00\x00\x00\x00\x00\xf0?R\x1aperUpstreamPreconnectRatio\x12u\n" +
-	"\x1bpredictive_preconnect_ratio\x18\x02 \x01(\v2\x1c.google.protobuf.DoubleValueB\x17\xfaB\x14\x12\x12\x19\x00\x00\x00\x00\x00\x00\b@)\x00\x00\x00\x00\x00\x00\xf0?R\x19predictivePreconnectRatio\x1af\n" +
+	"\x1bpredictive_preconnect_ratio\x18\x02 \x01(\v2\x1c.google.protobuf.DoubleValueB\x17\xfaB\x14\x12\x12\x19\x00\x00\x00\x00\x00\x00\b@)\x00\x00\x00\x00\x00\x00\xf0?R\x19predictivePreconnectRatio\x12f\n" +
+	"\x1bpreconnect_enabled_metadata\x18\x03 \x01(\v2&.envoy.type.matcher.v3.MetadataMatcherR\x19preconnectEnabledMetadata\x1af\n" +
 	"\"TypedExtensionProtocolOptionsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12*\n" +
 	"\x05value\x18\x02 \x01(\v2\x14.google.protobuf.AnyR\x05value:\x028\x01\"W\n" +
@@ -3707,6 +3720,7 @@ var file_envoy_config_cluster_v3_cluster_proto_goTypes = []any{
 	(*v36.MetadataKey)(nil),                                                     // 62: envoy.type.metadata.v3.MetadataKey
 	(*v34.HealthStatusSet)(nil),                                                 // 63: envoy.config.core.v3.HealthStatusSet
 	(*wrapperspb.DoubleValue)(nil),                                              // 64: google.protobuf.DoubleValue
+	(*v37.MetadataMatcher)(nil),                                                 // 65: envoy.type.matcher.v3.MetadataMatcher
 }
 var file_envoy_config_cluster_v3_cluster_proto_depIdxs = []int32{
 	34, // 0: envoy.config.cluster.v3.ClusterCollection.entries:type_name -> xds.core.v3.CollectionEntry
@@ -3791,19 +3805,20 @@ var file_envoy_config_cluster_v3_cluster_proto_depIdxs = []int32{
 	37, // 79: envoy.config.cluster.v3.Cluster.RefreshRate.max_interval:type_name -> google.protobuf.Duration
 	64, // 80: envoy.config.cluster.v3.Cluster.PreconnectPolicy.per_upstream_preconnect_ratio:type_name -> google.protobuf.DoubleValue
 	64, // 81: envoy.config.cluster.v3.Cluster.PreconnectPolicy.predictive_preconnect_ratio:type_name -> google.protobuf.DoubleValue
-	58, // 82: envoy.config.cluster.v3.Cluster.TypedExtensionProtocolOptionsEntry.value:type_name -> google.protobuf.Any
-	6,  // 83: envoy.config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetSelector.fallback_policy:type_name -> envoy.config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetSelector.LbSubsetSelectorFallbackPolicy
-	60, // 84: envoy.config.cluster.v3.Cluster.CommonLbConfig.ZoneAwareLbConfig.routing_enabled:type_name -> envoy.type.v3.Percent
-	61, // 85: envoy.config.cluster.v3.Cluster.CommonLbConfig.ZoneAwareLbConfig.min_cluster_size:type_name -> google.protobuf.UInt64Value
-	38, // 86: envoy.config.cluster.v3.Cluster.CommonLbConfig.ConsistentHashingLbConfig.hash_balance_factor:type_name -> google.protobuf.UInt32Value
-	48, // 87: envoy.config.cluster.v3.LoadBalancingPolicy.Policy.typed_extension_config:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	8,  // 88: envoy.config.cluster.v3.UpstreamConnectionOptions.HappyEyeballsConfig.first_address_family_version:type_name -> envoy.config.cluster.v3.UpstreamConnectionOptions.FirstAddressFamilyVersion
-	38, // 89: envoy.config.cluster.v3.UpstreamConnectionOptions.HappyEyeballsConfig.first_address_family_count:type_name -> google.protobuf.UInt32Value
-	90, // [90:90] is the sub-list for method output_type
-	90, // [90:90] is the sub-list for method input_type
-	90, // [90:90] is the sub-list for extension type_name
-	90, // [90:90] is the sub-list for extension extendee
-	0,  // [0:90] is the sub-list for field type_name
+	65, // 82: envoy.config.cluster.v3.Cluster.PreconnectPolicy.preconnect_enabled_metadata:type_name -> envoy.type.matcher.v3.MetadataMatcher
+	58, // 83: envoy.config.cluster.v3.Cluster.TypedExtensionProtocolOptionsEntry.value:type_name -> google.protobuf.Any
+	6,  // 84: envoy.config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetSelector.fallback_policy:type_name -> envoy.config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetSelector.LbSubsetSelectorFallbackPolicy
+	60, // 85: envoy.config.cluster.v3.Cluster.CommonLbConfig.ZoneAwareLbConfig.routing_enabled:type_name -> envoy.type.v3.Percent
+	61, // 86: envoy.config.cluster.v3.Cluster.CommonLbConfig.ZoneAwareLbConfig.min_cluster_size:type_name -> google.protobuf.UInt64Value
+	38, // 87: envoy.config.cluster.v3.Cluster.CommonLbConfig.ConsistentHashingLbConfig.hash_balance_factor:type_name -> google.protobuf.UInt32Value
+	48, // 88: envoy.config.cluster.v3.LoadBalancingPolicy.Policy.typed_extension_config:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	8,  // 89: envoy.config.cluster.v3.UpstreamConnectionOptions.HappyEyeballsConfig.first_address_family_version:type_name -> envoy.config.cluster.v3.UpstreamConnectionOptions.FirstAddressFamilyVersion
+	38, // 90: envoy.config.cluster.v3.UpstreamConnectionOptions.HappyEyeballsConfig.first_address_family_count:type_name -> google.protobuf.UInt32Value
+	91, // [91:91] is the sub-list for method output_type
+	91, // [91:91] is the sub-list for method input_type
+	91, // [91:91] is the sub-list for extension type_name
+	91, // [91:91] is the sub-list for extension extendee
+	0,  // [0:91] is the sub-list for field type_name
 }
 
 func init() { file_envoy_config_cluster_v3_cluster_proto_init() }
