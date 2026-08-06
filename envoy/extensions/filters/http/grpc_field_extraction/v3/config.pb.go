@@ -155,7 +155,16 @@ type RequestFieldValueDisposition struct {
 	// Types that are valid to be assigned to Disposition:
 	//
 	//	*RequestFieldValueDisposition_DynamicMetadata
-	Disposition   isRequestFieldValueDisposition_Disposition `protobuf_oneof:"disposition"`
+	Disposition isRequestFieldValueDisposition_Disposition `protobuf_oneof:"disposition"`
+	// The key that the extracted value is written to within the dynamic metadata.
+	// If empty, the field path (the key of “request_field_extractions“) is used.
+	//
+	// This is useful for normalizing the metadata written by different gRPC methods whose
+	// request messages name the same logical field differently.
+	//
+	// Within a single gRPC method, two field extractions must not resolve to the same
+	// metadata key, otherwise the configuration is rejected.
+	MetadataKey   string `protobuf:"bytes,2,opt,name=metadata_key,json=metadataKey,proto3" json:"metadata_key,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -206,6 +215,13 @@ func (x *RequestFieldValueDisposition) GetDynamicMetadata() string {
 	return ""
 }
 
+func (x *RequestFieldValueDisposition) GetMetadataKey() string {
+	if x != nil {
+		return x.MetadataKey
+	}
+	return ""
+}
+
 type isRequestFieldValueDisposition_Disposition interface {
 	isRequestFieldValueDisposition_Disposition()
 }
@@ -234,9 +250,10 @@ const file_envoy_extensions_filters_http_grpc_field_extraction_v3_config_proto_r
 	"\x19request_field_extractions\x18\x01 \x03(\v2e.envoy.extensions.filters.http.grpc_field_extraction.v3.FieldExtractions.RequestFieldExtractionsEntryR\x17requestFieldExtractions\x1a\xa0\x01\n" +
 	"\x1cRequestFieldExtractionsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12j\n" +
-	"\x05value\x18\x02 \x01(\v2T.envoy.extensions.filters.http.grpc_field_extraction.v3.RequestFieldValueDispositionR\x05value:\x028\x01\"Z\n" +
+	"\x05value\x18\x02 \x01(\v2T.envoy.extensions.filters.http.grpc_field_extraction.v3.RequestFieldValueDispositionR\x05value:\x028\x01\"}\n" +
 	"\x1cRequestFieldValueDisposition\x12+\n" +
-	"\x10dynamic_metadata\x18\x01 \x01(\tH\x00R\x0fdynamicMetadataB\r\n" +
+	"\x10dynamic_metadata\x18\x01 \x01(\tH\x00R\x0fdynamicMetadata\x12!\n" +
+	"\fmetadata_key\x18\x02 \x01(\tR\vmetadataKeyB\r\n" +
 	"\vdispositionB\xd4\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"Dio.envoyproxy.envoy.extensions.filters.http.grpc_field_extraction.v3B\vConfigProtoP\x01Zugithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/grpc_field_extraction/v3;grpc_field_extractionv3b\x06proto3"
 
