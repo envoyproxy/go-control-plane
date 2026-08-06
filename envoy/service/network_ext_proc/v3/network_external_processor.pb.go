@@ -198,7 +198,7 @@ func (x *Data) GetEndOfStream() bool {
 
 // ProcessingRequest contains data sent from Envoy to the external processing server.
 // Each request contains either read data (from client) or write data (to client)
-// along with optional metadata.
+// along with optional metadata and attributes.
 type ProcessingRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// ReadData contains the network data intercepted in the request path (client to server).
@@ -215,7 +215,11 @@ type ProcessingRequest struct {
 	//
 	// The metadata is not automatically propagated from request to response.
 	// The external processor must include any needed metadata in its response.
-	Metadata      *v3.Metadata `protobuf:"bytes,3,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	Metadata *v3.Metadata `protobuf:"bytes,3,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	// The values of properties selected by the “connection_attributes“
+	// list in the configuration. Each entry in the list is populated
+	// from the standard :ref:`attributes <arch_overview_attributes>` supported in the data plane.
+	Attributes    map[string]*structpb.Struct `protobuf:"bytes,4,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -267,6 +271,13 @@ func (x *ProcessingRequest) GetWriteData() *Data {
 func (x *ProcessingRequest) GetMetadata() *v3.Metadata {
 	if x != nil {
 		return x.Metadata
+	}
+	return nil
+}
+
+func (x *ProcessingRequest) GetAttributes() map[string]*structpb.Struct {
+	if x != nil {
+		return x.Attributes
 	}
 	return nil
 }
@@ -401,12 +412,18 @@ const file_envoy_service_network_ext_proc_v3_network_external_processor_proto_ra
 	"Benvoy/service/network_ext_proc/v3/network_external_processor.proto\x12!envoy.service.network_ext_proc.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\">\n" +
 	"\x04Data\x12\x12\n" +
 	"\x04data\x18\x01 \x01(\fR\x04data\x12\"\n" +
-	"\rend_of_stream\x18\x02 \x01(\bR\vendOfStream\"\xdd\x01\n" +
+	"\rend_of_stream\x18\x02 \x01(\bR\vendOfStream\"\x9b\x03\n" +
 	"\x11ProcessingRequest\x12D\n" +
 	"\tread_data\x18\x01 \x01(\v2'.envoy.service.network_ext_proc.v3.DataR\breadData\x12F\n" +
 	"\n" +
 	"write_data\x18\x02 \x01(\v2'.envoy.service.network_ext_proc.v3.DataR\twriteData\x12:\n" +
-	"\bmetadata\x18\x03 \x01(\v2\x1e.envoy.config.core.v3.MetadataR\bmetadata\"\x9f\x05\n" +
+	"\bmetadata\x18\x03 \x01(\v2\x1e.envoy.config.core.v3.MetadataR\bmetadata\x12d\n" +
+	"\n" +
+	"attributes\x18\x04 \x03(\v2D.envoy.service.network_ext_proc.v3.ProcessingRequest.AttributesEntryR\n" +
+	"attributes\x1aV\n" +
+	"\x0fAttributesEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12-\n" +
+	"\x05value\x18\x02 \x01(\v2\x17.google.protobuf.StructR\x05value:\x028\x01\"\x9f\x05\n" +
 	"\x12ProcessingResponse\x12D\n" +
 	"\tread_data\x18\x01 \x01(\v2'.envoy.service.network_ext_proc.v3.DataR\breadData\x12F\n" +
 	"\n" +
@@ -441,32 +458,35 @@ func file_envoy_service_network_ext_proc_v3_network_external_processor_proto_raw
 }
 
 var file_envoy_service_network_ext_proc_v3_network_external_processor_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_envoy_service_network_ext_proc_v3_network_external_processor_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_envoy_service_network_ext_proc_v3_network_external_processor_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_envoy_service_network_ext_proc_v3_network_external_processor_proto_goTypes = []any{
 	(ProcessingResponse_DataProcessedStatus)(0), // 0: envoy.service.network_ext_proc.v3.ProcessingResponse.DataProcessedStatus
 	(ProcessingResponse_ConnectionStatus)(0),    // 1: envoy.service.network_ext_proc.v3.ProcessingResponse.ConnectionStatus
 	(*Data)(nil),                                // 2: envoy.service.network_ext_proc.v3.Data
 	(*ProcessingRequest)(nil),                   // 3: envoy.service.network_ext_proc.v3.ProcessingRequest
 	(*ProcessingResponse)(nil),                  // 4: envoy.service.network_ext_proc.v3.ProcessingResponse
-	(*v3.Metadata)(nil),                         // 5: envoy.config.core.v3.Metadata
-	(*structpb.Struct)(nil),                     // 6: google.protobuf.Struct
+	nil,                                         // 5: envoy.service.network_ext_proc.v3.ProcessingRequest.AttributesEntry
+	(*v3.Metadata)(nil),                         // 6: envoy.config.core.v3.Metadata
+	(*structpb.Struct)(nil),                     // 7: google.protobuf.Struct
 }
 var file_envoy_service_network_ext_proc_v3_network_external_processor_proto_depIdxs = []int32{
-	2, // 0: envoy.service.network_ext_proc.v3.ProcessingRequest.read_data:type_name -> envoy.service.network_ext_proc.v3.Data
-	2, // 1: envoy.service.network_ext_proc.v3.ProcessingRequest.write_data:type_name -> envoy.service.network_ext_proc.v3.Data
-	5, // 2: envoy.service.network_ext_proc.v3.ProcessingRequest.metadata:type_name -> envoy.config.core.v3.Metadata
-	2, // 3: envoy.service.network_ext_proc.v3.ProcessingResponse.read_data:type_name -> envoy.service.network_ext_proc.v3.Data
-	2, // 4: envoy.service.network_ext_proc.v3.ProcessingResponse.write_data:type_name -> envoy.service.network_ext_proc.v3.Data
-	0, // 5: envoy.service.network_ext_proc.v3.ProcessingResponse.data_processing_status:type_name -> envoy.service.network_ext_proc.v3.ProcessingResponse.DataProcessedStatus
-	1, // 6: envoy.service.network_ext_proc.v3.ProcessingResponse.connection_status:type_name -> envoy.service.network_ext_proc.v3.ProcessingResponse.ConnectionStatus
-	6, // 7: envoy.service.network_ext_proc.v3.ProcessingResponse.dynamic_metadata:type_name -> google.protobuf.Struct
-	3, // 8: envoy.service.network_ext_proc.v3.NetworkExternalProcessor.Process:input_type -> envoy.service.network_ext_proc.v3.ProcessingRequest
-	4, // 9: envoy.service.network_ext_proc.v3.NetworkExternalProcessor.Process:output_type -> envoy.service.network_ext_proc.v3.ProcessingResponse
-	9, // [9:10] is the sub-list for method output_type
-	8, // [8:9] is the sub-list for method input_type
-	8, // [8:8] is the sub-list for extension type_name
-	8, // [8:8] is the sub-list for extension extendee
-	0, // [0:8] is the sub-list for field type_name
+	2,  // 0: envoy.service.network_ext_proc.v3.ProcessingRequest.read_data:type_name -> envoy.service.network_ext_proc.v3.Data
+	2,  // 1: envoy.service.network_ext_proc.v3.ProcessingRequest.write_data:type_name -> envoy.service.network_ext_proc.v3.Data
+	6,  // 2: envoy.service.network_ext_proc.v3.ProcessingRequest.metadata:type_name -> envoy.config.core.v3.Metadata
+	5,  // 3: envoy.service.network_ext_proc.v3.ProcessingRequest.attributes:type_name -> envoy.service.network_ext_proc.v3.ProcessingRequest.AttributesEntry
+	2,  // 4: envoy.service.network_ext_proc.v3.ProcessingResponse.read_data:type_name -> envoy.service.network_ext_proc.v3.Data
+	2,  // 5: envoy.service.network_ext_proc.v3.ProcessingResponse.write_data:type_name -> envoy.service.network_ext_proc.v3.Data
+	0,  // 6: envoy.service.network_ext_proc.v3.ProcessingResponse.data_processing_status:type_name -> envoy.service.network_ext_proc.v3.ProcessingResponse.DataProcessedStatus
+	1,  // 7: envoy.service.network_ext_proc.v3.ProcessingResponse.connection_status:type_name -> envoy.service.network_ext_proc.v3.ProcessingResponse.ConnectionStatus
+	7,  // 8: envoy.service.network_ext_proc.v3.ProcessingResponse.dynamic_metadata:type_name -> google.protobuf.Struct
+	7,  // 9: envoy.service.network_ext_proc.v3.ProcessingRequest.AttributesEntry.value:type_name -> google.protobuf.Struct
+	3,  // 10: envoy.service.network_ext_proc.v3.NetworkExternalProcessor.Process:input_type -> envoy.service.network_ext_proc.v3.ProcessingRequest
+	4,  // 11: envoy.service.network_ext_proc.v3.NetworkExternalProcessor.Process:output_type -> envoy.service.network_ext_proc.v3.ProcessingResponse
+	11, // [11:12] is the sub-list for method output_type
+	10, // [10:11] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_envoy_service_network_ext_proc_v3_network_external_processor_proto_init() }
@@ -480,7 +500,7 @@ func file_envoy_service_network_ext_proc_v3_network_external_processor_proto_ini
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_service_network_ext_proc_v3_network_external_processor_proto_rawDesc), len(file_envoy_service_network_ext_proc_v3_network_external_processor_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   3,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

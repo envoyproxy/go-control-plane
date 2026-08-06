@@ -50,6 +50,15 @@ func (m *NetworkExternalProcessor) MarshalToSizedBufferVTStrict(dAtA []byte) (in
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.ConnectionAttributes) > 0 {
+		for iNdEx := len(m.ConnectionAttributes) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.ConnectionAttributes[iNdEx])
+			copy(dAtA[i:], m.ConnectionAttributes[iNdEx])
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.ConnectionAttributes[iNdEx])))
+			i--
+			dAtA[i] = 0x3a
+		}
+	}
 	if m.MetadataOptions != nil {
 		size, err := m.MetadataOptions.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -303,6 +312,12 @@ func (m *NetworkExternalProcessor) SizeVT() (n int) {
 	if m.MetadataOptions != nil {
 		l = m.MetadataOptions.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if len(m.ConnectionAttributes) > 0 {
+		for _, s := range m.ConnectionAttributes {
+			l = len(s)
+			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+		}
 	}
 	n += len(m.unknownFields)
 	return n

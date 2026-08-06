@@ -87,7 +87,7 @@ func (ProcessingMode_DataSendMode) EnumDescriptor() ([]byte, []int) {
 //
 // By using the filter's processing mode, you can selectively choose which data
 // directions to process (read, write or both), allowing for efficient processing.
-// [#next-free-field: 7]
+// [#next-free-field: 8]
 type NetworkExternalProcessor struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The gRPC service that will process network traffic.
@@ -110,8 +110,15 @@ type NetworkExternalProcessor struct {
 	StatPrefix     string               `protobuf:"bytes,5,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// Options related to the sending and receiving of dynamic metadata.
 	MetadataOptions *MetadataOptions `protobuf:"bytes,6,opt,name=metadata_options,json=metadataOptions,proto3" json:"metadata_options,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// The data plane provides a number of :ref:`attributes <arch_overview_attributes>`
+	// for expressive policies. Each attribute name provided in this field will be
+	// evaluated against the connection and filter state and populated in the
+	// :ref:`ProcessingRequest.attributes <envoy_v3_api_field_service.network_ext_proc.v3.ProcessingRequest.attributes>` field.
+	// See the :ref:`attribute documentation <arch_overview_attributes>`
+	// for the list of supported attributes and their types.
+	ConnectionAttributes []string `protobuf:"bytes,7,rep,name=connection_attributes,json=connectionAttributes,proto3" json:"connection_attributes,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *NetworkExternalProcessor) Reset() {
@@ -182,6 +189,13 @@ func (x *NetworkExternalProcessor) GetStatPrefix() string {
 func (x *NetworkExternalProcessor) GetMetadataOptions() *MetadataOptions {
 	if x != nil {
 		return x.MetadataOptions
+	}
+	return nil
+}
+
+func (x *NetworkExternalProcessor) GetConnectionAttributes() []string {
+	if x != nil {
+		return x.ConnectionAttributes
 	}
 	return nil
 }
@@ -369,7 +383,7 @@ var File_envoy_extensions_filters_network_ext_proc_v3_ext_proc_proto protoreflec
 
 const file_envoy_extensions_filters_network_ext_proc_v3_ext_proc_proto_rawDesc = "" +
 	"\n" +
-	";envoy/extensions/filters/network/ext_proc/v3/ext_proc.proto\x12,envoy.extensions.filters.network.ext_proc.v3\x1a'envoy/config/core/v3/grpc_service.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xdc\x03\n" +
+	";envoy/extensions/filters/network/ext_proc/v3/ext_proc.proto\x12,envoy.extensions.filters.network.ext_proc.v3\x1a'envoy/config/core/v3/grpc_service.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x91\x04\n" +
 	"\x18NetworkExternalProcessor\x12D\n" +
 	"\fgrpc_service\x18\x01 \x01(\v2!.envoy.config.core.v3.GrpcServiceR\vgrpcService\x12,\n" +
 	"\x12failure_mode_allow\x18\x02 \x01(\bR\x10failureModeAllow\x12e\n" +
@@ -378,7 +392,8 @@ const file_envoy_extensions_filters_network_ext_proc_v3_ext_proc_proto_rawDesc =
 	"\xaa\x01\a\"\x03\b\x90\x1c2\x00R\x0emessageTimeout\x12(\n" +
 	"\vstat_prefix\x18\x05 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\n" +
 	"statPrefix\x12h\n" +
-	"\x10metadata_options\x18\x06 \x01(\v2=.envoy.extensions.filters.network.ext_proc.v3.MetadataOptionsR\x0fmetadataOptions\"\x96\x02\n" +
+	"\x10metadata_options\x18\x06 \x01(\v2=.envoy.extensions.filters.network.ext_proc.v3.MetadataOptionsR\x0fmetadataOptions\x123\n" +
+	"\x15connection_attributes\x18\a \x03(\tR\x14connectionAttributes\"\x96\x02\n" +
 	"\x0eProcessingMode\x12l\n" +
 	"\fprocess_read\x18\x01 \x01(\x0e2I.envoy.extensions.filters.network.ext_proc.v3.ProcessingMode.DataSendModeR\vprocessRead\x12n\n" +
 	"\rprocess_write\x18\x02 \x01(\x0e2I.envoy.extensions.filters.network.ext_proc.v3.ProcessingMode.DataSendModeR\fprocessWrite\"&\n" +
