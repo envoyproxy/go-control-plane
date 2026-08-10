@@ -58,6 +58,8 @@ func (m *AiProtocolManager) validate(all bool) error {
 
 	var errors []error
 
+	// no validation rules for BestEffortParsing
+
 	if len(errors) > 0 {
 		return AiProtocolManagerMultiError(errors)
 	}
@@ -137,3 +139,133 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = AiProtocolManagerValidationError{}
+
+// Validate checks the field values on AiProtocolManagerPerRoute with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AiProtocolManagerPerRoute) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AiProtocolManagerPerRoute with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AiProtocolManagerPerRouteMultiError, or nil if none found.
+func (m *AiProtocolManagerPerRoute) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AiProtocolManagerPerRoute) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if _, ok := _AiProtocolManagerPerRoute_Schema_NotInLookup[m.GetSchema()]; ok {
+		err := AiProtocolManagerPerRouteValidationError{
+			field:  "Schema",
+			reason: "value must not be in list [UNSPECIFIED]",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if _, ok := AiProtocolManagerPerRoute_Schema_name[int32(m.GetSchema())]; !ok {
+		err := AiProtocolManagerPerRouteValidationError{
+			field:  "Schema",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	// no validation rules for Normalize
+
+	if len(errors) > 0 {
+		return AiProtocolManagerPerRouteMultiError(errors)
+	}
+
+	return nil
+}
+
+// AiProtocolManagerPerRouteMultiError is an error wrapping multiple validation
+// errors returned by AiProtocolManagerPerRoute.ValidateAll() if the
+// designated constraints aren't met.
+type AiProtocolManagerPerRouteMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AiProtocolManagerPerRouteMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AiProtocolManagerPerRouteMultiError) AllErrors() []error { return m }
+
+// AiProtocolManagerPerRouteValidationError is the validation error returned by
+// AiProtocolManagerPerRoute.Validate if the designated constraints aren't met.
+type AiProtocolManagerPerRouteValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AiProtocolManagerPerRouteValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AiProtocolManagerPerRouteValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AiProtocolManagerPerRouteValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AiProtocolManagerPerRouteValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AiProtocolManagerPerRouteValidationError) ErrorName() string {
+	return "AiProtocolManagerPerRouteValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AiProtocolManagerPerRouteValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAiProtocolManagerPerRoute.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AiProtocolManagerPerRouteValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AiProtocolManagerPerRouteValidationError{}
+
+var _AiProtocolManagerPerRoute_Schema_NotInLookup = map[AiProtocolManagerPerRoute_Schema]struct{}{
+	0: {},
+}

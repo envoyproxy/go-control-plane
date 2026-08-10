@@ -7,6 +7,7 @@
 package ai_protocol_managerv3
 
 import (
+	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
@@ -47,6 +48,64 @@ func (m *AiProtocolManager) MarshalToSizedBufferVTStrict(dAtA []byte) (int, erro
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.BestEffortParsing {
+		i--
+		if m.BestEffortParsing {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *AiProtocolManagerPerRoute) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *AiProtocolManagerPerRoute) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *AiProtocolManagerPerRoute) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.Normalize {
+		i--
+		if m.Normalize {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.Schema != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.Schema))
+		i--
+		dAtA[i] = 0x8
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -56,6 +115,25 @@ func (m *AiProtocolManager) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
+	if m.BestEffortParsing {
+		n += 2
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *AiProtocolManagerPerRoute) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Schema != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.Schema))
+	}
+	if m.Normalize {
+		n += 2
+	}
 	n += len(m.unknownFields)
 	return n
 }

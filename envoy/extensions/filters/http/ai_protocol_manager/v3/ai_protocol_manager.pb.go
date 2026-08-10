@@ -9,6 +9,7 @@ package ai_protocol_managerv3
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	_ "github.com/cncf/xds/go/xds/annotations/v3"
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -23,11 +24,83 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// The schema a request payload can be declared to follow.
+type AiProtocolManagerPerRoute_Schema int32
+
+const (
+	// Not a valid choice; a route must name the schema its payload follows.
+	AiProtocolManagerPerRoute_UNSPECIFIED AiProtocolManagerPerRoute_Schema = 0
+	// The OpenAI Chat Completions request shape, served at “/chat/completions“.
+	AiProtocolManagerPerRoute_OPENAI_CHAT_COMPLETIONS AiProtocolManagerPerRoute_Schema = 1
+)
+
+// Enum value maps for AiProtocolManagerPerRoute_Schema.
+var (
+	AiProtocolManagerPerRoute_Schema_name = map[int32]string{
+		0: "UNSPECIFIED",
+		1: "OPENAI_CHAT_COMPLETIONS",
+	}
+	AiProtocolManagerPerRoute_Schema_value = map[string]int32{
+		"UNSPECIFIED":             0,
+		"OPENAI_CHAT_COMPLETIONS": 1,
+	}
+)
+
+func (x AiProtocolManagerPerRoute_Schema) Enum() *AiProtocolManagerPerRoute_Schema {
+	p := new(AiProtocolManagerPerRoute_Schema)
+	*p = x
+	return p
+}
+
+func (x AiProtocolManagerPerRoute_Schema) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (AiProtocolManagerPerRoute_Schema) Descriptor() protoreflect.EnumDescriptor {
+	return file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_enumTypes[0].Descriptor()
+}
+
+func (AiProtocolManagerPerRoute_Schema) Type() protoreflect.EnumType {
+	return &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_enumTypes[0]
+}
+
+func (x AiProtocolManagerPerRoute_Schema) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use AiProtocolManagerPerRoute_Schema.Descriptor instead.
+func (AiProtocolManagerPerRoute_Schema) EnumDescriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDescGZIP(), []int{1, 0}
+}
+
 // Configuration for the AI Protocol Manager filter.
+//
+// The filter manages AI endpoint traffic: it holds a request payload, validates
+// it against the schema the endpoint serves, and normalizes it to a canonical
+// schema, which is what lets routing, admission and policy act on a payload the
+// proxy understands rather than on opaque bytes.
+// Which routes are AI endpoints is declared with the :ref:`per-route
+// configuration
+// <envoy_v3_api_msg_extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute>`;
+// the filter leaves every other route alone.
 type AiProtocolManager struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Whether to parse a JSON payload on a route that is not a declared AI
+	// endpoint.
+	//
+	// This exists for compatibility: it lets a chain that wants a parsed body on
+	// ordinary routes have one without declaring those routes AI endpoints. Such a
+	// route names no schema, so there is nothing to hold the payload to, and a body
+	// that fails to parse is forwarded unchanged rather than rejected. When unset
+	// (the default) those routes are passed through untouched -- neither parsed nor
+	// buffered.
+	//
+	// A declared AI endpoint is unaffected: its payload is always held and
+	// validated, and a malformed one rejected with a 400, regardless of this
+	// setting.
+	BestEffortParsing bool `protobuf:"varint,1,opt,name=best_effort_parsing,json=bestEffortParsing,proto3" json:"best_effort_parsing,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *AiProtocolManager) Reset() {
@@ -60,12 +133,105 @@ func (*AiProtocolManager) Descriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDescGZIP(), []int{0}
 }
 
+func (x *AiProtocolManager) GetBestEffortParsing() bool {
+	if x != nil {
+		return x.BestEffortParsing
+	}
+	return false
+}
+
+// Per-route configuration for the AI Protocol Manager filter. Declares that the
+// route is an AI endpoint and which schema its payload follows, which is what
+// puts the payload under the filter's management.
+//
+// This is normally attached to a route matching the provider's REST path, for
+// example “/chat/completions“.
+type AiProtocolManagerPerRoute struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The schema the request payload on this route follows.
+	//
+	// Setting this hands the payload to the filter to hold and validate: a body
+	// that is not well-formed is rejected with a 400 rather than forwarded for the
+	// upstream to interpret differently.
+	//
+	// The schemas themselves are not part of this API yet; a later change adds
+	// them along with validation and transcoding against them. Until then the
+	// choice is recorded and carried, but the payload is not checked against it.
+	Schema AiProtocolManagerPerRoute_Schema `protobuf:"varint,1,opt,name=schema,proto3,enum=envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute_Schema" json:"schema,omitempty"`
+	// Whether to normalize the payload from :ref:`schema
+	// <envoy_v3_api_field_extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute.schema>`
+	// into the canonical schema.
+	//
+	// When unset the route is a pass-through endpoint: the payload is validated in
+	// its own schema and forwarded upstream in that same schema. When set, it is
+	// additionally transcoded into the canonical schema, which is what lets one set
+	// of policies apply to payloads from different providers.
+	//
+	// Transcoding is not implemented yet; a later change adds it. Until then this
+	// field is accepted and has no effect.
+	Normalize     bool `protobuf:"varint,2,opt,name=normalize,proto3" json:"normalize,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AiProtocolManagerPerRoute) Reset() {
+	*x = AiProtocolManagerPerRoute{}
+	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AiProtocolManagerPerRoute) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AiProtocolManagerPerRoute) ProtoMessage() {}
+
+func (x *AiProtocolManagerPerRoute) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AiProtocolManagerPerRoute.ProtoReflect.Descriptor instead.
+func (*AiProtocolManagerPerRoute) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *AiProtocolManagerPerRoute) GetSchema() AiProtocolManagerPerRoute_Schema {
+	if x != nil {
+		return x.Schema
+	}
+	return AiProtocolManagerPerRoute_UNSPECIFIED
+}
+
+func (x *AiProtocolManagerPerRoute) GetNormalize() bool {
+	if x != nil {
+		return x.Normalize
+	}
+	return false
+}
+
 var File_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDesc = "" +
 	"\n" +
-	"Nenvoy/extensions/filters/http/ai_protocol_manager/v3/ai_protocol_manager.proto\x124envoy.extensions.filters.http.ai_protocol_manager.v3\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\"\x13\n" +
-	"\x11AiProtocolManagerB\xe1\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
+	"Nenvoy/extensions/filters/http/ai_protocol_manager/v3/ai_protocol_manager.proto\x124envoy.extensions.filters.http.ai_protocol_manager.v3\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"C\n" +
+	"\x11AiProtocolManager\x12.\n" +
+	"\x13best_effort_parsing\x18\x01 \x01(\bR\x11bestEffortParsing\"\xed\x01\n" +
+	"\x19AiProtocolManagerPerRoute\x12z\n" +
+	"\x06schema\x18\x01 \x01(\x0e2V.envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute.SchemaB\n" +
+	"\xfaB\a\x82\x01\x04\x10\x01 \x00R\x06schema\x12\x1c\n" +
+	"\tnormalize\x18\x02 \x01(\bR\tnormalize\"6\n" +
+	"\x06Schema\x12\x0f\n" +
+	"\vUNSPECIFIED\x10\x00\x12\x1b\n" +
+	"\x17OPENAI_CHAT_COMPLETIONS\x10\x01B\xe1\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
 	"Bio.envoyproxy.envoy.extensions.filters.http.ai_protocol_manager.v3B\x16AiProtocolManagerProtoP\x01Zqgithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/ai_protocol_manager/v3;ai_protocol_managerv3b\x06proto3"
 
 var (
@@ -80,16 +246,20 @@ func file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manag
 	return file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDescData
 }
 
-var file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_goTypes = []any{
-	(*AiProtocolManager)(nil), // 0: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManager
+	(AiProtocolManagerPerRoute_Schema)(0), // 0: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute.Schema
+	(*AiProtocolManager)(nil),             // 1: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManager
+	(*AiProtocolManagerPerRoute)(nil),     // 2: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute
 }
 var file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0, // 0: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute.schema:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute.Schema
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() {
@@ -104,13 +274,14 @@ func file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manag
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDesc), len(file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   1,
+			NumEnums:      1,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_goTypes,
 		DependencyIndexes: file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_depIdxs,
+		EnumInfos:         file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_enumTypes,
 		MessageInfos:      file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes,
 	}.Build()
 	File_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto = out.File
