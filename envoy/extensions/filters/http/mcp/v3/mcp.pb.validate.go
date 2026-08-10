@@ -472,6 +472,50 @@ func (m *McpOverride) validate(all bool) error {
 
 	}
 
+	// no validation rules for ClearRouteCache
+
+	if all {
+		switch v := interface{}(m.GetParserConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, McpOverrideValidationError{
+					field:  "ParserConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, McpOverrideValidationError{
+					field:  "ParserConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetParserConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return McpOverrideValidationError{
+				field:  "ParserConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if _, ok := Mcp_RequestStorageMode_name[int32(m.GetRequestStorageMode())]; !ok {
+		err := McpOverrideValidationError{
+			field:  "RequestStorageMode",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	// no validation rules for RejectDuplicateKeys
+
 	if len(errors) > 0 {
 		return McpOverrideMultiError(errors)
 	}

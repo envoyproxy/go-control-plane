@@ -340,16 +340,25 @@ func (x *ParserConfig) GetGroupMetadataKey() string {
 }
 
 // Per-route override configuration for MCP filter
+// [#next-free-field: 7]
 type McpOverride struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Optional per-route traffic mode override
+	// Overrides the global traffic mode for this route.
 	TrafficMode Mcp_TrafficMode `protobuf:"varint,1,opt,name=traffic_mode,json=trafficMode,proto3,enum=envoy.extensions.filters.http.mcp.v3.Mcp_TrafficMode" json:"traffic_mode,omitempty"`
 	// Optional per-route max request body size override.
 	// When set, this overrides the global max_request_body_size for this route.
 	// It defaults to 8KB (8192 bytes) and the maximum allowed value is 10MB (10485760 bytes).
 	MaxRequestBodySize *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=max_request_body_size,json=maxRequestBodySize,proto3" json:"max_request_body_size,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	// Overrides the global clear_route_cache setting for this route.
+	ClearRouteCache bool `protobuf:"varint,3,opt,name=clear_route_cache,json=clearRouteCache,proto3" json:"clear_route_cache,omitempty"`
+	// Overrides the global parser config for this route.
+	ParserConfig *ParserConfig `protobuf:"bytes,4,opt,name=parser_config,json=parserConfig,proto3" json:"parser_config,omitempty"`
+	// Overrides the global request storage mode for this route.
+	RequestStorageMode Mcp_RequestStorageMode `protobuf:"varint,5,opt,name=request_storage_mode,json=requestStorageMode,proto3,enum=envoy.extensions.filters.http.mcp.v3.Mcp_RequestStorageMode" json:"request_storage_mode,omitempty"`
+	// Overrides the global reject_duplicate_keys setting for this route.
+	RejectDuplicateKeys bool `protobuf:"varint,6,opt,name=reject_duplicate_keys,json=rejectDuplicateKeys,proto3" json:"reject_duplicate_keys,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *McpOverride) Reset() {
@@ -394,6 +403,34 @@ func (x *McpOverride) GetMaxRequestBodySize() *wrapperspb.UInt32Value {
 		return x.MaxRequestBodySize
 	}
 	return nil
+}
+
+func (x *McpOverride) GetClearRouteCache() bool {
+	if x != nil {
+		return x.ClearRouteCache
+	}
+	return false
+}
+
+func (x *McpOverride) GetParserConfig() *ParserConfig {
+	if x != nil {
+		return x.ParserConfig
+	}
+	return nil
+}
+
+func (x *McpOverride) GetRequestStorageMode() Mcp_RequestStorageMode {
+	if x != nil {
+		return x.RequestStorageMode
+	}
+	return Mcp_MODE_UNSPECIFIED
+}
+
+func (x *McpOverride) GetRejectDuplicateKeys() bool {
+	if x != nil {
+		return x.RejectDuplicateKeys
+	}
+	return false
 }
 
 type Mcp_TraceContextPropagationConfig struct {
@@ -618,11 +655,15 @@ const file_envoy_extensions_filters_http_mcp_v3_mcp_proto_rawDesc = "" +
 	"\fMethodConfig\x12\x1f\n" +
 	"\x06method\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x06method\x12\x14\n" +
 	"\x05group\x18\x02 \x01(\tR\x05group\x12u\n" +
-	"\x10extraction_rules\x18\x03 \x03(\v2J.envoy.extensions.filters.http.mcp.v3.ParserConfig.AttributeExtractionRuleR\x0fextractionRules\"\xce\x01\n" +
+	"\x10extraction_rules\x18\x03 \x03(\v2J.envoy.extensions.filters.http.mcp.v3.ParserConfig.AttributeExtractionRuleR\x0fextractionRules\"\x81\x04\n" +
 	"\vMcpOverride\x12b\n" +
 	"\ftraffic_mode\x18\x01 \x01(\x0e25.envoy.extensions.filters.http.mcp.v3.Mcp.TrafficModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\vtrafficMode\x12[\n" +
 	"\x15max_request_body_size\x18\x02 \x01(\v2\x1c.google.protobuf.UInt32ValueB\n" +
-	"\xfaB\a*\x05\x18\x80\x80\x80\x05R\x12maxRequestBodySizeB\xa3\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
+	"\xfaB\a*\x05\x18\x80\x80\x80\x05R\x12maxRequestBodySize\x12*\n" +
+	"\x11clear_route_cache\x18\x03 \x01(\bR\x0fclearRouteCache\x12W\n" +
+	"\rparser_config\x18\x04 \x01(\v22.envoy.extensions.filters.http.mcp.v3.ParserConfigR\fparserConfig\x12x\n" +
+	"\x14request_storage_mode\x18\x05 \x01(\x0e2<.envoy.extensions.filters.http.mcp.v3.Mcp.RequestStorageModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\x12requestStorageMode\x122\n" +
+	"\x15reject_duplicate_keys\x18\x06 \x01(\bR\x13rejectDuplicateKeysB\xa3\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
 	"2io.envoyproxy.envoy.extensions.filters.http.mcp.v3B\bMcpProtoP\x01ZQgithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/mcp/v3;mcpv3b\x06proto3"
 
 var (
@@ -663,12 +704,14 @@ var file_envoy_extensions_filters_http_mcp_v3_mcp_proto_depIdxs = []int32{
 	8,  // 7: envoy.extensions.filters.http.mcp.v3.ParserConfig.methods:type_name -> envoy.extensions.filters.http.mcp.v3.ParserConfig.MethodConfig
 	0,  // 8: envoy.extensions.filters.http.mcp.v3.McpOverride.traffic_mode:type_name -> envoy.extensions.filters.http.mcp.v3.Mcp.TrafficMode
 	9,  // 9: envoy.extensions.filters.http.mcp.v3.McpOverride.max_request_body_size:type_name -> google.protobuf.UInt32Value
-	7,  // 10: envoy.extensions.filters.http.mcp.v3.ParserConfig.MethodConfig.extraction_rules:type_name -> envoy.extensions.filters.http.mcp.v3.ParserConfig.AttributeExtractionRule
-	11, // [11:11] is the sub-list for method output_type
-	11, // [11:11] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	3,  // 10: envoy.extensions.filters.http.mcp.v3.McpOverride.parser_config:type_name -> envoy.extensions.filters.http.mcp.v3.ParserConfig
+	1,  // 11: envoy.extensions.filters.http.mcp.v3.McpOverride.request_storage_mode:type_name -> envoy.extensions.filters.http.mcp.v3.Mcp.RequestStorageMode
+	7,  // 12: envoy.extensions.filters.http.mcp.v3.ParserConfig.MethodConfig.extraction_rules:type_name -> envoy.extensions.filters.http.mcp.v3.ParserConfig.AttributeExtractionRule
+	13, // [13:13] is the sub-list for method output_type
+	13, // [13:13] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_http_mcp_v3_mcp_proto_init() }

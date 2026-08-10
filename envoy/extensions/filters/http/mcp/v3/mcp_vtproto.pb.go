@@ -369,6 +369,41 @@ func (m *McpOverride) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.RejectDuplicateKeys {
+		i--
+		if m.RejectDuplicateKeys {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x30
+	}
+	if m.RequestStorageMode != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.RequestStorageMode))
+		i--
+		dAtA[i] = 0x28
+	}
+	if m.ParserConfig != nil {
+		size, err := m.ParserConfig.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x22
+	}
+	if m.ClearRouteCache {
+		i--
+		if m.ClearRouteCache {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x18
+	}
 	if m.MaxRequestBodySize != nil {
 		size, err := (*wrapperspb.UInt32Value)(m.MaxRequestBodySize).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -516,6 +551,19 @@ func (m *McpOverride) SizeVT() (n int) {
 	if m.MaxRequestBodySize != nil {
 		l = (*wrapperspb.UInt32Value)(m.MaxRequestBodySize).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.ClearRouteCache {
+		n += 2
+	}
+	if m.ParserConfig != nil {
+		l = m.ParserConfig.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.RequestStorageMode != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.RequestStorageMode))
+	}
+	if m.RejectDuplicateKeys {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n

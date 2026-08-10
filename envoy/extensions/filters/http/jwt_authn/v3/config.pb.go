@@ -286,12 +286,13 @@ type JwtProvider struct {
 	JwtCacheConfig *JwtCacheConfig `protobuf:"bytes,12,opt,name=jwt_cache_config,json=jwtCacheConfig,proto3" json:"jwt_cache_config,omitempty"`
 	// Add JWT claim to HTTP Header
 	// Specify the claim name you want to copy in which HTTP header. For examples, following config:
-	// The claim must be of type; string, int, double, bool. Array type claims are not supported
+	// Claims of type string, int, double and bool are copied verbatim. Claims of type array or
+	// object are serialized to JSON and copied base64-encoded.
 	//
 	// .. literalinclude:: /_configs/repo/jwt_authn.yaml
 	//
 	//	:language: yaml
-	//	:lines: 44-48
+	//	:lines: 44-51
 	//	:linenos:
 	//	:lineno-start: 44
 	//	:caption: :download:`jwt_authn.yaml </_configs/repo/jwt_authn.yaml>`
@@ -1809,10 +1810,45 @@ type JwtClaimToHeader struct {
 	// The HTTP header name to copy the claim to.
 	// The header name will be sanitized and replaced.
 	HeaderName string `protobuf:"bytes,1,opt,name=header_name,json=headerName,proto3" json:"header_name,omitempty"`
-	// The field name for the JWT Claim : it can be a nested claim of type (eg. "claim.nested.key", "sub")
-	// String separated with "." in case of nested claims. The nested claim name must use dot "." to separate
-	// the JSON name path.
-	ClaimName     string `protobuf:"bytes,2,opt,name=claim_name,json=claimName,proto3" json:"claim_name,omitempty"`
+	// The name of the claim to copy, split on "." to address nested claims: “sub“ selects the
+	// top-level “sub“ claim, and “nested.claim.key“ selects “key“ inside “claim“ inside
+	// “nested“.
+	//
+	// Because the name is always split, a claim whose own name contains a dot -- a URL-namespaced
+	// claim such as “http://example.org/parent_token“ -- is not addressable this way. Use
+	// :ref:`claim_path
+	// <envoy_v3_api_field_extensions.filters.http.jwt_authn.v3.JwtClaimToHeader.claim_path>` for
+	// those.
+	//
+	// Exactly one of “claim_name“ and “claim_path“ must be set.
+	ClaimName string `protobuf:"bytes,2,opt,name=claim_name,json=claimName,proto3" json:"claim_name,omitempty"`
+	// The path to the claim to copy, given as an explicit list of segments. Each segment is matched
+	// in full against a key of the enclosing JSON object, so claim names containing dots are
+	// addressable. For the payload “{"a.b": {"c.d": "x.y.z"}}“, the value “x.y.z“ is selected
+	// by:
+	//
+	// .. code-block:: yaml
+	//
+	//	claim_to_headers:
+	//	- header_name: x-jwt-claim
+	//	  claim_path:
+	//	  - key: a.b
+	//	  - key: c.d
+	//
+	// and a URL-namespaced top-level claim by:
+	//
+	// .. code-block:: yaml
+	//
+	//	claim_to_headers:
+	//	- header_name: x-jwt-claim
+	//	  claim_path:
+	//	  - key: http://example.org/parent_token
+	//
+	// Exactly one of “claim_name“ and “claim_path“ must be set.
+	//
+	// [#comment: A “min_items“ PGV rule cannot express this: a repeated field has no presence, so
+	// “min_items: 1“ would make “claim_path“ mandatory and reject every “claim_name“ config.]
+	ClaimPath     []*JwtClaimToHeader_PathSegment `protobuf:"bytes,3,rep,name=claim_path,json=claimPath,proto3" json:"claim_path,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1859,6 +1895,13 @@ func (x *JwtClaimToHeader) GetClaimName() string {
 		return x.ClaimName
 	}
 	return ""
+}
+
+func (x *JwtClaimToHeader) GetClaimPath() []*JwtClaimToHeader_PathSegment {
+	if x != nil {
+		return x.ClaimPath
+	}
+	return nil
 }
 
 // Alters the payload representation in the request dynamic metadata to facilitate its use in matching.
@@ -1911,6 +1954,53 @@ func (x *JwtProvider_NormalizePayload) GetSpaceDelimitedClaims() []string {
 		return x.SpaceDelimitedClaims
 	}
 	return nil
+}
+
+// Specifies a segment in a path for retrieving a claim from the JWT payload.
+type JwtClaimToHeader_PathSegment struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The key to retrieve the value with in the enclosing JSON object. The key is matched in
+	// full, so it may itself contain dots.
+	Key           string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *JwtClaimToHeader_PathSegment) Reset() {
+	*x = JwtClaimToHeader_PathSegment{}
+	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *JwtClaimToHeader_PathSegment) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*JwtClaimToHeader_PathSegment) ProtoMessage() {}
+
+func (x *JwtClaimToHeader_PathSegment) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use JwtClaimToHeader_PathSegment.ProtoReflect.Descriptor instead.
+func (*JwtClaimToHeader_PathSegment) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDescGZIP(), []int{14, 0}
+}
+
+func (x *JwtClaimToHeader_PathSegment) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
 }
 
 var File_envoy_extensions_filters_http_jwt_authn_v3_config_proto protoreflect.FileDescriptor
@@ -2021,13 +2111,17 @@ const file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDesc = "" 
 	"\x0ePerRouteConfig\x12%\n" +
 	"\bdisabled\x18\x01 \x01(\bB\a\xfaB\x04j\x02\b\x01H\x00R\bdisabled\x124\n" +
 	"\x10requirement_name\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x01H\x00R\x0frequirementNameB\x1c\n" +
-	"\x15requirement_specifier\x12\x03\xf8B\x01\"j\n" +
+	"\x15requirement_specifier\x12\x03\xf8B\x01\"\xf4\x01\n" +
 	"\x10JwtClaimToHeader\x12.\n" +
 	"\vheader_name\x18\x01 \x01(\tB\r\xfaB\n" +
 	"r\b\x10\x01\xc8\x01\x00\xc0\x01\x01R\n" +
-	"headerName\x12&\n" +
+	"headerName\x12\x1d\n" +
 	"\n" +
-	"claim_name\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\tclaimNameB\xb0\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"claim_name\x18\x02 \x01(\tR\tclaimName\x12g\n" +
+	"\n" +
+	"claim_path\x18\x03 \x03(\v2H.envoy.extensions.filters.http.jwt_authn.v3.JwtClaimToHeader.PathSegmentR\tclaimPath\x1a(\n" +
+	"\vPathSegment\x12\x19\n" +
+	"\x03key\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x03keyB\xb0\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"8io.envoyproxy.envoy.extensions.filters.http.jwt_authn.v3B\vConfigProtoP\x01Z]github.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/jwt_authn/v3;jwt_authnv3b\x06proto3"
 
 var (
@@ -2042,7 +2136,7 @@ func file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDescGZIP() 
 	return file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDescData
 }
 
-var file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
+var file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
 var file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_goTypes = []any{
 	(*JwtProvider)(nil),                  // 0: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider
 	(*JwtCacheConfig)(nil),               // 1: envoy.extensions.filters.http.jwt_authn.v3.JwtCacheConfig
@@ -2063,51 +2157,53 @@ var file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_goTypes = []any
 	nil,                                  // 16: envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule.RequiresEntry
 	nil,                                  // 17: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.ProvidersEntry
 	nil,                                  // 18: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.RequirementMapEntry
-	(*v3.StringMatcher)(nil),             // 19: envoy.type.matcher.v3.StringMatcher
-	(*durationpb.Duration)(nil),          // 20: google.protobuf.Duration
-	(*v31.DataSource)(nil),               // 21: envoy.config.core.v3.DataSource
-	(*v31.HttpUri)(nil),                  // 22: envoy.config.core.v3.HttpUri
-	(*v31.RetryPolicy)(nil),              // 23: envoy.config.core.v3.RetryPolicy
-	(*emptypb.Empty)(nil),                // 24: google.protobuf.Empty
-	(*v32.RouteMatch)(nil),               // 25: envoy.config.route.v3.RouteMatch
+	(*JwtClaimToHeader_PathSegment)(nil), // 19: envoy.extensions.filters.http.jwt_authn.v3.JwtClaimToHeader.PathSegment
+	(*v3.StringMatcher)(nil),             // 20: envoy.type.matcher.v3.StringMatcher
+	(*durationpb.Duration)(nil),          // 21: google.protobuf.Duration
+	(*v31.DataSource)(nil),               // 22: envoy.config.core.v3.DataSource
+	(*v31.HttpUri)(nil),                  // 23: envoy.config.core.v3.HttpUri
+	(*v31.RetryPolicy)(nil),              // 24: envoy.config.core.v3.RetryPolicy
+	(*emptypb.Empty)(nil),                // 25: google.protobuf.Empty
+	(*v32.RouteMatch)(nil),               // 26: envoy.config.route.v3.RouteMatch
 }
 var file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_depIdxs = []int32{
-	19, // 0: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.subjects:type_name -> envoy.type.matcher.v3.StringMatcher
-	20, // 1: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.max_lifetime:type_name -> google.protobuf.Duration
+	20, // 0: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.subjects:type_name -> envoy.type.matcher.v3.StringMatcher
+	21, // 1: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.max_lifetime:type_name -> google.protobuf.Duration
 	2,  // 2: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.remote_jwks:type_name -> envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks
-	21, // 3: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.local_jwks:type_name -> envoy.config.core.v3.DataSource
+	22, // 3: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.local_jwks:type_name -> envoy.config.core.v3.DataSource
 	4,  // 4: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.from_headers:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtHeader
 	15, // 5: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.normalize_payload_in_metadata:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.NormalizePayload
 	1,  // 6: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.jwt_cache_config:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtCacheConfig
 	14, // 7: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.claim_to_headers:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtClaimToHeader
-	22, // 8: envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks.http_uri:type_name -> envoy.config.core.v3.HttpUri
-	20, // 9: envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks.cache_duration:type_name -> google.protobuf.Duration
+	23, // 8: envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks.http_uri:type_name -> envoy.config.core.v3.HttpUri
+	21, // 9: envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks.cache_duration:type_name -> google.protobuf.Duration
 	3,  // 10: envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks.async_fetch:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwksAsyncFetch
-	23, // 11: envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks.retry_policy:type_name -> envoy.config.core.v3.RetryPolicy
-	20, // 12: envoy.extensions.filters.http.jwt_authn.v3.JwksAsyncFetch.failed_refetch_duration:type_name -> google.protobuf.Duration
+	24, // 11: envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks.retry_policy:type_name -> envoy.config.core.v3.RetryPolicy
+	21, // 12: envoy.extensions.filters.http.jwt_authn.v3.JwksAsyncFetch.failed_refetch_duration:type_name -> google.protobuf.Duration
 	5,  // 13: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.provider_and_audiences:type_name -> envoy.extensions.filters.http.jwt_authn.v3.ProviderWithAudiences
 	8,  // 14: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.requires_any:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementOrList
 	9,  // 15: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.requires_all:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementAndList
-	24, // 16: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.allow_missing_or_failed:type_name -> google.protobuf.Empty
-	24, // 17: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.allow_missing:type_name -> google.protobuf.Empty
+	25, // 16: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.allow_missing_or_failed:type_name -> google.protobuf.Empty
+	25, // 17: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.allow_missing:type_name -> google.protobuf.Empty
 	7,  // 18: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.extract_only_without_validation:type_name -> envoy.extensions.filters.http.jwt_authn.v3.ExtractOnlyWithoutValidation
 	6,  // 19: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementOrList.requirements:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
 	6,  // 20: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementAndList.requirements:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
-	25, // 21: envoy.extensions.filters.http.jwt_authn.v3.RequirementRule.match:type_name -> envoy.config.route.v3.RouteMatch
+	26, // 21: envoy.extensions.filters.http.jwt_authn.v3.RequirementRule.match:type_name -> envoy.config.route.v3.RouteMatch
 	6,  // 22: envoy.extensions.filters.http.jwt_authn.v3.RequirementRule.requires:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
 	16, // 23: envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule.requires:type_name -> envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule.RequiresEntry
 	17, // 24: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.providers:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.ProvidersEntry
 	10, // 25: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.rules:type_name -> envoy.extensions.filters.http.jwt_authn.v3.RequirementRule
 	11, // 26: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.filter_state_rules:type_name -> envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule
 	18, // 27: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.requirement_map:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.RequirementMapEntry
-	6,  // 28: envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule.RequiresEntry.value:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
-	0,  // 29: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.ProvidersEntry.value:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtProvider
-	6,  // 30: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.RequirementMapEntry.value:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
-	31, // [31:31] is the sub-list for method output_type
-	31, // [31:31] is the sub-list for method input_type
-	31, // [31:31] is the sub-list for extension type_name
-	31, // [31:31] is the sub-list for extension extendee
-	0,  // [0:31] is the sub-list for field type_name
+	19, // 28: envoy.extensions.filters.http.jwt_authn.v3.JwtClaimToHeader.claim_path:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtClaimToHeader.PathSegment
+	6,  // 29: envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule.RequiresEntry.value:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
+	0,  // 30: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.ProvidersEntry.value:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtProvider
+	6,  // 31: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.RequirementMapEntry.value:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
+	32, // [32:32] is the sub-list for method output_type
+	32, // [32:32] is the sub-list for method input_type
+	32, // [32:32] is the sub-list for extension type_name
+	32, // [32:32] is the sub-list for extension extendee
+	0,  // [0:32] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_init() }
@@ -2142,7 +2238,7 @@ func file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDesc), len(file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   19,
+			NumMessages:   20,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
