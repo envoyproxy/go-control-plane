@@ -50,7 +50,7 @@ func (m *BodySizeLimit) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		copy(dAtA[i:], m.unknownFields)
 	}
 	if m.MaxRequestBytes != nil {
-		size, err := (*wrapperspb.UInt32Value)(m.MaxRequestBytes).MarshalToSizedBufferVTStrict(dAtA[:i])
+		size, err := (*wrapperspb.UInt64Value)(m.MaxRequestBytes).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
@@ -69,7 +69,7 @@ func (m *BodySizeLimit) SizeVT() (n int) {
 	var l int
 	_ = l
 	if m.MaxRequestBytes != nil {
-		l = (*wrapperspb.UInt32Value)(m.MaxRequestBytes).SizeVT()
+		l = (*wrapperspb.UInt64Value)(m.MaxRequestBytes).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)

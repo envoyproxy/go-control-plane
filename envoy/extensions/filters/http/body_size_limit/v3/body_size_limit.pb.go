@@ -28,7 +28,7 @@ type BodySizeLimit struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The maximum request body size allowed. If the request body exceeds this limit,
 	// the filter will return a 413 response.
-	MaxRequestBytes *wrapperspb.UInt32Value `protobuf:"bytes,1,opt,name=max_request_bytes,json=maxRequestBytes,proto3" json:"max_request_bytes,omitempty"`
+	MaxRequestBytes *wrapperspb.UInt64Value `protobuf:"bytes,1,opt,name=max_request_bytes,json=maxRequestBytes,proto3" json:"max_request_bytes,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -63,7 +63,7 @@ func (*BodySizeLimit) Descriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_http_body_size_limit_v3_body_size_limit_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *BodySizeLimit) GetMaxRequestBytes() *wrapperspb.UInt32Value {
+func (x *BodySizeLimit) GetMaxRequestBytes() *wrapperspb.UInt64Value {
 	if x != nil {
 		return x.MaxRequestBytes
 	}
@@ -76,7 +76,7 @@ const file_envoy_extensions_filters_http_body_size_limit_v3_body_size_limit_prot
 	"\n" +
 	"Fenvoy/extensions/filters/http/body_size_limit/v3/body_size_limit.proto\x120envoy.extensions.filters.http.body_size_limit.v3\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"b\n" +
 	"\rBodySizeLimit\x12Q\n" +
-	"\x11max_request_bytes\x18\x01 \x01(\v2\x1c.google.protobuf.UInt32ValueB\a\xfaB\x04*\x02 \x00R\x0fmaxRequestBytesB\xc9\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x11max_request_bytes\x18\x01 \x01(\v2\x1c.google.protobuf.UInt64ValueB\a\xfaB\x042\x02 \x00R\x0fmaxRequestBytesB\xc9\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	">io.envoyproxy.envoy.extensions.filters.http.body_size_limit.v3B\x12BodySizeLimitProtoP\x01Zigithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/body_size_limit/v3;body_size_limitv3b\x06proto3"
 
 var (
@@ -94,10 +94,10 @@ func file_envoy_extensions_filters_http_body_size_limit_v3_body_size_limit_proto
 var file_envoy_extensions_filters_http_body_size_limit_v3_body_size_limit_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_envoy_extensions_filters_http_body_size_limit_v3_body_size_limit_proto_goTypes = []any{
 	(*BodySizeLimit)(nil),          // 0: envoy.extensions.filters.http.body_size_limit.v3.BodySizeLimit
-	(*wrapperspb.UInt32Value)(nil), // 1: google.protobuf.UInt32Value
+	(*wrapperspb.UInt64Value)(nil), // 1: google.protobuf.UInt64Value
 }
 var file_envoy_extensions_filters_http_body_size_limit_v3_body_size_limit_proto_depIdxs = []int32{
-	1, // 0: envoy.extensions.filters.http.body_size_limit.v3.BodySizeLimit.max_request_bytes:type_name -> google.protobuf.UInt32Value
+	1, // 0: envoy.extensions.filters.http.body_size_limit.v3.BodySizeLimit.max_request_bytes:type_name -> google.protobuf.UInt64Value
 	1, // [1:1] is the sub-list for method output_type
 	1, // [1:1] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
