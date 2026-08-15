@@ -37,7 +37,6 @@ updates:
       k8s.io:
           patterns:
             - "k8s.io/*"
-          group-by: dependency-name
   - package-ecosystem: gomod
     directory: /internal/tools
     allow:
