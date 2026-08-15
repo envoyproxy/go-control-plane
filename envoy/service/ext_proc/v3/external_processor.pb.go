@@ -794,11 +794,17 @@ type HttpBody struct {
 	// If “true“, this will be the last “HttpBody“ message that will be sent and no trailers
 	// will be sent for the current request/response.
 	EndOfStream bool `protobuf:"varint,2,opt,name=end_of_stream,json=endOfStream,proto3" json:"end_of_stream,omitempty"`
-	// This field is used in “GRPC“ body send mode when “end_of_stream“ is “true“ and “body“
-	// is empty. Those values would normally indicate an empty message on the stream with the
-	// end-of-stream bit set. However, if the half-close happens after the last message on the stream
-	// was already sent, then this field will be “true“ to indicate an end-of-stream with *no*
-	// message (as opposed to an empty message).
+	// This field is used only in “GRPC“ body send mode. It is not used in any other body send
+	// mode.
+	//
+	// This field is used only when “end_of_stream“ is true and “body“ is empty.
+	// Normally, in “GRPC“ body send mode, an empty “body“ field indicates an empty message on
+	// the gRPC stream. However, it is possible that the gRPC client sends a half-close without
+	// actually sending a message on the stream, so we need a way to differentiate between
+	// an empty message being sent and no message being sent. If this field is true, then it
+	// indicates that no message has been sent; if it is false, then it indicates that an empty
+	// message has been sent.
+	// [#not-implemented-hide:]
 	EndOfStreamWithoutMessage bool `protobuf:"varint,3,opt,name=end_of_stream_without_message,json=endOfStreamWithoutMessage,proto3" json:"end_of_stream_without_message,omitempty"`
 	// This field is used in “GRPC“ body send mode to indicate whether the message is compressed.
 	// This will never be set to “true“ by gRPC but may be set to “true“ by a proxy like Envoy.
