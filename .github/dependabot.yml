@@ -30,12 +30,14 @@ updates:
     schedule:
       interval: weekly
     groups:
+      all:
+        patterns:
+          - "*"
+        group-by: dependency-name
       k8s.io:
           patterns:
             - "k8s.io/*"
-      grpc:
-          patterns:
-            - "google.golang.org/grpc"
+          group-by: dependency-name
   - package-ecosystem: gomod
     directory: /internal/tools
     allow:
