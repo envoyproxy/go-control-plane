@@ -28,7 +28,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// [#next-free-field: 19]
+// [#next-free-field: 20]
 type LocalRateLimit struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The human readable prefix to use when emitting stats.
@@ -183,8 +183,16 @@ type LocalRateLimit struct {
 	// values.
 	// Minimum is 1. Default is 20.
 	MaxDynamicDescriptors *wrapperspb.UInt32Value `protobuf:"bytes,18,opt,name=max_dynamic_descriptors,json=maxDynamicDescriptors,proto3" json:"max_dynamic_descriptors,omitempty"`
-	unknownFields         protoimpl.UnknownFields
-	sizeCache             protoimpl.SizeCache
+	// Specifies whether the filter emits a “Retry-After“ header when it enforces an HTTP 429
+	// response. This option has no effect on responses with any other status code. The value is the
+	// number of seconds until the next token is available in the bucket that rejected the request,
+	// clamped to at least 1.
+	// If “response_headers_to_add“ sets a “Retry-After“ header, the filter does not overwrite it.
+	//
+	// Disabled by default.
+	EnableRetryAfterHeader bool `protobuf:"varint,19,opt,name=enable_retry_after_header,json=enableRetryAfterHeader,proto3" json:"enable_retry_after_header,omitempty"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *LocalRateLimit) Reset() {
@@ -336,11 +344,18 @@ func (x *LocalRateLimit) GetMaxDynamicDescriptors() *wrapperspb.UInt32Value {
 	return nil
 }
 
+func (x *LocalRateLimit) GetEnableRetryAfterHeader() bool {
+	if x != nil {
+		return x.EnableRetryAfterHeader
+	}
+	return false
+}
+
 var File_envoy_extensions_filters_http_local_ratelimit_v3_local_rate_limit_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_filters_http_local_ratelimit_v3_local_rate_limit_proto_rawDesc = "" +
 	"\n" +
-	"Genvoy/extensions/filters/http/local_ratelimit/v3/local_rate_limit.proto\x120envoy.extensions.filters.http.local_ratelimit.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a,envoy/config/route/v3/route_components.proto\x1a4envoy/extensions/common/ratelimit/v3/ratelimit.proto\x1a\x1fenvoy/type/v3/http_status.proto\x1a envoy/type/v3/token_bucket.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xf0\v\n" +
+	"Genvoy/extensions/filters/http/local_ratelimit/v3/local_rate_limit.proto\x120envoy.extensions.filters.http.local_ratelimit.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a,envoy/config/route/v3/route_components.proto\x1a4envoy/extensions/common/ratelimit/v3/ratelimit.proto\x1a\x1fenvoy/type/v3/http_status.proto\x1a envoy/type/v3/token_bucket.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xab\f\n" +
 	"\x0eLocalRateLimit\x12(\n" +
 	"\vstat_prefix\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\n" +
 	"statPrefix\x121\n" +
@@ -364,7 +379,8 @@ const file_envoy_extensions_filters_http_local_ratelimit_v3_local_rate_limit_pro
 	"\"rate_limited_as_resource_exhausted\x18\x0f \x01(\bR\x1erateLimitedAsResourceExhausted\x12A\n" +
 	"\vrate_limits\x18\x11 \x03(\v2 .envoy.config.route.v3.RateLimitR\n" +
 	"rateLimits\x12]\n" +
-	"\x17max_dynamic_descriptors\x18\x12 \x01(\v2\x1c.google.protobuf.UInt32ValueB\a\xfaB\x04*\x02(\x01R\x15maxDynamicDescriptorsB\xca\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x17max_dynamic_descriptors\x18\x12 \x01(\v2\x1c.google.protobuf.UInt32ValueB\a\xfaB\x04*\x02(\x01R\x15maxDynamicDescriptors\x129\n" +
+	"\x19enable_retry_after_header\x18\x13 \x01(\bR\x16enableRetryAfterHeaderB\xca\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	">io.envoyproxy.envoy.extensions.filters.http.local_ratelimit.v3B\x13LocalRateLimitProtoP\x01Zigithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/local_ratelimit/v3;local_ratelimitv3b\x06proto3"
 
 var (

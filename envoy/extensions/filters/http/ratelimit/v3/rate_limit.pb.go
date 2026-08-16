@@ -190,7 +190,7 @@ func (RateLimitPerRoute_OverrideOptions) EnumDescriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_rawDescGZIP(), []int{1, 1}
 }
 
-// [#next-free-field: 19]
+// [#next-free-field: 20]
 type RateLimit struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The rate limit domain to use when calling the rate limit service.
@@ -325,8 +325,17 @@ type RateLimit struct {
 	// The namespace where dynamic metadata from rate limit response is saved.
 	// If not set, the default is "envoy.filters.http.ratelimit".
 	MetadataNamespace string `protobuf:"bytes,18,opt,name=metadata_namespace,json=metadataNamespace,proto3" json:"metadata_namespace,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	// Specifies whether the filter emits a “Retry-After“ header when it enforces an HTTP 429
+	// response. This option has no effect on responses with any other status code. The value is the
+	// largest “duration_until_reset“ among the over-limit descriptor statuses returned by the rate
+	// limit service, expressed in seconds and clamped to at least 1. The header is not emitted when no
+	// over-limit descriptor status is present.
+	// If the rate limit service returns a “Retry-After“ header, the filter does not overwrite it.
+	//
+	// Disabled by default.
+	EnableRetryAfterHeader bool `protobuf:"varint,19,opt,name=enable_retry_after_header,json=enableRetryAfterHeader,proto3" json:"enable_retry_after_header,omitempty"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *RateLimit) Reset() {
@@ -485,6 +494,13 @@ func (x *RateLimit) GetMetadataNamespace() string {
 	return ""
 }
 
+func (x *RateLimit) GetEnableRetryAfterHeader() bool {
+	if x != nil {
+		return x.EnableRetryAfterHeader
+	}
+	return false
+}
+
 type RateLimitPerRoute struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Specifies if the rate limit filter should include the virtual host rate limits.
@@ -581,7 +597,7 @@ var File_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto protoreflec
 
 const file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_rawDesc = "" +
 	"\n" +
-	";envoy/extensions/filters/http/ratelimit/v3/rate_limit.proto\x12*envoy.extensions.filters.http.ratelimit.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a#envoy/config/ratelimit/v3/rls.proto\x1a,envoy/config/route/v3/route_components.proto\x1a\x1fenvoy/type/v3/http_status.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xad\v\n" +
+	";envoy/extensions/filters/http/ratelimit/v3/rate_limit.proto\x12*envoy.extensions.filters.http.ratelimit.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a#envoy/config/ratelimit/v3/rls.proto\x1a,envoy/config/route/v3/route_components.proto\x1a\x1fenvoy/type/v3/http_status.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xe8\v\n" +
 	"\tRateLimit\x12\x1f\n" +
 	"\x06domain\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x06domain\x12\x1d\n" +
 	"\x05stage\x18\x02 \x01(\rB\a\xfaB\x04*\x02\x18\n" +
@@ -605,7 +621,8 @@ const file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_rawDesc =
 	"\x19failure_mode_deny_percent\x18\x10 \x01(\v2..envoy.config.core.v3.RuntimeFractionalPercentR\x16failureModeDenyPercent\x12A\n" +
 	"\vrate_limits\x18\x11 \x03(\v2 .envoy.config.route.v3.RateLimitR\n" +
 	"rateLimits\x12-\n" +
-	"\x12metadata_namespace\x18\x12 \x01(\tR\x11metadataNamespace\"<\n" +
+	"\x12metadata_namespace\x18\x12 \x01(\tR\x11metadataNamespace\x129\n" +
+	"\x19enable_retry_after_header\x18\x13 \x01(\bR\x16enableRetryAfterHeader\"<\n" +
 	"\x1bXRateLimitHeadersRFCVersion\x12\a\n" +
 	"\x03OFF\x10\x00\x12\x14\n" +
 	"\x10DRAFT_VERSION_03\x10\x01:7\x9aň\x1e2\n" +

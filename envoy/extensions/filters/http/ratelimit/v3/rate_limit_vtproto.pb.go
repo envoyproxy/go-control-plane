@@ -50,6 +50,18 @@ func (m *RateLimit) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.EnableRetryAfterHeader {
+		i--
+		if m.EnableRetryAfterHeader {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x98
+	}
 	if len(m.MetadataNamespace) > 0 {
 		i -= len(m.MetadataNamespace)
 		copy(dAtA[i:], m.MetadataNamespace)
@@ -515,6 +527,9 @@ func (m *RateLimit) SizeVT() (n int) {
 	l = len(m.MetadataNamespace)
 	if l > 0 {
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.EnableRetryAfterHeader {
+		n += 3
 	}
 	n += len(m.unknownFields)
 	return n
