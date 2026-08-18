@@ -973,10 +973,10 @@ const file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_b
 	"\x13tool_list_http_rule\x18\x03 \x01(\v2?.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRuleH\x00R\x10toolListHttpRule\x12o\n" +
 	"\x0ftool_list_local\x18\x04 \x01(\v2E.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListLocalH\x00R\rtoolListLocal\x12t\n" +
 	"\x13default_server_info\x18\x05 \x01(\v2D.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpServerInfoR\x11defaultServerInfoB\x12\n" +
-	"\x10tool_list_config\"}\n" +
+	"\x10tool_list_config\"t\n" +
 	"\x17ToolsListSpecificConfig\x12\x14\n" +
-	"\x05title\x18\x01 \x01(\tR\x05title\x12)\n" +
-	"\vdescription\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\vdescription\x12!\n" +
+	"\x05title\x18\x01 \x01(\tR\x05title\x12 \n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\x12!\n" +
 	"\finput_schema\x18\x03 \x01(\tR\vinputSchema\"7\n" +
 	"\rMcpServerInfo\x12\x12\n" +
 	"\x04path\x18\x01 \x01(\tR\x04path\x12\x12\n" +

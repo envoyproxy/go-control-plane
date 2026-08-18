@@ -907,16 +907,7 @@ func (m *ToolsListSpecificConfig) validate(all bool) error {
 
 	// no validation rules for Title
 
-	if utf8.RuneCountInString(m.GetDescription()) < 1 {
-		err := ToolsListSpecificConfigValidationError{
-			field:  "Description",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Description
 
 	// no validation rules for InputSchema
 
