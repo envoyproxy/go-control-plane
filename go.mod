@@ -10,7 +10,7 @@ replace (
 )
 
 require (
-	github.com/envoyproxy/go-control-plane/envoy v1.37.0
+	github.com/envoyproxy/go-control-plane/envoy v1.39.0
 	github.com/envoyproxy/go-control-plane/ratelimit v0.1.0
 	github.com/google/go-cmp v0.7.0
 	github.com/stretchr/testify v1.11.1
