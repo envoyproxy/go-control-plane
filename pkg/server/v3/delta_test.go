@@ -422,7 +422,7 @@ func TestDeltaCancellations(t *testing.T) {
 		t.Errorf("DeltaAggregatedResources() => got %v, want no error", err)
 	}
 	if config.watches != 0 {
-		t.Errorf("Expect all watches canceled, got %q", config.watches)
+		t.Errorf("Expect all watches canceled, got %d", config.watches)
 	}
 }
 
@@ -444,7 +444,7 @@ func TestDeltaOpaqueRequestsChannelMuxing(t *testing.T) {
 		t.Errorf("DeltaAggregatedResources() => got %v, want no error", err)
 	}
 	if config.watches != 0 {
-		t.Errorf("Expect all watches canceled, got %q", config.watches)
+		t.Errorf("Expect all watches canceled, got %d", config.watches)
 	}
 }
 
