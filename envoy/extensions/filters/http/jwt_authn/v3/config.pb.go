@@ -1808,7 +1808,9 @@ func (*PerRouteConfig_RequirementName) isPerRouteConfig_RequirementSpecifier() {
 type JwtClaimToHeader struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The HTTP header name to copy the claim to.
-	// The header name will be sanitized and replaced.
+	// The header name is sanitized from the request for every provider configured on the filter
+	// (including on paths that bypass JWT verification) and then replaced with the claim value when
+	// verification succeeds.
 	HeaderName string `protobuf:"bytes,1,opt,name=header_name,json=headerName,proto3" json:"header_name,omitempty"`
 	// The name of the claim to copy, split on "." to address nested claims: “sub“ selects the
 	// top-level “sub“ claim, and “nested.claim.key“ selects “key“ inside “claim“ inside
