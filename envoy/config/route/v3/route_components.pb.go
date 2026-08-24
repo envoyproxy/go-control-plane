@@ -2782,7 +2782,9 @@ type RetryPolicy struct {
 	//
 	//	This currently works when the route cluster specifier support the dynamic refresh,
 	//	e.g. :ref:`matcher cluster specifier
-	//	<envoy_v3_api_msg_extensions.router.cluster_specifiers.matcher.v3.MatcherClusterSpecifier>`.
+	//	<envoy_v3_api_msg_extensions.router.cluster_specifiers.matcher.v3.MatcherClusterSpecifier>`
+	//	and :ref:`dynamic modules cluster specifier
+	//	<envoy_v3_api_msg_extensions.router.cluster_specifiers.dynamic_modules.v3.DynamicModuleClusterSpecifier>`.
 	RefreshClusterOnRetry bool `protobuf:"varint,14,opt,name=refresh_cluster_on_retry,json=refreshClusterOnRetry,proto3" json:"refresh_cluster_on_retry,omitempty"`
 	unknownFields         protoimpl.UnknownFields
 	sizeCache             protoimpl.SizeCache
