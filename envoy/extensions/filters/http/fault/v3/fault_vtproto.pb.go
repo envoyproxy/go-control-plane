@@ -84,6 +84,13 @@ func (m *FaultAbort) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.ResponseBody) > 0 {
+		i -= len(m.ResponseBody)
+		copy(dAtA[i:], m.ResponseBody)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.ResponseBody)))
+		i--
+		dAtA[i] = 0x32
+	}
 	if msg, ok := m.ErrorType.(*FaultAbort_GrpcStatus); ok {
 		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -412,6 +419,10 @@ func (m *FaultAbort) SizeVT() (n int) {
 		} else {
 			l = proto.Size(m.Percentage)
 		}
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.ResponseBody)
+	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
