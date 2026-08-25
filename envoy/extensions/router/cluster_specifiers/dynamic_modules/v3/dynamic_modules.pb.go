@@ -33,8 +33,8 @@ const (
 // freely by the module on each request.
 //
 // Each entry is built and validated when the cluster specifier is configured, so an invalid entry
-// is rejected at configuration load rather than on the request path. At least one property must be
-// specified.
+// is rejected at configuration load rather than on the request path. Every entry must replace at
+// least one property, so an entry that builds to no replacement is rejected as well.
 type RouteActionOverride struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Retry policy replacing the retry policy of the matched route. If not specified, the retry
@@ -47,11 +47,14 @@ type RouteActionOverride struct {
 	// :ref:`RouteAction.metadata_match
 	// <envoy_v3_api_field_config.route.v3.RouteAction.metadata_match>`. If not specified, or if there
 	// is no “envoy.lb“ entry, the criteria of the matched route are used, so an entry cannot be used
-	// to remove the criteria that the matched route configures.
+	// to remove the criteria that the matched route configures. An entry whose only property is a
+	// “metadata_match“ without an “envoy.lb“ entry therefore replaces nothing and is rejected.
 	MetadataMatch *v31.Metadata `protobuf:"bytes,2,opt,name=metadata_match,json=metadataMatch,proto3" json:"metadata_match,omitempty"`
 	// Request mirroring policies replacing the request mirroring policies of the matched route. If
 	// not specified, the request mirroring policies of the matched route are used, so an entry cannot
-	// be used to turn off mirroring that the matched route configures.
+	// be used to turn off mirroring that the matched route configures. Statically named mirror
+	// clusters are checked against the cluster manager when :ref:`validate_clusters
+	// <envoy_v3_api_field_config.route.v3.RouteConfiguration.validate_clusters>` is enabled.
 	RequestMirrorPolicies []*v3.RouteAction_RequestMirrorPolicy `protobuf:"bytes,3,rep,name=request_mirror_policies,json=requestMirrorPolicies,proto3" json:"request_mirror_policies,omitempty"`
 	unknownFields         protoimpl.UnknownFields
 	sizeCache             protoimpl.SizeCache
@@ -110,8 +113,8 @@ func (x *RouteActionOverride) GetRequestMirrorPolicies() []*v3.RouteAction_Reque
 
 // Configuration for the Dynamic Modules Cluster Specifier. This cluster specifier allows loading
 // shared object files via “dlopen“ to select the upstream cluster for a request, and to replace
-// the timeout, idle timeout, priority, request body buffer limit, retry policy, metadata match
-// criteria and request mirroring policies of the matched route.
+// the timeout, idle timeout, priority, request body buffer limit, cluster not found response code,
+// retry policy, metadata match criteria and request mirroring policies of the matched route.
 //
 // A module can be loaded by multiple cluster specifiers. It is loaded only once and shared across
 // multiple cluster specifier instances. The module is invoked while the route is being
@@ -165,8 +168,8 @@ type DynamicModuleClusterSpecifier struct {
 	//	  value: "shard-"
 	SpecifierConfig *anypb.Any `protobuf:"bytes,3,opt,name=specifier_config,json=specifierConfig,proto3" json:"specifier_config,omitempty"`
 	// Route action overrides that the module may select by name for a request. If not specified, the
-	// module can only select the cluster, the timeout, the idle timeout, the priority and the request
-	// body buffer limit.
+	// module can only select the cluster, the timeout, the idle timeout, the priority, the request
+	// body buffer limit and the cluster not found response code.
 	RouteActionOverrides map[string]*RouteActionOverride `protobuf:"bytes,4,rep,name=route_action_overrides,json=routeActionOverrides,proto3" json:"route_action_overrides,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
