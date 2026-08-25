@@ -541,6 +541,28 @@ func (m *ProcessingResponse) MarshalToSizedBufferVTStrict(dAtA []byte) (int, err
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.RequestDrainResponses {
+		i--
+		if m.RequestDrainResponses {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x80
+	}
+	if m.RequestDrainRequests {
+		i--
+		if m.RequestDrainRequests {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x78
+	}
 	if m.ServerWindowUpdate != nil {
 		size, err := m.ServerWindowUpdate.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -984,6 +1006,16 @@ func (m *HttpBody) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.DrainComplete {
+		i--
+		if m.DrainComplete {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x28
 	}
 	if m.GrpcMessageCompressed {
 		i--
@@ -1657,6 +1689,16 @@ func (m *StreamedBodyResponse) MarshalToSizedBufferVTStrict(dAtA []byte) (int, e
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.DrainComplete {
+		i--
+		if m.DrainComplete {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x28
+	}
 	if m.GrpcMessageCompressed {
 		i--
 		if m.GrpcMessageCompressed {
@@ -2060,6 +2102,12 @@ func (m *ProcessingResponse) SizeVT() (n int) {
 		l = m.ServerWindowUpdate.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
+	if m.RequestDrainRequests {
+		n += 2
+	}
+	if m.RequestDrainResponses {
+		n += 3
+	}
 	n += len(m.unknownFields)
 	return n
 }
@@ -2229,6 +2277,9 @@ func (m *HttpBody) SizeVT() (n int) {
 		n += 2
 	}
 	if m.GrpcMessageCompressed {
+		n += 2
+	}
+	if m.DrainComplete {
 		n += 2
 	}
 	n += len(m.unknownFields)
@@ -2486,6 +2537,9 @@ func (m *StreamedBodyResponse) SizeVT() (n int) {
 		n += 2
 	}
 	if m.GrpcMessageCompressed {
+		n += 2
+	}
+	if m.DrainComplete {
 		n += 2
 	}
 	n += len(m.unknownFields)

@@ -811,6 +811,10 @@ func (m *ProcessingResponse) validate(all bool) error {
 
 	// no validation rules for RequestDrain
 
+	// no validation rules for RequestDrainRequests
+
+	// no validation rules for RequestDrainResponses
+
 	if all {
 		switch v := interface{}(m.GetOverrideMessageTimeout()).(type) {
 		case interface{ ValidateAll() error }:
@@ -1487,6 +1491,8 @@ func (m *HttpBody) validate(all bool) error {
 	// no validation rules for EndOfStreamWithoutMessage
 
 	// no validation rules for GrpcMessageCompressed
+
+	// no validation rules for DrainComplete
 
 	if len(errors) > 0 {
 		return HttpBodyMultiError(errors)
@@ -2977,6 +2983,8 @@ func (m *StreamedBodyResponse) validate(all bool) error {
 	// no validation rules for EndOfStreamWithoutMessage
 
 	// no validation rules for GrpcMessageCompressed
+
+	// no validation rules for DrainComplete
 
 	if len(errors) > 0 {
 		return StreamedBodyResponseMultiError(errors)

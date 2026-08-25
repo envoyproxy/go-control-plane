@@ -439,7 +439,7 @@ func (*ProcessingRequest_ResponseTrailers) isProcessingRequest_Request() {}
 //   - If it is set to “FULL_DUPLEX_STREAMED“, the server must follow the API defined
 //     for this mode to send the “ProcessingResponse“ messages.
 //
-// [#next-free-field: 15]
+// [#next-free-field: 17]
 type ProcessingResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The response type that is sent by the server.
@@ -490,17 +490,95 @@ type ProcessingResponse struct {
 	//  2. Response Path: There are no restrictions on processing mode changes in this case.
 	ModeOverride *v3.ProcessingMode `protobuf:"bytes,9,opt,name=mode_override,json=modeOverride,proto3" json:"mode_override,omitempty"`
 	// [#not-implemented-hide:]
-	// Used only in “FULL_DUPLEX_STREAMED“ and “GRPC“ body send modes.
-	// Instructs the data plane to stop sending body data and to send a
-	// half-close on the ext_proc stream. The ext_proc server should then echo
-	// back all subsequent body contents as-is until it sees the client's
-	// half-close, at which point the ext_proc server can terminate the stream
-	// with an OK status. This provides a safe way for the ext_proc server
-	// to indicate that it does not need to see the rest of the stream;
-	// without this, the ext_proc server could not terminate the stream
-	// early, because it would wind up dropping any body contents that the
-	// client had already sent before it saw the ext_proc stream termination.
+	// Deprecated and not implemented. This field has been replaced with
+	// the request_drain_requests and request_drain_responses fields.
+	//
+	// Deprecated: Marked as deprecated in envoy/service/ext_proc/v3/external_processor.proto.
 	RequestDrain bool `protobuf:"varint,12,opt,name=request_drain,json=requestDrain,proto3" json:"request_drain,omitempty"`
+	// [#not-implemented-hide:]
+	// Initiates a drain of request body data. Used only in
+	// “FULL_DUPLEX_STREAMED“ and “GRPC“ body send modes.
+	//
+	// The expected sequence for a drain is as follows:
+	//
+	//  1. The ext_proc server sends a message to the data plane with this
+	//     field set to true.
+	//  2. The data plane pauses reading from the downstream client, applying
+	//     any necessary flow control push-back.
+	//  3. The data plane sends a
+	//     :ref:`request_body <envoy_v3_api_field_service.ext_proc.v3.ProcessingRequest.request_body>`
+	//     with the
+	//     :ref:`drain_complete <envoy_v3_api_field_service.ext_proc.v3.HttpBody.drain_complete>`
+	//     field set to true.
+	//  4. The ext_proc server continues processing all subsequent request body
+	//     chunks until it sees the body chunk with the
+	//     :ref:`drain_complete <envoy_v3_api_field_service.ext_proc.v3.HttpBody.drain_complete>`
+	//     field set to true.  When sending back its response to that last body
+	//     chunk, the ext_proc server will set the
+	//     :ref:`drain_complete <envoy_v3_api_field_service.ext_proc.v3.StreamedBodyResponse.drain_complete>`
+	//     field to true to let the data plane know that it has finished draining.
+	//  5. When the data plane sees the response with the
+	//     :ref:`drain_complete <envoy_v3_api_field_service.ext_proc.v3.StreamedBodyResponse.drain_complete>`
+	//     field set to true, it will resume reading from the downstream
+	//     client, passing all data directly to the upstream server,
+	//     without going through the ext_proc sidestream.
+	//
+	// This procedure provides a safe way for the ext_proc server to indicate
+	// that it does not need to see the rest of the request body.
+	//
+	// Note that if the data plane is sending request body data and the
+	// ext_proc server wants to terminate the stream with an OK status, it
+	// must perform this drain before doing so.
+	//
+	// Note that the data plane may have either sent a body chunk with
+	// :ref:`end_of_stream <envoy_v3_api_field_service.ext_proc.v3.StreamedBodyResponse.end_of_stream>`
+	// set to true or may have sent trailers before it received the drain
+	// request from the ext_proc server. In these cases, the data plane will
+	// ignore the drain request, and the ext_proc will consider the drain
+	// complete when it sees the end-of-stream or trailers.
+	RequestDrainRequests bool `protobuf:"varint,15,opt,name=request_drain_requests,json=requestDrainRequests,proto3" json:"request_drain_requests,omitempty"`
+	// [#not-implemented-hide:]
+	// Initiates a drain of response body data. Used only in
+	// “FULL_DUPLEX_STREAMED“ and “GRPC“ body send modes.
+	//
+	// The expected sequence for a drain is as follows:
+	//
+	//  1. The ext_proc server sends a message to the data plane with this
+	//     field set to true.
+	//  2. The data plane pauses reading from the upstream server, applying
+	//     any necessary flow control push-back.
+	//  3. The data plane sends a
+	//     :ref:`response_body <envoy_v3_api_field_service.ext_proc.v3.ProcessingRequest.response_body>`
+	//     with the
+	//     :ref:`drain_complete <envoy_v3_api_field_service.ext_proc.v3.HttpBody.drain_complete>`
+	//     field set to true.
+	//  4. The ext_proc server continues processing all subsequent response body
+	//     chunks until it sees the body chunk with the
+	//     :ref:`drain_complete <envoy_v3_api_field_service.ext_proc.v3.HttpBody.drain_complete>`
+	//     field set to true.  When sending back its response to that last body
+	//     chunk, the ext_proc server will set the
+	//     :ref:`drain_complete <envoy_v3_api_field_service.ext_proc.v3.StreamedBodyResponse.drain_complete>`
+	//     field to true to let the data plane know that it has finished draining.
+	//  5. When the data plane sees the response with the
+	//     :ref:`drain_complete <envoy_v3_api_field_service.ext_proc.v3.StreamedBodyResponse.drain_complete>`
+	//     field set to true, it will resume reading from the upstream
+	//     server, passing all data directly to the downstream client,
+	//     without going through the ext_proc sidestream.
+	//
+	// This procedure provides a safe way for the ext_proc server to indicate
+	// that it does not need to see the rest of the response body.
+	//
+	// Note that if the data plane is sending response body data and the
+	// ext_proc server wants to terminate the stream with an OK status, it
+	// must perform this drain before doing so.
+	//
+	// Note that the data plane may have either sent a body chunk with
+	// :ref:`end_of_stream <envoy_v3_api_field_service.ext_proc.v3.StreamedBodyResponse.end_of_stream>`
+	// set to true or may have sent trailers before it received the drain
+	// request from the ext_proc server. In these cases, the data plane will
+	// ignore the drain request, and the ext_proc will consider the drain
+	// complete when it sees the end-of-stream or trailers.
+	RequestDrainResponses bool `protobuf:"varint,16,opt,name=request_drain_responses,json=requestDrainResponses,proto3" json:"request_drain_responses,omitempty"`
 	// When the ext_proc server receives a request message and needs more time to process it, it
 	// sends back a “ProcessingResponse“ message with a new timeout value. When the data plane
 	// receives this response message, it ignores other fields in the response, stops the original
@@ -670,9 +748,24 @@ func (x *ProcessingResponse) GetModeOverride() *v3.ProcessingMode {
 	return nil
 }
 
+// Deprecated: Marked as deprecated in envoy/service/ext_proc/v3/external_processor.proto.
 func (x *ProcessingResponse) GetRequestDrain() bool {
 	if x != nil {
 		return x.RequestDrain
+	}
+	return false
+}
+
+func (x *ProcessingResponse) GetRequestDrainRequests() bool {
+	if x != nil {
+		return x.RequestDrainRequests
+	}
+	return false
+}
+
+func (x *ProcessingResponse) GetRequestDrainResponses() bool {
+	if x != nil {
+		return x.RequestDrainResponses
 	}
 	return false
 }
@@ -850,6 +943,7 @@ func (x *HttpHeaders) GetEndOfStream() bool {
 
 // This message is sent to the external server when the HTTP request and response bodies are
 // received.
+// [#next-free-field: 6]
 type HttpBody struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The contents of the body in the HTTP request/response. Note that in streaming mode multiple
@@ -876,8 +970,16 @@ type HttpBody struct {
 	// This field is used in “GRPC“ body send mode to indicate whether the message is compressed.
 	// This will never be set to “true“ by gRPC but may be set to “true“ by a proxy like Envoy.
 	GrpcMessageCompressed bool `protobuf:"varint,4,opt,name=grpc_message_compressed,json=grpcMessageCompressed,proto3" json:"grpc_message_compressed,omitempty"`
-	unknownFields         protoimpl.UnknownFields
-	sizeCache             protoimpl.SizeCache
+	// [#not-implemented-hide:]
+	// In “FULL_DUPLEX_STREAMED“ or “GRPC“ body send modes, if the
+	// data plane has seen the
+	// :ref:`request_drain_requests <envoy_v3_api_field_service.ext_proc.v3.ProcessingResponse.request_drain_requests>`
+	// or :ref:`request_drain_responses <envoy_v3_api_field_service.ext_proc.v3.ProcessingResponse.request_drain_responses>`
+	// field, it will populate this field to indicate that it has finished
+	// sending data to the ext_proc server.
+	DrainComplete bool `protobuf:"varint,5,opt,name=drain_complete,json=drainComplete,proto3" json:"drain_complete,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *HttpBody) Reset() {
@@ -934,6 +1036,13 @@ func (x *HttpBody) GetEndOfStreamWithoutMessage() bool {
 func (x *HttpBody) GetGrpcMessageCompressed() bool {
 	if x != nil {
 		return x.GrpcMessageCompressed
+	}
+	return false
+}
+
+func (x *HttpBody) GetDrainComplete() bool {
+	if x != nil {
+		return x.DrainComplete
 	}
 	return false
 }
@@ -1532,6 +1641,7 @@ func (x *HeaderMutation) GetRemoveHeaders() []string {
 }
 
 // The body response message corresponding to “FULL_DUPLEX_STREAMED“ or “GRPC“ body modes.
+// [#next-free-field: 6]
 type StreamedBodyResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// In “FULL_DUPLEX_STREAMED“ body send mode, contains the body response chunk that will be
@@ -1555,8 +1665,20 @@ type StreamedBodyResponse struct {
 	// This field is used in “GRPC“ body send mode to indicate whether the message is compressed.
 	// This will never be set to “true“ by gRPC but may be set to “true“ by a proxy like Envoy.
 	GrpcMessageCompressed bool `protobuf:"varint,4,opt,name=grpc_message_compressed,json=grpcMessageCompressed,proto3" json:"grpc_message_compressed,omitempty"`
-	unknownFields         protoimpl.UnknownFields
-	sizeCache             protoimpl.SizeCache
+	// [#not-implemented-hide:]
+	// In “FULL_DUPLEX_STREAMED“ or “GRPC“ body send modes, if the
+	// ext_proc server has seen the
+	// :ref:`drain_complete <envoy_v3_api_field_service.ext_proc.v3.HttpBody.drain_complete>`
+	// field, it will populate this field to indicate that it has finished
+	// sending data back to the data plane.
+	//
+	// If the data plane receives a message with this field set to true
+	// before it has sent a drain-complete message to the ext_proc server,
+	// the data plane will treat that as if the ext_proc stream has failed
+	// with a non-OK status.
+	DrainComplete bool `protobuf:"varint,5,opt,name=drain_complete,json=drainComplete,proto3" json:"drain_complete,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *StreamedBodyResponse) Reset() {
@@ -1613,6 +1735,13 @@ func (x *StreamedBodyResponse) GetEndOfStreamWithoutMessage() bool {
 func (x *StreamedBodyResponse) GetGrpcMessageCompressed() bool {
 	if x != nil {
 		return x.GrpcMessageCompressed
+	}
+	return false
+}
+
+func (x *StreamedBodyResponse) GetDrainComplete() bool {
+	if x != nil {
+		return x.DrainComplete
 	}
 	return false
 }
@@ -1987,7 +2116,7 @@ const file_envoy_service_ext_proc_v3_external_processor_proto_rawDesc = "" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12-\n" +
 	"\x05value\x18\x02 \x01(\v2\x17.google.protobuf.StructR\x05value:\x028\x01B\t\n" +
 	"\arequestJ\x04\b\x01\x10\x02R\n" +
-	"async_mode\"\xb2\f\n" +
+	"async_mode\"\xad\r\n" +
 	"\x12ProcessingResponse\x12U\n" +
 	"\x0frequest_headers\x18\x01 \x01(\v2*.envoy.service.ext_proc.v3.HeadersResponseH\x00R\x0erequestHeaders\x12W\n" +
 	"\x10response_headers\x18\x02 \x01(\v2*.envoy.service.ext_proc.v3.HeadersResponseH\x00R\x0fresponseHeaders\x12L\n" +
@@ -1999,8 +2128,10 @@ const file_envoy_service_ext_proc_v3_external_processor_proto_rawDesc = "" +
 	"\x1bstreamed_immediate_response\x18\v \x01(\v24.envoy.service.ext_proc.v3.StreamedImmediateResponseH\x00R\x19streamedImmediateResponse\x12B\n" +
 	"\x10dynamic_metadata\x18\b \x01(\v2\x17.google.protobuf.StructR\x0fdynamicMetadata\x12}\n" +
 	"\x16typed_dynamic_metadata\x18\r \x03(\v2G.envoy.service.ext_proc.v3.ProcessingResponse.TypedDynamicMetadataEntryR\x14typedDynamicMetadata\x12^\n" +
-	"\rmode_override\x18\t \x01(\v29.envoy.extensions.filters.http.ext_proc.v3.ProcessingModeR\fmodeOverride\x12#\n" +
-	"\rrequest_drain\x18\f \x01(\bR\frequestDrain\x12S\n" +
+	"\rmode_override\x18\t \x01(\v29.envoy.extensions.filters.http.ext_proc.v3.ProcessingModeR\fmodeOverride\x120\n" +
+	"\rrequest_drain\x18\f \x01(\bB\v\x92ǆ\xd8\x04\x033.0\x18\x01R\frequestDrain\x124\n" +
+	"\x16request_drain_requests\x18\x0f \x01(\bR\x14requestDrainRequests\x126\n" +
+	"\x17request_drain_responses\x18\x10 \x01(\bR\x15requestDrainResponses\x12S\n" +
 	"\x18override_message_timeout\x18\n" +
 	" \x01(\v2\x19.google.protobuf.DurationR\x16overrideMessageTimeout\x12r\n" +
 	"\x14server_window_update\x18\x0e \x01(\v2@.envoy.service.ext_proc.v3.ProcessingResponse.ServerWindowUpdateR\x12serverWindowUpdate\x1a\xc4\x01\n" +
@@ -2020,12 +2151,13 @@ const file_envoy_service_ext_proc_v3_external_processor_proto_rawDesc = "" +
 	"\rend_of_stream\x18\x03 \x01(\bR\vendOfStream\x1aV\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12-\n" +
-	"\x05value\x18\x02 \x01(\v2\x17.google.protobuf.StructR\x05value:\x028\x01\"\xbc\x01\n" +
+	"\x05value\x18\x02 \x01(\v2\x17.google.protobuf.StructR\x05value:\x028\x01\"\xe3\x01\n" +
 	"\bHttpBody\x12\x12\n" +
 	"\x04body\x18\x01 \x01(\fR\x04body\x12\"\n" +
 	"\rend_of_stream\x18\x02 \x01(\bR\vendOfStream\x12@\n" +
 	"\x1dend_of_stream_without_message\x18\x03 \x01(\bR\x19endOfStreamWithoutMessage\x126\n" +
-	"\x17grpc_message_compressed\x18\x04 \x01(\bR\x15grpcMessageCompressed\"K\n" +
+	"\x17grpc_message_compressed\x18\x04 \x01(\bR\x15grpcMessageCompressed\x12%\n" +
+	"\x0edrain_complete\x18\x05 \x01(\bR\rdrainComplete\"K\n" +
 	"\fHttpTrailers\x12;\n" +
 	"\btrailers\x18\x01 \x01(\v2\x1f.envoy.config.core.v3.HeaderMapR\btrailers\"X\n" +
 	"\x0fHeadersResponse\x12E\n" +
@@ -2062,12 +2194,13 @@ const file_envoy_service_ext_proc_v3_external_processor_proto_rawDesc = "" +
 	"\x0eHeaderMutation\x12H\n" +
 	"\vset_headers\x18\x01 \x03(\v2'.envoy.config.core.v3.HeaderValueOptionR\n" +
 	"setHeaders\x12%\n" +
-	"\x0eremove_headers\x18\x02 \x03(\tR\rremoveHeaders\"\xc8\x01\n" +
+	"\x0eremove_headers\x18\x02 \x03(\tR\rremoveHeaders\"\xef\x01\n" +
 	"\x14StreamedBodyResponse\x12\x12\n" +
 	"\x04body\x18\x01 \x01(\fR\x04body\x12\"\n" +
 	"\rend_of_stream\x18\x02 \x01(\bR\vendOfStream\x12@\n" +
 	"\x1dend_of_stream_without_message\x18\x03 \x01(\bR\x19endOfStreamWithoutMessage\x126\n" +
-	"\x17grpc_message_compressed\x18\x04 \x01(\bR\x15grpcMessageCompressed\"\xbb\x01\n" +
+	"\x17grpc_message_compressed\x18\x04 \x01(\bR\x15grpcMessageCompressed\x12%\n" +
+	"\x0edrain_complete\x18\x05 \x01(\bR\rdrainComplete\"\xbb\x01\n" +
 	"\fBodyMutation\x12\x14\n" +
 	"\x04body\x18\x01 \x01(\fH\x00R\x04body\x12\x1f\n" +
 	"\n" +
