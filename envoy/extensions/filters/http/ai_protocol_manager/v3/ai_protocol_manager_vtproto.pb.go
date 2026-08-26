@@ -8,6 +8,7 @@ package ai_protocol_managerv3
 
 import (
 	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
+	wrapperspb "github.com/planetscale/vtprotobuf/types/known/wrapperspb"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
@@ -48,15 +49,239 @@ func (m *AiProtocolManager) MarshalToSizedBufferVTStrict(dAtA []byte) (int, erro
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if m.BestEffortParsing {
+	if m.ResponseHandling != nil {
+		size, err := m.ResponseHandling.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
 		i--
-		if m.BestEffortParsing {
+		dAtA[i] = 0x12
+	}
+	if m.RequestHandling != nil {
+		size, err := m.RequestHandling.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *RequestHandling) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RequestHandling) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *RequestHandling) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.ParseUnconfiguredRoutes {
+		i--
+		if m.ParseUnconfiguredRoutes {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
 		}
 		i--
 		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ResponseHandling) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ResponseHandling) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *ResponseHandling) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.TokenUsage != nil {
+		size, err := m.TokenUsage.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *TokenUsageExtraction) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *TokenUsageExtraction) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *TokenUsageExtraction) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.Limits != nil {
+		size, err := m.Limits.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.MetadataNamespace) > 0 {
+		i -= len(m.MetadataNamespace)
+		copy(dAtA[i:], m.MetadataNamespace)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.MetadataNamespace)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.DefaultApiProtocol != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.DefaultApiProtocol))
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.IncludeUnconfiguredRoutes {
+		i--
+		if m.IncludeUnconfiguredRoutes {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *TokenUsageExtractionLimits) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *TokenUsageExtractionLimits) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *TokenUsageExtractionLimits) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.MaxParsedSseEvents != nil {
+		size, err := (*wrapperspb.UInt32Value)(m.MaxParsedSseEvents).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.MaxJsonBodySize != nil {
+		size, err := (*wrapperspb.UInt32Value)(m.MaxJsonBodySize).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.MaxSseEventSize != nil {
+		size, err := (*wrapperspb.UInt32Value)(m.MaxSseEventSize).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -91,18 +316,99 @@ func (m *AiProtocolManagerPerRoute) MarshalToSizedBufferVTStrict(dAtA []byte) (i
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if m.Normalize {
-		i--
-		if m.Normalize {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
+	if m.Response != nil {
+		size, err := m.Response.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
 		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
 		i--
-		dAtA[i] = 0x10
+		dAtA[i] = 0x12
 	}
-	if m.Schema != 0 {
-		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.Schema))
+	if m.Request != nil {
+		size, err := m.Request.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *RequestPerRoute) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RequestPerRoute) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *RequestPerRoute) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.ApiProtocol != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.ApiProtocol))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ResponsePerRoute) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ResponsePerRoute) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *ResponsePerRoute) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.ApiProtocol != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.ApiProtocol))
 		i--
 		dAtA[i] = 0x8
 	}
@@ -115,8 +421,86 @@ func (m *AiProtocolManager) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
-	if m.BestEffortParsing {
+	if m.RequestHandling != nil {
+		l = m.RequestHandling.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.ResponseHandling != nil {
+		l = m.ResponseHandling.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *RequestHandling) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.ParseUnconfiguredRoutes {
 		n += 2
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *ResponseHandling) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.TokenUsage != nil {
+		l = m.TokenUsage.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *TokenUsageExtraction) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.IncludeUnconfiguredRoutes {
+		n += 2
+	}
+	if m.DefaultApiProtocol != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.DefaultApiProtocol))
+	}
+	l = len(m.MetadataNamespace)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.Limits != nil {
+		l = m.Limits.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *TokenUsageExtractionLimits) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.MaxSseEventSize != nil {
+		l = (*wrapperspb.UInt32Value)(m.MaxSseEventSize).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.MaxJsonBodySize != nil {
+		l = (*wrapperspb.UInt32Value)(m.MaxJsonBodySize).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.MaxParsedSseEvents != nil {
+		l = (*wrapperspb.UInt32Value)(m.MaxParsedSseEvents).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
@@ -128,11 +512,39 @@ func (m *AiProtocolManagerPerRoute) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Schema != 0 {
-		n += 1 + protohelpers.SizeOfVarint(uint64(m.Schema))
+	if m.Request != nil {
+		l = m.Request.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
-	if m.Normalize {
-		n += 2
+	if m.Response != nil {
+		l = m.Response.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *RequestPerRoute) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.ApiProtocol != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.ApiProtocol))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *ResponsePerRoute) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.ApiProtocol != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.ApiProtocol))
 	}
 	n += len(m.unknownFields)
 	return n
