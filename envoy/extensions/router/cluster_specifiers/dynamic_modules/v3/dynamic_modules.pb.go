@@ -56,8 +56,14 @@ type RouteActionOverride struct {
 	// clusters are checked against the cluster manager when :ref:`validate_clusters
 	// <envoy_v3_api_field_config.route.v3.RouteConfiguration.validate_clusters>` is enabled.
 	RequestMirrorPolicies []*v3.RouteAction_RequestMirrorPolicy `protobuf:"bytes,3,rep,name=request_mirror_policies,json=requestMirrorPolicies,proto3" json:"request_mirror_policies,omitempty"`
-	unknownFields         protoimpl.UnknownFields
-	sizeCache             protoimpl.SizeCache
+	// Hash policy replacing the hash policy of the matched route, used when the upstream cluster
+	// employs a hashing load balancer. If not specified, the hash policy of the matched route is used,
+	// so an entry cannot be used to remove a hash policy that the matched route configures. A
+	// cluster-level hash policy and a load-balancer-level hash policy, when configured, take precedence
+	// over this route-level policy.
+	HashPolicy    []*v3.RouteAction_HashPolicy `protobuf:"bytes,4,rep,name=hash_policy,json=hashPolicy,proto3" json:"hash_policy,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *RouteActionOverride) Reset() {
@@ -111,10 +117,18 @@ func (x *RouteActionOverride) GetRequestMirrorPolicies() []*v3.RouteAction_Reque
 	return nil
 }
 
+func (x *RouteActionOverride) GetHashPolicy() []*v3.RouteAction_HashPolicy {
+	if x != nil {
+		return x.HashPolicy
+	}
+	return nil
+}
+
 // Configuration for the Dynamic Modules Cluster Specifier. This cluster specifier allows loading
 // shared object files via “dlopen“ to select the upstream cluster for a request, and to replace
 // the timeout, idle timeout, priority, request body buffer limit, cluster not found response code,
-// retry policy, metadata match criteria and request mirroring policies of the matched route.
+// hash policy, retry policy, metadata match criteria and request mirroring policies of the matched
+// route.
 //
 // A module can be loaded by multiple cluster specifiers. It is loaded only once and shared across
 // multiple cluster specifier instances. The module is invoked while the route is being
@@ -237,11 +251,13 @@ var File_envoy_extensions_router_cluster_specifiers_dynamic_modules_v3_dynamic_m
 
 const file_envoy_extensions_router_cluster_specifiers_dynamic_modules_v3_dynamic_modules_proto_rawDesc = "" +
 	"\n" +
-	"Senvoy/extensions/router/cluster_specifiers/dynamic_modules/v3/dynamic_modules.proto\x12=envoy.extensions.router.cluster_specifiers.dynamic_modules.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a,envoy/config/route/v3/route_components.proto\x1a9envoy/extensions/dynamic_modules/v3/dynamic_modules.proto\x1a\x19google/protobuf/any.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x93\x02\n" +
+	"Senvoy/extensions/router/cluster_specifiers/dynamic_modules/v3/dynamic_modules.proto\x12=envoy.extensions.router.cluster_specifiers.dynamic_modules.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a,envoy/config/route/v3/route_components.proto\x1a9envoy/extensions/dynamic_modules/v3/dynamic_modules.proto\x1a\x19google/protobuf/any.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xe3\x02\n" +
 	"\x13RouteActionOverride\x12E\n" +
 	"\fretry_policy\x18\x01 \x01(\v2\".envoy.config.route.v3.RetryPolicyR\vretryPolicy\x12E\n" +
 	"\x0emetadata_match\x18\x02 \x01(\v2\x1e.envoy.config.core.v3.MetadataR\rmetadataMatch\x12n\n" +
-	"\x17request_mirror_policies\x18\x03 \x03(\v26.envoy.config.route.v3.RouteAction.RequestMirrorPolicyR\x15requestMirrorPolicies\"\xda\x04\n" +
+	"\x17request_mirror_policies\x18\x03 \x03(\v26.envoy.config.route.v3.RouteAction.RequestMirrorPolicyR\x15requestMirrorPolicies\x12N\n" +
+	"\vhash_policy\x18\x04 \x03(\v2-.envoy.config.route.v3.RouteAction.HashPolicyR\n" +
+	"hashPolicy\"\xda\x04\n" +
 	"\x1dDynamicModuleClusterSpecifier\x12v\n" +
 	"\x15dynamic_module_config\x18\x01 \x01(\v28.envoy.extensions.dynamic_modules.v3.DynamicModuleConfigB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x13dynamicModuleConfig\x12%\n" +
 	"\x0especifier_name\x18\x02 \x01(\tR\rspecifierName\x12?\n" +
@@ -272,22 +288,24 @@ var file_envoy_extensions_router_cluster_specifiers_dynamic_modules_v3_dynamic_m
 	(*v3.RetryPolicy)(nil),                // 3: envoy.config.route.v3.RetryPolicy
 	(*v31.Metadata)(nil),                  // 4: envoy.config.core.v3.Metadata
 	(*v3.RouteAction_RequestMirrorPolicy)(nil), // 5: envoy.config.route.v3.RouteAction.RequestMirrorPolicy
-	(*v32.DynamicModuleConfig)(nil),            // 6: envoy.extensions.dynamic_modules.v3.DynamicModuleConfig
-	(*anypb.Any)(nil),                          // 7: google.protobuf.Any
+	(*v3.RouteAction_HashPolicy)(nil),          // 6: envoy.config.route.v3.RouteAction.HashPolicy
+	(*v32.DynamicModuleConfig)(nil),            // 7: envoy.extensions.dynamic_modules.v3.DynamicModuleConfig
+	(*anypb.Any)(nil),                          // 8: google.protobuf.Any
 }
 var file_envoy_extensions_router_cluster_specifiers_dynamic_modules_v3_dynamic_modules_proto_depIdxs = []int32{
 	3, // 0: envoy.extensions.router.cluster_specifiers.dynamic_modules.v3.RouteActionOverride.retry_policy:type_name -> envoy.config.route.v3.RetryPolicy
 	4, // 1: envoy.extensions.router.cluster_specifiers.dynamic_modules.v3.RouteActionOverride.metadata_match:type_name -> envoy.config.core.v3.Metadata
 	5, // 2: envoy.extensions.router.cluster_specifiers.dynamic_modules.v3.RouteActionOverride.request_mirror_policies:type_name -> envoy.config.route.v3.RouteAction.RequestMirrorPolicy
-	6, // 3: envoy.extensions.router.cluster_specifiers.dynamic_modules.v3.DynamicModuleClusterSpecifier.dynamic_module_config:type_name -> envoy.extensions.dynamic_modules.v3.DynamicModuleConfig
-	7, // 4: envoy.extensions.router.cluster_specifiers.dynamic_modules.v3.DynamicModuleClusterSpecifier.specifier_config:type_name -> google.protobuf.Any
-	2, // 5: envoy.extensions.router.cluster_specifiers.dynamic_modules.v3.DynamicModuleClusterSpecifier.route_action_overrides:type_name -> envoy.extensions.router.cluster_specifiers.dynamic_modules.v3.DynamicModuleClusterSpecifier.RouteActionOverridesEntry
-	0, // 6: envoy.extensions.router.cluster_specifiers.dynamic_modules.v3.DynamicModuleClusterSpecifier.RouteActionOverridesEntry.value:type_name -> envoy.extensions.router.cluster_specifiers.dynamic_modules.v3.RouteActionOverride
-	7, // [7:7] is the sub-list for method output_type
-	7, // [7:7] is the sub-list for method input_type
-	7, // [7:7] is the sub-list for extension type_name
-	7, // [7:7] is the sub-list for extension extendee
-	0, // [0:7] is the sub-list for field type_name
+	6, // 3: envoy.extensions.router.cluster_specifiers.dynamic_modules.v3.RouteActionOverride.hash_policy:type_name -> envoy.config.route.v3.RouteAction.HashPolicy
+	7, // 4: envoy.extensions.router.cluster_specifiers.dynamic_modules.v3.DynamicModuleClusterSpecifier.dynamic_module_config:type_name -> envoy.extensions.dynamic_modules.v3.DynamicModuleConfig
+	8, // 5: envoy.extensions.router.cluster_specifiers.dynamic_modules.v3.DynamicModuleClusterSpecifier.specifier_config:type_name -> google.protobuf.Any
+	2, // 6: envoy.extensions.router.cluster_specifiers.dynamic_modules.v3.DynamicModuleClusterSpecifier.route_action_overrides:type_name -> envoy.extensions.router.cluster_specifiers.dynamic_modules.v3.DynamicModuleClusterSpecifier.RouteActionOverridesEntry
+	0, // 7: envoy.extensions.router.cluster_specifiers.dynamic_modules.v3.DynamicModuleClusterSpecifier.RouteActionOverridesEntry.value:type_name -> envoy.extensions.router.cluster_specifiers.dynamic_modules.v3.RouteActionOverride
+	8, // [8:8] is the sub-list for method output_type
+	8, // [8:8] is the sub-list for method input_type
+	8, // [8:8] is the sub-list for extension type_name
+	8, // [8:8] is the sub-list for extension extendee
+	0, // [0:8] is the sub-list for field type_name
 }
 
 func init() {
