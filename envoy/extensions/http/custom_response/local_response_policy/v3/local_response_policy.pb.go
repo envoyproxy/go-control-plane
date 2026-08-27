@@ -32,7 +32,9 @@ const (
 type LocalResponsePolicy struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Optional new local reply body text. It will be used
-	// in the “%LOCAL_REPLY_BODY%“ command operator in the “body_format“.
+	// in the “%LOCAL_REPLY_BODY%“ command operator in the “body_format“. If unset when
+	// “body_format“ is configured for an existing local reply, the existing body will be used as
+	// the formatter input instead.
 	Body *v3.DataSource `protobuf:"bytes,1,opt,name=body,proto3" json:"body,omitempty"`
 	// Optional body format to be used for this response. If “body_format“ is  not
 	// provided, and “body“ is, the contents of “body“ will be used to populate
