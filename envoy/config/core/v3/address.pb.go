@@ -496,7 +496,7 @@ func (x *ExtraSourceAddress) GetSocketOptions() *SocketOptionsOverride {
 	return nil
 }
 
-// [#next-free-field: 7]
+// [#next-free-field: 8]
 type BindConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The address to bind to when creating a socket.
@@ -527,8 +527,26 @@ type BindConfig struct {
 	// <envoy_v3_api_msg_config.upstream.local_address_selector.v3.DefaultLocalAddressSelector>`).
 	// [#extension-category: envoy.upstream.local_address_selector]
 	LocalAddressSelector *TypedExtensionConfig `protobuf:"bytes,6,opt,name=local_address_selector,json=localAddressSelector,proto3" json:"local_address_selector,omitempty"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
+	// If set to true, the :ref:`network_namespace_filepath
+	// <envoy_v3_api_field_config.core.v3.SocketAddress.network_namespace_filepath>` of every source
+	// address in this bind config is validated when the configuration is loaded, and the
+	// configuration is rejected if a referenced network namespace cannot be opened.
+	//
+	// By default no such validation is performed: a network namespace that does not exist when the
+	// configuration is loaded may be created later, before connections are actually established, so
+	// eager validation would wrongly reject such configurations. If a namespace is unavailable when
+	// a connection is created, the connection attempt fails gracefully.
+	//
+	// Listener addresses do not need an equivalent option: a listener creates and binds its socket
+	// in the configured network namespace when the listener configuration is loaded, so an
+	// unavailable namespace always rejects the listener configuration.
+	//
+	// .. attention::
+	//
+	//	Network namespaces are only configurable on Linux. Otherwise, this field has no effect.
+	ValidateNetworkNamespaces bool `protobuf:"varint,7,opt,name=validate_network_namespaces,json=validateNetworkNamespaces,proto3" json:"validate_network_namespaces,omitempty"`
+	unknownFields             protoimpl.UnknownFields
+	sizeCache                 protoimpl.SizeCache
 }
 
 func (x *BindConfig) Reset() {
@@ -602,6 +620,13 @@ func (x *BindConfig) GetLocalAddressSelector() *TypedExtensionConfig {
 		return x.LocalAddressSelector
 	}
 	return nil
+}
+
+func (x *BindConfig) GetValidateNetworkNamespaces() bool {
+	if x != nil {
+		return x.ValidateNetworkNamespaces
+	}
+	return false
 }
 
 // Addresses specify either a logical or physical address and port, which are
@@ -802,7 +827,7 @@ const file_envoy_config_core_v3_address_proto_rawDesc = "" +
 	"\x1eenvoy.api.v2.core.TcpKeepalive\"\xb1\x01\n" +
 	"\x12ExtraSourceAddress\x12G\n" +
 	"\aaddress\x18\x01 \x01(\v2#.envoy.config.core.v3.SocketAddressB\b\xfaB\x05\x8a\x01\x02\x10\x01R\aaddress\x12R\n" +
-	"\x0esocket_options\x18\x02 \x01(\v2+.envoy.config.core.v3.SocketOptionsOverrideR\rsocketOptions\"\xb4\x04\n" +
+	"\x0esocket_options\x18\x02 \x01(\v2+.envoy.config.core.v3.SocketOptionsOverrideR\rsocketOptions\"\xf4\x04\n" +
 	"\n" +
 	"BindConfig\x12J\n" +
 	"\x0esource_address\x18\x01 \x01(\v2#.envoy.config.core.v3.SocketAddressR\rsourceAddress\x126\n" +
@@ -810,7 +835,8 @@ const file_envoy_config_core_v3_address_proto_rawDesc = "" +
 	"\x0esocket_options\x18\x03 \x03(\v2\".envoy.config.core.v3.SocketOptionR\rsocketOptions\x12^\n" +
 	"\x16extra_source_addresses\x18\x05 \x03(\v2(.envoy.config.core.v3.ExtraSourceAddressR\x14extraSourceAddresses\x12p\n" +
 	"\x1badditional_source_addresses\x18\x04 \x03(\v2#.envoy.config.core.v3.SocketAddressB\v\x92ǆ\xd8\x04\x033.0\x18\x01R\x19additionalSourceAddresses\x12`\n" +
-	"\x16local_address_selector\x18\x06 \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigR\x14localAddressSelector:#\x9aň\x1e\x1e\n" +
+	"\x16local_address_selector\x18\x06 \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigR\x14localAddressSelector\x12>\n" +
+	"\x1bvalidate_network_namespaces\x18\a \x01(\bR\x19validateNetworkNamespaces:#\x9aň\x1e\x1e\n" +
 	"\x1cenvoy.api.v2.core.BindConfig\"\x9f\x02\n" +
 	"\aAddress\x12L\n" +
 	"\x0esocket_address\x18\x01 \x01(\v2#.envoy.config.core.v3.SocketAddressH\x00R\rsocketAddress\x120\n" +
