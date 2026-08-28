@@ -148,6 +148,16 @@ func (m *DownstreamReverseConnectionSocketInterface) MarshalToSizedBufferVTStric
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.MaintainInterval != nil {
+		size, err := (*durationpb.Duration)(m.MaintainInterval).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x32
+	}
 	if m.MaxReconnectBackoff != nil {
 		size, err := (*durationpb.Duration)(m.MaxReconnectBackoff).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -284,6 +294,10 @@ func (m *DownstreamReverseConnectionSocketInterface) SizeVT() (n int) {
 	}
 	if m.MaxReconnectBackoff != nil {
 		l = (*durationpb.Duration)(m.MaxReconnectBackoff).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.MaintainInterval != nil {
+		l = (*durationpb.Duration)(m.MaintainInterval).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)

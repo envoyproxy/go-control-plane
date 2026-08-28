@@ -29,7 +29,7 @@ const (
 // Configuration for the downstream reverse connection socket interface.
 // This interface initiates reverse connections to upstream Envoys and provides
 // them as socket connections for downstream requests.
-// [#next-free-field: 6]
+// [#next-free-field: 7]
 type DownstreamReverseConnectionSocketInterface struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Stat prefix to be used for downstream reverse connection socket interface stats.
@@ -50,8 +50,12 @@ type DownstreamReverseConnectionSocketInterface struct {
 	// deterministic exponential schedule (1s, 2s, 4s, ...) with small upward jitter; this value caps
 	// that schedule.
 	MaxReconnectBackoff *durationpb.Duration `protobuf:"bytes,5,opt,name=max_reconnect_backoff,json=maxReconnectBackoff,proto3" json:"max_reconnect_backoff,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	// How often the initiator re-checks each host and dials any missing reverse tunnels.
+	// Defaults to 10s. The re-check is jittered upward so agents that start together do not
+	// redial in lockstep. The minimum value is 100ms.
+	MaintainInterval *durationpb.Duration `protobuf:"bytes,6,opt,name=maintain_interval,json=maintainInterval,proto3" json:"maintain_interval,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *DownstreamReverseConnectionSocketInterface) Reset() {
@@ -115,6 +119,13 @@ func (x *DownstreamReverseConnectionSocketInterface) GetAccessLog() []*v3.Access
 func (x *DownstreamReverseConnectionSocketInterface) GetMaxReconnectBackoff() *durationpb.Duration {
 	if x != nil {
 		return x.MaxReconnectBackoff
+	}
+	return nil
+}
+
+func (x *DownstreamReverseConnectionSocketInterface) GetMaintainInterval() *durationpb.Duration {
+	if x != nil {
+		return x.MaintainInterval
 	}
 	return nil
 }
@@ -203,7 +214,7 @@ var File_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v
 
 const file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v3_downstream_reverse_connection_socket_interface_proto_rawDesc = "" +
 	"\n" +
-	"}envoy/extensions/bootstrap/reverse_tunnel/downstream_socket_interface/v3/downstream_reverse_connection_socket_interface.proto\x12Henvoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a$envoy/config/core/v3/extension.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xdd\x05\n" +
+	"}envoy/extensions/bootstrap/reverse_tunnel/downstream_socket_interface/v3/downstream_reverse_connection_socket_interface.proto\x12Henvoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a$envoy/config/core/v3/extension.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xb4\x06\n" +
 	"*DownstreamReverseConnectionSocketInterface\x12\x1f\n" +
 	"\vstat_prefix\x18\x01 \x01(\tR\n" +
 	"statPrefix\x122\n" +
@@ -212,7 +223,9 @@ const file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface
 	"\n" +
 	"access_log\x18\x04 \x03(\v2$.envoy.config.accesslog.v3.AccessLogR\taccessLog\x12Y\n" +
 	"\x15max_reconnect_backoff\x18\x05 \x01(\v2\x19.google.protobuf.DurationB\n" +
-	"\xfaB\a\xaa\x01\x042\x02\b\x01R\x13maxReconnectBackoff\x1a\x86\x02\n" +
+	"\xfaB\a\xaa\x01\x042\x02\b\x01R\x13maxReconnectBackoff\x12U\n" +
+	"\x11maintain_interval\x18\x06 \x01(\v2\x19.google.protobuf.DurationB\r\xfaB\n" +
+	"\xaa\x01\a2\x05\x10\x80\xc2\xd7/R\x10maintainInterval\x1a\x86\x02\n" +
 	"\x13HttpHandshakeConfig\x12!\n" +
 	"\frequest_path\x18\x01 \x01(\tR\vrequestPath\x12V\n" +
 	"\x12additional_headers\x18\x02 \x03(\v2'.envoy.config.core.v3.HeaderValueOptionR\x11additionalHeaders\x12(\n" +
@@ -247,13 +260,14 @@ var file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v
 	1, // 0: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.http_handshake:type_name -> envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfig
 	2, // 1: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.access_log:type_name -> envoy.config.accesslog.v3.AccessLog
 	3, // 2: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.max_reconnect_backoff:type_name -> google.protobuf.Duration
-	4, // 3: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfig.additional_headers:type_name -> envoy.config.core.v3.HeaderValueOption
-	5, // 4: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfig.formatters:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	3, // 3: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.maintain_interval:type_name -> google.protobuf.Duration
+	4, // 4: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfig.additional_headers:type_name -> envoy.config.core.v3.HeaderValueOption
+	5, // 5: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfig.formatters:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() {
