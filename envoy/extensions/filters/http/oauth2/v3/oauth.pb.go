@@ -401,7 +401,20 @@ type OAuth2Credentials struct {
 	// This field is required unless :ref:`auth_type <envoy_v3_api_field_extensions.filters.http.oauth2.v3.OAuth2Config.auth_type>`
 	// is set to “TLS_CLIENT_AUTH“, in which case authentication is done via the client certificate.
 	// When “auth_type“ is “PRIVATE_KEY_JWT“, this field must contain the PEM-encoded private key
-	// used to sign the JWT client assertion.
+	// used to sign the JWT client assertion. The key may be supplied in either of two forms:
+	//
+	//   - As a single-value generic secret holding the PEM-encoded private key. No “kid“ header
+	//     parameter is included in the client assertion.
+	//   - As a multi-entry generic secret with a “private_key“ entry holding the PEM-encoded private
+	//     key and an optional “key_id“ entry. When present, the “key_id“ value is set as the
+	//     “kid“ header parameter of the client assertion, per
+	//     `RFC 7515 Section 4.1.4 <https://datatracker.ietf.org/doc/html/rfc7515#section-4.1.4>`_.
+	//     Identity providers use it to select the correct verification key when more than one key is
+	//     registered for the client. Distributing both in one secret means the key ID is always
+	//     rotated together with the key it identifies.
+	//
+	// The multi-entry form is only read when “auth_type“ is “PRIVATE_KEY_JWT“. The other auth
+	// types read the single-value form only.
 	TokenSecret *v3.SdsSecretConfig `protobuf:"bytes,2,opt,name=token_secret,json=tokenSecret,proto3" json:"token_secret,omitempty"`
 	// Configures how the secret token should be created.
 	//
@@ -515,6 +528,19 @@ type PrivateKeyJwtConfig struct {
 	// The value is truncated to whole seconds, so it must be at least “1s“ when set.
 	// Default: “60s“.
 	AssertionLifetime *durationpb.Duration `protobuf:"bytes,2,opt,name=assertion_lifetime,json=assertionLifetime,proto3" json:"assertion_lifetime,omitempty"`
+	// The value to use as the “aud“ (audience) claim in the JWT client assertion.
+	//
+	// `RFC 7523 Section 3 <https://datatracker.ietf.org/doc/html/rfc7523#section-3>`_ requires the
+	// “aud“ claim to identify the authorization server, and allows the token endpoint URL to be
+	// used for this purpose.
+	// `RFC 9126 Section 2.1 <https://datatracker.ietf.org/doc/html/rfc9126#section-2.1>`_ recommends
+	// the authorization server's issuer identifier instead, and
+	// `FAPI 2.0 <https://openid.net/specs/fapi-security-profile-2_0-final.html>`_ requires it, as a
+	// single canonical value identifies the server regardless of which endpoint receives the
+	// assertion.
+	//
+	// If not set, defaults to the configured “token_endpoint“ URI.
+	AssertionAudience string `protobuf:"bytes,3,opt,name=assertion_audience,json=assertionAudience,proto3" json:"assertion_audience,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -561,6 +587,13 @@ func (x *PrivateKeyJwtConfig) GetAssertionLifetime() *durationpb.Duration {
 		return x.AssertionLifetime
 	}
 	return nil
+}
+
+func (x *PrivateKeyJwtConfig) GetAssertionAudience() string {
+	if x != nil {
+		return x.AssertionAudience
+	}
+	return ""
 }
 
 // Defines how an OAuth token is forwarded upstream.
@@ -1384,11 +1417,12 @@ const file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDesc = "" +
 	"\voauth_nonce\x18\x06 \x01(\tB\v\xfaB\br\x06\xd0\x01\x01\xc0\x01\x01R\n" +
 	"oauthNonce\x120\n" +
 	"\rcode_verifier\x18\a \x01(\tB\v\xfaB\br\x06\xd0\x01\x01\xc0\x01\x01R\fcodeVerifierB\x16\n" +
-	"\x0ftoken_formation\x12\x03\xf8B\x01\"\xc8\x02\n" +
+	"\x0ftoken_formation\x12\x03\xf8B\x01\"\xf7\x02\n" +
 	"\x13PrivateKeyJwtConfig\x12\x84\x01\n" +
 	"\x11signing_algorithm\x18\x01 \x01(\x0e2M.envoy.extensions.filters.http.oauth2.v3.PrivateKeyJwtConfig.SigningAlgorithmB\b\xfaB\x05\x82\x01\x02\x10\x01R\x10signingAlgorithm\x12T\n" +
 	"\x12assertion_lifetime\x18\x02 \x01(\v2\x19.google.protobuf.DurationB\n" +
-	"\xfaB\a\xaa\x01\x042\x02\b\x01R\x11assertionLifetime\"T\n" +
+	"\xfaB\a\xaa\x01\x042\x02\b\x01R\x11assertionLifetime\x12-\n" +
+	"\x12assertion_audience\x18\x03 \x01(\tR\x11assertionAudience\"T\n" +
 	"\x10SigningAlgorithm\x12\t\n" +
 	"\x05RS256\x10\x00\x12\t\n" +
 	"\x05RS384\x10\x01\x12\t\n" +

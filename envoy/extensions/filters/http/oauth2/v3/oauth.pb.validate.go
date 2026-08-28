@@ -780,6 +780,8 @@ func (m *PrivateKeyJwtConfig) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for AssertionAudience
+
 	if len(errors) > 0 {
 		return PrivateKeyJwtConfigMultiError(errors)
 	}

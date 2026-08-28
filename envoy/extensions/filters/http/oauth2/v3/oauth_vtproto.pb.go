@@ -412,6 +412,13 @@ func (m *PrivateKeyJwtConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, er
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.AssertionAudience) > 0 {
+		i -= len(m.AssertionAudience)
+		copy(dAtA[i:], m.AssertionAudience)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.AssertionAudience)))
+		i--
+		dAtA[i] = 0x1a
+	}
 	if m.AssertionLifetime != nil {
 		size, err := (*durationpb.Duration)(m.AssertionLifetime).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -1262,6 +1269,10 @@ func (m *PrivateKeyJwtConfig) SizeVT() (n int) {
 	}
 	if m.AssertionLifetime != nil {
 		l = (*durationpb.Duration)(m.AssertionLifetime).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.AssertionAudience)
+	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
