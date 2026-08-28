@@ -233,7 +233,7 @@ func (*SanitizationConfig) Descriptor() ([]byte, []int) {
 }
 
 // Configuration for a Wasm VM.
-// [#next-free-field: 8]
+// [#next-free-field: 9]
 type VmConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// An ID which will be used along with a hash of the wasm code (or the name of the registered Null
@@ -296,8 +296,13 @@ type VmConfig struct {
 	//
 	//	Envoy rejects the configuration if there's conflict of key space.
 	EnvironmentVariables *EnvironmentVariables `protobuf:"bytes,7,opt,name=environment_variables,json=environmentVariables,proto3" json:"environment_variables,omitempty"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
+	// Configuration for restricting Proxy-Wasm capabilities available to modules.
+	//
+	// The restrictions are applied when the VM is created and are shared by every plugin running in
+	// that VM, so they are a property of the VM rather than of an individual plugin.
+	CapabilityRestrictionConfig *CapabilityRestrictionConfig `protobuf:"bytes,8,opt,name=capability_restriction_config,json=capabilityRestrictionConfig,proto3" json:"capability_restriction_config,omitempty"`
+	unknownFields               protoimpl.UnknownFields
+	sizeCache                   protoimpl.SizeCache
 }
 
 func (x *VmConfig) Reset() {
@@ -375,6 +380,13 @@ func (x *VmConfig) GetNackOnCodeCacheMiss() bool {
 func (x *VmConfig) GetEnvironmentVariables() *EnvironmentVariables {
 	if x != nil {
 		return x.EnvironmentVariables
+	}
+	return nil
+}
+
+func (x *VmConfig) GetCapabilityRestrictionConfig() *CapabilityRestrictionConfig {
+	if x != nil {
+		return x.CapabilityRestrictionConfig
 	}
 	return nil
 }
@@ -476,6 +488,14 @@ type PluginConfig struct {
 	// Reload configuration. This is only applied when “failure_policy“ is set to “FAIL_RELOAD“.
 	ReloadConfig *ReloadConfig `protobuf:"bytes,8,opt,name=reload_config,json=reloadConfig,proto3" json:"reload_config,omitempty"`
 	// Configuration for restricting Proxy-Wasm capabilities available to modules.
+	//
+	// This field is deprecated in favor of the :ref:`vm_config.capability_restriction_config
+	// <envoy_v3_api_field_extensions.wasm.v3.VmConfig.capability_restriction_config>` field, because
+	// the restrictions are applied to the Wasm VM and are therefore shared by every plugin running in
+	// it. If this field is set and “vm_config.capability_restriction_config“ is not, this field is
+	// used to populate it.
+	//
+	// Deprecated: Marked as deprecated in envoy/extensions/wasm/v3/wasm.proto.
 	CapabilityRestrictionConfig *CapabilityRestrictionConfig `protobuf:"bytes,6,opt,name=capability_restriction_config,json=capabilityRestrictionConfig,proto3" json:"capability_restriction_config,omitempty"`
 	// Whether or not to allow plugin onRequestHeaders and onResponseHeaders callbacks to return
 	// FilterHeadersStatus::StopIteration.
@@ -573,6 +593,7 @@ func (x *PluginConfig) GetReloadConfig() *ReloadConfig {
 	return nil
 }
 
+// Deprecated: Marked as deprecated in envoy/extensions/wasm/v3/wasm.proto.
 func (x *PluginConfig) GetCapabilityRestrictionConfig() *CapabilityRestrictionConfig {
 	if x != nil {
 		return x.CapabilityRestrictionConfig
@@ -666,7 +687,7 @@ const file_envoy_extensions_wasm_v3_wasm_proto_rawDesc = "" +
 	"\x18AllowedCapabilitiesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12B\n" +
 	"\x05value\x18\x02 \x01(\v2,.envoy.extensions.wasm.v3.SanitizationConfigR\x05value:\x028\x01\"\x14\n" +
-	"\x12SanitizationConfig\"\xf8\x02\n" +
+	"\x12SanitizationConfig\"\xf3\x03\n" +
 	"\bVmConfig\x12\x13\n" +
 	"\x05vm_id\x18\x01 \x01(\tR\x04vmId\x12\x18\n" +
 	"\aruntime\x18\x02 \x01(\tR\aruntime\x129\n" +
@@ -674,14 +695,15 @@ const file_envoy_extensions_wasm_v3_wasm_proto_rawDesc = "" +
 	"\rconfiguration\x18\x04 \x01(\v2\x14.google.protobuf.AnyR\rconfiguration\x12+\n" +
 	"\x11allow_precompiled\x18\x05 \x01(\bR\x10allowPrecompiled\x124\n" +
 	"\x17nack_on_code_cache_miss\x18\x06 \x01(\bR\x13nackOnCodeCacheMiss\x12c\n" +
-	"\x15environment_variables\x18\a \x01(\v2..envoy.extensions.wasm.v3.EnvironmentVariablesR\x14environmentVariables\"\xd6\x01\n" +
+	"\x15environment_variables\x18\a \x01(\v2..envoy.extensions.wasm.v3.EnvironmentVariablesR\x14environmentVariables\x12y\n" +
+	"\x1dcapability_restriction_config\x18\b \x01(\v25.envoy.extensions.wasm.v3.CapabilityRestrictionConfigR\x1bcapabilityRestrictionConfig\"\xd6\x01\n" +
 	"\x14EnvironmentVariables\x12\"\n" +
 	"\rhost_env_keys\x18\x01 \x03(\tR\vhostEnvKeys\x12\\\n" +
 	"\n" +
 	"key_values\x18\x02 \x03(\v2=.envoy.extensions.wasm.v3.EnvironmentVariables.KeyValuesEntryR\tkeyValues\x1a<\n" +
 	"\x0eKeyValuesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xe4\x04\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xf2\x04\n" +
 	"\fPluginConfig\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x17\n" +
 	"\aroot_id\x18\x02 \x01(\tR\x06rootId\x12A\n" +
@@ -689,8 +711,8 @@ const file_envoy_extensions_wasm_v3_wasm_proto_rawDesc = "" +
 	"\rconfiguration\x18\x04 \x01(\v2\x14.google.protobuf.AnyR\rconfiguration\x12(\n" +
 	"\tfail_open\x18\x05 \x01(\bB\v\x92ǆ\xd8\x04\x033.0\x18\x01R\bfailOpen\x12N\n" +
 	"\x0efailure_policy\x18\a \x01(\x0e2'.envoy.extensions.wasm.v3.FailurePolicyR\rfailurePolicy\x12K\n" +
-	"\rreload_config\x18\b \x01(\v2&.envoy.extensions.wasm.v3.ReloadConfigR\freloadConfig\x12y\n" +
-	"\x1dcapability_restriction_config\x18\x06 \x01(\v25.envoy.extensions.wasm.v3.CapabilityRestrictionConfigR\x1bcapabilityRestrictionConfig\x12`\n" +
+	"\rreload_config\x18\b \x01(\v2&.envoy.extensions.wasm.v3.ReloadConfigR\freloadConfig\x12\x86\x01\n" +
+	"\x1dcapability_restriction_config\x18\x06 \x01(\v25.envoy.extensions.wasm.v3.CapabilityRestrictionConfigB\v\x92ǆ\xd8\x04\x033.0\x18\x01R\x1bcapabilityRestrictionConfig\x12`\n" +
 	"\x1fallow_on_headers_stop_iteration\x18\t \x01(\v2\x1a.google.protobuf.BoolValueR\x1ballowOnHeadersStopIterationB\x04\n" +
 	"\x02vm\"k\n" +
 	"\vWasmService\x12>\n" +
@@ -739,20 +761,21 @@ var file_envoy_extensions_wasm_v3_wasm_proto_depIdxs = []int32{
 	11, // 2: envoy.extensions.wasm.v3.VmConfig.code:type_name -> envoy.config.core.v3.AsyncDataSource
 	12, // 3: envoy.extensions.wasm.v3.VmConfig.configuration:type_name -> google.protobuf.Any
 	5,  // 4: envoy.extensions.wasm.v3.VmConfig.environment_variables:type_name -> envoy.extensions.wasm.v3.EnvironmentVariables
-	9,  // 5: envoy.extensions.wasm.v3.EnvironmentVariables.key_values:type_name -> envoy.extensions.wasm.v3.EnvironmentVariables.KeyValuesEntry
-	4,  // 6: envoy.extensions.wasm.v3.PluginConfig.vm_config:type_name -> envoy.extensions.wasm.v3.VmConfig
-	12, // 7: envoy.extensions.wasm.v3.PluginConfig.configuration:type_name -> google.protobuf.Any
-	0,  // 8: envoy.extensions.wasm.v3.PluginConfig.failure_policy:type_name -> envoy.extensions.wasm.v3.FailurePolicy
-	1,  // 9: envoy.extensions.wasm.v3.PluginConfig.reload_config:type_name -> envoy.extensions.wasm.v3.ReloadConfig
-	2,  // 10: envoy.extensions.wasm.v3.PluginConfig.capability_restriction_config:type_name -> envoy.extensions.wasm.v3.CapabilityRestrictionConfig
-	13, // 11: envoy.extensions.wasm.v3.PluginConfig.allow_on_headers_stop_iteration:type_name -> google.protobuf.BoolValue
-	6,  // 12: envoy.extensions.wasm.v3.WasmService.config:type_name -> envoy.extensions.wasm.v3.PluginConfig
-	3,  // 13: envoy.extensions.wasm.v3.CapabilityRestrictionConfig.AllowedCapabilitiesEntry.value:type_name -> envoy.extensions.wasm.v3.SanitizationConfig
-	14, // [14:14] is the sub-list for method output_type
-	14, // [14:14] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	2,  // 5: envoy.extensions.wasm.v3.VmConfig.capability_restriction_config:type_name -> envoy.extensions.wasm.v3.CapabilityRestrictionConfig
+	9,  // 6: envoy.extensions.wasm.v3.EnvironmentVariables.key_values:type_name -> envoy.extensions.wasm.v3.EnvironmentVariables.KeyValuesEntry
+	4,  // 7: envoy.extensions.wasm.v3.PluginConfig.vm_config:type_name -> envoy.extensions.wasm.v3.VmConfig
+	12, // 8: envoy.extensions.wasm.v3.PluginConfig.configuration:type_name -> google.protobuf.Any
+	0,  // 9: envoy.extensions.wasm.v3.PluginConfig.failure_policy:type_name -> envoy.extensions.wasm.v3.FailurePolicy
+	1,  // 10: envoy.extensions.wasm.v3.PluginConfig.reload_config:type_name -> envoy.extensions.wasm.v3.ReloadConfig
+	2,  // 11: envoy.extensions.wasm.v3.PluginConfig.capability_restriction_config:type_name -> envoy.extensions.wasm.v3.CapabilityRestrictionConfig
+	13, // 12: envoy.extensions.wasm.v3.PluginConfig.allow_on_headers_stop_iteration:type_name -> google.protobuf.BoolValue
+	6,  // 13: envoy.extensions.wasm.v3.WasmService.config:type_name -> envoy.extensions.wasm.v3.PluginConfig
+	3,  // 14: envoy.extensions.wasm.v3.CapabilityRestrictionConfig.AllowedCapabilitiesEntry.value:type_name -> envoy.extensions.wasm.v3.SanitizationConfig
+	15, // [15:15] is the sub-list for method output_type
+	15, // [15:15] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_wasm_v3_wasm_proto_init() }

@@ -194,6 +194,16 @@ func (m *VmConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.CapabilityRestrictionConfig != nil {
+		size, err := m.CapabilityRestrictionConfig.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x42
+	}
 	if m.EnvironmentVariables != nil {
 		size, err := m.EnvironmentVariables.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -608,6 +618,10 @@ func (m *VmConfig) SizeVT() (n int) {
 	}
 	if m.EnvironmentVariables != nil {
 		l = m.EnvironmentVariables.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.CapabilityRestrictionConfig != nil {
+		l = m.CapabilityRestrictionConfig.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
