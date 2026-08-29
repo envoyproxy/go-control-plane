@@ -181,6 +181,13 @@ func (m *RequestFieldValueDisposition) MarshalToSizedBufferVTStrict(dAtA []byte)
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.MetadataKey) > 0 {
+		i -= len(m.MetadataKey)
+		copy(dAtA[i:], m.MetadataKey)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.MetadataKey)))
+		i--
+		dAtA[i] = 0x12
+	}
 	if msg, ok := m.Disposition.(*RequestFieldValueDisposition_DynamicMetadata); ok {
 		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -269,6 +276,10 @@ func (m *RequestFieldValueDisposition) SizeVT() (n int) {
 	_ = l
 	if vtmsg, ok := m.Disposition.(interface{ SizeVT() int }); ok {
 		n += vtmsg.SizeVT()
+	}
+	l = len(m.MetadataKey)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n

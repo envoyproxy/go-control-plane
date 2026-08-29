@@ -49,6 +49,13 @@ func (m *ReverseConnectionClusterConfig) MarshalToSizedBufferVTStrict(dAtA []byt
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.TenantIdFormat) > 0 {
+		i -= len(m.TenantIdFormat)
+		copy(dAtA[i:], m.TenantIdFormat)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.TenantIdFormat)))
+		i--
+		dAtA[i] = 0x1a
+	}
 	if len(m.HostIdFormat) > 0 {
 		i -= len(m.HostIdFormat)
 		copy(dAtA[i:], m.HostIdFormat)
@@ -80,6 +87,10 @@ func (m *ReverseConnectionClusterConfig) SizeVT() (n int) {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	l = len(m.HostIdFormat)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.TenantIdFormat)
 	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}

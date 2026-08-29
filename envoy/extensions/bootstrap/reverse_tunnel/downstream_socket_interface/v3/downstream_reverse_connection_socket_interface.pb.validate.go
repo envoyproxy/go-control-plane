@@ -93,6 +93,100 @@ func (m *DownstreamReverseConnectionSocketInterface) validate(all bool) error {
 		}
 	}
 
+	for idx, item := range m.GetAccessLog() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, DownstreamReverseConnectionSocketInterfaceValidationError{
+						field:  fmt.Sprintf("AccessLog[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, DownstreamReverseConnectionSocketInterfaceValidationError{
+						field:  fmt.Sprintf("AccessLog[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DownstreamReverseConnectionSocketInterfaceValidationError{
+					field:  fmt.Sprintf("AccessLog[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if d := m.GetMaxReconnectBackoff(); d != nil {
+		dur, err := d.AsDuration(), d.CheckValid()
+		if err != nil {
+			err = DownstreamReverseConnectionSocketInterfaceValidationError{
+				field:  "MaxReconnectBackoff",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		} else {
+
+			gte := time.Duration(1*time.Second + 0*time.Nanosecond)
+
+			if dur < gte {
+				err := DownstreamReverseConnectionSocketInterfaceValidationError{
+					field:  "MaxReconnectBackoff",
+					reason: "value must be greater than or equal to 1s",
+				}
+				if !all {
+					return err
+				}
+				errors = append(errors, err)
+			}
+
+		}
+	}
+
+	if d := m.GetMaintainInterval(); d != nil {
+		dur, err := d.AsDuration(), d.CheckValid()
+		if err != nil {
+			err = DownstreamReverseConnectionSocketInterfaceValidationError{
+				field:  "MaintainInterval",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		} else {
+
+			gte := time.Duration(0*time.Second + 100000000*time.Nanosecond)
+
+			if dur < gte {
+				err := DownstreamReverseConnectionSocketInterfaceValidationError{
+					field:  "MaintainInterval",
+					reason: "value must be greater than or equal to 100ms",
+				}
+				if !all {
+					return err
+				}
+				errors = append(errors, err)
+			}
+
+		}
+	}
+
 	if len(errors) > 0 {
 		return DownstreamReverseConnectionSocketInterfaceMultiError(errors)
 	}
@@ -201,6 +295,76 @@ func (m *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) validat
 	var errors []error
 
 	// no validation rules for RequestPath
+
+	for idx, item := range m.GetAdditionalHeaders() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigValidationError{
+						field:  fmt.Sprintf("AdditionalHeaders[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigValidationError{
+						field:  fmt.Sprintf("AdditionalHeaders[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigValidationError{
+					field:  fmt.Sprintf("AdditionalHeaders[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for UseHttpUpgrade
+
+	for idx, item := range m.GetFormatters() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigValidationError{
+						field:  fmt.Sprintf("Formatters[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigValidationError{
+						field:  fmt.Sprintf("Formatters[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigValidationError{
+					field:  fmt.Sprintf("Formatters[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	if len(errors) > 0 {
 		return DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigMultiError(errors)

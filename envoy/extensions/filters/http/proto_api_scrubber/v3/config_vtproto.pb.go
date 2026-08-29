@@ -49,6 +49,16 @@ func (m *ProtoApiScrubberConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int,
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.ScrubUnknownFields {
+		i--
+		if m.ScrubUnknownFields {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x20
+	}
 	if m.FilteringMode != 0 {
 		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.FilteringMode))
 		i--
@@ -432,6 +442,9 @@ func (m *ProtoApiScrubberConfig) SizeVT() (n int) {
 	}
 	if m.FilteringMode != 0 {
 		n += 1 + protohelpers.SizeOfVarint(uint64(m.FilteringMode))
+	}
+	if m.ScrubUnknownFields {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n

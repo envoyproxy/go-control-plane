@@ -50,6 +50,18 @@ func (m *LocalRateLimit) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) 
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.EnableRetryAfterHeader {
+		i--
+		if m.EnableRetryAfterHeader {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x98
+	}
 	if m.MaxDynamicDescriptors != nil {
 		size, err := (*wrapperspb.UInt32Value)(m.MaxDynamicDescriptors).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -457,6 +469,9 @@ func (m *LocalRateLimit) SizeVT() (n int) {
 	if m.MaxDynamicDescriptors != nil {
 		l = (*wrapperspb.UInt32Value)(m.MaxDynamicDescriptors).SizeVT()
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.EnableRetryAfterHeader {
+		n += 3
 	}
 	n += len(m.unknownFields)
 	return n

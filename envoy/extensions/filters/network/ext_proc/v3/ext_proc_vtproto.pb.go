@@ -50,6 +50,15 @@ func (m *NetworkExternalProcessor) MarshalToSizedBufferVTStrict(dAtA []byte) (in
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.ConnectionAttributes) > 0 {
+		for iNdEx := len(m.ConnectionAttributes) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.ConnectionAttributes[iNdEx])
+			copy(dAtA[i:], m.ConnectionAttributes[iNdEx])
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.ConnectionAttributes[iNdEx])))
+			i--
+			dAtA[i] = 0x3a
+		}
+	}
 	if m.MetadataOptions != nil {
 		size, err := m.MetadataOptions.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -246,6 +255,16 @@ func (m *MetadataOptions) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error)
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.ReceivingNamespaces != nil {
+		size, err := m.ReceivingNamespaces.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x12
+	}
 	if m.ForwardingNamespaces != nil {
 		size, err := m.ForwardingNamespaces.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -293,6 +312,12 @@ func (m *NetworkExternalProcessor) SizeVT() (n int) {
 	if m.MetadataOptions != nil {
 		l = m.MetadataOptions.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if len(m.ConnectionAttributes) > 0 {
+		for _, s := range m.ConnectionAttributes {
+			l = len(s)
+			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+		}
 	}
 	n += len(m.unknownFields)
 	return n
@@ -344,6 +369,10 @@ func (m *MetadataOptions) SizeVT() (n int) {
 	_ = l
 	if m.ForwardingNamespaces != nil {
 		l = m.ForwardingNamespaces.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.ReceivingNamespaces != nil {
+		l = m.ReceivingNamespaces.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)

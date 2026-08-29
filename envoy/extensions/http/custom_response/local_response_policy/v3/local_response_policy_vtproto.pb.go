@@ -50,6 +50,20 @@ func (m *LocalResponsePolicy) MarshalToSizedBufferVTStrict(dAtA []byte) (int, er
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if msg, ok := m.ResponseCodeDetailsAction.(*LocalResponsePolicy_ResponseCodeDetails); ok {
+		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+	}
+	if msg, ok := m.ResponseCodeDetailsAction.(*LocalResponsePolicy_PreserveResponseCodeDetails); ok {
+		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+	}
 	if len(m.ResponseHeadersToAdd) > 0 {
 		for iNdEx := len(m.ResponseHeadersToAdd) - 1; iNdEx >= 0; iNdEx-- {
 			if vtmsg, ok := interface{}(m.ResponseHeadersToAdd[iNdEx]).(interface {
@@ -131,6 +145,37 @@ func (m *LocalResponsePolicy) MarshalToSizedBufferVTStrict(dAtA []byte) (int, er
 	return len(dAtA) - i, nil
 }
 
+func (m *LocalResponsePolicy_PreserveResponseCodeDetails) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *LocalResponsePolicy_PreserveResponseCodeDetails) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i--
+	if m.PreserveResponseCodeDetails {
+		dAtA[i] = 1
+	} else {
+		dAtA[i] = 0
+	}
+	i--
+	dAtA[i] = 0x28
+	return len(dAtA) - i, nil
+}
+func (m *LocalResponsePolicy_ResponseCodeDetails) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *LocalResponsePolicy_ResponseCodeDetails) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i -= len(m.ResponseCodeDetails)
+	copy(dAtA[i:], m.ResponseCodeDetails)
+	i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.ResponseCodeDetails)))
+	i--
+	dAtA[i] = 0x32
+	return len(dAtA) - i, nil
+}
 func (m *LocalResponsePolicy) SizeVT() (n int) {
 	if m == nil {
 		return 0
@@ -173,6 +218,29 @@ func (m *LocalResponsePolicy) SizeVT() (n int) {
 			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 		}
 	}
+	if vtmsg, ok := m.ResponseCodeDetailsAction.(interface{ SizeVT() int }); ok {
+		n += vtmsg.SizeVT()
+	}
 	n += len(m.unknownFields)
+	return n
+}
+
+func (m *LocalResponsePolicy_PreserveResponseCodeDetails) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	n += 2
+	return n
+}
+func (m *LocalResponsePolicy_ResponseCodeDetails) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.ResponseCodeDetails)
+	n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	return n
 }

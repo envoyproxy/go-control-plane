@@ -165,6 +165,8 @@ func (m *RateLimitDescriptor) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for IsNegativeHits
+
 	if len(errors) > 0 {
 		return RateLimitDescriptorMultiError(errors)
 	}

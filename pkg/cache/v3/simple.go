@@ -97,8 +97,8 @@ type snapshotCache struct {
 	// be the first fields in the struct to guarantee 64-bit alignment,
 	// which is a requirement for atomic operations on 64-bit operands to work on
 	// 32-bit machines.
-	watchCount      int64
-	deltaWatchCount int64
+	watchCount      atomic.Int64
+	deltaWatchCount atomic.Int64
 
 	log log.Logger
 
@@ -468,7 +468,7 @@ func (cache *snapshotCache) CreateWatch(request *Request, sub Subscription, valu
 }
 
 func (cache *snapshotCache) nextWatchID() int64 {
-	return atomic.AddInt64(&cache.watchCount, 1)
+	return cache.watchCount.Add(1)
 }
 
 // cancellation function for cleaning stale watches.
@@ -788,7 +788,7 @@ func (cache *snapshotCache) respondDelta(ctx context.Context, watch DeltaRespons
 }
 
 func (cache *snapshotCache) nextDeltaWatchID() int64 {
-	return atomic.AddInt64(&cache.deltaWatchCount, 1)
+	return cache.deltaWatchCount.Add(1)
 }
 
 // cancellation function for cleaning stale delta watches.

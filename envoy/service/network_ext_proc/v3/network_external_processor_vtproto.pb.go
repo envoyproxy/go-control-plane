@@ -100,6 +100,28 @@ func (m *ProcessingRequest) MarshalToSizedBufferVTStrict(dAtA []byte) (int, erro
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.Attributes) > 0 {
+		for k := range m.Attributes {
+			v := m.Attributes[k]
+			baseI := i
+			size, err := (*structpb.Struct)(v).MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x22
+		}
+	}
 	if m.Metadata != nil {
 		if vtmsg, ok := interface{}(m.Metadata).(interface {
 			MarshalToSizedBufferVTStrict([]byte) (int, error)
@@ -174,6 +196,16 @@ func (m *ProcessingResponse) MarshalToSizedBufferVTStrict(dAtA []byte) (int, err
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.CloseStreamToExtProcServer {
+		i--
+		if m.CloseStreamToExtProcServer {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x30
 	}
 	if m.DynamicMetadata != nil {
 		size, err := (*structpb.Struct)(m.DynamicMetadata).MarshalToSizedBufferVTStrict(dAtA[:i])
@@ -259,6 +291,19 @@ func (m *ProcessingRequest) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
+	if len(m.Attributes) > 0 {
+		for k, v := range m.Attributes {
+			_ = k
+			_ = v
+			l = 0
+			if v != nil {
+				l = (*structpb.Struct)(v).SizeVT()
+			}
+			l += 1 + protohelpers.SizeOfVarint(uint64(l))
+			mapEntrySize := 1 + len(k) + protohelpers.SizeOfVarint(uint64(len(k))) + l
+			n += mapEntrySize + 1 + protohelpers.SizeOfVarint(uint64(mapEntrySize))
+		}
+	}
 	n += len(m.unknownFields)
 	return n
 }
@@ -286,6 +331,9 @@ func (m *ProcessingResponse) SizeVT() (n int) {
 	if m.DynamicMetadata != nil {
 		l = (*structpb.Struct)(m.DynamicMetadata).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.CloseStreamToExtProcServer {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n

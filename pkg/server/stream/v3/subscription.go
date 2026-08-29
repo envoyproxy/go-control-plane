@@ -1,7 +1,10 @@
 package stream
 
+import "strings"
+
 const (
 	explicitWildcard = "*"
+	globSuffix       = "/*"
 )
 
 // Subscription stores the server view of a given type subscription in a stream.
@@ -15,9 +18,14 @@ type Subscription struct {
 	// this flag will be set to false
 	allowLegacyWildcard bool
 
-	// subscribedResourceNames provides the resources explicitly requested by the client
+	// subscribedResourceNames provides the resources explicitly requested by the client.
+	// Prefix glob subscriptions (e.g. "collection/*") are stored separately in subscribedPrefixes.
 	// This list might be non-empty even when set as wildcard.
 	subscribedResourceNames map[string]struct{}
+
+	// subscribedPrefixes stores the extracted prefixes from glob collection subscriptions
+	// (e.g. subscribing to "collection/*" stores "collection/" here).
+	subscribedPrefixes map[string]struct{}
 
 	// returnedResources contains the resources acknowledged by the client and the acknowledged versions.
 	returnedResources map[string]string
@@ -36,6 +44,7 @@ func newSubscription(emptyRequest, allowLegacyWildcard bool, initialResourceVers
 		wildcard:                wildcard,
 		allowLegacyWildcard:     allowLegacyWildcard,
 		subscribedResourceNames: map[string]struct{}{},
+		subscribedPrefixes:      map[string]struct{}{},
 		returnedResources:       initialResourceVersions,
 	}
 
@@ -72,11 +81,15 @@ func (s *Subscription) SetResourceSubscription(subscribed []string) {
 	}
 
 	subscribedResources := make(map[string]struct{}, len(subscribed))
+	subscribedPrefixes := make(map[string]struct{})
 	explicitWildcardSet := false
 	for _, resource := range subscribed {
-		if resource == explicitWildcard {
+		switch {
+		case resource == explicitWildcard:
 			explicitWildcardSet = true
-		} else {
+		case strings.HasSuffix(resource, globSuffix):
+			subscribedPrefixes[strings.TrimSuffix(resource, "*")] = struct{}{}
+		default:
 			subscribedResources[resource] = struct{}{}
 		}
 	}
@@ -86,15 +99,20 @@ func (s *Subscription) SetResourceSubscription(subscribed []string) {
 		// This ensures later subscriptions will trigger responses,
 		// even if the version has not changed
 		for resource := range s.returnedResources {
-			if _, ok := subscribedResources[resource]; !ok {
-				delete(s.returnedResources, resource)
+			if _, ok := subscribedResources[resource]; ok {
+				continue
 			}
+			if matchesAnyPrefix(subscribedPrefixes, resource) {
+				continue
+			}
+			delete(s.returnedResources, resource)
 		}
 	}
 
 	// Explicit subscription to wildcard as we are not in legacy wildcard behavior
 	s.wildcard = explicitWildcardSet
 	s.subscribedResourceNames = subscribedResources
+	s.subscribedPrefixes = subscribedPrefixes
 }
 
 func NewDeltaSubscription(subscribed, unsubscribed []string, initialResourceVersions map[string]string, allowLegacyWildcard bool) Subscription {
@@ -131,6 +149,10 @@ func (s *Subscription) UpdateResourceSubscriptions(subscribed, unsubscribed []st
 			s.wildcard = true
 			continue
 		}
+		if strings.HasSuffix(resource, globSuffix) {
+			s.subscribedPrefixes[strings.TrimSuffix(resource, "*")] = struct{}{}
+			continue
+		}
 		s.subscribedResourceNames[resource] = struct{}{}
 	}
 
@@ -138,6 +160,11 @@ func (s *Subscription) UpdateResourceSubscriptions(subscribed, unsubscribed []st
 	for _, resource := range unsubscribed {
 		if resource == explicitWildcard {
 			s.wildcard = false
+			continue
+		}
+		if strings.HasSuffix(resource, globSuffix) {
+			prefix := strings.TrimSuffix(resource, "*")
+			delete(s.subscribedPrefixes, prefix)
 			continue
 		}
 		if _, ok := s.subscribedResourceNames[resource]; ok && s.wildcard {
@@ -159,10 +186,25 @@ func (s *Subscription) UpdateResourceSubscriptions(subscribed, unsubscribed []st
 	}
 }
 
-// SubscribedResources returns the list of resources currently explicitly subscribed to
+// SubscribedResources returns the list of resources currently explicitly subscribed to.
 // If the request is set to wildcard it may be empty.
 func (s Subscription) SubscribedResources() map[string]struct{} {
 	return s.subscribedResourceNames
+}
+
+// SubscribedPrefixes returns the set of prefix glob subscriptions, keyed by prefix
+// (e.g. subscribing to "collection/*" yields the key "collection/").
+func (s Subscription) SubscribedPrefixes() map[string]struct{} {
+	return s.subscribedPrefixes
+}
+
+func matchesAnyPrefix(prefixes map[string]struct{}, name string) bool {
+	for prefix := range prefixes {
+		if strings.HasPrefix(name, prefix) {
+			return true
+		}
+	}
+	return false
 }
 
 // IsWildcard returns whether or not the subscription currently has a wildcard watch.

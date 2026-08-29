@@ -51,6 +51,16 @@ func (m *Lua) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.FilterContext != nil {
+		size, err := (*structpb.Struct)(m.FilterContext).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x32
+	}
 	if m.ClearRouteCache != nil {
 		size, err := (*wrapperspb.BoolValue)(m.ClearRouteCache).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -309,6 +319,10 @@ func (m *Lua) SizeVT() (n int) {
 	}
 	if m.ClearRouteCache != nil {
 		l = (*wrapperspb.BoolValue)(m.ClearRouteCache).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.FilterContext != nil {
+		l = (*structpb.Struct)(m.FilterContext).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)

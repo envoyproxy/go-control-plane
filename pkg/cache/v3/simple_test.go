@@ -588,7 +588,8 @@ func TestSnapshotSingleResourceFetch(t *testing.T) {
 	assert.Empty(t, cmp.Diff(
 		unwrapResource(discoveryResponse.GetResources()[0]).GetResource(),
 		anyDuration(time.Second),
-		protocmp.Transform()),
+		protocmp.Transform(),
+	),
 	)
 }
 

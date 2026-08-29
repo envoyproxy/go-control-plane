@@ -253,6 +253,8 @@ func (m *DynamicModuleFilterPerRoute) validate(all bool) error {
 
 	// no validation rules for PerRouteConfigName
 
+	// no validation rules for FilterName
+
 	if all {
 		switch v := interface{}(m.GetFilterConfig()).(type) {
 		case interface{ ValidateAll() error }:

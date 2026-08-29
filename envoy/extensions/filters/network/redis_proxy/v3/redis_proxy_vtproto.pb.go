@@ -566,6 +566,11 @@ func (m *RedisProxy) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.ProtocolVersion != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.ProtocolVersion))
+		i--
+		dAtA[i] = 0x60
+	}
 	if len(m.CustomCommands) > 0 {
 		for iNdEx := len(m.CustomCommands) - 1; iNdEx >= 0; iNdEx-- {
 			i -= len(m.CustomCommands[iNdEx])
@@ -1318,6 +1323,9 @@ func (m *RedisProxy) SizeVT() (n int) {
 			l = len(s)
 			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 		}
+	}
+	if m.ProtocolVersion != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.ProtocolVersion))
 	}
 	n += len(m.unknownFields)
 	return n

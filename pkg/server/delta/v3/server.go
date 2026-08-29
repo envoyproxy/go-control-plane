@@ -43,7 +43,7 @@ type server struct {
 	callbacks Callbacks
 
 	// total stream count for counting bi-di streams
-	streamCount int64
+	streamCount atomic.Int64
 	ctx         context.Context
 
 	// Local configuration flags for individual xDS implementations.
@@ -92,7 +92,7 @@ func NewServer(ctx context.Context, config cache.ConfigWatcher, callbacks Callba
 }
 
 func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.DeltaDiscoveryRequest, defaultTypeURL string) error {
-	streamID := atomic.AddInt64(&s.streamCount, 1)
+	streamID := s.streamCount.Add(1)
 
 	// streamNonce holds a unique nonce for req-resp pairs per xDS stream.
 	var streamNonce int64

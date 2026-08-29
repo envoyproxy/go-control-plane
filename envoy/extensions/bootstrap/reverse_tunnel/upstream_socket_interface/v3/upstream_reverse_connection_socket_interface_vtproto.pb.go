@@ -50,6 +50,45 @@ func (m *UpstreamReverseConnectionSocketInterface) MarshalToSizedBufferVTStrict(
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.MaxConnectionsPerNode != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.MaxConnectionsPerNode))
+		i--
+		dAtA[i] = 0x38
+	}
+	if len(m.AccessLog) > 0 {
+		for iNdEx := len(m.AccessLog) - 1; iNdEx >= 0; iNdEx-- {
+			if vtmsg, ok := interface{}(m.AccessLog[iNdEx]).(interface {
+				MarshalToSizedBufferVTStrict([]byte) (int, error)
+			}); ok {
+				size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+			} else {
+				encoded, err := proto.Marshal(m.AccessLog[iNdEx])
+				if err != nil {
+					return 0, err
+				}
+				i -= len(encoded)
+				copy(dAtA[i:], encoded)
+				i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+			}
+			i--
+			dAtA[i] = 0x32
+		}
+	}
+	if m.EnableTenantIsolation != nil {
+		size, err := (*wrapperspb.BoolValue)(m.EnableTenantIsolation).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x2a
+	}
 	if m.ReporterConfig != nil {
 		if vtmsg, ok := interface{}(m.ReporterConfig).(interface {
 			MarshalToSizedBufferVTStrict([]byte) (int, error)
@@ -128,6 +167,25 @@ func (m *UpstreamReverseConnectionSocketInterface) SizeVT() (n int) {
 			l = proto.Size(m.ReporterConfig)
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.EnableTenantIsolation != nil {
+		l = (*wrapperspb.BoolValue)(m.EnableTenantIsolation).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if len(m.AccessLog) > 0 {
+		for _, e := range m.AccessLog {
+			if size, ok := interface{}(e).(interface {
+				SizeVT() int
+			}); ok {
+				l = size.SizeVT()
+			} else {
+				l = proto.Size(e)
+			}
+			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+		}
+	}
+	if m.MaxConnectionsPerNode != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.MaxConnectionsPerNode))
 	}
 	n += len(m.unknownFields)
 	return n

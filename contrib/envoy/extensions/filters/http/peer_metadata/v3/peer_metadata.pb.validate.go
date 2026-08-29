@@ -578,6 +578,110 @@ var _ interface {
 	ErrorName() string
 } = Config_IstioHeadersValidationError{}
 
+// Validate checks the field values on Config_UpstreamFilterState with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *Config_UpstreamFilterState) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Config_UpstreamFilterState with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// Config_UpstreamFilterStateMultiError, or nil if none found.
+func (m *Config_UpstreamFilterState) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Config_UpstreamFilterState) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for PeerMetadataKey
+
+	if len(errors) > 0 {
+		return Config_UpstreamFilterStateMultiError(errors)
+	}
+
+	return nil
+}
+
+// Config_UpstreamFilterStateMultiError is an error wrapping multiple
+// validation errors returned by Config_UpstreamFilterState.ValidateAll() if
+// the designated constraints aren't met.
+type Config_UpstreamFilterStateMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m Config_UpstreamFilterStateMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m Config_UpstreamFilterStateMultiError) AllErrors() []error { return m }
+
+// Config_UpstreamFilterStateValidationError is the validation error returned
+// by Config_UpstreamFilterState.Validate if the designated constraints aren't met.
+type Config_UpstreamFilterStateValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e Config_UpstreamFilterStateValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e Config_UpstreamFilterStateValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e Config_UpstreamFilterStateValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e Config_UpstreamFilterStateValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e Config_UpstreamFilterStateValidationError) ErrorName() string {
+	return "Config_UpstreamFilterStateValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e Config_UpstreamFilterStateValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sConfig_UpstreamFilterState.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = Config_UpstreamFilterStateValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = Config_UpstreamFilterStateValidationError{}
+
 // Validate checks the field values on Config_DiscoveryMethod with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -718,6 +822,47 @@ func (m *Config_DiscoveryMethod) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return Config_DiscoveryMethodValidationError{
 					field:  "IstioHeaders",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *Config_DiscoveryMethod_UpstreamFilterState:
+		if v == nil {
+			err := Config_DiscoveryMethodValidationError{
+				field:  "MethodSpecifier",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetUpstreamFilterState()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, Config_DiscoveryMethodValidationError{
+						field:  "UpstreamFilterState",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, Config_DiscoveryMethodValidationError{
+						field:  "UpstreamFilterState",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetUpstreamFilterState()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return Config_DiscoveryMethodValidationError{
+					field:  "UpstreamFilterState",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -866,6 +1011,47 @@ func (m *Config_PropagationMethod) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return Config_PropagationMethodValidationError{
 					field:  "IstioHeaders",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *Config_PropagationMethod_Baggage:
+		if v == nil {
+			err := Config_PropagationMethodValidationError{
+				field:  "MethodSpecifier",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetBaggage()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, Config_PropagationMethodValidationError{
+						field:  "Baggage",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, Config_PropagationMethodValidationError{
+						field:  "Baggage",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetBaggage()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return Config_PropagationMethodValidationError{
+					field:  "Baggage",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}

@@ -9,6 +9,7 @@ package reverse_tunnelv3
 import (
 	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
 	durationpb "github.com/planetscale/vtprotobuf/types/known/durationpb"
+	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
@@ -48,6 +49,13 @@ func (m *Validation) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if len(m.TenantIdFormat) > 0 {
+		i -= len(m.TenantIdFormat)
+		copy(dAtA[i:], m.TenantIdFormat)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.TenantIdFormat)))
+		i--
+		dAtA[i] = 0x2a
 	}
 	if len(m.DynamicMetadataNamespace) > 0 {
 		i -= len(m.DynamicMetadataNamespace)
@@ -112,6 +120,58 @@ func (m *ReverseTunnel) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.JwtValidator != nil {
+		if vtmsg, ok := interface{}(m.JwtValidator).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.JwtValidator)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+		}
+		i--
+		dAtA[i] = 0x52
+	}
+	if m.EnableConnectionLimit {
+		i--
+		if m.EnableConnectionLimit {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x48
+	}
+	if m.SkipRebalancing {
+		i--
+		if m.SkipRebalancing {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x40
+	}
+	if m.UseHttpUpgrade {
+		i--
+		if m.UseHttpUpgrade {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x38
 	}
 	if len(m.RequiredClusterName) > 0 {
 		i -= len(m.RequiredClusterName)
@@ -186,6 +246,10 @@ func (m *Validation) SizeVT() (n int) {
 	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
+	l = len(m.TenantIdFormat)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
 	n += len(m.unknownFields)
 	return n
 }
@@ -216,6 +280,25 @@ func (m *ReverseTunnel) SizeVT() (n int) {
 	}
 	l = len(m.RequiredClusterName)
 	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.UseHttpUpgrade {
+		n += 2
+	}
+	if m.SkipRebalancing {
+		n += 2
+	}
+	if m.EnableConnectionLimit {
+		n += 2
+	}
+	if m.JwtValidator != nil {
+		if size, ok := interface{}(m.JwtValidator).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.JwtValidator)
+		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
