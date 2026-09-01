@@ -491,7 +491,8 @@ type CommonTlsContext struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// TLS protocol versions, cipher suites etc.
 	TlsParams *TlsParameters `protobuf:"bytes,1,opt,name=tls_params,json=tlsParams,proto3" json:"tls_params,omitempty"`
-	// Only a single TLS certificate is supported in client contexts. In server contexts,
+	// Only a single TLS certificate is supported in client contexts unless
+	// “custom_tls_certificate_selector“ is explicitly defined with “max_session_keys“ set to 0. In server contexts,
 	// :ref:`Multiple TLS certificates <arch_overview_ssl_cert_select>` can be associated with the
 	// same context to allow both RSA and ECDSA certificates and support SNI-based selection.
 	//
