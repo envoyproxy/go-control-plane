@@ -115,6 +115,11 @@ func (m *Mcp) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.AttributeSource != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.AttributeSource))
+		i--
+		dAtA[i] = 0x48
+	}
 	if m.RejectDuplicateKeys != nil {
 		size, err := (*wrapperspb.BoolValue)(m.RejectDuplicateKeys).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -476,6 +481,9 @@ func (m *Mcp) SizeVT() (n int) {
 	if m.RejectDuplicateKeys != nil {
 		l = (*wrapperspb.BoolValue)(m.RejectDuplicateKeys).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.AttributeSource != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.AttributeSource))
 	}
 	n += len(m.unknownFields)
 	return n

@@ -212,6 +212,17 @@ func (m *Mcp) validate(all bool) error {
 		}
 	}
 
+	if _, ok := Mcp_AttributeSource_name[int32(m.GetAttributeSource())]; !ok {
+		err := McpValidationError{
+			field:  "AttributeSource",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if len(errors) > 0 {
 		return McpMultiError(errors)
 	}
