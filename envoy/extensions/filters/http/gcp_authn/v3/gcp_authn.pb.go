@@ -28,7 +28,7 @@ const (
 )
 
 // Filter configuration.
-// [#next-free-field: 7]
+// [#next-free-field: 9]
 type GcpAuthnFilterConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The HTTP URI to fetch tokens from GCE Metadata Server(https://cloud.google.com/compute/docs/metadata/overview).
@@ -49,15 +49,21 @@ type GcpAuthnFilterConfig struct {
 	CacheConfig *TokenCacheConfig `protobuf:"bytes,3,opt,name=cache_config,json=cacheConfig,proto3" json:"cache_config,omitempty"`
 	// Request header location to extract the token. By default (i.e. if this field is not specified), the token
 	// is extracted to the Authorization HTTP header, in the format "Authorization: Bearer <token>".
+	// If “token_metadata_key“ is set, this field takes no effect.
 	// Not supported by all data planes.
 	TokenHeader *TokenHeader `protobuf:"bytes,4,opt,name=token_header,json=tokenHeader,proto3" json:"token_header,omitempty"`
+	// Optional dynamic metadata key to save the token. The metadata uses the filter config name as the namespace.
+	// Takes precedence over “token_header“.
+	TokenMetadataKey string `protobuf:"bytes,7,opt,name=token_metadata_key,json=tokenMetadataKey,proto3" json:"token_metadata_key,omitempty"`
 	// Cluster to send traffic to the GCE metadata server. Not supported
 	// by all data planes; a data plane may instead have its own mechanism
 	// for contacting the metadata server.
 	Cluster string `protobuf:"bytes,5,opt,name=cluster,proto3" json:"cluster,omitempty"`
 	// Timeout for fetching the tokens from the GCE metadata server.
 	// Not supported by all data planes.
-	Timeout       *durationpb.Duration `protobuf:"bytes,6,opt,name=timeout,proto3" json:"timeout,omitempty"`
+	Timeout *durationpb.Duration `protobuf:"bytes,6,opt,name=timeout,proto3" json:"timeout,omitempty"`
+	// Defines the authentication service. This field overrides the cluster's typed_filter_metadata definition.
+	Audience      *Audience `protobuf:"bytes,8,opt,name=audience,proto3" json:"audience,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -121,6 +127,13 @@ func (x *GcpAuthnFilterConfig) GetTokenHeader() *TokenHeader {
 	return nil
 }
 
+func (x *GcpAuthnFilterConfig) GetTokenMetadataKey() string {
+	if x != nil {
+		return x.TokenMetadataKey
+	}
+	return ""
+}
+
 func (x *GcpAuthnFilterConfig) GetCluster() string {
 	if x != nil {
 		return x.Cluster
@@ -135,8 +148,16 @@ func (x *GcpAuthnFilterConfig) GetTimeout() *durationpb.Duration {
 	return nil
 }
 
+func (x *GcpAuthnFilterConfig) GetAudience() *Audience {
+	if x != nil {
+		return x.Audience
+	}
+	return nil
+}
+
 // Audience is the URL of the receiving service that performs token authentication.
 // It will be provided to the filter through cluster's typed_filter_metadata.
+// [#next-free-field: 6]
 type Audience struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The audience URL, used for fetching unbound JWT token.
@@ -150,8 +171,12 @@ type Audience struct {
 	// If defined, the filter will fetch bound Access Token instead of unbound.
 	// It takes precedence over “bound_jwt“, “access_token“ and “url“.
 	BoundAccessToken *Audience_BoundAccessToken `protobuf:"bytes,4,opt,name=bound_access_token,json=boundAccessToken,proto3" json:"bound_access_token,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// If defined, the filter will fetch an access token for a service account.
+	// It takes precedence over “bound_access_token“, “bound_jwt“, “access_token“, and “url“.
+	// Requires inlined audience definition in the filter configuration.
+	IamAccessToken *Audience_IAMAccessToken `protobuf:"bytes,5,opt,name=iam_access_token,json=iamAccessToken,proto3" json:"iam_access_token,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *Audience) Reset() {
@@ -208,6 +233,13 @@ func (x *Audience) GetBoundJwt() *Audience_BoundJwt {
 func (x *Audience) GetBoundAccessToken() *Audience_BoundAccessToken {
 	if x != nil {
 		return x.BoundAccessToken
+	}
+	return nil
+}
+
+func (x *Audience) GetIamAccessToken() *Audience_IAMAccessToken {
+	if x != nil {
+		return x.IamAccessToken
 	}
 	return nil
 }
@@ -432,28 +464,102 @@ func (*Audience_BoundAccessToken) Descriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_rawDescGZIP(), []int{1, 2}
 }
 
+// Default lifetime is 1h.
+type Audience_IAMAccessToken struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// A template string for the account email or unique ID for which the credentials are requested,
+	// e.g. “my-sa-%DYNAMIC_METADATA(my_filter:tenant_project)%@my-project.iam.gserviceaccount.com“.
+	Account string `protobuf:"bytes,1,opt,name=account,proto3" json:"account,omitempty"`
+	// A template string for the authorization header value,
+	// e.g. “Bearer %DYNAMIC_METADATA(gcp_authn:token)%“.
+	Authorization string `protobuf:"bytes,2,opt,name=authorization,proto3" json:"authorization,omitempty"`
+	// Optional custom scopes for the token request.
+	// Default scope is https://www.googleapis.com/auth/cloud-platform.
+	Scopes        []string `protobuf:"bytes,3,rep,name=scopes,proto3" json:"scopes,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Audience_IAMAccessToken) Reset() {
+	*x = Audience_IAMAccessToken{}
+	mi := &file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Audience_IAMAccessToken) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Audience_IAMAccessToken) ProtoMessage() {}
+
+func (x *Audience_IAMAccessToken) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Audience_IAMAccessToken.ProtoReflect.Descriptor instead.
+func (*Audience_IAMAccessToken) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_rawDescGZIP(), []int{1, 3}
+}
+
+func (x *Audience_IAMAccessToken) GetAccount() string {
+	if x != nil {
+		return x.Account
+	}
+	return ""
+}
+
+func (x *Audience_IAMAccessToken) GetAuthorization() string {
+	if x != nil {
+		return x.Authorization
+	}
+	return ""
+}
+
+func (x *Audience_IAMAccessToken) GetScopes() []string {
+	if x != nil {
+		return x.Scopes
+	}
+	return nil
+}
+
 var File_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_rawDesc = "" +
 	"\n" +
-	":envoy/extensions/filters/http/gcp_authn/v3/gcp_authn.proto\x12*envoy.extensions.filters.http.gcp_authn.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a#envoy/config/core/v3/http_uri.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xc1\x03\n" +
+	":envoy/extensions/filters/http/gcp_authn/v3/gcp_authn.proto\x12*envoy.extensions.filters.http.gcp_authn.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a#envoy/config/core/v3/http_uri.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xc1\x04\n" +
 	"\x14GcpAuthnFilterConfig\x12E\n" +
 	"\bhttp_uri\x18\x01 \x01(\v2\x1d.envoy.config.core.v3.HttpUriB\v\x92ǆ\xd8\x04\x033.0\x18\x01R\ahttpUri\x12D\n" +
 	"\fretry_policy\x18\x02 \x01(\v2!.envoy.config.core.v3.RetryPolicyR\vretryPolicy\x12_\n" +
 	"\fcache_config\x18\x03 \x01(\v2<.envoy.extensions.filters.http.gcp_authn.v3.TokenCacheConfigR\vcacheConfig\x12Z\n" +
-	"\ftoken_header\x18\x04 \x01(\v27.envoy.extensions.filters.http.gcp_authn.v3.TokenHeaderR\vtokenHeader\x12\x18\n" +
+	"\ftoken_header\x18\x04 \x01(\v27.envoy.extensions.filters.http.gcp_authn.v3.TokenHeaderR\vtokenHeader\x12,\n" +
+	"\x12token_metadata_key\x18\a \x01(\tR\x10tokenMetadataKey\x12\x18\n" +
 	"\acluster\x18\x05 \x01(\tR\acluster\x12E\n" +
 	"\atimeout\x18\x06 \x01(\v2\x19.google.protobuf.DurationB\x10\xfaB\r\xaa\x01\n" +
-	"\x1a\x06\b\x80\x80\x80\x80\x102\x00R\atimeout\"\x9c\x03\n" +
+	"\x1a\x06\b\x80\x80\x80\x80\x102\x00R\atimeout\x12P\n" +
+	"\baudience\x18\b \x01(\v24.envoy.extensions.filters.http.gcp_authn.v3.AudienceR\baudience\"\x87\x05\n" +
 	"\bAudience\x12\x10\n" +
 	"\x03url\x18\x01 \x01(\tR\x03url\x12c\n" +
 	"\faccess_token\x18\x02 \x01(\v2@.envoy.extensions.filters.http.gcp_authn.v3.Audience.AccessTokenR\vaccessToken\x12Z\n" +
 	"\tbound_jwt\x18\x03 \x01(\v2=.envoy.extensions.filters.http.gcp_authn.v3.Audience.BoundJwtR\bboundJwt\x12s\n" +
-	"\x12bound_access_token\x18\x04 \x01(\v2E.envoy.extensions.filters.http.gcp_authn.v3.Audience.BoundAccessTokenR\x10boundAccessToken\x1a\r\n" +
+	"\x12bound_access_token\x18\x04 \x01(\v2E.envoy.extensions.filters.http.gcp_authn.v3.Audience.BoundAccessTokenR\x10boundAccessToken\x12m\n" +
+	"\x10iam_access_token\x18\x05 \x01(\v2C.envoy.extensions.filters.http.gcp_authn.v3.Audience.IAMAccessTokenR\x0eiamAccessToken\x1a\r\n" +
 	"\vAccessToken\x1a%\n" +
 	"\bBoundJwt\x12\x19\n" +
 	"\x03url\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x03url\x1a\x12\n" +
-	"\x10BoundAccessToken\"`\n" +
+	"\x10BoundAccessToken\x1az\n" +
+	"\x0eIAMAccessToken\x12!\n" +
+	"\aaccount\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\aaccount\x12-\n" +
+	"\rauthorization\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\rauthorization\x12\x16\n" +
+	"\x06scopes\x18\x03 \x03(\tR\x06scopes\"`\n" +
 	"\x10TokenCacheConfig\x12L\n" +
 	"\n" +
 	"cache_size\x18\x01 \x01(\v2\x1c.google.protobuf.UInt64ValueB\x0f\xfaB\f2\n" +
@@ -476,7 +582,7 @@ func file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_rawDescGZIP
 	return file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_rawDescData
 }
 
-var file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_goTypes = []any{
 	(*GcpAuthnFilterConfig)(nil),      // 0: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig
 	(*Audience)(nil),                  // 1: envoy.extensions.filters.http.gcp_authn.v3.Audience
@@ -485,26 +591,29 @@ var file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_goTypes = []
 	(*Audience_AccessToken)(nil),      // 4: envoy.extensions.filters.http.gcp_authn.v3.Audience.AccessToken
 	(*Audience_BoundJwt)(nil),         // 5: envoy.extensions.filters.http.gcp_authn.v3.Audience.BoundJwt
 	(*Audience_BoundAccessToken)(nil), // 6: envoy.extensions.filters.http.gcp_authn.v3.Audience.BoundAccessToken
-	(*v3.HttpUri)(nil),                // 7: envoy.config.core.v3.HttpUri
-	(*v3.RetryPolicy)(nil),            // 8: envoy.config.core.v3.RetryPolicy
-	(*durationpb.Duration)(nil),       // 9: google.protobuf.Duration
-	(*wrapperspb.UInt64Value)(nil),    // 10: google.protobuf.UInt64Value
+	(*Audience_IAMAccessToken)(nil),   // 7: envoy.extensions.filters.http.gcp_authn.v3.Audience.IAMAccessToken
+	(*v3.HttpUri)(nil),                // 8: envoy.config.core.v3.HttpUri
+	(*v3.RetryPolicy)(nil),            // 9: envoy.config.core.v3.RetryPolicy
+	(*durationpb.Duration)(nil),       // 10: google.protobuf.Duration
+	(*wrapperspb.UInt64Value)(nil),    // 11: google.protobuf.UInt64Value
 }
 var file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_depIdxs = []int32{
-	7,  // 0: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig.http_uri:type_name -> envoy.config.core.v3.HttpUri
-	8,  // 1: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig.retry_policy:type_name -> envoy.config.core.v3.RetryPolicy
+	8,  // 0: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig.http_uri:type_name -> envoy.config.core.v3.HttpUri
+	9,  // 1: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig.retry_policy:type_name -> envoy.config.core.v3.RetryPolicy
 	2,  // 2: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig.cache_config:type_name -> envoy.extensions.filters.http.gcp_authn.v3.TokenCacheConfig
 	3,  // 3: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig.token_header:type_name -> envoy.extensions.filters.http.gcp_authn.v3.TokenHeader
-	9,  // 4: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig.timeout:type_name -> google.protobuf.Duration
-	4,  // 5: envoy.extensions.filters.http.gcp_authn.v3.Audience.access_token:type_name -> envoy.extensions.filters.http.gcp_authn.v3.Audience.AccessToken
-	5,  // 6: envoy.extensions.filters.http.gcp_authn.v3.Audience.bound_jwt:type_name -> envoy.extensions.filters.http.gcp_authn.v3.Audience.BoundJwt
-	6,  // 7: envoy.extensions.filters.http.gcp_authn.v3.Audience.bound_access_token:type_name -> envoy.extensions.filters.http.gcp_authn.v3.Audience.BoundAccessToken
-	10, // 8: envoy.extensions.filters.http.gcp_authn.v3.TokenCacheConfig.cache_size:type_name -> google.protobuf.UInt64Value
-	9,  // [9:9] is the sub-list for method output_type
-	9,  // [9:9] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	10, // 4: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig.timeout:type_name -> google.protobuf.Duration
+	1,  // 5: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig.audience:type_name -> envoy.extensions.filters.http.gcp_authn.v3.Audience
+	4,  // 6: envoy.extensions.filters.http.gcp_authn.v3.Audience.access_token:type_name -> envoy.extensions.filters.http.gcp_authn.v3.Audience.AccessToken
+	5,  // 7: envoy.extensions.filters.http.gcp_authn.v3.Audience.bound_jwt:type_name -> envoy.extensions.filters.http.gcp_authn.v3.Audience.BoundJwt
+	6,  // 8: envoy.extensions.filters.http.gcp_authn.v3.Audience.bound_access_token:type_name -> envoy.extensions.filters.http.gcp_authn.v3.Audience.BoundAccessToken
+	7,  // 9: envoy.extensions.filters.http.gcp_authn.v3.Audience.iam_access_token:type_name -> envoy.extensions.filters.http.gcp_authn.v3.Audience.IAMAccessToken
+	11, // 10: envoy.extensions.filters.http.gcp_authn.v3.TokenCacheConfig.cache_size:type_name -> google.protobuf.UInt64Value
+	11, // [11:11] is the sub-list for method output_type
+	11, // [11:11] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_init() }
@@ -518,7 +627,7 @@ func file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_rawDesc), len(file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
