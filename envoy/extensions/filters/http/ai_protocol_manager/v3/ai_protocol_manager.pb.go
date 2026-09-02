@@ -110,6 +110,12 @@ type RequestHandling struct {
 	// When “true“, such routes are parsed too, but never failed over it — a
 	// route that declared no AI wire contract has nothing to hold its payload
 	// to, so a body that fails to parse is forwarded unchanged.
+	//
+	// Only requests that can be held to end of stream are taken: the request must
+	// carry a JSON content type (“application/json“ or a “+json“ suffix) and
+	// must not be gRPC or Connect streaming, an upgrade, or a CONNECT. Holding a
+	// full-duplex request would stall it, since the client may not finish the
+	// request until it sees a response the held upstream cannot produce.
 	ParseUnconfiguredRoutes bool `protobuf:"varint,1,opt,name=parse_unconfigured_routes,json=parseUnconfiguredRoutes,proto3" json:"parse_unconfigured_routes,omitempty"`
 	unknownFields           protoimpl.UnknownFields
 	sizeCache               protoimpl.SizeCache
