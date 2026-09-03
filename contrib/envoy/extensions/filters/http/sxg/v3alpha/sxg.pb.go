@@ -40,13 +40,15 @@ type SXG struct {
 	// is appropriate for most content, if the downstream service is serving Javascript, or HTML with inline
 	// Javascript, 1 day (so, with backdated expiry, 2 days, or 172800 seconds) is more appropriate.
 	Duration *durationpb.Duration `protobuf:"bytes,3,opt,name=duration,proto3" json:"duration,omitempty"`
-	// The SXG response payload is Merkle Integrity Content Encoding (MICE) encoded (specification is [here](https://datatracker.ietf.org/doc/html/draft-thomson-http-mice-03))
+	// The SXG response payload is `Merkle Integrity Content Encoding (MICE) encoded
+	// <https://datatracker.ietf.org/doc/html/draft-thomson-http-mice-03>`_.
 	// This value indicates the record size in the encoded payload. The default value is 4096.
 	MiRecordSize uint64 `protobuf:"varint,4,opt,name=mi_record_size,json=miRecordSize,proto3" json:"mi_record_size,omitempty"`
 	// The URI of certificate CBOR file published. Since it is required that the certificate CBOR file
 	// be served from the same domain as the SXG document, this should be a relative URI.
 	CborUrl string `protobuf:"bytes,5,opt,name=cbor_url,json=cborUrl,proto3" json:"cbor_url,omitempty"`
-	// URL to retrieve validity data for signature, a CBOR map. See specification [here](https://tools.ietf.org/html/draft-yasskin-httpbis-origin-signed-exchanges-impl-00#section-3.6)
+	// URL to retrieve validity data for signature, a CBOR map. See specification
+	// `here <https://tools.ietf.org/html/draft-yasskin-httpbis-origin-signed-exchanges-impl-00#section-3.6>`_
 	ValidityUrl string `protobuf:"bytes,6,opt,name=validity_url,json=validityUrl,proto3" json:"validity_url,omitempty"`
 	// Header that will be set if it is determined that the client can accept SXG (typically “accept: application/signed-exchange;v=b3“)
 	// If not set, filter will default to: “x-client-can-accept-sxg“

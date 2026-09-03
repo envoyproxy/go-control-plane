@@ -24,11 +24,11 @@ const (
 
 // Proto representation of the statistics collected upon absl::Mutex contention, if Envoy is run
 // under :option:`--enable-mutex-tracing`. For more information, see the “absl::Mutex“
-// [docs](https://abseil.io/about/design/mutex#extra-features).
+// `docs <https://abseil.io/about/design/mutex#extra-features>`__.
 //
 // *NB*: The wait cycles below are measured by “absl::base_internal::CycleClock“, and may not
 // correspond to core clock frequency. For more information, see the “CycleClock“
-// [docs](https://github.com/abseil/abseil-cpp/blob/master/absl/base/internal/cycleclock.h).
+// `docs <https://github.com/abseil/abseil-cpp/blob/master/absl/base/internal/cycleclock.h>`__.
 type MutexStats struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The number of individual mutex contentions which have occurred since startup.

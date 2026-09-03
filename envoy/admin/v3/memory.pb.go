@@ -24,7 +24,7 @@ const (
 
 // Proto representation of the internal memory consumption of an Envoy instance. These represent
 // values extracted from an internal TCMalloc instance. For more information, see the section of the
-// docs entitled ["Generic Tcmalloc Status"](https://gperftools.github.io/gperftools/tcmalloc.html).
+// docs entitled `"Generic Tcmalloc Status" <https://gperftools.github.io/gperftools/tcmalloc.html>`_.
 // [#next-free-field: 7]
 type Memory struct {
 	state protoimpl.MessageState `protogen:"open.v1"`

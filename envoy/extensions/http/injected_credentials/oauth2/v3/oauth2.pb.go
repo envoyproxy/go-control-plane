@@ -84,10 +84,10 @@ func (OAuth2_AuthType) EnumDescriptor() ([]byte, []int) {
 type OAuth2 struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Endpoint on the authorization server to retrieve the access token from.
-	// Refer to [RFC 6749: The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749#section-3.2) for details.
+	// Refer to `RFC 6749: The OAuth 2.0 Authorization Framework <https://www.rfc-editor.org/rfc/rfc6749#section-3.2>`__ for details.
 	TokenEndpoint *v3.HttpUri `protobuf:"bytes,1,opt,name=token_endpoint,json=tokenEndpoint,proto3" json:"token_endpoint,omitempty"`
 	// Optional list of OAuth scopes to be claimed in the authorization request.
-	// Refer to [RFC 6749: The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749#section-4.4.2) for details.
+	// Refer to `RFC 6749: The OAuth 2.0 Authorization Framework <https://www.rfc-editor.org/rfc/rfc6749#section-4.4.2>`__ for details.
 	Scopes []string `protobuf:"bytes,2,rep,name=scopes,proto3" json:"scopes,omitempty"`
 	// Types that are valid to be assigned to FlowType:
 	//
@@ -183,24 +183,24 @@ type isOAuth2_FlowType interface {
 
 type OAuth2_ClientCredentials_ struct {
 	// Client Credentials Grant.
-	// Refer to [RFC 6749: The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749#section-4.4) for details.
+	// Refer to `RFC 6749: The OAuth 2.0 Authorization Framework <https://www.rfc-editor.org/rfc/rfc6749#section-4.4>`__ for details.
 	ClientCredentials *OAuth2_ClientCredentials `protobuf:"bytes,3,opt,name=client_credentials,json=clientCredentials,proto3,oneof"`
 }
 
 func (*OAuth2_ClientCredentials_) isOAuth2_FlowType() {}
 
 // Credentials to authenticate client to the authorization server.
-// Refer to [RFC 6749: The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749#section-2.3) for details.
+// Refer to `RFC 6749: The OAuth 2.0 Authorization Framework <https://www.rfc-editor.org/rfc/rfc6749#section-2.3>`__ for details.
 type OAuth2_ClientCredentials struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Client ID.
-	// Refer to [RFC 6749: The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749#section-2.3.1) for details.
+	// Refer to `RFC 6749: The OAuth 2.0 Authorization Framework <https://www.rfc-editor.org/rfc/rfc6749#section-2.3.1>`__ for details.
 	ClientId string `protobuf:"bytes,1,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
 	// Client secret.
-	// Refer to [RFC 6749: The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749#section-2.3.1) for details.
+	// Refer to `RFC 6749: The OAuth 2.0 Authorization Framework <https://www.rfc-editor.org/rfc/rfc6749#section-2.3.1>`__ for details.
 	ClientSecret *v31.SdsSecretConfig `protobuf:"bytes,2,opt,name=client_secret,json=clientSecret,proto3" json:"client_secret,omitempty"`
 	// The method to use when sending credentials to the authorization server.
-	// Refer to [RFC 6749: The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749#section-2.3.1) for details.
+	// Refer to `RFC 6749: The OAuth 2.0 Authorization Framework <https://www.rfc-editor.org/rfc/rfc6749#section-2.3.1>`__ for details.
 	AuthType      OAuth2_AuthType `protobuf:"varint,3,opt,name=auth_type,json=authType,proto3,enum=envoy.extensions.http.injected_credentials.oauth2.v3.OAuth2_AuthType" json:"auth_type,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
