@@ -24,7 +24,7 @@ const (
 )
 
 // The following descriptor entry is appended with a value extracted from a
-// named claim in a JWT found in an HTTP request header.
+// named claim in a JWT found in an HTTP request header or cookie.
 //
 // .. code-block:: cpp
 //
@@ -60,18 +60,28 @@ const (
 //	<envoy_v3_api_field_config.route.v3.RateLimit.Action.metadata>`
 //	descriptor action instead of this extension.
 //
-// [#next-free-field: 7]
+// [#next-free-field: 8]
 type Descriptor struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The key to use in the descriptor entry.
 	DescriptorKey string `protobuf:"bytes,1,opt,name=descriptor_key,json=descriptorKey,proto3" json:"descriptor_key,omitempty"`
 	// The name of the HTTP header containing the JWT, e.g. "authorization".
+	//
+	// Exactly one of “header_name“ or “cookie“ must be set.
 	HeaderName string `protobuf:"bytes,2,opt,name=header_name,json=headerName,proto3" json:"header_name,omitempty"`
+	// The name of the cookie containing the JWT, e.g. "auth_token". The cookie
+	// is looked up in the request's “Cookie“ header.
+	//
+	// Exactly one of “header_name“ or “cookie“ must be set.
+	Cookie string `protobuf:"bytes,7,opt,name=cookie,proto3" json:"cookie,omitempty"`
 	// The value prefix to strip before parsing the remainder as a JWT, e.g.
 	// "Bearer " (with a trailing space) for an "authorization" header
-	// formatted as "Authorization: Bearer <token>". If the header value does
-	// not start with this prefix, the descriptor is not populated (falls
-	// through to “default_value“/“skip_if_absent“ below).
+	// formatted as "Authorization: Bearer <token>". If the header or cookie
+	// value does not start with this prefix, the descriptor is not populated
+	// (falls through to “default_value“/“skip_if_absent“ below).
+	//
+	// This is typically only needed for “header_name“; cookie values do not
+	// usually carry a prefix.
 	ValuePrefix string `protobuf:"bytes,3,opt,name=value_prefix,json=valuePrefix,proto3" json:"value_prefix,omitempty"`
 	// The name of the JWT claim to extract. Can be a nested claim, dot-
 	// separated, e.g. "claim.nested.key". Matches the same convention as
@@ -81,12 +91,12 @@ type Descriptor struct {
 	// booleans, arrays, objects) are treated as absent. An empty string-valued
 	// claim populates the descriptor with an empty value.
 	ClaimName string `protobuf:"bytes,4,opt,name=claim_name,json=claimName,proto3" json:"claim_name,omitempty"`
-	// The default value to use if the header is absent, is not a
+	// The default value to use if the header or cookie is absent, is not a
 	// structurally valid JWT, or the named claim is absent/non-string.
 	DefaultValue string `protobuf:"bytes,5,opt,name=default_value,json=defaultValue,proto3" json:"default_value,omitempty"`
 	// If true, Envoy skips this descriptor entry (rather than aborting the
-	// whole descriptor for this action list) when the header is absent, the
-	// JWT cannot be parsed, or the named claim is absent/non-string, and
+	// whole descriptor for this action list) when the header or cookie is
+	// absent, the JWT cannot be parsed, or the named claim is absent/non-string, and
 	// “default_value“ is not specified. An empty string-valued claim is
 	// present and produces an entry with an empty value regardless of this
 	// setting.
@@ -139,6 +149,13 @@ func (x *Descriptor) GetHeaderName() string {
 	return ""
 }
 
+func (x *Descriptor) GetCookie() string {
+	if x != nil {
+		return x.Cookie
+	}
+	return ""
+}
+
 func (x *Descriptor) GetValuePrefix() string {
 	if x != nil {
 		return x.ValuePrefix
@@ -171,13 +188,13 @@ var File_envoy_extensions_rate_limit_descriptors_jwt_claim_v3_jwt_claim_proto pr
 
 const file_envoy_extensions_rate_limit_descriptors_jwt_claim_v3_jwt_claim_proto_rawDesc = "" +
 	"\n" +
-	"Denvoy/extensions/rate_limit_descriptors/jwt_claim/v3/jwt_claim.proto\x124envoy.extensions.rate_limit_descriptors.jwt_claim.v3\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x8f\x02\n" +
+	"Denvoy/extensions/rate_limit_descriptors/jwt_claim/v3/jwt_claim.proto\x124envoy.extensions.rate_limit_descriptors.jwt_claim.v3\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xb2\x02\n" +
 	"\n" +
 	"Descriptor\x12.\n" +
-	"\x0edescriptor_key\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\rdescriptorKey\x12.\n" +
-	"\vheader_name\x18\x02 \x01(\tB\r\xfaB\n" +
-	"r\b\x10\x01\xc8\x01\x00\xc0\x01\x01R\n" +
-	"headerName\x12.\n" +
+	"\x0edescriptor_key\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\rdescriptorKey\x12,\n" +
+	"\vheader_name\x18\x02 \x01(\tB\v\xfaB\br\x06\xc8\x01\x00\xc0\x01\x01R\n" +
+	"headerName\x12#\n" +
+	"\x06cookie\x18\a \x01(\tB\v\xfaB\br\x06\xc8\x01\x00\xc0\x01\x01R\x06cookie\x12.\n" +
 	"\fvalue_prefix\x18\x03 \x01(\tB\v\xfaB\br\x06\xc8\x01\x00\xc0\x01\x02R\vvaluePrefix\x12&\n" +
 	"\n" +
 	"claim_name\x18\x04 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\tclaimName\x12#\n" +

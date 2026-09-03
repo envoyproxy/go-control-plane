@@ -69,10 +69,10 @@ func (m *Descriptor) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if utf8.RuneCountInString(m.GetHeaderName()) < 1 {
+	if !_Descriptor_HeaderName_Pattern.MatchString(m.GetHeaderName()) {
 		err := DescriptorValidationError{
 			field:  "HeaderName",
-			reason: "value length must be at least 1 runes",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
 		}
 		if !all {
 			return err
@@ -80,9 +80,9 @@ func (m *Descriptor) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if !_Descriptor_HeaderName_Pattern.MatchString(m.GetHeaderName()) {
+	if !_Descriptor_Cookie_Pattern.MatchString(m.GetCookie()) {
 		err := DescriptorValidationError{
-			field:  "HeaderName",
+			field:  "Cookie",
 			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
 		}
 		if !all {
@@ -195,5 +195,7 @@ var _ interface {
 } = DescriptorValidationError{}
 
 var _Descriptor_HeaderName_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+var _Descriptor_Cookie_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 var _Descriptor_ValuePrefix_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")

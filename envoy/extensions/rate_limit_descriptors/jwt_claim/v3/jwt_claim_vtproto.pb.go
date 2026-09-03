@@ -48,6 +48,13 @@ func (m *Descriptor) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.Cookie) > 0 {
+		i -= len(m.Cookie)
+		copy(dAtA[i:], m.Cookie)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.Cookie)))
+		i--
+		dAtA[i] = 0x3a
+	}
 	if m.SkipIfAbsent {
 		i--
 		if m.SkipIfAbsent {
@@ -124,6 +131,10 @@ func (m *Descriptor) SizeVT() (n int) {
 	}
 	if m.SkipIfAbsent {
 		n += 2
+	}
+	l = len(m.Cookie)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
