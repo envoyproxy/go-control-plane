@@ -117,8 +117,10 @@ type RequestHandling struct {
 	// full-duplex request would stall it, since the client may not finish the
 	// request until it sees a response the held upstream cannot produce.
 	ParseUnconfiguredRoutes bool `protobuf:"varint,1,opt,name=parse_unconfigured_routes,json=parseUnconfiguredRoutes,proto3" json:"parse_unconfigured_routes,omitempty"`
-	unknownFields           protoimpl.UnknownFields
-	sizeCache               protoimpl.SizeCache
+	// Request-path parsing limits. Defaults apply when unset.
+	Limits        *RequestParsingLimits `protobuf:"bytes,2,opt,name=limits,proto3" json:"limits,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *RequestHandling) Reset() {
@@ -158,6 +160,70 @@ func (x *RequestHandling) GetParseUnconfiguredRoutes() bool {
 	return false
 }
 
+func (x *RequestHandling) GetLimits() *RequestParsingLimits {
+	if x != nil {
+		return x.Limits
+	}
+	return nil
+}
+
+// Per-stream limits for request payload parsing.
+type RequestParsingLimits struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Maximum size, in bytes, of a decoded string value kept inline in the
+	// parsed document; a larger value stays in the external buffer and is
+	// referenced by offset. Object keys are always inline.
+	//
+	// This is the deployment-wide default, applied when a declared API's payload
+	// schema does not pin its own threshold. Defaults to 1KiB, which keeps
+	// ordinary metadata (model names, roles, tool names) inline while
+	// conversation content goes to the buffer.
+	//
+	// Keep it above the longest “model“ name in use. Values over the threshold
+	// are offloaded, and on a declared AI endpoint the payload schema requires
+	// “model“ inline, so an offloaded one is rejected with a 400.
+	InlineStringThresholdBytes *wrapperspb.UInt32Value `protobuf:"bytes,1,opt,name=inline_string_threshold_bytes,json=inlineStringThresholdBytes,proto3" json:"inline_string_threshold_bytes,omitempty"`
+	unknownFields              protoimpl.UnknownFields
+	sizeCache                  protoimpl.SizeCache
+}
+
+func (x *RequestParsingLimits) Reset() {
+	*x = RequestParsingLimits{}
+	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RequestParsingLimits) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RequestParsingLimits) ProtoMessage() {}
+
+func (x *RequestParsingLimits) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RequestParsingLimits.ProtoReflect.Descriptor instead.
+func (*RequestParsingLimits) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *RequestParsingLimits) GetInlineStringThresholdBytes() *wrapperspb.UInt32Value {
+	if x != nil {
+		return x.InlineStringThresholdBytes
+	}
+	return nil
+}
+
 // Response-side processing configuration. Individual response features are
 // enabled by the presence of their corresponding messages.
 type ResponseHandling struct {
@@ -171,7 +237,7 @@ type ResponseHandling struct {
 
 func (x *ResponseHandling) Reset() {
 	*x = ResponseHandling{}
-	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[2]
+	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -183,7 +249,7 @@ func (x *ResponseHandling) String() string {
 func (*ResponseHandling) ProtoMessage() {}
 
 func (x *ResponseHandling) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[2]
+	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -196,7 +262,7 @@ func (x *ResponseHandling) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResponseHandling.ProtoReflect.Descriptor instead.
 func (*ResponseHandling) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDescGZIP(), []int{2}
+	return file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ResponseHandling) GetTokenUsage() *TokenUsageExtraction {
@@ -248,7 +314,7 @@ type TokenUsageExtraction struct {
 
 func (x *TokenUsageExtraction) Reset() {
 	*x = TokenUsageExtraction{}
-	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[3]
+	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -260,7 +326,7 @@ func (x *TokenUsageExtraction) String() string {
 func (*TokenUsageExtraction) ProtoMessage() {}
 
 func (x *TokenUsageExtraction) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[3]
+	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -273,7 +339,7 @@ func (x *TokenUsageExtraction) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TokenUsageExtraction.ProtoReflect.Descriptor instead.
 func (*TokenUsageExtraction) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDescGZIP(), []int{3}
+	return file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *TokenUsageExtraction) GetIncludeUnconfiguredRoutes() bool {
@@ -343,7 +409,7 @@ type TokenUsageExtractionLimits struct {
 
 func (x *TokenUsageExtractionLimits) Reset() {
 	*x = TokenUsageExtractionLimits{}
-	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[4]
+	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -355,7 +421,7 @@ func (x *TokenUsageExtractionLimits) String() string {
 func (*TokenUsageExtractionLimits) ProtoMessage() {}
 
 func (x *TokenUsageExtractionLimits) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[4]
+	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -368,7 +434,7 @@ func (x *TokenUsageExtractionLimits) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TokenUsageExtractionLimits.ProtoReflect.Descriptor instead.
 func (*TokenUsageExtractionLimits) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDescGZIP(), []int{4}
+	return file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *TokenUsageExtractionLimits) GetMaxSseEventSize() *wrapperspb.UInt32Value {
@@ -419,7 +485,7 @@ type AiProtocolManagerPerRoute struct {
 
 func (x *AiProtocolManagerPerRoute) Reset() {
 	*x = AiProtocolManagerPerRoute{}
-	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[5]
+	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -431,7 +497,7 @@ func (x *AiProtocolManagerPerRoute) String() string {
 func (*AiProtocolManagerPerRoute) ProtoMessage() {}
 
 func (x *AiProtocolManagerPerRoute) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[5]
+	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -444,7 +510,7 @@ func (x *AiProtocolManagerPerRoute) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AiProtocolManagerPerRoute.ProtoReflect.Descriptor instead.
 func (*AiProtocolManagerPerRoute) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDescGZIP(), []int{5}
+	return file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *AiProtocolManagerPerRoute) GetRequest() *RequestPerRoute {
@@ -482,7 +548,7 @@ type RequestPerRoute struct {
 
 func (x *RequestPerRoute) Reset() {
 	*x = RequestPerRoute{}
-	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[6]
+	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -494,7 +560,7 @@ func (x *RequestPerRoute) String() string {
 func (*RequestPerRoute) ProtoMessage() {}
 
 func (x *RequestPerRoute) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[6]
+	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -507,7 +573,7 @@ func (x *RequestPerRoute) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequestPerRoute.ProtoReflect.Descriptor instead.
 func (*RequestPerRoute) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDescGZIP(), []int{6}
+	return file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *RequestPerRoute) GetApiProtocol() v3.ApiProtocol {
@@ -530,7 +596,7 @@ type ResponsePerRoute struct {
 
 func (x *ResponsePerRoute) Reset() {
 	*x = ResponsePerRoute{}
-	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[7]
+	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -542,7 +608,7 @@ func (x *ResponsePerRoute) String() string {
 func (*ResponsePerRoute) ProtoMessage() {}
 
 func (x *ResponsePerRoute) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[7]
+	mi := &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -555,7 +621,7 @@ func (x *ResponsePerRoute) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResponsePerRoute.ProtoReflect.Descriptor instead.
 func (*ResponsePerRoute) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDescGZIP(), []int{7}
+	return file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ResponsePerRoute) GetApiProtocol() v3.ApiProtocol {
@@ -572,9 +638,12 @@ const file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_mana
 	"Nenvoy/extensions/filters/http/ai_protocol_manager/v3/ai_protocol_manager.proto\x124envoy.extensions.filters.http.ai_protocol_manager.v3\x1a#envoy/type/ai/v3/api_protocol.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xfa\x01\n" +
 	"\x11AiProtocolManager\x12p\n" +
 	"\x10request_handling\x18\x01 \x01(\v2E.envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandlingR\x0frequestHandling\x12s\n" +
-	"\x11response_handling\x18\x02 \x01(\v2F.envoy.extensions.filters.http.ai_protocol_manager.v3.ResponseHandlingR\x10responseHandling\"M\n" +
+	"\x11response_handling\x18\x02 \x01(\v2F.envoy.extensions.filters.http.ai_protocol_manager.v3.ResponseHandlingR\x10responseHandling\"\xb1\x01\n" +
 	"\x0fRequestHandling\x12:\n" +
-	"\x19parse_unconfigured_routes\x18\x01 \x01(\bR\x17parseUnconfiguredRoutes\"\x7f\n" +
+	"\x19parse_unconfigured_routes\x18\x01 \x01(\bR\x17parseUnconfiguredRoutes\x12b\n" +
+	"\x06limits\x18\x02 \x01(\v2J.envoy.extensions.filters.http.ai_protocol_manager.v3.RequestParsingLimitsR\x06limits\"\x84\x01\n" +
+	"\x14RequestParsingLimits\x12l\n" +
+	"\x1dinline_string_threshold_bytes\x18\x01 \x01(\v2\x1c.google.protobuf.UInt32ValueB\v\xfaB\b*\x06\x18\x80\x80@(@R\x1ainlineStringThresholdBytes\"\x7f\n" +
 	"\x10ResponseHandling\x12k\n" +
 	"\vtoken_usage\x18\x01 \x01(\v2J.envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionR\n" +
 	"tokenUsage\"\xca\x02\n" +
@@ -608,37 +677,40 @@ func file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manag
 	return file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDescData
 }
 
-var file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_goTypes = []any{
 	(*AiProtocolManager)(nil),          // 0: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManager
 	(*RequestHandling)(nil),            // 1: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandling
-	(*ResponseHandling)(nil),           // 2: envoy.extensions.filters.http.ai_protocol_manager.v3.ResponseHandling
-	(*TokenUsageExtraction)(nil),       // 3: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction
-	(*TokenUsageExtractionLimits)(nil), // 4: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits
-	(*AiProtocolManagerPerRoute)(nil),  // 5: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute
-	(*RequestPerRoute)(nil),            // 6: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestPerRoute
-	(*ResponsePerRoute)(nil),           // 7: envoy.extensions.filters.http.ai_protocol_manager.v3.ResponsePerRoute
-	(v3.ApiProtocol)(0),                // 8: envoy.type.ai.v3.ApiProtocol
+	(*RequestParsingLimits)(nil),       // 2: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestParsingLimits
+	(*ResponseHandling)(nil),           // 3: envoy.extensions.filters.http.ai_protocol_manager.v3.ResponseHandling
+	(*TokenUsageExtraction)(nil),       // 4: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction
+	(*TokenUsageExtractionLimits)(nil), // 5: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits
+	(*AiProtocolManagerPerRoute)(nil),  // 6: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute
+	(*RequestPerRoute)(nil),            // 7: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestPerRoute
+	(*ResponsePerRoute)(nil),           // 8: envoy.extensions.filters.http.ai_protocol_manager.v3.ResponsePerRoute
 	(*wrapperspb.UInt32Value)(nil),     // 9: google.protobuf.UInt32Value
+	(v3.ApiProtocol)(0),                // 10: envoy.type.ai.v3.ApiProtocol
 }
 var file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_depIdxs = []int32{
 	1,  // 0: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManager.request_handling:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandling
-	2,  // 1: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManager.response_handling:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.ResponseHandling
-	3,  // 2: envoy.extensions.filters.http.ai_protocol_manager.v3.ResponseHandling.token_usage:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction
-	8,  // 3: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.default_api_protocol:type_name -> envoy.type.ai.v3.ApiProtocol
-	4,  // 4: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.limits:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits
-	9,  // 5: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits.max_sse_event_size:type_name -> google.protobuf.UInt32Value
-	9,  // 6: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits.max_json_body_size:type_name -> google.protobuf.UInt32Value
-	9,  // 7: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits.max_parsed_sse_events:type_name -> google.protobuf.UInt32Value
-	6,  // 8: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute.request:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.RequestPerRoute
-	7,  // 9: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute.response:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.ResponsePerRoute
-	8,  // 10: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestPerRoute.api_protocol:type_name -> envoy.type.ai.v3.ApiProtocol
-	8,  // 11: envoy.extensions.filters.http.ai_protocol_manager.v3.ResponsePerRoute.api_protocol:type_name -> envoy.type.ai.v3.ApiProtocol
-	12, // [12:12] is the sub-list for method output_type
-	12, // [12:12] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	3,  // 1: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManager.response_handling:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.ResponseHandling
+	2,  // 2: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandling.limits:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.RequestParsingLimits
+	9,  // 3: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestParsingLimits.inline_string_threshold_bytes:type_name -> google.protobuf.UInt32Value
+	4,  // 4: envoy.extensions.filters.http.ai_protocol_manager.v3.ResponseHandling.token_usage:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction
+	10, // 5: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.default_api_protocol:type_name -> envoy.type.ai.v3.ApiProtocol
+	5,  // 6: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.limits:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits
+	9,  // 7: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits.max_sse_event_size:type_name -> google.protobuf.UInt32Value
+	9,  // 8: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits.max_json_body_size:type_name -> google.protobuf.UInt32Value
+	9,  // 9: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits.max_parsed_sse_events:type_name -> google.protobuf.UInt32Value
+	7,  // 10: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute.request:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.RequestPerRoute
+	8,  // 11: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute.response:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.ResponsePerRoute
+	10, // 12: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestPerRoute.api_protocol:type_name -> envoy.type.ai.v3.ApiProtocol
+	10, // 13: envoy.extensions.filters.http.ai_protocol_manager.v3.ResponsePerRoute.api_protocol:type_name -> envoy.type.ai.v3.ApiProtocol
+	14, // [14:14] is the sub-list for method output_type
+	14, // [14:14] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() {
@@ -654,7 +726,7 @@ func file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manag
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDesc), len(file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
