@@ -8,7 +8,6 @@ package listenerv3
 
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
-	_ "github.com/cncf/xds/go/xds/annotations/v3"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -226,7 +225,7 @@ var File_envoy_config_listener_v3_quic_config_proto protoreflect.FileDescriptor
 
 const file_envoy_config_listener_v3_quic_config_proto_rawDesc = "" +
 	"\n" +
-	"*envoy/config/listener/v3/quic_config.proto\x12\x18envoy.config.listener.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a$envoy/config/core/v3/extension.proto\x1a#envoy/config/core/v3/protocol.proto\x1a.envoy/config/core/v3/socket_cmsg_headers.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xee\n" +
+	"*envoy/config/listener/v3/quic_config.proto\x12\x18envoy.config.listener.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a$envoy/config/core/v3/extension.proto\x1a#envoy/config/core/v3/protocol.proto\x1a.envoy/config/core/v3/socket_cmsg_headers.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xe4\n" +
 	"\n" +
 	"\x13QuicProtocolOptions\x12]\n" +
 	"\x15quic_protocol_options\x18\x01 \x01(\v2).envoy.config.core.v3.QuicProtocolOptionsR\x13quicProtocolOptions\x12<\n" +
@@ -236,8 +235,8 @@ const file_envoy_config_listener_v3_quic_config_proto_rawDesc = "" +
 	")packets_to_read_to_connection_count_ratio\x18\x05 \x01(\v2\x1c.google.protobuf.UInt32ValueB\a\xfaB\x04*\x02(\x01R#packetsToReadToConnectionCountRatio\x12\\\n" +
 	"\x14crypto_stream_config\x18\x06 \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigR\x12cryptoStreamConfig\x12Z\n" +
 	"\x13proof_source_config\x18\a \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigR\x11proofSourceConfig\x12o\n" +
-	"\x1econnection_id_generator_config\x18\b \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigR\x1bconnectionIdGeneratorConfig\x12{\n" +
-	"\x1fserver_preferred_address_config\x18\t \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigB\b\xd2Ƥ\xe1\x06\x02\b\x01R\x1cserverPreferredAddressConfig\x12]\n" +
+	"\x1econnection_id_generator_config\x18\b \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigR\x1bconnectionIdGeneratorConfig\x12q\n" +
+	"\x1fserver_preferred_address_config\x18\t \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigR\x1cserverPreferredAddressConfig\x12]\n" +
 	"\x1dsend_disable_active_migration\x18\n" +
 	" \x01(\v2\x1a.google.protobuf.BoolValueR\x1asendDisableActiveMigration\x12q\n" +
 	"\x1fconnection_debug_visitor_config\x18\v \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigR\x1cconnectionDebugVisitorConfig\x12[\n" +
