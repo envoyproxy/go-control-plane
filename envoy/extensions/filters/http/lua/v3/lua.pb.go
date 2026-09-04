@@ -27,7 +27,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// [#next-free-field: 7]
+// [#next-free-field: 9]
 type Lua struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The Lua code that Envoy will execute. This can be a very small script that
@@ -98,6 +98,30 @@ type Lua struct {
 	// specific one, such as a virtual host when the route has its own “LuaPerRoute“, is not
 	// reached, and this value is used instead.
 	FilterContext *structpb.Struct `protobuf:"bytes,6,opt,name=filter_context,json=filterContext,proto3" json:"filter_context,omitempty"`
+	// Additional patterns for the Lua “package.path“ of every VM this filter creates, so that a
+	// script can “require“ modules from locations the interpreter does not search on its own.
+	// Each entry is one Lua path pattern; the entries are joined with “;“ in the order given and
+	// placed ahead of the interpreter's built-in default path, which is kept.
+	//
+	// .. code-block:: yaml
+	//
+	//	package_paths:
+	//	- /etc/envoy/lua/?.lua
+	//	- /etc/envoy/lua/?/init.lua
+	//
+	// The patterns are in place before any configured code runs, including the run that validates
+	// the configuration, so a “require“ at the top level of a script whose module cannot be found
+	// is rejected as a configuration error rather than failing per request.
+	//
+	// Each worker builds its own VM and runs the script again to do so, after the configuration has
+	// been accepted, so the files a script requires must stay readable for as long as the process
+	// runs and not only while the configuration is loaded.
+	PackagePaths []string `protobuf:"bytes,7,rep,name=package_paths,json=packagePaths,proto3" json:"package_paths,omitempty"`
+	// As :ref:`package_paths
+	// <envoy_v3_api_field_extensions.filters.http.lua.v3.Lua.package_paths>`, but for
+	// “package.cpath“, i.e. modules which are loadable C libraries rather than Lua source, for
+	// example “/etc/envoy/lua/?.so“.
+	PackageCpaths []string `protobuf:"bytes,8,rep,name=package_cpaths,json=packageCpaths,proto3" json:"package_cpaths,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -175,6 +199,21 @@ func (x *Lua) GetFilterContext() *structpb.Struct {
 	return nil
 }
 
+func (x *Lua) GetPackagePaths() []string {
+	if x != nil {
+		return x.PackagePaths
+	}
+	return nil
+}
+
+func (x *Lua) GetPackageCpaths() []string {
+	if x != nil {
+		return x.PackageCpaths
+	}
+	return nil
+}
+
+// [#next-free-field: 7]
 type LuaPerRoute struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to Override:
@@ -199,6 +238,22 @@ type LuaPerRoute struct {
 	// <envoy_v3_api_field_extensions.filters.http.lua.v3.Lua.filter_context>` rather than merging
 	// into it.
 	FilterContext *structpb.Struct `protobuf:"bytes,4,opt,name=filter_context,json=filterContext,proto3" json:"filter_context,omitempty"`
+	// Additional patterns for the Lua “package.path“ of the VM built from this route's
+	// :ref:`source_code
+	// <envoy_v3_api_field_extensions.filters.http.lua.v3.LuaPerRoute.source_code>`, with the same
+	// meaning as the filter-level :ref:`package_paths
+	// <envoy_v3_api_field_extensions.filters.http.lua.v3.Lua.package_paths>`.
+	//
+	// This route's inline source code gets its own VM, which is why it needs its own patterns: the
+	// filter-level ones are not visible to it. Setting these has no effect when this route selects a
+	// script by :ref:`name
+	// <envoy_v3_api_field_extensions.filters.http.lua.v3.LuaPerRoute.name>`, or configures no script
+	// at all, since that VM belongs to the filter and carries the filter-level patterns.
+	PackagePaths []string `protobuf:"bytes,5,rep,name=package_paths,json=packagePaths,proto3" json:"package_paths,omitempty"`
+	// As :ref:`package_paths
+	// <envoy_v3_api_field_extensions.filters.http.lua.v3.LuaPerRoute.package_paths>`, but for
+	// “package.cpath“.
+	PackageCpaths []string `protobuf:"bytes,6,rep,name=package_cpaths,json=packageCpaths,proto3" json:"package_cpaths,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -274,6 +329,20 @@ func (x *LuaPerRoute) GetFilterContext() *structpb.Struct {
 	return nil
 }
 
+func (x *LuaPerRoute) GetPackagePaths() []string {
+	if x != nil {
+		return x.PackagePaths
+	}
+	return nil
+}
+
+func (x *LuaPerRoute) GetPackageCpaths() []string {
+	if x != nil {
+		return x.PackageCpaths
+	}
+	return nil
+}
+
 type isLuaPerRoute_Override interface {
 	isLuaPerRoute_Override()
 }
@@ -305,7 +374,7 @@ var File_envoy_extensions_filters_http_lua_v3_lua_proto protoreflect.FileDescrip
 
 const file_envoy_extensions_filters_http_lua_v3_lua_proto_rawDesc = "" +
 	"\n" +
-	".envoy/extensions/filters/http/lua/v3/lua.proto\x12$envoy.extensions.filters.http.lua.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\x9b\x04\n" +
+	".envoy/extensions/filters/http/lua/v3/lua.proto\x12$envoy.extensions.filters.http.lua.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\x83\x05\n" +
 	"\x03Lua\x12,\n" +
 	"\vinline_code\x18\x01 \x01(\tB\v\x92ǆ\xd8\x04\x033.0\x18\x01R\n" +
 	"inlineCode\x12]\n" +
@@ -314,17 +383,21 @@ const file_envoy_extensions_filters_http_lua_v3_lua_proto_rawDesc = "" +
 	"\vstat_prefix\x18\x04 \x01(\tR\n" +
 	"statPrefix\x12F\n" +
 	"\x11clear_route_cache\x18\x05 \x01(\v2\x1a.google.protobuf.BoolValueR\x0fclearRouteCache\x12>\n" +
-	"\x0efilter_context\x18\x06 \x01(\v2\x17.google.protobuf.StructR\rfilterContext\x1a`\n" +
+	"\x0efilter_context\x18\x06 \x01(\v2\x17.google.protobuf.StructR\rfilterContext\x121\n" +
+	"\rpackage_paths\x18\a \x03(\tB\f\xfaB\t\x92\x01\x06\"\x04r\x02\x10\x01R\fpackagePaths\x123\n" +
+	"\x0epackage_cpaths\x18\b \x03(\tB\f\xfaB\t\x92\x01\x06\"\x04r\x02\x10\x01R\rpackageCpaths\x1a`\n" +
 	"\x10SourceCodesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x126\n" +
 	"\x05value\x18\x02 \x01(\v2 .envoy.config.core.v3.DataSourceR\x05value:\x028\x01:*\x9aň\x1e%\n" +
-	"#envoy.config.filter.http.lua.v2.Lua\"\xe4\x01\n" +
+	"#envoy.config.filter.http.lua.v2.Lua\"\xcc\x02\n" +
 	"\vLuaPerRoute\x12%\n" +
 	"\bdisabled\x18\x01 \x01(\bB\a\xfaB\x04j\x02\b\x01H\x00R\bdisabled\x12\x1d\n" +
 	"\x04name\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x01H\x00R\x04name\x12C\n" +
 	"\vsource_code\x18\x03 \x01(\v2 .envoy.config.core.v3.DataSourceH\x00R\n" +
 	"sourceCode\x12>\n" +
-	"\x0efilter_context\x18\x04 \x01(\v2\x17.google.protobuf.StructR\rfilterContextB\n" +
+	"\x0efilter_context\x18\x04 \x01(\v2\x17.google.protobuf.StructR\rfilterContext\x121\n" +
+	"\rpackage_paths\x18\x05 \x03(\tB\f\xfaB\t\x92\x01\x06\"\x04r\x02\x10\x01R\fpackagePaths\x123\n" +
+	"\x0epackage_cpaths\x18\x06 \x03(\tB\f\xfaB\t\x92\x01\x06\"\x04r\x02\x10\x01R\rpackageCpathsB\n" +
 	"\n" +
 	"\boverrideB\x9b\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"2io.envoyproxy.envoy.extensions.filters.http.lua.v3B\bLuaProtoP\x01ZQgithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/lua/v3;luav3b\x06proto3"

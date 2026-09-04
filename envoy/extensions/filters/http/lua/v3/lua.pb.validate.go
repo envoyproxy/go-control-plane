@@ -194,6 +194,38 @@ func (m *Lua) validate(all bool) error {
 		}
 	}
 
+	for idx, item := range m.GetPackagePaths() {
+		_, _ = idx, item
+
+		if utf8.RuneCountInString(item) < 1 {
+			err := LuaValidationError{
+				field:  fmt.Sprintf("PackagePaths[%v]", idx),
+				reason: "value length must be at least 1 runes",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
+	for idx, item := range m.GetPackageCpaths() {
+		_, _ = idx, item
+
+		if utf8.RuneCountInString(item) < 1 {
+			err := LuaValidationError{
+				field:  fmt.Sprintf("PackageCpaths[%v]", idx),
+				reason: "value length must be at least 1 runes",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return LuaMultiError(errors)
 	}
@@ -320,6 +352,38 @@ func (m *LuaPerRoute) validate(all bool) error {
 				cause:  err,
 			}
 		}
+	}
+
+	for idx, item := range m.GetPackagePaths() {
+		_, _ = idx, item
+
+		if utf8.RuneCountInString(item) < 1 {
+			err := LuaPerRouteValidationError{
+				field:  fmt.Sprintf("PackagePaths[%v]", idx),
+				reason: "value length must be at least 1 runes",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
+	for idx, item := range m.GetPackageCpaths() {
+		_, _ = idx, item
+
+		if utf8.RuneCountInString(item) < 1 {
+			err := LuaPerRouteValidationError{
+				field:  fmt.Sprintf("PackageCpaths[%v]", idx),
+				reason: "value length must be at least 1 runes",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
 	}
 
 	switch v := m.Override.(type) {

@@ -51,6 +51,24 @@ func (m *Lua) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.PackageCpaths) > 0 {
+		for iNdEx := len(m.PackageCpaths) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.PackageCpaths[iNdEx])
+			copy(dAtA[i:], m.PackageCpaths[iNdEx])
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.PackageCpaths[iNdEx])))
+			i--
+			dAtA[i] = 0x42
+		}
+	}
+	if len(m.PackagePaths) > 0 {
+		for iNdEx := len(m.PackagePaths) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.PackagePaths[iNdEx])
+			copy(dAtA[i:], m.PackagePaths[iNdEx])
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.PackagePaths[iNdEx])))
+			i--
+			dAtA[i] = 0x3a
+		}
+	}
 	if m.FilterContext != nil {
 		size, err := (*structpb.Struct)(m.FilterContext).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -173,6 +191,24 @@ func (m *LuaPerRoute) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if len(m.PackageCpaths) > 0 {
+		for iNdEx := len(m.PackageCpaths) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.PackageCpaths[iNdEx])
+			copy(dAtA[i:], m.PackageCpaths[iNdEx])
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.PackageCpaths[iNdEx])))
+			i--
+			dAtA[i] = 0x32
+		}
+	}
+	if len(m.PackagePaths) > 0 {
+		for iNdEx := len(m.PackagePaths) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.PackagePaths[iNdEx])
+			copy(dAtA[i:], m.PackagePaths[iNdEx])
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.PackagePaths[iNdEx])))
+			i--
+			dAtA[i] = 0x2a
+		}
 	}
 	if m.FilterContext != nil {
 		size, err := (*structpb.Struct)(m.FilterContext).MarshalToSizedBufferVTStrict(dAtA[:i])
@@ -325,6 +361,18 @@ func (m *Lua) SizeVT() (n int) {
 		l = (*structpb.Struct)(m.FilterContext).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
+	if len(m.PackagePaths) > 0 {
+		for _, s := range m.PackagePaths {
+			l = len(s)
+			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+		}
+	}
+	if len(m.PackageCpaths) > 0 {
+		for _, s := range m.PackageCpaths {
+			l = len(s)
+			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+		}
+	}
 	n += len(m.unknownFields)
 	return n
 }
@@ -341,6 +389,18 @@ func (m *LuaPerRoute) SizeVT() (n int) {
 	if m.FilterContext != nil {
 		l = (*structpb.Struct)(m.FilterContext).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if len(m.PackagePaths) > 0 {
+		for _, s := range m.PackagePaths {
+			l = len(s)
+			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+		}
+	}
+	if len(m.PackageCpaths) > 0 {
+		for _, s := range m.PackageCpaths {
+			l = len(s)
+			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+		}
 	}
 	n += len(m.unknownFields)
 	return n
