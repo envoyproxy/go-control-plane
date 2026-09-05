@@ -28,7 +28,9 @@ const (
 // cluster selection, allowing different retry attempts to automatically target
 // different upstream clusters. Unlike the standard aggregate cluster which uses
 // health-based selection, the composite cluster uses the retry attempt count to
-// deterministically select which sub-cluster to route to.
+// deterministically select which sub-cluster to route to. If the selected sub-cluster has no
+// host available, the following sub-clusters in the list are tried in order within the same
+// attempt.
 //
 // When retry attempts exceed the number of configured clusters, requests will fail with no
 // host available.
@@ -55,7 +57,9 @@ type ClusterConfig struct {
 	// List of clusters to use for request routing. The first cluster is used for the
 	// initial request (attempt 1), the second cluster for the first retry (attempt 2),
 	// and so on. Must contain at least one cluster. When retry attempts exceed the number
-	// of configured clusters, requests will fail with no host available.
+	// of configured clusters, requests will fail with no host available. When the cluster
+	// selected for an attempt has no host available, the following clusters in this list are
+	// tried in order for that attempt.
 	Clusters      []*ClusterConfig_ClusterEntry `protobuf:"bytes,1,rep,name=clusters,proto3" json:"clusters,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
