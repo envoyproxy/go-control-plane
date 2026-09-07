@@ -1333,6 +1333,40 @@ func (m *HttpRule) validate(all bool) error {
 
 	// no validation rules for Body
 
+	for idx, item := range m.GetBindings() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, HttpRuleValidationError{
+						field:  fmt.Sprintf("Bindings[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, HttpRuleValidationError{
+						field:  fmt.Sprintf("Bindings[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return HttpRuleValidationError{
+					field:  fmt.Sprintf("Bindings[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return HttpRuleMultiError(errors)
 	}
@@ -1545,3 +1579,153 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = McpJsonRestBridgePerRouteValidationError{}
+
+// Validate checks the field values on HttpRule_ParameterBinding with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *HttpRule_ParameterBinding) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on HttpRule_ParameterBinding with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// HttpRule_ParameterBindingMultiError, or nil if none found.
+func (m *HttpRule_ParameterBinding) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *HttpRule_ParameterBinding) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Type
+
+	if utf8.RuneCountInString(m.GetName()) < 1 {
+		err := HttpRule_ParameterBindingValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(m.GetName()) > 16384 {
+		err := HttpRule_ParameterBindingValidationError{
+			field:  "Name",
+			reason: "value length must be at most 16384 bytes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if !_HttpRule_ParameterBinding_Name_Pattern.MatchString(m.GetName()) {
+		err := HttpRule_ParameterBindingValidationError{
+			field:  "Name",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if utf8.RuneCountInString(m.GetArgumentPath()) < 1 {
+		err := HttpRule_ParameterBindingValidationError{
+			field:  "ArgumentPath",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return HttpRule_ParameterBindingMultiError(errors)
+	}
+
+	return nil
+}
+
+// HttpRule_ParameterBindingMultiError is an error wrapping multiple validation
+// errors returned by HttpRule_ParameterBinding.ValidateAll() if the
+// designated constraints aren't met.
+type HttpRule_ParameterBindingMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m HttpRule_ParameterBindingMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m HttpRule_ParameterBindingMultiError) AllErrors() []error { return m }
+
+// HttpRule_ParameterBindingValidationError is the validation error returned by
+// HttpRule_ParameterBinding.Validate if the designated constraints aren't met.
+type HttpRule_ParameterBindingValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e HttpRule_ParameterBindingValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e HttpRule_ParameterBindingValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e HttpRule_ParameterBindingValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e HttpRule_ParameterBindingValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e HttpRule_ParameterBindingValidationError) ErrorName() string {
+	return "HttpRule_ParameterBindingValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e HttpRule_ParameterBindingValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sHttpRule_ParameterBinding.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = HttpRule_ParameterBindingValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = HttpRule_ParameterBindingValidationError{}
+
+var _HttpRule_ParameterBinding_Name_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
