@@ -48,6 +48,13 @@ func (m *MetadataKey_PathSegment) MarshalToSizedBufferVTStrict(dAtA []byte) (int
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if msg, ok := m.Segment.(*MetadataKey_PathSegment_Index); ok {
+		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+	}
 	if msg, ok := m.Segment.(*MetadataKey_PathSegment_Key); ok {
 		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -70,6 +77,18 @@ func (m *MetadataKey_PathSegment_Key) MarshalToSizedBufferVTStrict(dAtA []byte) 
 	i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.Key)))
 	i--
 	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+func (m *MetadataKey_PathSegment_Index) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *MetadataKey_PathSegment_Index) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i = protohelpers.EncodeVarint(dAtA, i, uint64(m.Index))
+	i--
+	dAtA[i] = 0x10
 	return len(dAtA) - i, nil
 }
 func (m *MetadataKey) MarshalVTStrict() (dAtA []byte, err error) {
@@ -430,6 +449,15 @@ func (m *MetadataKey_PathSegment_Key) SizeVT() (n int) {
 	_ = l
 	l = len(m.Key)
 	n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	return n
+}
+func (m *MetadataKey_PathSegment_Index) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	n += 1 + protohelpers.SizeOfVarint(uint64(m.Index))
 	return n
 }
 func (m *MetadataKey) SizeVT() (n int) {
