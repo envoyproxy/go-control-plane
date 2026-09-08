@@ -241,6 +241,11 @@ func (m *TokenUsageExtraction) MarshalToSizedBufferVTStrict(dAtA []byte) (int, e
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.UsageSignal != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.UsageSignal))
+		i--
+		dAtA[i] = 0x28
+	}
 	if m.Limits != nil {
 		size, err := m.Limits.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -550,6 +555,9 @@ func (m *TokenUsageExtraction) SizeVT() (n int) {
 	if m.Limits != nil {
 		l = m.Limits.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.UsageSignal != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.UsageSignal))
 	}
 	n += len(m.unknownFields)
 	return n

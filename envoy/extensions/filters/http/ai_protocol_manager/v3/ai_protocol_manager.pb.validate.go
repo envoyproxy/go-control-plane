@@ -643,6 +643,17 @@ func (m *TokenUsageExtraction) validate(all bool) error {
 		}
 	}
 
+	if _, ok := TokenUsageExtraction_UsageSignal_name[int32(m.GetUsageSignal())]; !ok {
+		err := TokenUsageExtractionValidationError{
+			field:  "UsageSignal",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if len(errors) > 0 {
 		return TokenUsageExtractionMultiError(errors)
 	}
