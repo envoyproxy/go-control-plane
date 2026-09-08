@@ -222,6 +222,16 @@ func (m *TlsCertificate) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) 
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.TlsParams != nil {
+		size, err := m.TlsParams.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x4a
+	}
 	if m.Pkcs12 != nil {
 		if vtmsg, ok := interface{}(m.Pkcs12).(interface {
 			MarshalToSizedBufferVTStrict([]byte) (int, error)
@@ -1006,6 +1016,10 @@ func (m *TlsCertificate) SizeVT() (n int) {
 		} else {
 			l = proto.Size(m.Pkcs12)
 		}
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.TlsParams != nil {
+		l = m.TlsParams.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)

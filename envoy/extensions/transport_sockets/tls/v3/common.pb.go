@@ -575,7 +575,7 @@ type PrivateKeyProvider_TypedConfig struct {
 
 func (*PrivateKeyProvider_TypedConfig) isPrivateKeyProvider_ConfigType() {}
 
-// [#next-free-field: 9]
+// [#next-free-field: 10]
 type TlsCertificate struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The TLS certificate chain.
@@ -634,8 +634,27 @@ type TlsCertificate struct {
 	OcspStaple *v3.DataSource `protobuf:"bytes,4,opt,name=ocsp_staple,json=ocspStaple,proto3" json:"ocsp_staple,omitempty"`
 	// [#not-implemented-hide:]
 	SignedCertificateTimestamp []*v3.DataSource `protobuf:"bytes,5,rep,name=signed_certificate_timestamp,json=signedCertificateTimestamp,proto3" json:"signed_certificate_timestamp,omitempty"`
-	unknownFields              protoimpl.UnknownFields
-	sizeCache                  protoimpl.SizeCache
+	// Optional per-certificate TLS parameters. When set on a server certificate, any specified
+	// fields override the corresponding context-level
+	// :ref:`tls_params <envoy_v3_api_field_extensions.transport_sockets.tls.v3.CommonTlsContext.tls_params>`
+	// for that certificate during the TLS handshake; unset fields continue to use the context-level
+	// values. This allows different cipher suites, ECDH curves, protocol versions, signature
+	// algorithms, or compliance policies per certificate.
+	//
+	// These parameters do not affect certificate selection, which continues to be based only on SNI,
+	// the client's ECDSA capability, and OCSP capability. They are applied after a certificate has
+	// been selected. For a multi-certificate configuration this means each certificate's parameters
+	// must be compatible with the clients that select it: if the selected certificate's parameters
+	// leave nothing in common with the client, the handshake fails and no other certificate is tried.
+	//
+	// Note: because these are overrides rather than constraints, a certificate-level
+	// “tls_minimum_protocol_version“ can lower the floor set by the context-level
+	// “tls_params“, weakening the listener's overall TLS security policy.
+	// Setting this on a client certificate is not supported and is ignored.
+	// This field has no effect on QUIC/HTTP3 downstream connections.
+	TlsParams     *TlsParameters `protobuf:"bytes,9,opt,name=tls_params,json=tlsParams,proto3" json:"tls_params,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *TlsCertificate) Reset() {
@@ -720,6 +739,13 @@ func (x *TlsCertificate) GetOcspStaple() *v3.DataSource {
 func (x *TlsCertificate) GetSignedCertificateTimestamp() []*v3.DataSource {
 	if x != nil {
 		return x.SignedCertificateTimestamp
+	}
+	return nil
+}
+
+func (x *TlsCertificate) GetTlsParams() *TlsParameters {
+	if x != nil {
+		return x.TlsParams
 	}
 	return nil
 }
@@ -1362,7 +1388,7 @@ const file_envoy_extensions_transport_sockets_tls_v3_common_proto_rawDesc = "" +
 	"\ftyped_config\x18\x03 \x01(\v2\x14.google.protobuf.AnyB\x06\xb8\xb7\x8b\xa4\x02\x01H\x00R\vtypedConfig\x12\x1a\n" +
 	"\bfallback\x18\x04 \x01(\bR\bfallback:+\x9aň\x1e&\n" +
 	"$envoy.api.v2.auth.PrivateKeyProviderB\r\n" +
-	"\vconfig_typeJ\x04\b\x02\x10\x03R\x06config\"\xc8\x05\n" +
+	"\vconfig_typeJ\x04\b\x02\x10\x03R\x06config\"\xa1\x06\n" +
 	"\x0eTlsCertificate\x12M\n" +
 	"\x11certificate_chain\x18\x01 \x01(\v2 .envoy.config.core.v3.DataSourceR\x10certificateChain\x12I\n" +
 	"\vprivate_key\x18\x02 \x01(\v2 .envoy.config.core.v3.DataSourceB\x06\xb8\xb7\x8b\xa4\x02\x01R\n" +
@@ -1373,7 +1399,9 @@ const file_envoy_extensions_transport_sockets_tls_v3_common_proto_rawDesc = "" +
 	"\bpassword\x18\x03 \x01(\v2 .envoy.config.core.v3.DataSourceB\x06\xb8\xb7\x8b\xa4\x02\x01R\bpassword\x12A\n" +
 	"\vocsp_staple\x18\x04 \x01(\v2 .envoy.config.core.v3.DataSourceR\n" +
 	"ocspStaple\x12b\n" +
-	"\x1csigned_certificate_timestamp\x18\x05 \x03(\v2 .envoy.config.core.v3.DataSourceR\x1asignedCertificateTimestamp:'\x9aň\x1e\"\n" +
+	"\x1csigned_certificate_timestamp\x18\x05 \x03(\v2 .envoy.config.core.v3.DataSourceR\x1asignedCertificateTimestamp\x12W\n" +
+	"\n" +
+	"tls_params\x18\t \x01(\v28.envoy.extensions.transport_sockets.tls.v3.TlsParametersR\ttlsParams:'\x9aň\x1e\"\n" +
 	" envoy.api.v2.auth.TlsCertificate\"\x8b\x01\n" +
 	"\x14TlsSessionTicketKeys\x12D\n" +
 	"\x04keys\x18\x01 \x03(\v2 .envoy.config.core.v3.DataSourceB\x0e\xfaB\x05\x92\x01\x02\b\x01\xb8\xb7\x8b\xa4\x02\x01R\x04keys:-\x9aň\x1e(\n" +
@@ -1469,25 +1497,26 @@ var file_envoy_extensions_transport_sockets_tls_v3_common_proto_depIdxs = []int3
 	13, // 9: envoy.extensions.transport_sockets.tls.v3.TlsCertificate.password:type_name -> envoy.config.core.v3.DataSource
 	13, // 10: envoy.extensions.transport_sockets.tls.v3.TlsCertificate.ocsp_staple:type_name -> envoy.config.core.v3.DataSource
 	13, // 11: envoy.extensions.transport_sockets.tls.v3.TlsCertificate.signed_certificate_timestamp:type_name -> envoy.config.core.v3.DataSource
-	13, // 12: envoy.extensions.transport_sockets.tls.v3.TlsSessionTicketKeys.keys:type_name -> envoy.config.core.v3.DataSource
-	2,  // 13: envoy.extensions.transport_sockets.tls.v3.SubjectAltNameMatcher.san_type:type_name -> envoy.extensions.transport_sockets.tls.v3.SubjectAltNameMatcher.SanType
-	15, // 14: envoy.extensions.transport_sockets.tls.v3.SubjectAltNameMatcher.matcher:type_name -> envoy.type.matcher.v3.StringMatcher
-	13, // 15: envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext.trusted_ca:type_name -> envoy.config.core.v3.DataSource
-	8,  // 16: envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext.ca_certificate_provider_instance:type_name -> envoy.extensions.transport_sockets.tls.v3.CertificateProviderPluginInstance
-	11, // 17: envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext.system_root_certs:type_name -> envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext.SystemRootCerts
-	14, // 18: envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext.watched_directory:type_name -> envoy.config.core.v3.WatchedDirectory
-	9,  // 19: envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext.match_typed_subject_alt_names:type_name -> envoy.extensions.transport_sockets.tls.v3.SubjectAltNameMatcher
-	15, // 20: envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext.match_subject_alt_names:type_name -> envoy.type.matcher.v3.StringMatcher
-	16, // 21: envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext.require_signed_certificate_timestamp:type_name -> google.protobuf.BoolValue
-	13, // 22: envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext.crl:type_name -> envoy.config.core.v3.DataSource
-	3,  // 23: envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext.trust_chain_verification:type_name -> envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext.TrustChainVerification
-	17, // 24: envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext.custom_validator_config:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	18, // 25: envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext.max_verify_depth:type_name -> google.protobuf.UInt32Value
-	26, // [26:26] is the sub-list for method output_type
-	26, // [26:26] is the sub-list for method input_type
-	26, // [26:26] is the sub-list for extension type_name
-	26, // [26:26] is the sub-list for extension extendee
-	0,  // [0:26] is the sub-list for field type_name
+	4,  // 12: envoy.extensions.transport_sockets.tls.v3.TlsCertificate.tls_params:type_name -> envoy.extensions.transport_sockets.tls.v3.TlsParameters
+	13, // 13: envoy.extensions.transport_sockets.tls.v3.TlsSessionTicketKeys.keys:type_name -> envoy.config.core.v3.DataSource
+	2,  // 14: envoy.extensions.transport_sockets.tls.v3.SubjectAltNameMatcher.san_type:type_name -> envoy.extensions.transport_sockets.tls.v3.SubjectAltNameMatcher.SanType
+	15, // 15: envoy.extensions.transport_sockets.tls.v3.SubjectAltNameMatcher.matcher:type_name -> envoy.type.matcher.v3.StringMatcher
+	13, // 16: envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext.trusted_ca:type_name -> envoy.config.core.v3.DataSource
+	8,  // 17: envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext.ca_certificate_provider_instance:type_name -> envoy.extensions.transport_sockets.tls.v3.CertificateProviderPluginInstance
+	11, // 18: envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext.system_root_certs:type_name -> envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext.SystemRootCerts
+	14, // 19: envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext.watched_directory:type_name -> envoy.config.core.v3.WatchedDirectory
+	9,  // 20: envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext.match_typed_subject_alt_names:type_name -> envoy.extensions.transport_sockets.tls.v3.SubjectAltNameMatcher
+	15, // 21: envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext.match_subject_alt_names:type_name -> envoy.type.matcher.v3.StringMatcher
+	16, // 22: envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext.require_signed_certificate_timestamp:type_name -> google.protobuf.BoolValue
+	13, // 23: envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext.crl:type_name -> envoy.config.core.v3.DataSource
+	3,  // 24: envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext.trust_chain_verification:type_name -> envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext.TrustChainVerification
+	17, // 25: envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext.custom_validator_config:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	18, // 26: envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext.max_verify_depth:type_name -> google.protobuf.UInt32Value
+	27, // [27:27] is the sub-list for method output_type
+	27, // [27:27] is the sub-list for method input_type
+	27, // [27:27] is the sub-list for extension type_name
+	27, // [27:27] is the sub-list for extension extendee
+	0,  // [0:27] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_transport_sockets_tls_v3_common_proto_init() }
