@@ -42,6 +42,10 @@ const (
 //
 // If the “default_proxy_address“ is set and proxy address is not found in
 // “typed_filter_metadata“, the default proxy address is used.
+//
+// Optionally, the key “envoy.http11_proxy_transport_socket.proxy_authorization“ and the
+// proxy authorization value in “google.protobuf.StringValue“ format can be set to send the
+// “Proxy-Authorization“ header with the “CONNECT“ request.
 type Http11ProxyUpstreamTransport struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The underlying transport socket being wrapped. Defaults to plaintext (raw_buffer) if unset.
