@@ -30,10 +30,18 @@ type QuicDownstreamTransport struct {
 	state                protoimpl.MessageState   `protogen:"open.v1"`
 	DownstreamTlsContext *v3.DownstreamTlsContext `protobuf:"bytes,1,opt,name=downstream_tls_context,json=downstreamTlsContext,proto3" json:"downstream_tls_context,omitempty"`
 	// If false, QUIC will tell TLS to reject any early data and to stop issuing 0-RTT credentials with resumption session tickets. This will prevent clients from sending 0-RTT requests.
-	// Default to true.
+	// Default to true, except when :ref:`require_client_certificate
+	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.DownstreamTlsContext.require_client_certificate>`
+	// is set, in which case early data is never used and this defaults to false.
 	EnableEarlyData *wrapperspb.BoolValue `protobuf:"bytes,2,opt,name=enable_early_data,json=enableEarlyData,proto3" json:"enable_early_data,omitempty"`
 	// If false, TLS session tickets are not issued and accepted by QUIC.
-	// Default to true.
+	// Default to true, except when :ref:`require_client_certificate
+	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.DownstreamTlsContext.require_client_certificate>`
+	// is set, in which case this defaults to false. QUIC does not re-validate the client
+	// certificate when a session is resumed: a resumed connection reuses the certificate verdict of
+	// the original handshake until the ticket expires, so certificate revocation or expiry and
+	// validation context changes are not rechecked. Setting this to true on a filter chain that
+	// requires a client certificate opts into that trade-off in exchange for cheaper handshakes.
 	EnableResumption *wrapperspb.BoolValue `protobuf:"bytes,3,opt,name=enable_resumption,json=enableResumption,proto3" json:"enable_resumption,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
