@@ -10,6 +10,7 @@ import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	_ "github.com/envoyproxy/go-control-plane/envoy/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
+	v31 "github.com/envoyproxy/go-control-plane/envoy/type/matcher/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -396,6 +397,8 @@ type Compressor_CommonDirectionConfig struct {
 	// Minimum value of the “Content-Length“ header in request or response messages (depending on the
 	// direction this common config is applied to), in bytes, that will trigger compression. Defaults to 30.
 	MinContentLength *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=min_content_length,json=minContentLength,proto3" json:"min_content_length,omitempty"`
+	//	Using ``content_type`` is deprecated. Use ``content_type_matcher`` instead.
+	//
 	// Set of strings that allows specifying which mime-types yield compression; e.g.,
 	// “application/json“, “text/html“, etc.
 	//
@@ -410,9 +413,19 @@ type Compressor_CommonDirectionConfig struct {
 	// * “text/html“
 	// * “text/plain“
 	// * “text/xml“
-	ContentType   []string `protobuf:"bytes,3,rep,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	//
+	// Deprecated: Marked as deprecated in envoy/extensions/filters/http/compressor/v3/compressor.proto.
+	ContentType []string `protobuf:"bytes,3,rep,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
+	// Allows specifying which content types yield compression using
+	// envoy.type.matcher.v3.StringMatcher.
+	//
+	// When this field is specified, the default content type list is not used.
+	// If both “content_type“ and “content_type_matcher“ are specified,
+	// “content_type_matcher“ takes precedence and the deprecated “content_type“
+	// field is ignored.
+	ContentTypeMatcher []*v31.StringMatcher `protobuf:"bytes,4,rep,name=content_type_matcher,json=contentTypeMatcher,proto3" json:"content_type_matcher,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *Compressor_CommonDirectionConfig) Reset() {
@@ -459,9 +472,17 @@ func (x *Compressor_CommonDirectionConfig) GetMinContentLength() *wrapperspb.UIn
 	return nil
 }
 
+// Deprecated: Marked as deprecated in envoy/extensions/filters/http/compressor/v3/compressor.proto.
 func (x *Compressor_CommonDirectionConfig) GetContentType() []string {
 	if x != nil {
 		return x.ContentType
+	}
+	return nil
+}
+
+func (x *Compressor_CommonDirectionConfig) GetContentTypeMatcher() []*v31.StringMatcher {
+	if x != nil {
+		return x.ContentTypeMatcher
 	}
 	return nil
 }
@@ -630,7 +651,7 @@ var File_envoy_extensions_filters_http_compressor_v3_compressor_proto protorefle
 
 const file_envoy_extensions_filters_http_compressor_v3_compressor_proto_rawDesc = "" +
 	"\n" +
-	"<envoy/extensions/filters/http/compressor/v3/compressor.proto\x12+envoy.extensions.filters.http.compressor.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a$envoy/config/core/v3/extension.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\x82\r\n" +
+	"<envoy/extensions/filters/http/compressor/v3/compressor.proto\x12+envoy.extensions.filters.http.compressor.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a$envoy/config/core/v3/extension.proto\x1a\"envoy/type/matcher/v3/string.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xe7\r\n" +
 	"\n" +
 	"Compressor\x12P\n" +
 	"\x0econtent_length\x18\x01 \x01(\v2\x1c.google.protobuf.UInt32ValueB\v\x92ǆ\xd8\x04\x033.0\x18\x01R\rcontentLength\x12.\n" +
@@ -641,11 +662,12 @@ const file_envoy_extensions_filters_http_compressor_v3_compressor_proto_rawDesc 
 	"\x12compressor_library\x18\x06 \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x11compressorLibrary\x12\x88\x01\n" +
 	"\x18request_direction_config\x18\a \x01(\v2N.envoy.extensions.filters.http.compressor.v3.Compressor.RequestDirectionConfigR\x16requestDirectionConfig\x12\x8b\x01\n" +
 	"\x19response_direction_config\x18\b \x01(\v2O.envoy.extensions.filters.http.compressor.v3.Compressor.ResponseDirectionConfigR\x17responseDirectionConfig\x12!\n" +
-	"\fchoose_first\x18\t \x01(\bR\vchooseFirst\x1a\xca\x01\n" +
+	"\fchoose_first\x18\t \x01(\bR\vchooseFirst\x1a\xaf\x02\n" +
 	"\x15CommonDirectionConfig\x12B\n" +
 	"\aenabled\x18\x01 \x01(\v2(.envoy.config.core.v3.RuntimeFeatureFlagR\aenabled\x12J\n" +
-	"\x12min_content_length\x18\x02 \x01(\v2\x1c.google.protobuf.UInt32ValueR\x10minContentLength\x12!\n" +
-	"\fcontent_type\x18\x03 \x03(\tR\vcontentType\x1a\x8c\x01\n" +
+	"\x12min_content_length\x18\x02 \x01(\v2\x1c.google.protobuf.UInt32ValueR\x10minContentLength\x12.\n" +
+	"\fcontent_type\x18\x03 \x03(\tB\v\x92ǆ\xd8\x04\x033.0\x18\x01R\vcontentType\x12V\n" +
+	"\x14content_type_matcher\x18\x04 \x03(\v2$.envoy.type.matcher.v3.StringMatcherR\x12contentTypeMatcher\x1a\x8c\x01\n" +
 	"\x16RequestDirectionConfig\x12r\n" +
 	"\rcommon_config\x18\x01 \x01(\v2M.envoy.extensions.filters.http.compressor.v3.Compressor.CommonDirectionConfigR\fcommonConfig\x1a\xc8\x03\n" +
 	"\x17ResponseDirectionConfig\x12r\n" +
@@ -692,6 +714,7 @@ var file_envoy_extensions_filters_http_compressor_v3_compressor_proto_goTypes = 
 	(*v3.RuntimeFeatureFlag)(nil),              // 8: envoy.config.core.v3.RuntimeFeatureFlag
 	(*v3.TypedExtensionConfig)(nil),            // 9: envoy.config.core.v3.TypedExtensionConfig
 	(*wrapperspb.BoolValue)(nil),               // 10: google.protobuf.BoolValue
+	(*v31.StringMatcher)(nil),                  // 11: envoy.type.matcher.v3.StringMatcher
 }
 var file_envoy_extensions_filters_http_compressor_v3_compressor_proto_depIdxs = []int32{
 	7,  // 0: envoy.extensions.filters.http.compressor.v3.Compressor.content_length:type_name -> google.protobuf.UInt32Value
@@ -705,13 +728,14 @@ var file_envoy_extensions_filters_http_compressor_v3_compressor_proto_depIdxs = 
 	2,  // 8: envoy.extensions.filters.http.compressor.v3.CompressorPerRoute.overrides:type_name -> envoy.extensions.filters.http.compressor.v3.CompressorOverrides
 	8,  // 9: envoy.extensions.filters.http.compressor.v3.Compressor.CommonDirectionConfig.enabled:type_name -> envoy.config.core.v3.RuntimeFeatureFlag
 	7,  // 10: envoy.extensions.filters.http.compressor.v3.Compressor.CommonDirectionConfig.min_content_length:type_name -> google.protobuf.UInt32Value
-	4,  // 11: envoy.extensions.filters.http.compressor.v3.Compressor.RequestDirectionConfig.common_config:type_name -> envoy.extensions.filters.http.compressor.v3.Compressor.CommonDirectionConfig
-	4,  // 12: envoy.extensions.filters.http.compressor.v3.Compressor.ResponseDirectionConfig.common_config:type_name -> envoy.extensions.filters.http.compressor.v3.Compressor.CommonDirectionConfig
-	13, // [13:13] is the sub-list for method output_type
-	13, // [13:13] is the sub-list for method input_type
-	13, // [13:13] is the sub-list for extension type_name
-	13, // [13:13] is the sub-list for extension extendee
-	0,  // [0:13] is the sub-list for field type_name
+	11, // 11: envoy.extensions.filters.http.compressor.v3.Compressor.CommonDirectionConfig.content_type_matcher:type_name -> envoy.type.matcher.v3.StringMatcher
+	4,  // 12: envoy.extensions.filters.http.compressor.v3.Compressor.RequestDirectionConfig.common_config:type_name -> envoy.extensions.filters.http.compressor.v3.Compressor.CommonDirectionConfig
+	4,  // 13: envoy.extensions.filters.http.compressor.v3.Compressor.ResponseDirectionConfig.common_config:type_name -> envoy.extensions.filters.http.compressor.v3.Compressor.CommonDirectionConfig
+	14, // [14:14] is the sub-list for method output_type
+	14, // [14:14] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_http_compressor_v3_compressor_proto_init() }
