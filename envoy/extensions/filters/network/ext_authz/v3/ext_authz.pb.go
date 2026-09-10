@@ -28,8 +28,9 @@ const (
 // External Authorization filter calls out to an external service over the
 // gRPC Authorization API defined by
 // :ref:`CheckRequest <envoy_v3_api_msg_service.auth.v3.CheckRequest>`.
-// A failed check will cause this filter to close the TCP connection.
-// [#next-free-field: 12]
+// A failed check will cause this filter to close the TCP connection, unless “shadow_mode“ is
+// enabled.
+// [#next-free-field: 13]
 type ExtAuthz struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The prefix to use when emitting statistics.
@@ -89,8 +90,16 @@ type ExtAuthz struct {
 	// This works similarly to “metadata_context_namespaces“ but allows Envoy and the ext_authz server to share
 	// the protobuf message definition in order to perform safe parsing.
 	TypedMetadataContextNamespaces []string `protobuf:"bytes,11,rep,name=typed_metadata_context_namespaces,json=typedMetadataContextNamespaces,proto3" json:"typed_metadata_context_namespaces,omitempty"`
-	unknownFields                  protoimpl.UnknownFields
-	sizeCache                      protoimpl.SizeCache
+	// When set to “true“, the filter operates in shadow mode. The filter still calls the external
+	// authorization service but never closes the connection. The authorization decision is instead
+	// recorded in the connection's :ref:`FilterState <arch_overview_data_sharing_between_filters>`
+	// under the key “envoy.filters.network.ext_authz“ so that a subsequent filter can read and
+	// optionally enforce it.
+	//
+	// Defaults to “false“.
+	ShadowMode    bool `protobuf:"varint,12,opt,name=shadow_mode,json=shadowMode,proto3" json:"shadow_mode,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ExtAuthz) Reset() {
@@ -200,11 +209,18 @@ func (x *ExtAuthz) GetTypedMetadataContextNamespaces() []string {
 	return nil
 }
 
+func (x *ExtAuthz) GetShadowMode() bool {
+	if x != nil {
+		return x.ShadowMode
+	}
+	return false
+}
+
 var File_envoy_extensions_filters_network_ext_authz_v3_ext_authz_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_filters_network_ext_authz_v3_ext_authz_proto_rawDesc = "" +
 	"\n" +
-	"=envoy/extensions/filters/network/ext_authz/v3/ext_authz.proto\x12-envoy.extensions.filters.network.ext_authz.v3\x1a(envoy/config/core/v3/config_source.proto\x1a'envoy/config/core/v3/grpc_service.proto\x1a$envoy/type/matcher/v3/metadata.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\x92\x06\n" +
+	"=envoy/extensions/filters/network/ext_authz/v3/ext_authz.proto\x12-envoy.extensions.filters.network.ext_authz.v3\x1a(envoy/config/core/v3/config_source.proto\x1a'envoy/config/core/v3/grpc_service.proto\x1a$envoy/type/matcher/v3/metadata.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xb3\x06\n" +
 	"\bExtAuthz\x12(\n" +
 	"\vstat_prefix\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\n" +
 	"statPrefix\x12D\n" +
@@ -218,7 +234,9 @@ const file_envoy_extensions_filters_network_ext_authz_v3_ext_authz_proto_rawDesc
 	"\x18send_tls_alert_on_denial\x18\t \x01(\bR\x14sendTlsAlertOnDenial\x12>\n" +
 	"\x1bmetadata_context_namespaces\x18\n" +
 	" \x03(\tR\x19metadataContextNamespaces\x12I\n" +
-	"!typed_metadata_context_namespaces\x18\v \x03(\tR\x1etypedMetadataContextNamespaces:8\x9aň\x1e3\n" +
+	"!typed_metadata_context_namespaces\x18\v \x03(\tR\x1etypedMetadataContextNamespaces\x12\x1f\n" +
+	"\vshadow_mode\x18\f \x01(\bR\n" +
+	"shadowMode:8\x9aň\x1e3\n" +
 	"1envoy.config.filter.network.ext_authz.v2.ExtAuthzB\xb8\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	";io.envoyproxy.envoy.extensions.filters.network.ext_authz.v3B\rExtAuthzProtoP\x01Z`github.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/ext_authz/v3;ext_authzv3b\x06proto3"
 

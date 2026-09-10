@@ -49,6 +49,16 @@ func (m *ExtAuthz) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.ShadowMode {
+		i--
+		if m.ShadowMode {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x60
+	}
 	if len(m.TypedMetadataContextNamespaces) > 0 {
 		for iNdEx := len(m.TypedMetadataContextNamespaces) - 1; iNdEx >= 0; iNdEx-- {
 			i -= len(m.TypedMetadataContextNamespaces[iNdEx])
@@ -233,6 +243,9 @@ func (m *ExtAuthz) SizeVT() (n int) {
 			l = len(s)
 			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 		}
+	}
+	if m.ShadowMode {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n
