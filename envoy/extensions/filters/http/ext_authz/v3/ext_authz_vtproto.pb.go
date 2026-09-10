@@ -51,6 +51,18 @@ func (m *ExtAuthz) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.EmitClientSpan != nil {
+		size, err := (*wrapperspb.BoolValue)(m.EmitClientSpan).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x2
+		i--
+		dAtA[i] = 0x8a
+	}
 	if m.ShadowMode {
 		i--
 		if m.ShadowMode {
@@ -1089,6 +1101,16 @@ func (m *CheckSettings) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.EmitClientSpan != nil {
+		size, err := (*wrapperspb.BoolValue)(m.EmitClientSpan).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x32
+	}
 	if msg, ok := m.ServiceOverride.(*CheckSettings_HttpService); ok {
 		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -1365,6 +1387,10 @@ func (m *ExtAuthz) SizeVT() (n int) {
 	}
 	if m.ShadowMode {
 		n += 3
+	}
+	if m.EmitClientSpan != nil {
+		l = (*wrapperspb.BoolValue)(m.EmitClientSpan).SizeVT()
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
@@ -1648,6 +1674,10 @@ func (m *CheckSettings) SizeVT() (n int) {
 	}
 	if vtmsg, ok := m.ServiceOverride.(interface{ SizeVT() int }); ok {
 		n += vtmsg.SizeVT()
+	}
+	if m.EmitClientSpan != nil {
+		l = (*wrapperspb.BoolValue)(m.EmitClientSpan).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n

@@ -83,7 +83,7 @@ func (ShadowDecision_CheckResult) EnumDescriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_http_ext_authz_v3_ext_authz_proto_rawDescGZIP(), []int{1, 0}
 }
 
-// [#next-free-field: 33]
+// [#next-free-field: 34]
 type ExtAuthz struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// External authorization service configuration.
@@ -413,9 +413,15 @@ type ExtAuthz struct {
 	// request as usual.
 	//
 	// Defaults to “false“.
-	ShadowMode    bool `protobuf:"varint,32,opt,name=shadow_mode,json=shadowMode,proto3" json:"shadow_mode,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	ShadowMode bool `protobuf:"varint,32,opt,name=shadow_mode,json=shadowMode,proto3" json:"shadow_mode,omitempty"`
+	// Whether to emit client-side spans for external authorization requests (e.g. gRPC or HTTP calls).
+	// When set to false, client-side egress spans will not be emitted/exported to trace collectors,
+	// but trace context (e.g. “traceparent“) will still be propagated to the authorization server.
+	//
+	// If unset, defaults to “true“.
+	EmitClientSpan *wrapperspb.BoolValue `protobuf:"bytes,33,opt,name=emit_client_span,json=emitClientSpan,proto3" json:"emit_client_span,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *ExtAuthz) Reset() {
@@ -674,6 +680,13 @@ func (x *ExtAuthz) GetShadowMode() bool {
 		return x.ShadowMode
 	}
 	return false
+}
+
+func (x *ExtAuthz) GetEmitClientSpan() *wrapperspb.BoolValue {
+	if x != nil {
+		return x.EmitClientSpan
+	}
+	return nil
 }
 
 type isExtAuthz_Services interface {
@@ -1258,7 +1271,7 @@ func (*ExtAuthzPerRoute_Disabled) isExtAuthzPerRoute_Override() {}
 func (*ExtAuthzPerRoute_CheckSettings) isExtAuthzPerRoute_Override() {}
 
 // Extra settings for the check request.
-// [#next-free-field: 6]
+// [#next-free-field: 7]
 type CheckSettings struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Context extensions to set on the CheckRequest's
@@ -1302,8 +1315,10 @@ type CheckSettings struct {
 	//	*CheckSettings_GrpcService
 	//	*CheckSettings_HttpService
 	ServiceOverride isCheckSettings_ServiceOverride `protobuf_oneof:"service_override"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// Overrides the filter-level “emit_client_span“ setting for this route.
+	EmitClientSpan *wrapperspb.BoolValue `protobuf:"bytes,6,opt,name=emit_client_span,json=emitClientSpan,proto3" json:"emit_client_span,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *CheckSettings) Reset() {
@@ -1382,6 +1397,13 @@ func (x *CheckSettings) GetHttpService() *HttpService {
 	return nil
 }
 
+func (x *CheckSettings) GetEmitClientSpan() *wrapperspb.BoolValue {
+	if x != nil {
+		return x.EmitClientSpan
+	}
+	return nil
+}
+
 type isCheckSettings_ServiceOverride interface {
 	isCheckSettings_ServiceOverride()
 }
@@ -1404,7 +1426,7 @@ var File_envoy_extensions_filters_http_ext_authz_v3_ext_authz_proto protoreflect
 
 const file_envoy_extensions_filters_http_ext_authz_v3_ext_authz_proto_rawDesc = "" +
 	"\n" +
-	":envoy/extensions/filters/http/ext_authz/v3/ext_authz.proto\x12*envoy.extensions.filters.http.ext_authz.v3\x1a:envoy/config/common/mutation_rules/v3/mutation_rules.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a'envoy/config/core/v3/grpc_service.proto\x1a#envoy/config/core/v3/http_uri.proto\x1a$envoy/type/matcher/v3/metadata.proto\x1a\"envoy/type/matcher/v3/string.proto\x1a\x1fenvoy/type/v3/http_status.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a udpa/annotations/sensitive.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\x9f\x12\n" +
+	":envoy/extensions/filters/http/ext_authz/v3/ext_authz.proto\x12*envoy.extensions.filters.http.ext_authz.v3\x1a:envoy/config/common/mutation_rules/v3/mutation_rules.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a'envoy/config/core/v3/grpc_service.proto\x1a#envoy/config/core/v3/http_uri.proto\x1a$envoy/type/matcher/v3/metadata.proto\x1a\"envoy/type/matcher/v3/string.proto\x1a\x1fenvoy/type/v3/http_status.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a udpa/annotations/sensitive.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xe5\x12\n" +
 	"\bExtAuthz\x12F\n" +
 	"\fgrpc_service\x18\x01 \x01(\v2!.envoy.config.core.v3.GrpcServiceH\x00R\vgrpcService\x12\\\n" +
 	"\fhttp_service\x18\x03 \x01(\v27.envoy.extensions.filters.http.ext_authz.v3.HttpServiceH\x00R\vhttpService\x12^\n" +
@@ -1439,7 +1461,8 @@ const file_envoy_extensions_filters_http_ext_authz_v3_ext_authz_proto_rawDesc = 
 	"\x1emax_denied_response_body_bytes\x18\x1e \x01(\rR\x1amaxDeniedResponseBodyBytes\x12C\n" +
 	"\x1eenforce_response_header_limits\x18\x1f \x01(\bR\x1benforceResponseHeaderLimits\x12\x1f\n" +
 	"\vshadow_mode\x18  \x01(\bR\n" +
-	"shadowMode:5\x9aň\x1e0\n" +
+	"shadowMode\x12D\n" +
+	"\x10emit_client_span\x18! \x01(\v2\x1a.google.protobuf.BoolValueR\x0eemitClientSpan:5\x9aň\x1e0\n" +
 	".envoy.config.filter.http.ext_authz.v3.ExtAuthzB\n" +
 	"\n" +
 	"\bservicesJ\x04\b\x04\x10\x05R\tuse_alpha\"\xb7\x02\n" +
@@ -1485,13 +1508,14 @@ const file_envoy_extensions_filters_http_ext_authz_v3_ext_authz_proto_rawDesc = 
 	"\bdisabled\x18\x01 \x01(\bH\x00R\bdisabled\x12l\n" +
 	"\x0echeck_settings\x18\x02 \x01(\v29.envoy.extensions.filters.http.ext_authz.v3.CheckSettingsB\b\xfaB\x05\x8a\x01\x02\x10\x01H\x00R\rcheckSettings:=\x9aň\x1e8\n" +
 	"6envoy.config.filter.http.ext_authz.v2.ExtAuthzPerRouteB\x0f\n" +
-	"\boverride\x12\x03\xf8B\x01\"\x82\x05\n" +
+	"\boverride\x12\x03\xf8B\x01\"\xc8\x05\n" +
 	"\rCheckSettings\x12\x87\x01\n" +
 	"\x12context_extensions\x18\x01 \x03(\v2P.envoy.extensions.filters.http.ext_authz.v3.CheckSettings.ContextExtensionsEntryB\x06\xb8\xb7\x8b\xa4\x02\x01R\x11contextExtensions\x12C\n" +
 	"\x1edisable_request_body_buffering\x18\x02 \x01(\bR\x1bdisableRequestBodyBuffering\x12f\n" +
 	"\x11with_request_body\x18\x03 \x01(\v2:.envoy.extensions.filters.http.ext_authz.v3.BufferSettingsR\x0fwithRequestBody\x12F\n" +
 	"\fgrpc_service\x18\x04 \x01(\v2!.envoy.config.core.v3.GrpcServiceH\x00R\vgrpcService\x12\\\n" +
-	"\fhttp_service\x18\x05 \x01(\v27.envoy.extensions.filters.http.ext_authz.v3.HttpServiceH\x00R\vhttpService\x1aD\n" +
+	"\fhttp_service\x18\x05 \x01(\v27.envoy.extensions.filters.http.ext_authz.v3.HttpServiceH\x00R\vhttpService\x12D\n" +
+	"\x10emit_client_span\x18\x06 \x01(\v2\x1a.google.protobuf.BoolValueR\x0eemitClientSpan\x1aD\n" +
 	"\x16ContextExtensionsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01::\x9aň\x1e5\n" +
@@ -1553,29 +1577,31 @@ var file_envoy_extensions_filters_http_ext_authz_v3_ext_authz_proto_depIdxs = []
 	18, // 11: envoy.extensions.filters.http.ext_authz.v3.ExtAuthz.decoder_header_mutation_rules:type_name -> envoy.config.common.mutation_rules.v3.HeaderMutationRules
 	17, // 12: envoy.extensions.filters.http.ext_authz.v3.ExtAuthz.enable_dynamic_metadata_ingestion:type_name -> google.protobuf.BoolValue
 	19, // 13: envoy.extensions.filters.http.ext_authz.v3.ExtAuthz.filter_metadata:type_name -> google.protobuf.Struct
-	0,  // 14: envoy.extensions.filters.http.ext_authz.v3.ShadowDecision.check_result:type_name -> envoy.extensions.filters.http.ext_authz.v3.ShadowDecision.CheckResult
-	20, // 15: envoy.extensions.filters.http.ext_authz.v3.ShadowDecision.response_headers:type_name -> envoy.config.core.v3.HeaderValue
-	21, // 16: envoy.extensions.filters.http.ext_authz.v3.HttpService.server_uri:type_name -> envoy.config.core.v3.HttpUri
-	5,  // 17: envoy.extensions.filters.http.ext_authz.v3.HttpService.authorization_request:type_name -> envoy.extensions.filters.http.ext_authz.v3.AuthorizationRequest
-	6,  // 18: envoy.extensions.filters.http.ext_authz.v3.HttpService.authorization_response:type_name -> envoy.extensions.filters.http.ext_authz.v3.AuthorizationResponse
-	22, // 19: envoy.extensions.filters.http.ext_authz.v3.HttpService.retry_policy:type_name -> envoy.config.core.v3.RetryPolicy
-	16, // 20: envoy.extensions.filters.http.ext_authz.v3.AuthorizationRequest.allowed_headers:type_name -> envoy.type.matcher.v3.ListStringMatcher
-	20, // 21: envoy.extensions.filters.http.ext_authz.v3.AuthorizationRequest.headers_to_add:type_name -> envoy.config.core.v3.HeaderValue
-	16, // 22: envoy.extensions.filters.http.ext_authz.v3.AuthorizationResponse.allowed_upstream_headers:type_name -> envoy.type.matcher.v3.ListStringMatcher
-	16, // 23: envoy.extensions.filters.http.ext_authz.v3.AuthorizationResponse.allowed_upstream_headers_to_append:type_name -> envoy.type.matcher.v3.ListStringMatcher
-	16, // 24: envoy.extensions.filters.http.ext_authz.v3.AuthorizationResponse.allowed_client_headers:type_name -> envoy.type.matcher.v3.ListStringMatcher
-	16, // 25: envoy.extensions.filters.http.ext_authz.v3.AuthorizationResponse.allowed_client_headers_on_success:type_name -> envoy.type.matcher.v3.ListStringMatcher
-	16, // 26: envoy.extensions.filters.http.ext_authz.v3.AuthorizationResponse.dynamic_metadata_from_headers:type_name -> envoy.type.matcher.v3.ListStringMatcher
-	8,  // 27: envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute.check_settings:type_name -> envoy.extensions.filters.http.ext_authz.v3.CheckSettings
-	9,  // 28: envoy.extensions.filters.http.ext_authz.v3.CheckSettings.context_extensions:type_name -> envoy.extensions.filters.http.ext_authz.v3.CheckSettings.ContextExtensionsEntry
-	3,  // 29: envoy.extensions.filters.http.ext_authz.v3.CheckSettings.with_request_body:type_name -> envoy.extensions.filters.http.ext_authz.v3.BufferSettings
-	10, // 30: envoy.extensions.filters.http.ext_authz.v3.CheckSettings.grpc_service:type_name -> envoy.config.core.v3.GrpcService
-	4,  // 31: envoy.extensions.filters.http.ext_authz.v3.CheckSettings.http_service:type_name -> envoy.extensions.filters.http.ext_authz.v3.HttpService
-	32, // [32:32] is the sub-list for method output_type
-	32, // [32:32] is the sub-list for method input_type
-	32, // [32:32] is the sub-list for extension type_name
-	32, // [32:32] is the sub-list for extension extendee
-	0,  // [0:32] is the sub-list for field type_name
+	17, // 14: envoy.extensions.filters.http.ext_authz.v3.ExtAuthz.emit_client_span:type_name -> google.protobuf.BoolValue
+	0,  // 15: envoy.extensions.filters.http.ext_authz.v3.ShadowDecision.check_result:type_name -> envoy.extensions.filters.http.ext_authz.v3.ShadowDecision.CheckResult
+	20, // 16: envoy.extensions.filters.http.ext_authz.v3.ShadowDecision.response_headers:type_name -> envoy.config.core.v3.HeaderValue
+	21, // 17: envoy.extensions.filters.http.ext_authz.v3.HttpService.server_uri:type_name -> envoy.config.core.v3.HttpUri
+	5,  // 18: envoy.extensions.filters.http.ext_authz.v3.HttpService.authorization_request:type_name -> envoy.extensions.filters.http.ext_authz.v3.AuthorizationRequest
+	6,  // 19: envoy.extensions.filters.http.ext_authz.v3.HttpService.authorization_response:type_name -> envoy.extensions.filters.http.ext_authz.v3.AuthorizationResponse
+	22, // 20: envoy.extensions.filters.http.ext_authz.v3.HttpService.retry_policy:type_name -> envoy.config.core.v3.RetryPolicy
+	16, // 21: envoy.extensions.filters.http.ext_authz.v3.AuthorizationRequest.allowed_headers:type_name -> envoy.type.matcher.v3.ListStringMatcher
+	20, // 22: envoy.extensions.filters.http.ext_authz.v3.AuthorizationRequest.headers_to_add:type_name -> envoy.config.core.v3.HeaderValue
+	16, // 23: envoy.extensions.filters.http.ext_authz.v3.AuthorizationResponse.allowed_upstream_headers:type_name -> envoy.type.matcher.v3.ListStringMatcher
+	16, // 24: envoy.extensions.filters.http.ext_authz.v3.AuthorizationResponse.allowed_upstream_headers_to_append:type_name -> envoy.type.matcher.v3.ListStringMatcher
+	16, // 25: envoy.extensions.filters.http.ext_authz.v3.AuthorizationResponse.allowed_client_headers:type_name -> envoy.type.matcher.v3.ListStringMatcher
+	16, // 26: envoy.extensions.filters.http.ext_authz.v3.AuthorizationResponse.allowed_client_headers_on_success:type_name -> envoy.type.matcher.v3.ListStringMatcher
+	16, // 27: envoy.extensions.filters.http.ext_authz.v3.AuthorizationResponse.dynamic_metadata_from_headers:type_name -> envoy.type.matcher.v3.ListStringMatcher
+	8,  // 28: envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute.check_settings:type_name -> envoy.extensions.filters.http.ext_authz.v3.CheckSettings
+	9,  // 29: envoy.extensions.filters.http.ext_authz.v3.CheckSettings.context_extensions:type_name -> envoy.extensions.filters.http.ext_authz.v3.CheckSettings.ContextExtensionsEntry
+	3,  // 30: envoy.extensions.filters.http.ext_authz.v3.CheckSettings.with_request_body:type_name -> envoy.extensions.filters.http.ext_authz.v3.BufferSettings
+	10, // 31: envoy.extensions.filters.http.ext_authz.v3.CheckSettings.grpc_service:type_name -> envoy.config.core.v3.GrpcService
+	4,  // 32: envoy.extensions.filters.http.ext_authz.v3.CheckSettings.http_service:type_name -> envoy.extensions.filters.http.ext_authz.v3.HttpService
+	17, // 33: envoy.extensions.filters.http.ext_authz.v3.CheckSettings.emit_client_span:type_name -> google.protobuf.BoolValue
+	34, // [34:34] is the sub-list for method output_type
+	34, // [34:34] is the sub-list for method input_type
+	34, // [34:34] is the sub-list for extension type_name
+	34, // [34:34] is the sub-list for extension extendee
+	0,  // [0:34] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_http_ext_authz_v3_ext_authz_proto_init() }
