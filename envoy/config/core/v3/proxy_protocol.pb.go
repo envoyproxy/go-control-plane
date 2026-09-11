@@ -349,7 +349,8 @@ func (x *ProxyProtocolConfig) GetAddedTlvs() []*TlvEntry {
 
 type PerHostConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Enables per-host configuration for Proxy Protocol.
+	// Enables per-host configuration for Proxy Protocol. Only the static “value“ of each
+	// “TlvEntry“ is applied to host-level TLVs. The “format_string“ field is not evaluated here.
 	AddedTlvs     []*TlvEntry `protobuf:"bytes,1,rep,name=added_tlvs,json=addedTlvs,proto3" json:"added_tlvs,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
