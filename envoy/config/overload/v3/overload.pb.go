@@ -490,8 +490,10 @@ func (x *ShrinkHeapConfig) GetMaxUnfreedMemoryBytes() *wrapperspb.UInt64Value {
 
 type OverloadAction struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The name of the overload action. This is just a well-known string that
-	// listeners can use for registering callbacks.
+	// The action name. Most actions use a well-known string for listener callback registration.
+	// “ScaleTimersOverloadActionConfig“ actions may use unique custom names for independently
+	// triggered “reduce_timeouts“ instances. Custom names must not use the reserved
+	// “envoy.overload_actions.“ prefix. No action name may duplicate a “LoadShedPoint“ name.
 	// Valid known overload actions include:
 	// - envoy.overload_actions.stop_accepting_requests
 	// - envoy.overload_actions.disable_http_keepalive
@@ -509,7 +511,10 @@ type OverloadAction struct {
 	// <envoy_v3_api_field_config.overload.v3.Trigger.name>` must be unique
 	// in this list.
 	Triggers []*Trigger `protobuf:"bytes,2,rep,name=triggers,proto3" json:"triggers,omitempty"`
-	// Configuration for the action being instantiated if applicable.
+	// Optional implementation configuration. Well-known names identify the action directly; for a
+	// custom name, this configuration's type identifies it. Currently only
+	// “ScaleTimersOverloadActionConfig“ supports custom names, identifying a “reduce_timeouts“
+	// instance.
 	TypedConfig   *anypb.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3" json:"typed_config,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
