@@ -9,6 +9,7 @@
 - Added support for thrift route config type on server resources (#600)
 - Programmatic ADS client that supports communication with an xDS management server (#604)
 - Added cache support for custom resource names with delta xDS (#609)
+- Added support for the FilterChain resource type for Filter Chain Discovery Service (FCDS)
 
 ### Changed
 

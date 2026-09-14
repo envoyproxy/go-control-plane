@@ -37,6 +37,7 @@ const (
 	listenerName        = "listener0"
 	scopedListenerName  = "scopedListener0"
 	virtualHostName     = "virtualHost0"
+	filterChainName     = "filterChain0"
 	runtimeName         = "runtime0"
 	tlsName             = "secret0"
 	rootName            = "root0"
@@ -50,6 +51,7 @@ var (
 	testEmbeddedRoute   = resource.MakeRouteConfig(embeddedRouteName, clusterName)
 	testScopedRoute     = resource.MakeScopedRouteConfig(scopedRouteName, routeName, []string{"1.2.3.4"})
 	testVirtualHost     = resource.MakeVirtualHost(virtualHostName, clusterName)
+	testFilterChain     = resource.MakeFilterChain(resource.Ads, filterChainName, routeName)
 	testListener        = resource.MakeRouteHTTPListener(resource.Ads, listenerName, 80, routeName)
 	testListenerDefault = resource.MakeRouteHTTPListenerDefaultFilterChain(resource.Ads, listenerName, 80, routeName)
 	testScopedListener  = resource.MakeScopedRouteHTTPListenerForRoute(resource.Ads, scopedListenerName, 80, embeddedRouteName)
@@ -64,6 +66,7 @@ func TestValidate(t *testing.T) {
 	require.NoError(t, testRoute.Validate())
 	require.NoError(t, testScopedRoute.Validate())
 	require.NoError(t, testVirtualHost.Validate())
+	require.NoError(t, testFilterChain.Validate())
 	require.NoError(t, testListener.Validate())
 	require.NoError(t, testScopedListener.Validate())
 	require.NoError(t, testRuntime.Validate())
@@ -104,6 +107,8 @@ func TestGetResourceName(t *testing.T) {
 	assert.Equalf(t, scopedRouteName, name, "GetResourceName(%v) => got %q, want %q", testScopedRoute, name, scopedRouteName)
 	name = cache.GetResourceName(testVirtualHost)
 	assert.Equalf(t, virtualHostName, name, "GetResourceName(%v) => got %q, want %q", testVirtualHost, name, virtualHostName)
+	name = cache.GetResourceName(testFilterChain)
+	assert.Equalf(t, filterChainName, name, "GetResourceName(%v) => got %q, want %q", testFilterChain, name, filterChainName)
 	name = cache.GetResourceName(testListener)
 	assert.Equalf(t, listenerName, name, "GetResourceName(%v) => got %q, want %q", testListener, name, listenerName)
 	name = cache.GetResourceName(testRuntime)
@@ -112,6 +117,22 @@ func TestGetResourceName(t *testing.T) {
 	assert.Equalf(t, customName, name, "GetResourceName(nil) => got %q, want %q", name, customName)
 	name = cache.GetResourceName(nil)
 	assert.Emptyf(t, name, "GetResourceName(nil) => got %q, want none", name)
+}
+
+func TestFilterChainResponseType(t *testing.T) {
+	assert.Equal(t, types.FilterChain, cache.GetResponseType(rsrc.FilterChainType))
+
+	typeURL, err := cache.GetResponseTypeURL(types.FilterChain)
+	require.NoError(t, err)
+	assert.Equal(t, rsrc.FilterChainType, typeURL)
+}
+
+func TestFilterChainReferences(t *testing.T) {
+	refs := cache.GetResourceReferences(map[string]types.ResourceWithTTL{
+		filterChainName: {Resource: testFilterChain},
+	})
+	require.Contains(t, refs, rsrc.RouteType)
+	assert.True(t, refs[rsrc.RouteType][routeName])
 }
 
 func TestGetResourceNames(t *testing.T) {

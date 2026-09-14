@@ -46,6 +46,8 @@ func GetResponseType(typeURL resource.Type) types.ResponseType {
 		return types.VirtualHost
 	case resource.ListenerType:
 		return types.Listener
+	case resource.FilterChainType:
+		return types.FilterChain
 	case resource.SecretType:
 		return types.Secret
 	case resource.RuntimeType:
@@ -75,6 +77,8 @@ func GetResponseTypeURL(responseType types.ResponseType) (string, error) {
 		return resource.VirtualHostType, nil
 	case types.Listener:
 		return resource.ListenerType, nil
+	case types.FilterChain:
+		return resource.FilterChainType, nil
 	case types.Secret:
 		return resource.SecretType, nil
 	case types.Runtime:
@@ -161,6 +165,7 @@ func GetAllResourceReferences(resourceGroups [types.UnknownType]Resources) map[r
 		types.Cluster:     {},
 		types.Listener:    {},
 		types.ScopedRoute: {},
+		types.FilterChain: {},
 	}
 
 	for responseType, resourceGroup := range resourceGroups {
@@ -192,6 +197,8 @@ func getResourceReferences(resources map[string]types.ResourceWithTTL, out map[r
 			getScopedRouteReferences(v, out)
 		case *listener.Listener:
 			getListenerReferences(v, out)
+		case *listener.FilterChain:
+			getFilterChainReferences(v, out)
 		case *runtime.Runtime:
 			// no dependencies
 		}
@@ -231,6 +238,21 @@ func getListenerReferences(src *listener.Listener, out map[resource.Type]map[str
 	if src.GetDefaultFilterChain() != nil {
 		getListenerReferencesFromChain(src.GetDefaultFilterChain(), routes)
 	}
+
+	if len(routes) > 0 {
+		if _, ok := out[resource.RouteType]; !ok {
+			out[resource.RouteType] = map[string]bool{}
+		}
+
+		maps.Copy(out[resource.RouteType], routes)
+	}
+}
+
+// Standalone filter chains distributed via FCDS reference routes the same way a
+// listener's chains do (RDS route names and scoped-route names).
+func getFilterChainReferences(src *listener.FilterChain, out map[resource.Type]map[string]bool) {
+	routes := map[string]bool{}
+	getListenerReferencesFromChain(src, routes)
 
 	if len(routes) > 0 {
 		if _, ok := out[resource.RouteType]; !ok {
