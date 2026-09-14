@@ -207,14 +207,15 @@ func (m *ServerInfo) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.SupportedProtocolVersions) > 0 {
-		for iNdEx := len(m.SupportedProtocolVersions) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.SupportedProtocolVersions[iNdEx])
-			copy(dAtA[i:], m.SupportedProtocolVersions[iNdEx])
-			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.SupportedProtocolVersions[iNdEx])))
-			i--
-			dAtA[i] = 0xa
+	if m.MaxSupportedProtocolVersion != nil {
+		size, err := (*wrapperspb.StringValue)(m.MaxSupportedProtocolVersion).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
 		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -799,11 +800,9 @@ func (m *ServerInfo) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
-	if len(m.SupportedProtocolVersions) > 0 {
-		for _, s := range m.SupportedProtocolVersions {
-			l = len(s)
-			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
-		}
+	if m.MaxSupportedProtocolVersion != nil {
+		l = (*wrapperspb.StringValue)(m.MaxSupportedProtocolVersion).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	l = len(m.Description)
 	if l > 0 {

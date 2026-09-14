@@ -375,17 +375,15 @@ func (*TraceContextExtractionOptions) Descriptor() ([]byte, []int) {
 // Configuration for the server metadata.
 type ServerInfo struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// [#not-implemented-hide:]
-	// [#comment:TODO(guoyilin42): Implement supported_protocol_versions]
-	// Lists the MCP protocol versions supported by this MCP endpoint.
+	// The maximum MCP protocol version supported by this MCP endpoint.
 	//
-	//   - If provided: The extension enforces version negotiation according to the MCP specification:
-	//     https://modelcontextprotocol.io/specification/2025-11-25/basic/lifecycle#version-negotiation
-	//   - If not provided: The extension accepts any version sent by the client during negotiation and
-	//     skips validation of the mcp-protocol-version header on subsequent requests.
+	// Supported values are “2025-11-25“ and “2026-07-28“. Versions prior
+	// to “2025-11-25“ are rejected because the filter unconditionally supports features
+	// up to “2025-11-25“ and does not support downgrading below that baseline.
+	// If not provided: Defaults to “2025-11-25“.
 	//
-	// Example values: ["2025-11-25", "2025-06-18"]
-	SupportedProtocolVersions []string `protobuf:"bytes,1,rep,name=supported_protocol_versions,json=supportedProtocolVersions,proto3" json:"supported_protocol_versions,omitempty"`
+	// Example value: "2026-07-28"
+	MaxSupportedProtocolVersion *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=max_supported_protocol_version,json=maxSupportedProtocolVersion,proto3" json:"max_supported_protocol_version,omitempty"`
 	// [#not-implemented-hide:]
 	// [#comment:TODO(guoyilin42): Implement description]
 	// Optional description of the server.
@@ -394,9 +392,9 @@ type ServerInfo struct {
 	//
 	//   - If provided: The extension uses this version as the fallback protocol version.
 	//   - If not provided: The extension uses the fallback protocol version defined in the latest MCP
-	//     specification. For example, the current latest 2025-11-25 specification designates "2025-03-26"
+	//     specification. For example, the current latest 2026-07-28 specification designates "2025-03-26"
 	//     as the fallback protocol version.
-	//     See https://modelcontextprotocol.io/specification/2025-11-25/basic/transports#protocol-version-header
+	//     See https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http#protocol-version-header
 	FallbackProtocolVersion *wrapperspb.StringValue `protobuf:"bytes,3,opt,name=fallback_protocol_version,json=fallbackProtocolVersion,proto3" json:"fallback_protocol_version,omitempty"`
 	unknownFields           protoimpl.UnknownFields
 	sizeCache               protoimpl.SizeCache
@@ -432,9 +430,9 @@ func (*ServerInfo) Descriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *ServerInfo) GetSupportedProtocolVersions() []string {
+func (x *ServerInfo) GetMaxSupportedProtocolVersion() *wrapperspb.StringValue {
 	if x != nil {
-		return x.SupportedProtocolVersions
+		return x.MaxSupportedProtocolVersion
 	}
 	return nil
 }
@@ -1103,10 +1101,12 @@ const file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_b
 	"\x12RequestStorageMode\x12\x14\n" +
 	"\x10MODE_UNSPECIFIED\x10\x00\x12\x14\n" +
 	"\x10DYNAMIC_METADATA\x10\x01\"\x1f\n" +
-	"\x1dTraceContextExtractionOptions\"\xc8\x01\n" +
+	"\x1dTraceContextExtractionOptions\"\x8b\x02\n" +
 	"\n" +
-	"ServerInfo\x12>\n" +
-	"\x1bsupported_protocol_versions\x18\x01 \x03(\tR\x19supportedProtocolVersions\x12 \n" +
+	"ServerInfo\x12\x80\x01\n" +
+	"\x1emax_supported_protocol_version\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueB\x1d\xfaB\x1ar\x18R\n" +
+	"2025-11-25R\n" +
+	"2026-07-28R\x1bmaxSupportedProtocolVersion\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12X\n" +
 	"\x19fallback_protocol_version\x18\x03 \x01(\v2\x1c.google.protobuf.StringValueR\x17fallbackProtocolVersion\"\x10\n" +
 	"\x0eToolsListLocal\"\xfb\x03\n" +
@@ -1193,22 +1193,23 @@ var file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bri
 	13, // 3: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.max_response_body_size:type_name -> google.protobuf.UInt32Value
 	0,  // 4: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.request_storage_mode:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.RequestStorageMode
 	3,  // 5: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.trace_context_extraction:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.TraceContextExtractionOptions
-	14, // 6: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerInfo.fallback_protocol_version:type_name -> google.protobuf.StringValue
-	9,  // 7: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tools:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig
-	10, // 8: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tool_list_http_rule:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
-	5,  // 9: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tool_list_local:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListLocal
-	8,  // 10: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.default_server_info:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpServerInfo
-	10, // 11: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.http_rule:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
-	7,  // 12: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.tool_list_config:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListSpecificConfig
-	8,  // 13: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.server_info:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpServerInfo
-	12, // 14: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule.bindings:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule.ParameterBinding
-	6,  // 15: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridgePerRoute.tool_config:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig
-	1,  // 16: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule.ParameterBinding.type:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule.ParameterBinding.Type
-	17, // [17:17] is the sub-list for method output_type
-	17, // [17:17] is the sub-list for method input_type
-	17, // [17:17] is the sub-list for extension type_name
-	17, // [17:17] is the sub-list for extension extendee
-	0,  // [0:17] is the sub-list for field type_name
+	14, // 6: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerInfo.max_supported_protocol_version:type_name -> google.protobuf.StringValue
+	14, // 7: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerInfo.fallback_protocol_version:type_name -> google.protobuf.StringValue
+	9,  // 8: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tools:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig
+	10, // 9: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tool_list_http_rule:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
+	5,  // 10: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tool_list_local:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListLocal
+	8,  // 11: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.default_server_info:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpServerInfo
+	10, // 12: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.http_rule:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
+	7,  // 13: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.tool_list_config:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListSpecificConfig
+	8,  // 14: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.server_info:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpServerInfo
+	12, // 15: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule.bindings:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule.ParameterBinding
+	6,  // 16: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridgePerRoute.tool_config:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig
+	1,  // 17: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule.ParameterBinding.type:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule.ParameterBinding.Type
+	18, // [18:18] is the sub-list for method output_type
+	18, // [18:18] is the sub-list for method input_type
+	18, // [18:18] is the sub-list for extension type_name
+	18, // [18:18] is the sub-list for extension extendee
+	0,  // [0:18] is the sub-list for field type_name
 }
 
 func init() {

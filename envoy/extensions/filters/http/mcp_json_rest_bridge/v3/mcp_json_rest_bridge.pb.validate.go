@@ -423,6 +423,21 @@ func (m *ServerInfo) validate(all bool) error {
 
 	var errors []error
 
+	if wrapper := m.GetMaxSupportedProtocolVersion(); wrapper != nil {
+
+		if _, ok := _ServerInfo_MaxSupportedProtocolVersion_InLookup[wrapper.GetValue()]; !ok {
+			err := ServerInfoValidationError{
+				field:  "MaxSupportedProtocolVersion",
+				reason: "value must be in list [2025-11-25 2026-07-28]",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
 	// no validation rules for Description
 
 	if all {
@@ -530,6 +545,11 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ServerInfoValidationError{}
+
+var _ServerInfo_MaxSupportedProtocolVersion_InLookup = map[string]struct{}{
+	"2025-11-25": {},
+	"2026-07-28": {},
+}
 
 // Validate checks the field values on ToolsListLocal with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
