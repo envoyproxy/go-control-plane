@@ -199,7 +199,7 @@ func (Mcp_AttributeSource) EnumDescriptor() ([]byte, []int) {
 }
 
 // This filter will inspect and get attributes from MCP traffic.
-// [#next-free-field: 10]
+// [#next-free-field: 11]
 type Mcp struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Configures how the filter handles non-MCP traffic.
@@ -249,8 +249,29 @@ type Mcp struct {
 	// and the method-specific identifier carried by “Mcp-Name“; other configured
 	// extraction rules still require body parsing.
 	AttributeSource Mcp_AttributeSource `protobuf:"varint,9,opt,name=attribute_source,json=attributeSource,proto3,enum=envoy.extensions.filters.http.mcp.v3.Mcp_AttributeSource" json:"attribute_source,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// When true, stop parsing (and buffering) the request body as soon as all the
+	// required routing attributes for the request's method have been collected
+	// (for example “method“ and “params.name“ for “tools/call“), even if
+	// optional attributes such as “params._meta“ or the remainder of the body
+	// have not been parsed yet. This decouples routing from body size, so a large
+	// trailing payload (for example “params.arguments“) does not need to be
+	// buffered at the proxy just to route the request.
+	//
+	// Early termination is intentionally skipped when it could change observable
+	// behavior, so it has no effect when any of the following holds:
+	//
+	//   - “reject_duplicate_keys“ is set (duplicate detection needs a full-body scan);
+	//   - “propagate_trace_context“ or “propagate_baggage“ is set (both read
+	//     “params._meta“, which may appear after the routing attributes);
+	//   - “attribute_source“ is not “BODY“.
+	//
+	// Requests whose body arrives complete in a single chunk are unaffected, since
+	// the whole root object is observed before iteration continues.
+	//
+	// Defaults to false.
+	EarlyTerminateWhenRoutable bool `protobuf:"varint,10,opt,name=early_terminate_when_routable,json=earlyTerminateWhenRoutable,proto3" json:"early_terminate_when_routable,omitempty"`
+	unknownFields              protoimpl.UnknownFields
+	sizeCache                  protoimpl.SizeCache
 }
 
 func (x *Mcp) Reset() {
@@ -344,6 +365,13 @@ func (x *Mcp) GetAttributeSource() Mcp_AttributeSource {
 		return x.AttributeSource
 	}
 	return Mcp_BODY
+}
+
+func (x *Mcp) GetEarlyTerminateWhenRoutable() bool {
+	if x != nil {
+		return x.EarlyTerminateWhenRoutable
+	}
+	return false
 }
 
 // Parser configuration with method-specific rules.
@@ -692,7 +720,7 @@ var File_envoy_extensions_filters_http_mcp_v3_mcp_proto protoreflect.FileDescrip
 
 const file_envoy_extensions_filters_http_mcp_v3_mcp_proto_rawDesc = "" +
 	"\n" +
-	".envoy/extensions/filters/http/mcp/v3/mcp.proto\x12$envoy.extensions.filters.http.mcp.v3\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xb7\t\n" +
+	".envoy/extensions/filters/http/mcp/v3/mcp.proto\x12$envoy.extensions.filters.http.mcp.v3\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xfa\t\n" +
 	"\x03Mcp\x12b\n" +
 	"\ftraffic_mode\x18\x01 \x01(\x0e25.envoy.extensions.filters.http.mcp.v3.Mcp.TrafficModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\vtrafficMode\x12*\n" +
 	"\x11clear_route_cache\x18\x02 \x01(\bR\x0fclearRouteCache\x12[\n" +
@@ -703,7 +731,9 @@ const file_envoy_extensions_filters_http_mcp_v3_mcp_proto_rawDesc = "" +
 	"\x17propagate_trace_context\x18\x06 \x01(\v2G.envoy.extensions.filters.http.mcp.v3.Mcp.TraceContextPropagationConfigR\x15propagateTraceContext\x12o\n" +
 	"\x11propagate_baggage\x18\a \x01(\v2B.envoy.extensions.filters.http.mcp.v3.Mcp.BaggagePropagationConfigR\x10propagateBaggage\x12N\n" +
 	"\x15reject_duplicate_keys\x18\b \x01(\v2\x1a.google.protobuf.BoolValueR\x13rejectDuplicateKeys\x12n\n" +
-	"\x10attribute_source\x18\t \x01(\x0e29.envoy.extensions.filters.http.mcp.v3.Mcp.AttributeSourceB\b\xfaB\x05\x82\x01\x02\x10\x01R\x0fattributeSource\x1a)\n" +
+	"\x10attribute_source\x18\t \x01(\x0e29.envoy.extensions.filters.http.mcp.v3.Mcp.AttributeSourceB\b\xfaB\x05\x82\x01\x02\x10\x01R\x0fattributeSource\x12A\n" +
+	"\x1dearly_terminate_when_routable\x18\n" +
+	" \x01(\bR\x1aearlyTerminateWhenRoutable\x1a)\n" +
 	"\x1dTraceContextPropagationConfig:\b\xd2Ƥ\xe1\x06\x02\b\x01\x1a$\n" +
 	"\x18BaggagePropagationConfig:\b\xd2Ƥ\xe1\x06\x02\b\x01\"<\n" +
 	"\vTrafficMode\x12\x10\n" +

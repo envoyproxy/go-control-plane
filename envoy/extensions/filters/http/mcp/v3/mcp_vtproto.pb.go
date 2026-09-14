@@ -115,6 +115,16 @@ func (m *Mcp) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.EarlyTerminateWhenRoutable {
+		i--
+		if m.EarlyTerminateWhenRoutable {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x50
+	}
 	if m.AttributeSource != 0 {
 		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.AttributeSource))
 		i--
@@ -484,6 +494,9 @@ func (m *Mcp) SizeVT() (n int) {
 	}
 	if m.AttributeSource != 0 {
 		n += 1 + protohelpers.SizeOfVarint(uint64(m.AttributeSource))
+	}
+	if m.EarlyTerminateWhenRoutable {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n
