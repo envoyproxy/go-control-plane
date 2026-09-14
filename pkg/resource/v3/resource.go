@@ -21,6 +21,7 @@ const (
 	ScopedRouteType     = APITypePrefix + "envoy.config.route.v3.ScopedRouteConfiguration"
 	VirtualHostType     = APITypePrefix + "envoy.config.route.v3.VirtualHost"
 	ListenerType        = APITypePrefix + "envoy.config.listener.v3.Listener"
+	FilterChainType     = APITypePrefix + "envoy.config.listener.v3.FilterChain"
 	SecretType          = APITypePrefix + "envoy.extensions.transport_sockets.tls.v3.Secret"
 	ExtensionConfigType = APITypePrefix + "envoy.config.core.v3.TypedExtensionConfig"
 	RuntimeType         = APITypePrefix + "envoy.service.runtime.v3.Runtime"

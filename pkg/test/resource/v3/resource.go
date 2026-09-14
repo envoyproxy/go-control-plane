@@ -351,6 +351,35 @@ func MakeRouteHTTPListener(mode, listenerName string, port uint32, route string)
 	return makeListener(listenerName, port, filterChains)
 }
 
+// MakeFilterChain creates a named filter chain suitable for standalone FCDS distribution.
+// The Name is required so the chain can be addressed as its own xDS resource.
+func MakeFilterChain(mode, filterChainName, route string) *listener.FilterChain {
+	manager := buildHTTPConnectionManager()
+	manager.RouteSpecifier = &hcm.HttpConnectionManager_Rds{
+		Rds: &hcm.Rds{
+			ConfigSource:    configSource(mode),
+			RouteConfigName: route,
+		},
+	}
+
+	pbst, err := anypb.New(manager)
+	if err != nil {
+		panic(err)
+	}
+
+	return &listener.FilterChain{
+		Name: filterChainName,
+		Filters: []*listener.Filter{
+			{
+				Name: "http_connection_manager",
+				ConfigType: &listener.Filter_TypedConfig{
+					TypedConfig: pbst,
+				},
+			},
+		},
+	}
+}
+
 func MakeRouteHTTPListenerDefaultFilterChain(mode, listenerName string, port uint32, route string) *listener.Listener {
 	rdsSource := configSource(mode)
 	routeSpecifier := &hcm.HttpConnectionManager_Rds{

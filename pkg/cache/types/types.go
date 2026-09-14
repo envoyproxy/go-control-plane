@@ -54,5 +54,6 @@ const (
 	Runtime
 	ExtensionConfig
 	RateLimitConfig
+	FilterChain
 	UnknownType // token to count the total number of supported types
 )
