@@ -1539,6 +1539,11 @@ type HeaderValueOption struct {
 	AppendAction HeaderValueOption_HeaderAppendAction `protobuf:"varint,3,opt,name=append_action,json=appendAction,proto3,enum=envoy.config.core.v3.HeaderValueOption_HeaderAppendAction" json:"append_action,omitempty"`
 	// Is the header value allowed to be empty? If false (default), custom headers with empty values are dropped,
 	// otherwise they are added.
+	//
+	// .. note::
+	//
+	//	In any context other than the router filter, we always act as if keep_empty_value is true,
+	//	regardless of the setting of this field.
 	KeepEmptyValue bool `protobuf:"varint,4,opt,name=keep_empty_value,json=keepEmptyValue,proto3" json:"keep_empty_value,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache

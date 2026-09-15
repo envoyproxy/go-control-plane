@@ -1588,6 +1588,10 @@ type HeaderMutation struct {
 	// “:authority“, “:scheme“, or “host“ headers will be ignored.
 	// The header value is encoded in the
 	// :ref:`raw_value <envoy_v3_api_field_config.core.v3.HeaderValue.raw_value>` field.
+	// Note that the :ref:`append field in HeaderValueOption <envoy_v3_api_field_config.core.v3.HeaderValueOption.append>`
+	// defaults to false when used in this message.
+	// The :ref:`keep_empty_value field in HeaderValueOption <envoy_v3_api_field_config.core.v3.HeaderValueOption.keep_empty_value>`
+	// is not supported.
 	SetHeaders []*v31.HeaderValueOption `protobuf:"bytes,1,rep,name=set_headers,json=setHeaders,proto3" json:"set_headers,omitempty"`
 	// Remove these HTTP headers. Attempts to remove system headers --
 	// any header starting with “:“, plus “host“ -- will be ignored.

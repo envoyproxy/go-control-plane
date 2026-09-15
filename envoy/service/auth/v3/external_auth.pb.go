@@ -81,6 +81,8 @@ type DeniedHttpResponse struct {
 	// This field allows the authorization service to send HTTP response headers
 	// to the downstream client. Note that the :ref:`append field in HeaderValueOption <envoy_v3_api_field_config.core.v3.HeaderValueOption.append>` defaults to
 	// false when used in this message.
+	// The :ref:`keep_empty_value field in HeaderValueOption <envoy_v3_api_field_config.core.v3.HeaderValueOption.keep_empty_value>`
+	// is not supported.
 	Headers []*v31.HeaderValueOption `protobuf:"bytes,2,rep,name=headers,proto3" json:"headers,omitempty"`
 	// This field allows the authorization service to send a response body data
 	// to the downstream client.
@@ -151,6 +153,8 @@ type OkHttpResponse struct {
 	// the filter will append the correspondent header value to the matched request header.
 	// By leaving “append“ as false, the filter will either add a new header, or override an existing
 	// one if there is a match.
+	// The :ref:`keep_empty_value field in HeaderValueOption <envoy_v3_api_field_config.core.v3.HeaderValueOption.keep_empty_value>`
+	// is not supported.
 	Headers []*v31.HeaderValueOption `protobuf:"bytes,2,rep,name=headers,proto3" json:"headers,omitempty"`
 	// HTTP entity headers to remove from the original request before dispatching
 	// it to the upstream. This allows the authorization service to act on auth
@@ -178,6 +182,8 @@ type OkHttpResponse struct {
 	// This field allows the authorization service to send HTTP response headers
 	// to the downstream client on success. Note that the :ref:`append field in HeaderValueOption <envoy_v3_api_field_config.core.v3.HeaderValueOption.append>`
 	// defaults to false when used in this message.
+	// The :ref:`keep_empty_value field in HeaderValueOption <envoy_v3_api_field_config.core.v3.HeaderValueOption.keep_empty_value>`
+	// is not supported.
 	ResponseHeadersToAdd []*v31.HeaderValueOption `protobuf:"bytes,6,rep,name=response_headers_to_add,json=responseHeadersToAdd,proto3" json:"response_headers_to_add,omitempty"`
 	// This field allows the authorization service to set (and overwrite) query
 	// string parameters on the original request before it is sent upstream.
