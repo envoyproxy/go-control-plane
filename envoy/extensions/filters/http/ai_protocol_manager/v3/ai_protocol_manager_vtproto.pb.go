@@ -9,6 +9,7 @@ package ai_protocol_managerv3
 import (
 	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
 	wrapperspb "github.com/planetscale/vtprotobuf/types/known/wrapperspb"
+	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
@@ -48,6 +49,30 @@ func (m *AiProtocolManager) MarshalToSizedBufferVTStrict(dAtA []byte) (int, erro
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if len(m.Filters) > 0 {
+		for iNdEx := len(m.Filters) - 1; iNdEx >= 0; iNdEx-- {
+			if vtmsg, ok := interface{}(m.Filters[iNdEx]).(interface {
+				MarshalToSizedBufferVTStrict([]byte) (int, error)
+			}); ok {
+				size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+			} else {
+				encoded, err := proto.Marshal(m.Filters[iNdEx])
+				if err != nil {
+					return 0, err
+				}
+				i -= len(encoded)
+				copy(dAtA[i:], encoded)
+				i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+			}
+			i--
+			dAtA[i] = 0x1a
+		}
 	}
 	if m.ResponseHandling != nil {
 		size, err := m.ResponseHandling.MarshalToSizedBufferVTStrict(dAtA[:i])
@@ -486,6 +511,18 @@ func (m *AiProtocolManager) SizeVT() (n int) {
 	if m.ResponseHandling != nil {
 		l = m.ResponseHandling.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if len(m.Filters) > 0 {
+		for _, e := range m.Filters {
+			if size, ok := interface{}(e).(interface {
+				SizeVT() int
+			}); ok {
+				l = size.SizeVT()
+			} else {
+				l = proto.Size(e)
+			}
+			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+		}
 	}
 	n += len(m.unknownFields)
 	return n
