@@ -240,9 +240,11 @@ type Mcp struct {
 	//
 	// If unset (default), do not extract or inject baggage.
 	PropagateBaggage *Mcp_BaggagePropagationConfig `protobuf:"bytes,7,opt,name=propagate_baggage,json=propagateBaggage,proto3" json:"propagate_baggage,omitempty"`
-	// When true, reject requests that contain duplicate JSON keys at any
-	// nesting level. RFC 8259 Section 4 states that names within an object SHOULD be
-	// unique. Defaults to false (last-key-wins / last-win).
+	// When true, disallow requests that contain duplicate JSON keys at any
+	// nesting level. RFC 8259 Section 4 states that names within an object SHOULD
+	// be unique. Defaults to false (last-key-wins / last-win). If traffic mode is
+	// REJECT_NO_MCP, reject these requests; if PASS_THROUGH, log an error status
+	// but don't reject the request.
 	RejectDuplicateKeys *wrapperspb.BoolValue `protobuf:"bytes,8,opt,name=reject_duplicate_keys,json=rejectDuplicateKeys,proto3" json:"reject_duplicate_keys,omitempty"`
 	// Controls whether MCP request attributes are obtained from the request body
 	// or from MCP request headers. Header-based extraction is limited to “method“
