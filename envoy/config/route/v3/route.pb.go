@@ -26,7 +26,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// [#next-free-field: 19]
+// [#next-free-field: 20]
 type RouteConfiguration struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The name of the route configuration. For example, it might match
@@ -137,9 +137,36 @@ type RouteConfiguration struct {
 	// The metadata should go under the filter namespace that will need it.
 	// For instance, if the metadata is intended for the Router filter,
 	// the filter name should be specified as “envoy.filters.http.router“.
-	Metadata      *v3.Metadata `protobuf:"bytes,17,opt,name=metadata,proto3" json:"metadata,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Metadata *v3.Metadata `protobuf:"bytes,17,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	// After the route matching has resolved a route for incoming request, the route specifiers
+	// are applied to the route to customize or monitor it and the output of the specifiers will be
+	// used as the final route by Envoy for the request. The specifiers here will not modify/affect
+	// the request attributes (e.g., headers, path) directly.
+	//
+	// Specifiers are executed in order, and the output of each is the input of the next. The route
+	// that comes out of the last one is the route Envoy uses for the request.
+	//
+	// Specifiers are configured at three levels. Specifiers in three levels will run in this order:
+	//
+	//  1. The “route_specifiers“ of
+	//     :ref:`route configuration <envoy_v3_api_msg_config.route.v3.RouteConfiguration>`
+	//  2. The “route_specifiers“ of resolved
+	//     :ref:`virtual host <envoy_v3_api_msg_config.route.v3.VirtualHost>`
+	//  3. The “route_specifiers“ of resolved
+	//     :ref:`route <envoy_v3_api_msg_config.route.v3.Route>`.
+	//
+	// .. note::
+	//
+	//	If the route matching resolves no route, the route specifiers at the route configuration
+	//	and the virtual host levels will still be applied to null. This allows route specifiers to
+	//	optionally generate a valid route even when no route is resolved for the request.
+	//	Similarly, if the route matching resolves a valid route, the route specifiers may drop it
+	//	and return no route. Then Envoy will treat it as route not found and result in 404 response.
+	//
+	// See :ref:`route specifiers <config_http_conn_man_route_specifiers>` for more details.
+	RouteSpecifiers []*v3.TypedExtensionConfig `protobuf:"bytes,19,rep,name=route_specifiers,json=routeSpecifiers,proto3" json:"route_specifiers,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *RouteConfiguration) Reset() {
@@ -298,6 +325,13 @@ func (x *RouteConfiguration) GetMetadata() *v3.Metadata {
 	return nil
 }
 
+func (x *RouteConfiguration) GetRouteSpecifiers() []*v3.TypedExtensionConfig {
+	if x != nil {
+		return x.RouteSpecifiers
+	}
+	return nil
+}
+
 type Vhds struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Configuration source specifier for VHDS.
@@ -347,7 +381,7 @@ var File_envoy_config_route_v3_route_proto protoreflect.FileDescriptor
 
 const file_envoy_config_route_v3_route_proto_rawDesc = "" +
 	"\n" +
-	"!envoy/config/route/v3/route.proto\x12\x15envoy.config.route.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a,envoy/config/route/v3/route_components.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xac\f\n" +
+	"!envoy/config/route/v3/route.proto\x12\x15envoy.config.route.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a$envoy/config/core/v3/extension.proto\x1a,envoy/config/route/v3/route_components.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\x83\r\n" +
 	"\x12RouteConfiguration\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12G\n" +
 	"\rvirtual_hosts\x18\x02 \x03(\v2\".envoy.config.route.v3.VirtualHostR\fvirtualHosts\x12/\n" +
@@ -370,7 +404,8 @@ const file_envoy_config_route_v3_route_proto_rawDesc = "" +
 	"\fvhost_header\x18\x12 \x01(\tR\vvhostHeader\x12S\n" +
 	"'ignore_path_parameters_in_path_matching\x18\x0f \x01(\bR\"ignorePathParametersInPathMatching\x12z\n" +
 	"\x17typed_per_filter_config\x18\x10 \x03(\v2C.envoy.config.route.v3.RouteConfiguration.TypedPerFilterConfigEntryR\x14typedPerFilterConfig\x12:\n" +
-	"\bmetadata\x18\x11 \x01(\v2\x1e.envoy.config.core.v3.MetadataR\bmetadata\x1a]\n" +
+	"\bmetadata\x18\x11 \x01(\v2\x1e.envoy.config.core.v3.MetadataR\bmetadata\x12U\n" +
+	"\x10route_specifiers\x18\x13 \x03(\v2*.envoy.config.core.v3.TypedExtensionConfigR\x0frouteSpecifiers\x1a]\n" +
 	"\x19TypedPerFilterConfigEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12*\n" +
 	"\x05value\x18\x02 \x01(\v2\x14.google.protobuf.AnyR\x05value:\x028\x01:&\x9aň\x1e!\n" +
@@ -405,8 +440,9 @@ var file_envoy_config_route_v3_route_proto_goTypes = []any{
 	(*ClusterSpecifierPlugin)(nil),          // 7: envoy.config.route.v3.ClusterSpecifierPlugin
 	(*RouteAction_RequestMirrorPolicy)(nil), // 8: envoy.config.route.v3.RouteAction.RequestMirrorPolicy
 	(*v3.Metadata)(nil),                     // 9: envoy.config.core.v3.Metadata
-	(*v3.ConfigSource)(nil),                 // 10: envoy.config.core.v3.ConfigSource
-	(*anypb.Any)(nil),                       // 11: google.protobuf.Any
+	(*v3.TypedExtensionConfig)(nil),         // 10: envoy.config.core.v3.TypedExtensionConfig
+	(*v3.ConfigSource)(nil),                 // 11: envoy.config.core.v3.ConfigSource
+	(*anypb.Any)(nil),                       // 12: google.protobuf.Any
 }
 var file_envoy_config_route_v3_route_proto_depIdxs = []int32{
 	3,  // 0: envoy.config.route.v3.RouteConfiguration.virtual_hosts:type_name -> envoy.config.route.v3.VirtualHost
@@ -419,13 +455,14 @@ var file_envoy_config_route_v3_route_proto_depIdxs = []int32{
 	8,  // 7: envoy.config.route.v3.RouteConfiguration.request_mirror_policies:type_name -> envoy.config.route.v3.RouteAction.RequestMirrorPolicy
 	2,  // 8: envoy.config.route.v3.RouteConfiguration.typed_per_filter_config:type_name -> envoy.config.route.v3.RouteConfiguration.TypedPerFilterConfigEntry
 	9,  // 9: envoy.config.route.v3.RouteConfiguration.metadata:type_name -> envoy.config.core.v3.Metadata
-	10, // 10: envoy.config.route.v3.Vhds.config_source:type_name -> envoy.config.core.v3.ConfigSource
-	11, // 11: envoy.config.route.v3.RouteConfiguration.TypedPerFilterConfigEntry.value:type_name -> google.protobuf.Any
-	12, // [12:12] is the sub-list for method output_type
-	12, // [12:12] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	10, // 10: envoy.config.route.v3.RouteConfiguration.route_specifiers:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	11, // 11: envoy.config.route.v3.Vhds.config_source:type_name -> envoy.config.core.v3.ConfigSource
+	12, // 12: envoy.config.route.v3.RouteConfiguration.TypedPerFilterConfigEntry.value:type_name -> google.protobuf.Any
+	13, // [13:13] is the sub-list for method output_type
+	13, // [13:13] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_envoy_config_route_v3_route_proto_init() }

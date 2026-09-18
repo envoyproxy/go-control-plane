@@ -51,6 +51,32 @@ func (m *RouteConfiguration) MarshalToSizedBufferVTStrict(dAtA []byte) (int, err
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.RouteSpecifiers) > 0 {
+		for iNdEx := len(m.RouteSpecifiers) - 1; iNdEx >= 0; iNdEx-- {
+			if vtmsg, ok := interface{}(m.RouteSpecifiers[iNdEx]).(interface {
+				MarshalToSizedBufferVTStrict([]byte) (int, error)
+			}); ok {
+				size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+			} else {
+				encoded, err := proto.Marshal(m.RouteSpecifiers[iNdEx])
+				if err != nil {
+					return 0, err
+				}
+				i -= len(encoded)
+				copy(dAtA[i:], encoded)
+				i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+			}
+			i--
+			dAtA[i] = 0x1
+			i--
+			dAtA[i] = 0x9a
+		}
+	}
 	if len(m.VhostHeader) > 0 {
 		i -= len(m.VhostHeader)
 		copy(dAtA[i:], m.VhostHeader)
@@ -461,6 +487,18 @@ func (m *RouteConfiguration) SizeVT() (n int) {
 	l = len(m.VhostHeader)
 	if l > 0 {
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if len(m.RouteSpecifiers) > 0 {
+		for _, e := range m.RouteSpecifiers {
+			if size, ok := interface{}(e).(interface {
+				SizeVT() int
+			}); ok {
+				l = size.SizeVT()
+			} else {
+				l = proto.Size(e)
+			}
+			n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+		}
 	}
 	n += len(m.unknownFields)
 	return n
