@@ -129,6 +129,8 @@ func (m *DynamicModuleMatcher) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for OnError
+
 	if len(errors) > 0 {
 		return DynamicModuleMatcherMultiError(errors)
 	}

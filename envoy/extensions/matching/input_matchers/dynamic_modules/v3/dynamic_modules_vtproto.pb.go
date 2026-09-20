@@ -50,6 +50,11 @@ func (m *DynamicModuleMatcher) MarshalToSizedBufferVTStrict(dAtA []byte) (int, e
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.OnError != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.OnError))
+		i--
+		dAtA[i] = 0x20
+	}
 	if m.MatcherConfig != nil {
 		size, err := (*anypb.Any)(m.MatcherConfig).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -115,6 +120,9 @@ func (m *DynamicModuleMatcher) SizeVT() (n int) {
 	if m.MatcherConfig != nil {
 		l = (*anypb.Any)(m.MatcherConfig).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.OnError != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.OnError))
 	}
 	n += len(m.unknownFields)
 	return n

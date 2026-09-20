@@ -25,6 +25,56 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// The policy applied when the module cannot evaluate a match, for example after a panic in the
+// module's match hook.
+type DynamicModuleMatcher_OnError int32
+
+const (
+	// Treat an evaluation that could not complete as no match. This is the default.
+	DynamicModuleMatcher_NO_MATCH DynamicModuleMatcher_OnError = 0
+	// Treat an evaluation that could not complete as a match.
+	DynamicModuleMatcher_MATCH DynamicModuleMatcher_OnError = 1
+)
+
+// Enum value maps for DynamicModuleMatcher_OnError.
+var (
+	DynamicModuleMatcher_OnError_name = map[int32]string{
+		0: "NO_MATCH",
+		1: "MATCH",
+	}
+	DynamicModuleMatcher_OnError_value = map[string]int32{
+		"NO_MATCH": 0,
+		"MATCH":    1,
+	}
+)
+
+func (x DynamicModuleMatcher_OnError) Enum() *DynamicModuleMatcher_OnError {
+	p := new(DynamicModuleMatcher_OnError)
+	*p = x
+	return p
+}
+
+func (x DynamicModuleMatcher_OnError) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (DynamicModuleMatcher_OnError) Descriptor() protoreflect.EnumDescriptor {
+	return file_envoy_extensions_matching_input_matchers_dynamic_modules_v3_dynamic_modules_proto_enumTypes[0].Descriptor()
+}
+
+func (DynamicModuleMatcher_OnError) Type() protoreflect.EnumType {
+	return &file_envoy_extensions_matching_input_matchers_dynamic_modules_v3_dynamic_modules_proto_enumTypes[0]
+}
+
+func (x DynamicModuleMatcher_OnError) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use DynamicModuleMatcher_OnError.Descriptor instead.
+func (DynamicModuleMatcher_OnError) EnumDescriptor() ([]byte, []int) {
+	return file_envoy_extensions_matching_input_matchers_dynamic_modules_v3_dynamic_modules_proto_rawDescGZIP(), []int{0, 0}
+}
+
 // Configuration for the Dynamic Modules Input Matcher. This matcher allows loading shared object
 // files via “dlopen“ to implement custom matching logic in dynamic modules (e.g. Rust, Go).
 //
@@ -56,6 +106,15 @@ type DynamicModuleMatcher struct {
 	// “google.protobuf.BytesValue“ and “google.protobuf.StringValue“ are passed directly
 	// without the wrapper.
 	MatcherConfig *anypb.Any `protobuf:"bytes,3,opt,name=matcher_config,json=matcherConfig,proto3" json:"matcher_config,omitempty"`
+	// The result applied for an evaluation that the module could not complete, for example when the
+	// module's match hook panics. A panic is caught at the ABI boundary and cannot report a match
+	// result, so the matcher applies this policy for that single evaluation. If not specified,
+	// defaults to “NO_MATCH“.
+	//
+	// “NO_MATCH“ is safe for allow-on-match trees where a missed match denies the request.
+	// “MATCH“ is safe for deny-on-match trees where a missed match would let a request bypass the
+	// rule.
+	OnError       DynamicModuleMatcher_OnError `protobuf:"varint,4,opt,name=on_error,json=onError,proto3,enum=envoy.extensions.matching.input_matchers.dynamic_modules.v3.DynamicModuleMatcher_OnError" json:"on_error,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -111,15 +170,26 @@ func (x *DynamicModuleMatcher) GetMatcherConfig() *anypb.Any {
 	return nil
 }
 
+func (x *DynamicModuleMatcher) GetOnError() DynamicModuleMatcher_OnError {
+	if x != nil {
+		return x.OnError
+	}
+	return DynamicModuleMatcher_NO_MATCH
+}
+
 var File_envoy_extensions_matching_input_matchers_dynamic_modules_v3_dynamic_modules_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_matching_input_matchers_dynamic_modules_v3_dynamic_modules_proto_rawDesc = "" +
 	"\n" +
-	"Qenvoy/extensions/matching/input_matchers/dynamic_modules/v3/dynamic_modules.proto\x12;envoy.extensions.matching.input_matchers.dynamic_modules.v3\x1a9envoy/extensions/dynamic_modules/v3/dynamic_modules.proto\x1a\x19google/protobuf/any.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xee\x01\n" +
+	"Qenvoy/extensions/matching/input_matchers/dynamic_modules/v3/dynamic_modules.proto\x12;envoy.extensions.matching.input_matchers.dynamic_modules.v3\x1a9envoy/extensions/dynamic_modules/v3/dynamic_modules.proto\x1a\x19google/protobuf/any.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x88\x03\n" +
 	"\x14DynamicModuleMatcher\x12v\n" +
 	"\x15dynamic_module_config\x18\x01 \x01(\v28.envoy.extensions.dynamic_modules.v3.DynamicModuleConfigB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x13dynamicModuleConfig\x12!\n" +
 	"\fmatcher_name\x18\x02 \x01(\tR\vmatcherName\x12;\n" +
-	"\x0ematcher_config\x18\x03 \x01(\v2\x14.google.protobuf.AnyR\rmatcherConfigB\xe0\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x0ematcher_config\x18\x03 \x01(\v2\x14.google.protobuf.AnyR\rmatcherConfig\x12t\n" +
+	"\bon_error\x18\x04 \x01(\x0e2Y.envoy.extensions.matching.input_matchers.dynamic_modules.v3.DynamicModuleMatcher.OnErrorR\aonError\"\"\n" +
+	"\aOnError\x12\f\n" +
+	"\bNO_MATCH\x10\x00\x12\t\n" +
+	"\x05MATCH\x10\x01B\xe0\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"Iio.envoyproxy.envoy.extensions.matching.input_matchers.dynamic_modules.v3B\x13DynamicModulesProtoP\x01Ztgithub.com/envoyproxy/go-control-plane/envoy/extensions/matching/input_matchers/dynamic_modules/v3;dynamic_modulesv3b\x06proto3"
 
 var (
@@ -134,20 +204,23 @@ func file_envoy_extensions_matching_input_matchers_dynamic_modules_v3_dynamic_mo
 	return file_envoy_extensions_matching_input_matchers_dynamic_modules_v3_dynamic_modules_proto_rawDescData
 }
 
+var file_envoy_extensions_matching_input_matchers_dynamic_modules_v3_dynamic_modules_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_envoy_extensions_matching_input_matchers_dynamic_modules_v3_dynamic_modules_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_envoy_extensions_matching_input_matchers_dynamic_modules_v3_dynamic_modules_proto_goTypes = []any{
-	(*DynamicModuleMatcher)(nil),   // 0: envoy.extensions.matching.input_matchers.dynamic_modules.v3.DynamicModuleMatcher
-	(*v3.DynamicModuleConfig)(nil), // 1: envoy.extensions.dynamic_modules.v3.DynamicModuleConfig
-	(*anypb.Any)(nil),              // 2: google.protobuf.Any
+	(DynamicModuleMatcher_OnError)(0), // 0: envoy.extensions.matching.input_matchers.dynamic_modules.v3.DynamicModuleMatcher.OnError
+	(*DynamicModuleMatcher)(nil),      // 1: envoy.extensions.matching.input_matchers.dynamic_modules.v3.DynamicModuleMatcher
+	(*v3.DynamicModuleConfig)(nil),    // 2: envoy.extensions.dynamic_modules.v3.DynamicModuleConfig
+	(*anypb.Any)(nil),                 // 3: google.protobuf.Any
 }
 var file_envoy_extensions_matching_input_matchers_dynamic_modules_v3_dynamic_modules_proto_depIdxs = []int32{
-	1, // 0: envoy.extensions.matching.input_matchers.dynamic_modules.v3.DynamicModuleMatcher.dynamic_module_config:type_name -> envoy.extensions.dynamic_modules.v3.DynamicModuleConfig
-	2, // 1: envoy.extensions.matching.input_matchers.dynamic_modules.v3.DynamicModuleMatcher.matcher_config:type_name -> google.protobuf.Any
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	2, // 0: envoy.extensions.matching.input_matchers.dynamic_modules.v3.DynamicModuleMatcher.dynamic_module_config:type_name -> envoy.extensions.dynamic_modules.v3.DynamicModuleConfig
+	3, // 1: envoy.extensions.matching.input_matchers.dynamic_modules.v3.DynamicModuleMatcher.matcher_config:type_name -> google.protobuf.Any
+	0, // 2: envoy.extensions.matching.input_matchers.dynamic_modules.v3.DynamicModuleMatcher.on_error:type_name -> envoy.extensions.matching.input_matchers.dynamic_modules.v3.DynamicModuleMatcher.OnError
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() {
@@ -162,13 +235,14 @@ func file_envoy_extensions_matching_input_matchers_dynamic_modules_v3_dynamic_mo
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_matching_input_matchers_dynamic_modules_v3_dynamic_modules_proto_rawDesc), len(file_envoy_extensions_matching_input_matchers_dynamic_modules_v3_dynamic_modules_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_envoy_extensions_matching_input_matchers_dynamic_modules_v3_dynamic_modules_proto_goTypes,
 		DependencyIndexes: file_envoy_extensions_matching_input_matchers_dynamic_modules_v3_dynamic_modules_proto_depIdxs,
+		EnumInfos:         file_envoy_extensions_matching_input_matchers_dynamic_modules_v3_dynamic_modules_proto_enumTypes,
 		MessageInfos:      file_envoy_extensions_matching_input_matchers_dynamic_modules_v3_dynamic_modules_proto_msgTypes,
 	}.Build()
 	File_envoy_extensions_matching_input_matchers_dynamic_modules_v3_dynamic_modules_proto = out.File
