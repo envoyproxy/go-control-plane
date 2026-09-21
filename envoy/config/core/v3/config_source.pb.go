@@ -447,9 +447,10 @@ func (x *RateLimitSettings) GetFillRate() *wrapperspb.DoubleValue {
 // Local filesystem path configuration source.
 type PathConfigSource struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Path on the filesystem to source and watch for configuration updates.
-	// When sourcing configuration for a :ref:`secret <envoy_v3_api_msg_extensions.transport_sockets.tls.v3.Secret>`,
-	// the certificate and key files are also watched for updates.
+	// Path on the filesystem from which to source configuration updates.
+	// When sourcing configuration for a
+	// :ref:`secret <envoy_v3_api_msg_extensions.transport_sockets.tls.v3.Secret>`, file-based secret
+	// data supported for SDS rotation is also monitored for updates.
 	//
 	// .. note::
 	//
@@ -457,12 +458,14 @@ type PathConfigSource struct {
 	//
 	// .. note::
 	//
-	//	If ``watched_directory`` is *not* configured, Envoy will watch the file path for *moves*.
-	//	This is because in general only moves are atomic. The same method of swapping files as is
-	//	demonstrated in the :ref:`runtime documentation <config_runtime_symbolic_link_swap>` can be
-	//	used here also. If ``watched_directory`` is configured, no watch will be placed directly on
-	//	this path. Instead, the configured ``watched_directory`` will be used to trigger reloads of
-	//	this path. This is required in certain deployment scenarios. See below for more information.
+	//	If neither ``poll_interval`` nor ``watched_directory`` is configured, Envoy will watch the
+	//	file path for *moves*. This is because in general only moves are atomic. The same method of
+	//	swapping files as is demonstrated in the
+	//	:ref:`runtime documentation <config_runtime_symbolic_link_swap>` can be used here also.
+	//	One of ``poll_interval`` and ``watched_directory`` can also be configured; the configuration
+	//	is rejected if both are set. With ``poll_interval``, the same path is reloaded periodically.
+	//	With ``watched_directory``, no watch is placed directly on this path; events in the
+	//	configured directory trigger this path to be reloaded.
 	Path string `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
 	// If configured, this directory will be watched for *moves*. When an entry in this directory is
 	// moved to, the “path“ will be reloaded. This is required in certain deployment scenarios.
@@ -477,9 +480,25 @@ type PathConfigSource struct {
 	//
 	// The above configuration will ensure that Envoy watches the owning directory for moves which is
 	// required due to how Kubernetes manages ConfigMap symbolic links during atomic updates.
+	//
+	// This field cannot be used together with “poll_interval“.
 	WatchedDirectory *WatchedDirectory `protobuf:"bytes,2,opt,name=watched_directory,json=watchedDirectory,proto3" json:"watched_directory,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// If configured, the “path“ will be polled at this interval instead of watched for filesystem
+	// events on either the file or “watched_directory“. This is useful when the underlying
+	// filesystem does not reliably provide change notifications, or when a custom deployment model
+	// does not generate the move or modification events handled by watching the path or directory.
+	// The file is read on every poll, but an update is delivered only when its parsed contents
+	// change.
+	//
+	// When this configuration source provides a
+	// :ref:`Secret <envoy_v3_api_msg_extensions.transport_sockets.tls.v3.Secret>`, the same secret
+	// files that are watched in event-based mode are polled at this interval. The last successfully
+	// loaded configuration or secret remains active when a poll fails.
+	//
+	// This field cannot be used together with “watched_directory“ and must be at least 1ms.
+	PollInterval  *durationpb.Duration `protobuf:"bytes,3,opt,name=poll_interval,json=pollInterval,proto3" json:"poll_interval,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *PathConfigSource) Reset() {
@@ -522,6 +541,13 @@ func (x *PathConfigSource) GetPath() string {
 func (x *PathConfigSource) GetWatchedDirectory() *WatchedDirectory {
 	if x != nil {
 		return x.WatchedDirectory
+	}
+	return nil
+}
+
+func (x *PathConfigSource) GetPollInterval() *durationpb.Duration {
+	if x != nil {
+		return x.PollInterval
 	}
 	return nil
 }
@@ -841,10 +867,11 @@ const file_envoy_config_core_v3_config_source_proto_rawDesc = "" +
 	"\n" +
 	"max_tokens\x18\x01 \x01(\v2\x1c.google.protobuf.UInt32ValueR\tmaxTokens\x12I\n" +
 	"\tfill_rate\x18\x02 \x01(\v2\x1c.google.protobuf.DoubleValueB\x0e\xfaB\v\x12\t!\x00\x00\x00\x00\x00\x00\x00\x00R\bfillRate:*\x9aň\x1e%\n" +
-	"#envoy.api.v2.core.RateLimitSettings\"\x84\x01\n" +
+	"#envoy.api.v2.core.RateLimitSettings\"\xd2\x01\n" +
 	"\x10PathConfigSource\x12\x1b\n" +
 	"\x04path\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x04path\x12S\n" +
-	"\x11watched_directory\x18\x02 \x01(\v2&.envoy.config.core.v3.WatchedDirectoryR\x10watchedDirectory\"\x8c\x05\n" +
+	"\x11watched_directory\x18\x02 \x01(\v2&.envoy.config.core.v3.WatchedDirectoryR\x10watchedDirectory\x12L\n" +
+	"\rpoll_interval\x18\x03 \x01(\v2\x19.google.protobuf.DurationB\f\xfaB\t\xaa\x01\x062\x04\x10\xc0\x84=R\fpollInterval\"\x8c\x05\n" +
 	"\fConfigSource\x128\n" +
 	"\vauthorities\x18\a \x03(\v2\x16.xds.core.v3.AuthorityR\vauthorities\x12!\n" +
 	"\x04path\x18\x01 \x01(\tB\v\x92ǆ\xd8\x04\x033.0\x18\x01H\x00R\x04path\x12V\n" +
@@ -913,20 +940,21 @@ var file_envoy_config_core_v3_config_source_proto_depIdxs = []int32{
 	12, // 8: envoy.config.core.v3.RateLimitSettings.max_tokens:type_name -> google.protobuf.UInt32Value
 	13, // 9: envoy.config.core.v3.RateLimitSettings.fill_rate:type_name -> google.protobuf.DoubleValue
 	14, // 10: envoy.config.core.v3.PathConfigSource.watched_directory:type_name -> envoy.config.core.v3.WatchedDirectory
-	15, // 11: envoy.config.core.v3.ConfigSource.authorities:type_name -> xds.core.v3.Authority
-	6,  // 12: envoy.config.core.v3.ConfigSource.path_config_source:type_name -> envoy.config.core.v3.PathConfigSource
-	2,  // 13: envoy.config.core.v3.ConfigSource.api_config_source:type_name -> envoy.config.core.v3.ApiConfigSource
-	3,  // 14: envoy.config.core.v3.ConfigSource.ads:type_name -> envoy.config.core.v3.AggregatedConfigSource
-	4,  // 15: envoy.config.core.v3.ConfigSource.self:type_name -> envoy.config.core.v3.SelfConfigSource
-	10, // 16: envoy.config.core.v3.ConfigSource.initial_fetch_timeout:type_name -> google.protobuf.Duration
-	0,  // 17: envoy.config.core.v3.ConfigSource.resource_api_version:type_name -> envoy.config.core.v3.ApiVersion
-	7,  // 18: envoy.config.core.v3.ExtensionConfigSource.config_source:type_name -> envoy.config.core.v3.ConfigSource
-	16, // 19: envoy.config.core.v3.ExtensionConfigSource.default_config:type_name -> google.protobuf.Any
-	20, // [20:20] is the sub-list for method output_type
-	20, // [20:20] is the sub-list for method input_type
-	20, // [20:20] is the sub-list for extension type_name
-	20, // [20:20] is the sub-list for extension extendee
-	0,  // [0:20] is the sub-list for field type_name
+	10, // 11: envoy.config.core.v3.PathConfigSource.poll_interval:type_name -> google.protobuf.Duration
+	15, // 12: envoy.config.core.v3.ConfigSource.authorities:type_name -> xds.core.v3.Authority
+	6,  // 13: envoy.config.core.v3.ConfigSource.path_config_source:type_name -> envoy.config.core.v3.PathConfigSource
+	2,  // 14: envoy.config.core.v3.ConfigSource.api_config_source:type_name -> envoy.config.core.v3.ApiConfigSource
+	3,  // 15: envoy.config.core.v3.ConfigSource.ads:type_name -> envoy.config.core.v3.AggregatedConfigSource
+	4,  // 16: envoy.config.core.v3.ConfigSource.self:type_name -> envoy.config.core.v3.SelfConfigSource
+	10, // 17: envoy.config.core.v3.ConfigSource.initial_fetch_timeout:type_name -> google.protobuf.Duration
+	0,  // 18: envoy.config.core.v3.ConfigSource.resource_api_version:type_name -> envoy.config.core.v3.ApiVersion
+	7,  // 19: envoy.config.core.v3.ExtensionConfigSource.config_source:type_name -> envoy.config.core.v3.ConfigSource
+	16, // 20: envoy.config.core.v3.ExtensionConfigSource.default_config:type_name -> google.protobuf.Any
+	21, // [21:21] is the sub-list for method output_type
+	21, // [21:21] is the sub-list for method input_type
+	21, // [21:21] is the sub-list for extension type_name
+	21, // [21:21] is the sub-list for extension extendee
+	0,  // [0:21] is the sub-list for field type_name
 }
 
 func init() { file_envoy_config_core_v3_config_source_proto_init() }
