@@ -672,26 +672,19 @@ func (m *TokenHeader) validate(all bool) error {
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetName()) < 1 {
-		err := TokenHeaderValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	if m.GetName() != "" {
 
-	if !_TokenHeader_Name_Pattern.MatchString(m.GetName()) {
-		err := TokenHeaderValidationError{
-			field:  "Name",
-			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+		if !_TokenHeader_Name_Pattern.MatchString(m.GetName()) {
+			err := TokenHeaderValidationError{
+				field:  "Name",
+				reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
+
 	}
 
 	if !_TokenHeader_ValuePrefix_Pattern.MatchString(m.GetValuePrefix()) {
@@ -703,6 +696,35 @@ func (m *TokenHeader) validate(all bool) error {
 			return err
 		}
 		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetPreserveExisting()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TokenHeaderValidationError{
+					field:  "PreserveExisting",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TokenHeaderValidationError{
+					field:  "PreserveExisting",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPreserveExisting()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TokenHeaderValidationError{
+				field:  "PreserveExisting",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
 	}
 
 	if len(errors) > 0 {
@@ -1226,3 +1248,106 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = Audience_IAMAccessTokenValidationError{}
+
+// Validate checks the field values on TokenHeader_PreserveExisting with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *TokenHeader_PreserveExisting) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TokenHeader_PreserveExisting with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// TokenHeader_PreserveExistingMultiError, or nil if none found.
+func (m *TokenHeader_PreserveExisting) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TokenHeader_PreserveExisting) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return TokenHeader_PreserveExistingMultiError(errors)
+	}
+
+	return nil
+}
+
+// TokenHeader_PreserveExistingMultiError is an error wrapping multiple
+// validation errors returned by TokenHeader_PreserveExisting.ValidateAll() if
+// the designated constraints aren't met.
+type TokenHeader_PreserveExistingMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TokenHeader_PreserveExistingMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TokenHeader_PreserveExistingMultiError) AllErrors() []error { return m }
+
+// TokenHeader_PreserveExistingValidationError is the validation error returned
+// by TokenHeader_PreserveExisting.Validate if the designated constraints
+// aren't met.
+type TokenHeader_PreserveExistingValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TokenHeader_PreserveExistingValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TokenHeader_PreserveExistingValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TokenHeader_PreserveExistingValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TokenHeader_PreserveExistingValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TokenHeader_PreserveExistingValidationError) ErrorName() string {
+	return "TokenHeader_PreserveExistingValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e TokenHeader_PreserveExistingValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTokenHeader_PreserveExisting.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TokenHeader_PreserveExistingValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TokenHeader_PreserveExistingValidationError{}

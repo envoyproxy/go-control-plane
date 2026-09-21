@@ -293,14 +293,20 @@ func (x *TokenCacheConfig) GetCacheSize() *wrapperspb.UInt64Value {
 
 type TokenHeader struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The HTTP header's name.
+	// The HTTP header's name. Defaults to “Authorization“ if not specified.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The header's prefix. The format is "value_prefix<token>"
 	// For example, for "Authorization: Bearer <token>", value_prefix="Bearer " with a space at the
 	// end.
-	ValuePrefix   string `protobuf:"bytes,2,opt,name=value_prefix,json=valuePrefix,proto3" json:"value_prefix,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	ValuePrefix string `protobuf:"bytes,2,opt,name=value_prefix,json=valuePrefix,proto3" json:"value_prefix,omitempty"`
+	// If set, the filter checks if the target header is already present (by header key existence,
+	// even if the header value is empty). If present, it skips token fetching and preserves the
+	// existing header intact (“value_prefix“ has no effect on the preserved header). If absent,
+	// a new token is fetched and written using “name“ and “value_prefix“.
+	// If not set, the default behavior is to unconditionally overwrite the header.
+	PreserveExisting *TokenHeader_PreserveExisting `protobuf:"bytes,3,opt,name=preserve_existing,json=preserveExisting,proto3" json:"preserve_existing,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *TokenHeader) Reset() {
@@ -345,6 +351,13 @@ func (x *TokenHeader) GetValuePrefix() string {
 		return x.ValuePrefix
 	}
 	return ""
+}
+
+func (x *TokenHeader) GetPreserveExisting() *TokenHeader_PreserveExisting {
+	if x != nil {
+		return x.PreserveExisting
+	}
+	return nil
 }
 
 type Audience_AccessToken struct {
@@ -531,6 +544,43 @@ func (x *Audience_IAMAccessToken) GetScopes() []string {
 	return nil
 }
 
+// Configuration options for preserving an existing token header.
+type TokenHeader_PreserveExisting struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TokenHeader_PreserveExisting) Reset() {
+	*x = TokenHeader_PreserveExisting{}
+	mi := &file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TokenHeader_PreserveExisting) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TokenHeader_PreserveExisting) ProtoMessage() {}
+
+func (x *TokenHeader_PreserveExisting) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TokenHeader_PreserveExisting.ProtoReflect.Descriptor instead.
+func (*TokenHeader_PreserveExisting) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_rawDescGZIP(), []int{3, 0}
+}
+
 var File_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_rawDesc = "" +
@@ -563,11 +613,12 @@ const file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_rawDesc = 
 	"\x10TokenCacheConfig\x12L\n" +
 	"\n" +
 	"cache_size\x18\x01 \x01(\v2\x1c.google.protobuf.UInt64ValueB\x0f\xfaB\f2\n" +
-	"\x18\xff\xff\xff\xff\xff\xff\xff\xff\x7fR\tcacheSize\"`\n" +
-	"\vTokenHeader\x12!\n" +
-	"\x04name\x18\x01 \x01(\tB\r\xfaB\n" +
-	"r\b\x10\x01\xc8\x01\x00\xc0\x01\x01R\x04name\x12.\n" +
-	"\fvalue_prefix\x18\x02 \x01(\tB\v\xfaB\br\x06\xc8\x01\x00\xc0\x01\x02R\vvaluePrefixB\xb2\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x18\xff\xff\xff\xff\xff\xff\xff\xff\x7fR\tcacheSize\"\xec\x01\n" +
+	"\vTokenHeader\x12\"\n" +
+	"\x04name\x18\x01 \x01(\tB\x0e\xfaB\vr\t\xc8\x01\x00\xd0\x01\x01\xc0\x01\x01R\x04name\x12.\n" +
+	"\fvalue_prefix\x18\x02 \x01(\tB\v\xfaB\br\x06\xc8\x01\x00\xc0\x01\x02R\vvaluePrefix\x12u\n" +
+	"\x11preserve_existing\x18\x03 \x01(\v2H.envoy.extensions.filters.http.gcp_authn.v3.TokenHeader.PreserveExistingR\x10preserveExisting\x1a\x12\n" +
+	"\x10PreserveExistingB\xb2\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"8io.envoyproxy.envoy.extensions.filters.http.gcp_authn.v3B\rGcpAuthnProtoP\x01Z]github.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/gcp_authn/v3;gcp_authnv3b\x06proto3"
 
 var (
@@ -582,38 +633,40 @@ func file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_rawDescGZIP
 	return file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_rawDescData
 }
 
-var file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_goTypes = []any{
-	(*GcpAuthnFilterConfig)(nil),      // 0: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig
-	(*Audience)(nil),                  // 1: envoy.extensions.filters.http.gcp_authn.v3.Audience
-	(*TokenCacheConfig)(nil),          // 2: envoy.extensions.filters.http.gcp_authn.v3.TokenCacheConfig
-	(*TokenHeader)(nil),               // 3: envoy.extensions.filters.http.gcp_authn.v3.TokenHeader
-	(*Audience_AccessToken)(nil),      // 4: envoy.extensions.filters.http.gcp_authn.v3.Audience.AccessToken
-	(*Audience_BoundJwt)(nil),         // 5: envoy.extensions.filters.http.gcp_authn.v3.Audience.BoundJwt
-	(*Audience_BoundAccessToken)(nil), // 6: envoy.extensions.filters.http.gcp_authn.v3.Audience.BoundAccessToken
-	(*Audience_IAMAccessToken)(nil),   // 7: envoy.extensions.filters.http.gcp_authn.v3.Audience.IAMAccessToken
-	(*v3.HttpUri)(nil),                // 8: envoy.config.core.v3.HttpUri
-	(*v3.RetryPolicy)(nil),            // 9: envoy.config.core.v3.RetryPolicy
-	(*durationpb.Duration)(nil),       // 10: google.protobuf.Duration
-	(*wrapperspb.UInt64Value)(nil),    // 11: google.protobuf.UInt64Value
+	(*GcpAuthnFilterConfig)(nil),         // 0: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig
+	(*Audience)(nil),                     // 1: envoy.extensions.filters.http.gcp_authn.v3.Audience
+	(*TokenCacheConfig)(nil),             // 2: envoy.extensions.filters.http.gcp_authn.v3.TokenCacheConfig
+	(*TokenHeader)(nil),                  // 3: envoy.extensions.filters.http.gcp_authn.v3.TokenHeader
+	(*Audience_AccessToken)(nil),         // 4: envoy.extensions.filters.http.gcp_authn.v3.Audience.AccessToken
+	(*Audience_BoundJwt)(nil),            // 5: envoy.extensions.filters.http.gcp_authn.v3.Audience.BoundJwt
+	(*Audience_BoundAccessToken)(nil),    // 6: envoy.extensions.filters.http.gcp_authn.v3.Audience.BoundAccessToken
+	(*Audience_IAMAccessToken)(nil),      // 7: envoy.extensions.filters.http.gcp_authn.v3.Audience.IAMAccessToken
+	(*TokenHeader_PreserveExisting)(nil), // 8: envoy.extensions.filters.http.gcp_authn.v3.TokenHeader.PreserveExisting
+	(*v3.HttpUri)(nil),                   // 9: envoy.config.core.v3.HttpUri
+	(*v3.RetryPolicy)(nil),               // 10: envoy.config.core.v3.RetryPolicy
+	(*durationpb.Duration)(nil),          // 11: google.protobuf.Duration
+	(*wrapperspb.UInt64Value)(nil),       // 12: google.protobuf.UInt64Value
 }
 var file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_depIdxs = []int32{
-	8,  // 0: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig.http_uri:type_name -> envoy.config.core.v3.HttpUri
-	9,  // 1: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig.retry_policy:type_name -> envoy.config.core.v3.RetryPolicy
+	9,  // 0: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig.http_uri:type_name -> envoy.config.core.v3.HttpUri
+	10, // 1: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig.retry_policy:type_name -> envoy.config.core.v3.RetryPolicy
 	2,  // 2: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig.cache_config:type_name -> envoy.extensions.filters.http.gcp_authn.v3.TokenCacheConfig
 	3,  // 3: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig.token_header:type_name -> envoy.extensions.filters.http.gcp_authn.v3.TokenHeader
-	10, // 4: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig.timeout:type_name -> google.protobuf.Duration
+	11, // 4: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig.timeout:type_name -> google.protobuf.Duration
 	1,  // 5: envoy.extensions.filters.http.gcp_authn.v3.GcpAuthnFilterConfig.audience:type_name -> envoy.extensions.filters.http.gcp_authn.v3.Audience
 	4,  // 6: envoy.extensions.filters.http.gcp_authn.v3.Audience.access_token:type_name -> envoy.extensions.filters.http.gcp_authn.v3.Audience.AccessToken
 	5,  // 7: envoy.extensions.filters.http.gcp_authn.v3.Audience.bound_jwt:type_name -> envoy.extensions.filters.http.gcp_authn.v3.Audience.BoundJwt
 	6,  // 8: envoy.extensions.filters.http.gcp_authn.v3.Audience.bound_access_token:type_name -> envoy.extensions.filters.http.gcp_authn.v3.Audience.BoundAccessToken
 	7,  // 9: envoy.extensions.filters.http.gcp_authn.v3.Audience.iam_access_token:type_name -> envoy.extensions.filters.http.gcp_authn.v3.Audience.IAMAccessToken
-	11, // 10: envoy.extensions.filters.http.gcp_authn.v3.TokenCacheConfig.cache_size:type_name -> google.protobuf.UInt64Value
-	11, // [11:11] is the sub-list for method output_type
-	11, // [11:11] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	12, // 10: envoy.extensions.filters.http.gcp_authn.v3.TokenCacheConfig.cache_size:type_name -> google.protobuf.UInt64Value
+	8,  // 11: envoy.extensions.filters.http.gcp_authn.v3.TokenHeader.preserve_existing:type_name -> envoy.extensions.filters.http.gcp_authn.v3.TokenHeader.PreserveExisting
+	12, // [12:12] is the sub-list for method output_type
+	12, // [12:12] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_init() }
@@ -627,7 +680,7 @@ func file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_rawDesc), len(file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
