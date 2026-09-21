@@ -59,7 +59,8 @@ type DynamicModuleFilter struct {
 	// “filter_config“ can be used to configure the logging level or the header manipulation
 	// behavior.
 	//
-	// “google.protobuf.Struct“ is serialized as JSON before passing it to the plugin.
+	// “google.protobuf.Struct“ and the “value“ field of “xds.type.v3.TypedStruct“ are
+	// serialized as JSON before passing them to the plugin.
 	// “google.protobuf.BytesValue“ and “google.protobuf.StringValue“ are passed directly without
 	// the wrapper.
 	//
@@ -183,7 +184,8 @@ type DynamicModuleFilterPerRoute struct {
 	// manipulation. The “filter_config“ can be used to configure the logging level or the header
 	// manipulation behavior.
 	//
-	// “google.protobuf.Struct“ is serialized as JSON before passing it to the plugin.
+	// “google.protobuf.Struct“ and the “value“ field of “xds.type.v3.TypedStruct“ are
+	// serialized as JSON before passing them to the plugin.
 	// “google.protobuf.BytesValue“ and “google.protobuf.StringValue“ are passed directly without
 	// the wrapper.
 	//

@@ -52,7 +52,8 @@ type DynamicModuleFormatter struct {
 	// “formatter_name“, the module can decide which in-module command parser implementation to use
 	// and fine-tune which commands it recognizes.
 	//
-	// “google.protobuf.Struct“ is serialized as JSON before passing it to the module.
+	// “google.protobuf.Struct“ and the “value“ field of “xds.type.v3.TypedStruct“ are
+	// serialized as JSON before passing them to the module.
 	// “google.protobuf.BytesValue“ and “google.protobuf.StringValue“ are passed directly
 	// without the wrapper.
 	//

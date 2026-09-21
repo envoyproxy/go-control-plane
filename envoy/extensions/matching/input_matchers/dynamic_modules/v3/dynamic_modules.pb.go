@@ -102,7 +102,8 @@ type DynamicModuleMatcher struct {
 	// “matcher_name“, the module can decide which in-module matcher implementation to use and
 	// fine-tune the behavior of the matcher.
 	//
-	// “google.protobuf.Struct“ is serialized as JSON before passing it to the module.
+	// “google.protobuf.Struct“ and the “value“ field of “xds.type.v3.TypedStruct“ are
+	// serialized as JSON before passing them to the module.
 	// “google.protobuf.BytesValue“ and “google.protobuf.StringValue“ are passed directly
 	// without the wrapper.
 	MatcherConfig *anypb.Any `protobuf:"bytes,3,opt,name=matcher_config,json=matcherConfig,proto3" json:"matcher_config,omitempty"`

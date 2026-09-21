@@ -45,7 +45,8 @@ type DynamicModuleConfigValidator struct {
 	// The configuration for the implementation chosen by “extension_name“. If not specified, an
 	// empty configuration is passed to the module.
 	//
-	// “google.protobuf.Struct“ is serialized as JSON before passing it to the module.
+	// “google.protobuf.Struct“ and the “value“ field of “xds.type.v3.TypedStruct“ are
+	// serialized as JSON before passing them to the module.
 	// “google.protobuf.BytesValue“ and “google.protobuf.StringValue“ are passed directly without
 	// the wrapper. Otherwise the serialized bytes of the configured message are passed.
 	ExtensionConfig *anypb.Any `protobuf:"bytes,3,opt,name=extension_config,json=extensionConfig,proto3" json:"extension_config,omitempty"`
