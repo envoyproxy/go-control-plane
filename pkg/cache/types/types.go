@@ -42,17 +42,23 @@ type ResponseType int
 // https://www.envoyproxy.io/docs/envoy/latest/api-docs/xds_protocol#aggregated-discovery-service
 // ADS expects things to be returned in a specific order.
 // See the following issue for details: https://github.com/envoyproxy/go-control-plane/issues/526
+//
+// A type goes after whatever makes Envoy subscribe to it, and before whatever refers to what
+// it carries: endpoints follow the cluster that names them, routes follow the listener that
+// names them. Place a new type by that rule rather than appending it here.
 const (
 	Cluster ResponseType = iota
 	Endpoint
 	LbEndpoint
 	Listener
+	// Subscribed to from the filters of a listener, and referred to by name from the
+	// per-filter configuration of a route.
+	ExtensionConfig
 	Route
 	ScopedRoute
 	VirtualHost
 	Secret
 	Runtime
-	ExtensionConfig
 	RateLimitConfig
 	FilterChain
 	UnknownType // token to count the total number of supported types
