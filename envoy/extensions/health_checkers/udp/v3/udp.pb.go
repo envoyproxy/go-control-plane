@@ -8,7 +8,6 @@ package udpv3
 
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
-	_ "github.com/cncf/xds/go/xds/annotations/v3"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -49,10 +48,13 @@ const (
 // statistics, and event logging.
 type UdpHealthCheck struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Payload sent as exactly one UDP datagram at the start of each health-check attempt.
+	// Payload sent as exactly one UDP datagram at the start of each health-check attempt. The decoded
+	// payload must not exceed 65,507 bytes. A smaller payload may be required to avoid IP
+	// fragmentation along the network path.
 	Send *v3.HealthCheck_Payload `protobuf:"bytes,1,opt,name=send,proto3" json:"send,omitempty"`
 	// Expected response payload. A response datagram must match the entire payload exactly to make
-	// the health-check attempt successful.
+	// the health-check attempt successful. The decoded payload must not exceed 65,507 bytes. A
+	// smaller payload may be required to avoid IP fragmentation along the network path.
 	Receive       *v3.HealthCheck_Payload `protobuf:"bytes,2,opt,name=receive,proto3" json:"receive,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -106,10 +108,10 @@ var File_envoy_extensions_health_checkers_udp_v3_udp_proto protoreflect.FileDesc
 
 const file_envoy_extensions_health_checkers_udp_v3_udp_proto_rawDesc = "" +
 	"\n" +
-	"1envoy/extensions/health_checkers/udp/v3/udp.proto\x12'envoy.extensions.health_checkers.udp.v3\x1a'envoy/config/core/v3/health_check.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xa8\x01\n" +
+	"1envoy/extensions/health_checkers/udp/v3/udp.proto\x12'envoy.extensions.health_checkers.udp.v3\x1a'envoy/config/core/v3/health_check.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xa8\x01\n" +
 	"\x0eUdpHealthCheck\x12G\n" +
 	"\x04send\x18\x01 \x01(\v2).envoy.config.core.v3.HealthCheck.PayloadB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x04send\x12M\n" +
-	"\areceive\x18\x02 \x01(\v2).envoy.config.core.v3.HealthCheck.PayloadB\b\xfaB\x05\x8a\x01\x02\x10\x01R\areceiveB\xa9\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
+	"\areceive\x18\x02 \x01(\v2).envoy.config.core.v3.HealthCheck.PayloadB\b\xfaB\x05\x8a\x01\x02\x10\x01R\areceiveB\xa1\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"5io.envoyproxy.envoy.extensions.health_checkers.udp.v3B\bUdpProtoP\x01ZTgithub.com/envoyproxy/go-control-plane/envoy/extensions/health_checkers/udp/v3;udpv3b\x06proto3"
 
 var (
