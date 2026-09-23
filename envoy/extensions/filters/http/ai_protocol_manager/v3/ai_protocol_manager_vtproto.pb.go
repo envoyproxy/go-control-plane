@@ -288,8 +288,8 @@ func (m *TokenUsageExtraction) MarshalToSizedBufferVTStrict(dAtA []byte) (int, e
 		i--
 		dAtA[i] = 0x1a
 	}
-	if m.DefaultApiProtocol != 0 {
-		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.DefaultApiProtocol))
+	if m.DefaultLlmProtocol != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.DefaultLlmProtocol))
 		i--
 		dAtA[i] = 0x10
 	}
@@ -452,8 +452,8 @@ func (m *RequestPerRoute) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error)
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if m.ApiProtocol != 0 {
-		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.ApiProtocol))
+	if m.LlmProtocol != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.LlmProtocol))
 		i--
 		dAtA[i] = 0x8
 	}
@@ -490,8 +490,8 @@ func (m *ResponsePerRoute) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if m.ApiProtocol != 0 {
-		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.ApiProtocol))
+	if m.LlmProtocol != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.LlmProtocol))
 		i--
 		dAtA[i] = 0x8
 	}
@@ -582,8 +582,8 @@ func (m *TokenUsageExtraction) SizeVT() (n int) {
 	if m.IncludeUnconfiguredRoutes {
 		n += 2
 	}
-	if m.DefaultApiProtocol != 0 {
-		n += 1 + protohelpers.SizeOfVarint(uint64(m.DefaultApiProtocol))
+	if m.DefaultLlmProtocol != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.DefaultLlmProtocol))
 	}
 	l = len(m.MetadataNamespace)
 	if l > 0 {
@@ -646,8 +646,8 @@ func (m *RequestPerRoute) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
-	if m.ApiProtocol != 0 {
-		n += 1 + protohelpers.SizeOfVarint(uint64(m.ApiProtocol))
+	if m.LlmProtocol != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.LlmProtocol))
 	}
 	n += len(m.unknownFields)
 	return n
@@ -659,8 +659,8 @@ func (m *ResponsePerRoute) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
-	if m.ApiProtocol != 0 {
-		n += 1 + protohelpers.SizeOfVarint(uint64(m.ApiProtocol))
+	if m.LlmProtocol != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.LlmProtocol))
 	}
 	n += len(m.unknownFields)
 	return n

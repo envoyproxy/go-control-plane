@@ -121,8 +121,8 @@ func (m *TokenUsage) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x12
 	}
-	if m.ApiProtocol != 0 {
-		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.ApiProtocol))
+	if m.LlmProtocol != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.LlmProtocol))
 		i--
 		dAtA[i] = 0x8
 	}
@@ -241,8 +241,8 @@ func (m *TokenUsage) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
-	if m.ApiProtocol != 0 {
-		n += 1 + protohelpers.SizeOfVarint(uint64(m.ApiProtocol))
+	if m.LlmProtocol != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.LlmProtocol))
 	}
 	l = len(m.Model)
 	if l > 0 {

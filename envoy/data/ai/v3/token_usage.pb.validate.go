@@ -37,7 +37,7 @@ var (
 	_ = anypb.Any{}
 	_ = sort.Sort
 
-	_ = v3.ApiProtocol(0)
+	_ = v3.LLMProtocol(0)
 )
 
 // Validate checks the field values on TokenUsage with the rules defined in the
@@ -62,7 +62,7 @@ func (m *TokenUsage) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for ApiProtocol
+	// no validation rules for LlmProtocol
 
 	// no validation rules for Model
 

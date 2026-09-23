@@ -96,8 +96,8 @@ func (m *RequestInfo) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x12
 	}
-	if m.InputApiProtocol != 0 {
-		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.InputApiProtocol))
+	if m.InputLlmProtocol != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.InputLlmProtocol))
 		i--
 		dAtA[i] = 0x8
 	}
@@ -110,8 +110,8 @@ func (m *RequestInfo) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
-	if m.InputApiProtocol != 0 {
-		n += 1 + protohelpers.SizeOfVarint(uint64(m.InputApiProtocol))
+	if m.InputLlmProtocol != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.InputLlmProtocol))
 	}
 	l = len(m.Model)
 	if l > 0 {

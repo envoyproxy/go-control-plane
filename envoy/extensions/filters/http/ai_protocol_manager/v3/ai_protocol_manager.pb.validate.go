@@ -37,7 +37,7 @@ var (
 	_ = anypb.Any{}
 	_ = sort.Sort
 
-	_ = v3.ApiProtocol(0)
+	_ = v3.LLMProtocol(0)
 )
 
 // Validate checks the field values on AiProtocolManager with the rules defined
@@ -635,9 +635,9 @@ func (m *TokenUsageExtraction) validate(all bool) error {
 
 	// no validation rules for IncludeUnconfiguredRoutes
 
-	if _, ok := v3.ApiProtocol_name[int32(m.GetDefaultApiProtocol())]; !ok {
+	if _, ok := v3.LLMProtocol_name[int32(m.GetDefaultLlmProtocol())]; !ok {
 		err := TokenUsageExtractionValidationError{
-			field:  "DefaultApiProtocol",
+			field:  "DefaultLlmProtocol",
 			reason: "value must be one of the defined enum values",
 		}
 		if !all {
@@ -1097,9 +1097,9 @@ func (m *RequestPerRoute) validate(all bool) error {
 
 	var errors []error
 
-	if _, ok := v3.ApiProtocol_name[int32(m.GetApiProtocol())]; !ok {
+	if _, ok := v3.LLMProtocol_name[int32(m.GetLlmProtocol())]; !ok {
 		err := RequestPerRouteValidationError{
-			field:  "ApiProtocol",
+			field:  "LlmProtocol",
 			reason: "value must be one of the defined enum values",
 		}
 		if !all {
@@ -1208,9 +1208,9 @@ func (m *ResponsePerRoute) validate(all bool) error {
 
 	var errors []error
 
-	if _, ok := v3.ApiProtocol_name[int32(m.GetApiProtocol())]; !ok {
+	if _, ok := v3.LLMProtocol_name[int32(m.GetLlmProtocol())]; !ok {
 		err := ResponsePerRouteValidationError{
-			field:  "ApiProtocol",
+			field:  "LlmProtocol",
 			reason: "value must be one of the defined enum values",
 		}
 		if !all {

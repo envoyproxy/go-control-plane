@@ -33,7 +33,7 @@ const (
 type RequestInfo struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The route's declared wire API. When unspecified, only “model“ and “stream“ are read.
-	InputApiProtocol v3.ApiProtocol `protobuf:"varint,1,opt,name=input_api_protocol,json=inputApiProtocol,proto3,enum=envoy.type.ai.v3.ApiProtocol" json:"input_api_protocol,omitempty"`
+	InputLlmProtocol v3.LLMProtocol `protobuf:"varint,1,opt,name=input_llm_protocol,json=inputLlmProtocol,proto3,enum=envoy.type.ai.v3.LLMProtocol" json:"input_llm_protocol,omitempty"`
 	// The requested model.
 	Model string `protobuf:"bytes,2,opt,name=model,proto3" json:"model,omitempty"`
 	// Whether a streamed response was requested.
@@ -78,11 +78,11 @@ func (*RequestInfo) Descriptor() ([]byte, []int) {
 	return file_envoy_data_ai_v3_request_info_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *RequestInfo) GetInputApiProtocol() v3.ApiProtocol {
+func (x *RequestInfo) GetInputLlmProtocol() v3.LLMProtocol {
 	if x != nil {
-		return x.InputApiProtocol
+		return x.InputLlmProtocol
 	}
-	return v3.ApiProtocol(0)
+	return v3.LLMProtocol(0)
 }
 
 func (x *RequestInfo) GetModel() string {
@@ -124,9 +124,9 @@ var File_envoy_data_ai_v3_request_info_proto protoreflect.FileDescriptor
 
 const file_envoy_data_ai_v3_request_info_proto_rawDesc = "" +
 	"\n" +
-	"#envoy/data/ai/v3/request_info.proto\x12\x10envoy.data.ai.v3\x1a#envoy/type/ai/v3/api_protocol.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\"\xee\x02\n" +
+	"#envoy/data/ai/v3/request_info.proto\x12\x10envoy.data.ai.v3\x1a#envoy/type/ai/v3/llm_protocol.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\"\xee\x02\n" +
 	"\vRequestInfo\x12K\n" +
-	"\x12input_api_protocol\x18\x01 \x01(\x0e2\x1d.envoy.type.ai.v3.ApiProtocolR\x10inputApiProtocol\x12\x14\n" +
+	"\x12input_llm_protocol\x18\x01 \x01(\x0e2\x1d.envoy.type.ai.v3.LLMProtocolR\x10inputLlmProtocol\x12\x14\n" +
 	"\x05model\x18\x02 \x01(\tR\x05model\x122\n" +
 	"\x06stream\x18\x03 \x01(\v2\x1a.google.protobuf.BoolValueR\x06stream\x12H\n" +
 	"\x11max_output_tokens\x18\x04 \x01(\v2\x1c.google.protobuf.UInt64ValueR\x0fmaxOutputTokens\x12A\n" +
@@ -150,13 +150,13 @@ func file_envoy_data_ai_v3_request_info_proto_rawDescGZIP() []byte {
 var file_envoy_data_ai_v3_request_info_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_envoy_data_ai_v3_request_info_proto_goTypes = []any{
 	(*RequestInfo)(nil),            // 0: envoy.data.ai.v3.RequestInfo
-	(v3.ApiProtocol)(0),            // 1: envoy.type.ai.v3.ApiProtocol
+	(v3.LLMProtocol)(0),            // 1: envoy.type.ai.v3.LLMProtocol
 	(*wrapperspb.BoolValue)(nil),   // 2: google.protobuf.BoolValue
 	(*wrapperspb.UInt64Value)(nil), // 3: google.protobuf.UInt64Value
 	(*wrapperspb.UInt32Value)(nil), // 4: google.protobuf.UInt32Value
 }
 var file_envoy_data_ai_v3_request_info_proto_depIdxs = []int32{
-	1, // 0: envoy.data.ai.v3.RequestInfo.input_api_protocol:type_name -> envoy.type.ai.v3.ApiProtocol
+	1, // 0: envoy.data.ai.v3.RequestInfo.input_llm_protocol:type_name -> envoy.type.ai.v3.LLMProtocol
 	2, // 1: envoy.data.ai.v3.RequestInfo.stream:type_name -> google.protobuf.BoolValue
 	3, // 2: envoy.data.ai.v3.RequestInfo.max_output_tokens:type_name -> google.protobuf.UInt64Value
 	4, // 3: envoy.data.ai.v3.RequestInfo.message_count:type_name -> google.protobuf.UInt32Value

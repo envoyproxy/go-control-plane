@@ -88,7 +88,7 @@ func (TokenUsageExtraction_UsageSignal) EnumDescriptor() ([]byte, []int) {
 //
 // Request and response processing are independently enabled by the presence
 // of “request_handling“ and “response_handling“. Which routes are AI
-// endpoints — and which :ref:`wire API <envoy_v3_api_enum_type.ai.v3.ApiProtocol>`
+// endpoints — and which :ref:`wire API <envoy_v3_api_enum_type.ai.v3.LLMProtocol>`
 // each speaks — is declared with the :ref:`per-route configuration
 // <envoy_v3_api_msg_extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute>`.
 type AiProtocolManager struct {
@@ -360,13 +360,13 @@ type TokenUsageExtraction struct {
 	IncludeUnconfiguredRoutes bool `protobuf:"varint,1,opt,name=include_unconfigured_routes,json=includeUnconfiguredRoutes,proto3" json:"include_unconfigured_routes,omitempty"`
 	// Fallback wire API used when the route does not identify a response API.
 	//
-	// “API_PROTOCOL_UNSPECIFIED“ means auto-detect from the response shape
+	// “LLM_PROTOCOL_UNSPECIFIED“ means auto-detect from the response shape
 	// (only strongly shaped, value-validated markers lock a stream). This is a
 	// fallback, not an override of per-route response configuration; see the
 	// :ref:`per-route configuration
 	// <envoy_v3_api_msg_extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute>`
 	// for the full precedence.
-	DefaultApiProtocol v31.ApiProtocol `protobuf:"varint,2,opt,name=default_api_protocol,json=defaultApiProtocol,proto3,enum=envoy.type.ai.v3.ApiProtocol" json:"default_api_protocol,omitempty"`
+	DefaultLlmProtocol v31.LLMProtocol `protobuf:"varint,2,opt,name=default_llm_protocol,json=defaultLlmProtocol,proto3,enum=envoy.type.ai.v3.LLMProtocol" json:"default_llm_protocol,omitempty"`
 	// Namespace for the emitted typed dynamic metadata.
 	// Defaults to “envoy.ai.token_usage“.
 	MetadataNamespace string `protobuf:"bytes,3,opt,name=metadata_namespace,json=metadataNamespace,proto3" json:"metadata_namespace,omitempty"`
@@ -415,11 +415,11 @@ func (x *TokenUsageExtraction) GetIncludeUnconfiguredRoutes() bool {
 	return false
 }
 
-func (x *TokenUsageExtraction) GetDefaultApiProtocol() v31.ApiProtocol {
+func (x *TokenUsageExtraction) GetDefaultLlmProtocol() v31.LLMProtocol {
 	if x != nil {
-		return x.DefaultApiProtocol
+		return x.DefaultLlmProtocol
 	}
-	return v31.ApiProtocol(0)
+	return v31.LLMProtocol(0)
 }
 
 func (x *TokenUsageExtraction) GetMetadataNamespace() string {
@@ -537,9 +537,9 @@ func (x *TokenUsageExtractionLimits) GetMaxParsedSseEvents() *wrapperspb.UInt32V
 // protocol translation can make the client-facing request API differ from
 // the provider's response API. For response token-usage extraction the
 // effective wire API is resolved in precedence order: per-route
-// “response.api_protocol“, then per-route “request.api_protocol“, then
-// :ref:`default_api_protocol
-// <envoy_v3_api_field_extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.default_api_protocol>`,
+// “response.llm_protocol“, then per-route “request.llm_protocol“, then
+// :ref:`default_llm_protocol
+// <envoy_v3_api_field_extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.default_llm_protocol>`,
 // then auto-detection.
 type AiProtocolManagerPerRoute struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -549,7 +549,7 @@ type AiProtocolManagerPerRoute struct {
 	// is enabled).
 	Request *RequestPerRoute `protobuf:"bytes,1,opt,name=request,proto3" json:"request,omitempty"`
 	// Optional response-side route configuration. When absent, response
-	// processing inherits “request.api_protocol“ when available, then the
+	// processing inherits “request.llm_protocol“ when available, then the
 	// global fallback.
 	Response      *ResponsePerRoute `protobuf:"bytes,2,opt,name=response,proto3" json:"response,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -604,7 +604,7 @@ func (x *AiProtocolManagerPerRoute) GetResponse() *ResponsePerRoute {
 type RequestPerRoute struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The wire API a request payload on this route follows.
-	// “API_PROTOCOL_UNSPECIFIED“ declares the endpoint without naming its
+	// “LLM_PROTOCOL_UNSPECIFIED“ declares the endpoint without naming its
 	// API.
 	//
 	// Payloads are validated against the declared API's schema when one is
@@ -614,7 +614,7 @@ type RequestPerRoute struct {
 	// [#comment: Normalization is not implemented yet; a normalization knob
 	// will be added here once the transformation and its output contract
 	// exist.]
-	ApiProtocol   v31.ApiProtocol `protobuf:"varint,1,opt,name=api_protocol,json=apiProtocol,proto3,enum=envoy.type.ai.v3.ApiProtocol" json:"api_protocol,omitempty"`
+	LlmProtocol   v31.LLMProtocol `protobuf:"varint,1,opt,name=llm_protocol,json=llmProtocol,proto3,enum=envoy.type.ai.v3.LLMProtocol" json:"llm_protocol,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -649,20 +649,20 @@ func (*RequestPerRoute) Descriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *RequestPerRoute) GetApiProtocol() v31.ApiProtocol {
+func (x *RequestPerRoute) GetLlmProtocol() v31.LLMProtocol {
 	if x != nil {
-		return x.ApiProtocol
+		return x.LlmProtocol
 	}
-	return v31.ApiProtocol(0)
+	return v31.LLMProtocol(0)
 }
 
 // Per-route response-side behavior.
 type ResponsePerRoute struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The wire API the response on this route follows. This can differ from
-	// “request.api_protocol“ when the gateway performs protocol translation.
-	// “API_PROTOCOL_UNSPECIFIED“ falls through the precedence chain above.
-	ApiProtocol   v31.ApiProtocol `protobuf:"varint,1,opt,name=api_protocol,json=apiProtocol,proto3,enum=envoy.type.ai.v3.ApiProtocol" json:"api_protocol,omitempty"`
+	// “request.llm_protocol“ when the gateway performs protocol translation.
+	// “LLM_PROTOCOL_UNSPECIFIED“ falls through the precedence chain above.
+	LlmProtocol   v31.LLMProtocol `protobuf:"varint,1,opt,name=llm_protocol,json=llmProtocol,proto3,enum=envoy.type.ai.v3.LLMProtocol" json:"llm_protocol,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -697,18 +697,18 @@ func (*ResponsePerRoute) Descriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *ResponsePerRoute) GetApiProtocol() v31.ApiProtocol {
+func (x *ResponsePerRoute) GetLlmProtocol() v31.LLMProtocol {
 	if x != nil {
-		return x.ApiProtocol
+		return x.LlmProtocol
 	}
-	return v31.ApiProtocol(0)
+	return v31.LLMProtocol(0)
 }
 
 var File_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDesc = "" +
 	"\n" +
-	"Nenvoy/extensions/filters/http/ai_protocol_manager/v3/ai_protocol_manager.proto\x124envoy.extensions.filters.http.ai_protocol_manager.v3\x1a$envoy/config/core/v3/extension.proto\x1a#envoy/type/ai/v3/api_protocol.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xc0\x02\n" +
+	"Nenvoy/extensions/filters/http/ai_protocol_manager/v3/ai_protocol_manager.proto\x124envoy.extensions.filters.http.ai_protocol_manager.v3\x1a$envoy/config/core/v3/extension.proto\x1a#envoy/type/ai/v3/llm_protocol.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xc0\x02\n" +
 	"\x11AiProtocolManager\x12p\n" +
 	"\x10request_handling\x18\x01 \x01(\v2E.envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandlingR\x0frequestHandling\x12s\n" +
 	"\x11response_handling\x18\x02 \x01(\v2F.envoy.extensions.filters.http.ai_protocol_manager.v3.ResponseHandlingR\x10responseHandling\x12D\n" +
@@ -723,7 +723,7 @@ const file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_mana
 	"tokenUsage\"\x96\x04\n" +
 	"\x14TokenUsageExtraction\x12>\n" +
 	"\x1binclude_unconfigured_routes\x18\x01 \x01(\bR\x19includeUnconfiguredRoutes\x12Y\n" +
-	"\x14default_api_protocol\x18\x02 \x01(\x0e2\x1d.envoy.type.ai.v3.ApiProtocolB\b\xfaB\x05\x82\x01\x02\x10\x01R\x12defaultApiProtocol\x12-\n" +
+	"\x14default_llm_protocol\x18\x02 \x01(\x0e2\x1d.envoy.type.ai.v3.LLMProtocolB\b\xfaB\x05\x82\x01\x02\x10\x01R\x12defaultLlmProtocol\x12-\n" +
 	"\x12metadata_namespace\x18\x03 \x01(\tR\x11metadataNamespace\x12h\n" +
 	"\x06limits\x18\x04 \x01(\v2P.envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimitsR\x06limits\x12\x83\x01\n" +
 	"\fusage_signal\x18\x05 \x01(\x0e2V.envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.UsageSignalB\b\xfaB\x05\x82\x01\x02\x10\x01R\vusageSignal\"D\n" +
@@ -738,9 +738,9 @@ const file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_mana
 	"\arequest\x18\x01 \x01(\v2E.envoy.extensions.filters.http.ai_protocol_manager.v3.RequestPerRouteR\arequest\x12b\n" +
 	"\bresponse\x18\x02 \x01(\v2F.envoy.extensions.filters.http.ai_protocol_manager.v3.ResponsePerRouteR\bresponse\"]\n" +
 	"\x0fRequestPerRoute\x12J\n" +
-	"\fapi_protocol\x18\x01 \x01(\x0e2\x1d.envoy.type.ai.v3.ApiProtocolB\b\xfaB\x05\x82\x01\x02\x10\x01R\vapiProtocol\"^\n" +
+	"\fllm_protocol\x18\x01 \x01(\x0e2\x1d.envoy.type.ai.v3.LLMProtocolB\b\xfaB\x05\x82\x01\x02\x10\x01R\vllmProtocol\"^\n" +
 	"\x10ResponsePerRoute\x12J\n" +
-	"\fapi_protocol\x18\x01 \x01(\x0e2\x1d.envoy.type.ai.v3.ApiProtocolB\b\xfaB\x05\x82\x01\x02\x10\x01R\vapiProtocolB\xe1\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
+	"\fllm_protocol\x18\x01 \x01(\x0e2\x1d.envoy.type.ai.v3.LLMProtocolB\b\xfaB\x05\x82\x01\x02\x10\x01R\vllmProtocolB\xe1\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
 	"Bio.envoyproxy.envoy.extensions.filters.http.ai_protocol_manager.v3B\x16AiProtocolManagerProtoP\x01Zqgithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/ai_protocol_manager/v3;ai_protocol_managerv3b\x06proto3"
 
 var (
@@ -770,7 +770,7 @@ var file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manage
 	(*ResponsePerRoute)(nil),              // 9: envoy.extensions.filters.http.ai_protocol_manager.v3.ResponsePerRoute
 	(*v3.TypedExtensionConfig)(nil),       // 10: envoy.config.core.v3.TypedExtensionConfig
 	(*wrapperspb.UInt32Value)(nil),        // 11: google.protobuf.UInt32Value
-	(v31.ApiProtocol)(0),                  // 12: envoy.type.ai.v3.ApiProtocol
+	(v31.LLMProtocol)(0),                  // 12: envoy.type.ai.v3.LLMProtocol
 }
 var file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_depIdxs = []int32{
 	2,  // 0: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManager.request_handling:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandling
@@ -779,7 +779,7 @@ var file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manage
 	3,  // 3: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandling.limits:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.RequestParsingLimits
 	11, // 4: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestParsingLimits.inline_string_threshold_bytes:type_name -> google.protobuf.UInt32Value
 	5,  // 5: envoy.extensions.filters.http.ai_protocol_manager.v3.ResponseHandling.token_usage:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction
-	12, // 6: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.default_api_protocol:type_name -> envoy.type.ai.v3.ApiProtocol
+	12, // 6: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.default_llm_protocol:type_name -> envoy.type.ai.v3.LLMProtocol
 	6,  // 7: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.limits:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits
 	0,  // 8: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.usage_signal:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.UsageSignal
 	11, // 9: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits.max_sse_event_size:type_name -> google.protobuf.UInt32Value
@@ -787,8 +787,8 @@ var file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manage
 	11, // 11: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits.max_parsed_sse_events:type_name -> google.protobuf.UInt32Value
 	8,  // 12: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute.request:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.RequestPerRoute
 	9,  // 13: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute.response:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.ResponsePerRoute
-	12, // 14: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestPerRoute.api_protocol:type_name -> envoy.type.ai.v3.ApiProtocol
-	12, // 15: envoy.extensions.filters.http.ai_protocol_manager.v3.ResponsePerRoute.api_protocol:type_name -> envoy.type.ai.v3.ApiProtocol
+	12, // 14: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestPerRoute.llm_protocol:type_name -> envoy.type.ai.v3.LLMProtocol
+	12, // 15: envoy.extensions.filters.http.ai_protocol_manager.v3.ResponsePerRoute.llm_protocol:type_name -> envoy.type.ai.v3.LLMProtocol
 	16, // [16:16] is the sub-list for method output_type
 	16, // [16:16] is the sub-list for method input_type
 	16, // [16:16] is the sub-list for extension type_name

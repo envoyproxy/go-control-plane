@@ -37,7 +37,7 @@ var (
 	_ = anypb.Any{}
 	_ = sort.Sort
 
-	_ = v3.ApiProtocol(0)
+	_ = v3.LLMProtocol(0)
 )
 
 // Validate checks the field values on RequestInfo with the rules defined in
@@ -62,7 +62,7 @@ func (m *RequestInfo) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for InputApiProtocol
+	// no validation rules for InputLlmProtocol
 
 	// no validation rules for Model
 

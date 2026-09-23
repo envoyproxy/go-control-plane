@@ -37,7 +37,7 @@ const (
 	// counts may be stale (an earlier cumulative snapshot) or incomplete.
 	TokenUsage_PARTIAL TokenUsage_ExtractionStatus = 2
 	// Usage-bearing input was observed but no usable canonical count could
-	// be extracted; only “api_protocol“ and “model“ may be populated.
+	// be extracted; only “llm_protocol“ and “model“ may be populated.
 	TokenUsage_FAILED TokenUsage_ExtractionStatus = 3
 )
 
@@ -97,7 +97,7 @@ func (TokenUsage_ExtractionStatus) EnumDescriptor() ([]byte, []int) {
 // provider-reported and is not independently verified by Envoy.
 //
 // Every count is optional: wire APIs report different subsets, and a
-// status-only record (“api_protocol“, “model“ when captured, and
+// status-only record (“llm_protocol“, “model“ when captured, and
 // “extraction_status: FAILED“) is published when extraction failed
 // outright, distinguishing that from a response that supplied no usage
 // (which publishes nothing).
@@ -107,7 +107,7 @@ type TokenUsage struct {
 	// The wire API the usage was extracted from. This names an API contract,
 	// not a provider identity: any OpenAI-compatible backend reports an OpenAI
 	// protocol here.
-	ApiProtocol v3.ApiProtocol `protobuf:"varint,1,opt,name=api_protocol,json=apiProtocol,proto3,enum=envoy.type.ai.v3.ApiProtocol" json:"api_protocol,omitempty"`
+	LlmProtocol v3.LLMProtocol `protobuf:"varint,1,opt,name=llm_protocol,json=llmProtocol,proto3,enum=envoy.type.ai.v3.LLMProtocol" json:"llm_protocol,omitempty"`
 	// The model reported by the response, when present.
 	Model string `protobuf:"bytes,2,opt,name=model,proto3" json:"model,omitempty"`
 	// Canonical inclusive input token count.
@@ -164,11 +164,11 @@ func (*TokenUsage) Descriptor() ([]byte, []int) {
 	return file_envoy_data_ai_v3_token_usage_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *TokenUsage) GetApiProtocol() v3.ApiProtocol {
+func (x *TokenUsage) GetLlmProtocol() v3.LLMProtocol {
 	if x != nil {
-		return x.ApiProtocol
+		return x.LlmProtocol
 	}
-	return v3.ApiProtocol(0)
+	return v3.LLMProtocol(0)
 }
 
 func (x *TokenUsage) GetModel() string {
@@ -343,10 +343,10 @@ var File_envoy_data_ai_v3_token_usage_proto protoreflect.FileDescriptor
 
 const file_envoy_data_ai_v3_token_usage_proto_rawDesc = "" +
 	"\n" +
-	"\"envoy/data/ai/v3/token_usage.proto\x12\x10envoy.data.ai.v3\x1a#envoy/type/ai/v3/api_protocol.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\"\xe2\x05\n" +
+	"\"envoy/data/ai/v3/token_usage.proto\x12\x10envoy.data.ai.v3\x1a#envoy/type/ai/v3/llm_protocol.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\"\xe2\x05\n" +
 	"\n" +
 	"TokenUsage\x12@\n" +
-	"\fapi_protocol\x18\x01 \x01(\x0e2\x1d.envoy.type.ai.v3.ApiProtocolR\vapiProtocol\x12\x14\n" +
+	"\fllm_protocol\x18\x01 \x01(\x0e2\x1d.envoy.type.ai.v3.LLMProtocolR\vllmProtocol\x12\x14\n" +
 	"\x05model\x18\x02 \x01(\tR\x05model\x12?\n" +
 	"\finput_tokens\x18\x03 \x01(\v2\x1c.google.protobuf.UInt64ValueR\vinputTokens\x12A\n" +
 	"\routput_tokens\x18\x04 \x01(\v2\x1c.google.protobuf.UInt64ValueR\foutputTokens\x12?\n" +
@@ -388,11 +388,11 @@ var file_envoy_data_ai_v3_token_usage_proto_goTypes = []any{
 	(*TokenUsage)(nil),               // 1: envoy.data.ai.v3.TokenUsage
 	(*InputTokenDetails)(nil),        // 2: envoy.data.ai.v3.InputTokenDetails
 	(*OutputTokenDetails)(nil),       // 3: envoy.data.ai.v3.OutputTokenDetails
-	(v3.ApiProtocol)(0),              // 4: envoy.type.ai.v3.ApiProtocol
+	(v3.LLMProtocol)(0),              // 4: envoy.type.ai.v3.LLMProtocol
 	(*wrapperspb.UInt64Value)(nil),   // 5: google.protobuf.UInt64Value
 }
 var file_envoy_data_ai_v3_token_usage_proto_depIdxs = []int32{
-	4,  // 0: envoy.data.ai.v3.TokenUsage.api_protocol:type_name -> envoy.type.ai.v3.ApiProtocol
+	4,  // 0: envoy.data.ai.v3.TokenUsage.llm_protocol:type_name -> envoy.type.ai.v3.LLMProtocol
 	5,  // 1: envoy.data.ai.v3.TokenUsage.input_tokens:type_name -> google.protobuf.UInt64Value
 	5,  // 2: envoy.data.ai.v3.TokenUsage.output_tokens:type_name -> google.protobuf.UInt64Value
 	5,  // 3: envoy.data.ai.v3.TokenUsage.total_tokens:type_name -> google.protobuf.UInt64Value
