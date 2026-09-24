@@ -60,6 +60,35 @@ func (m *RequestInfo) validate(all bool) error {
 
 	// no validation rules for MetadataNamespace
 
+	if all {
+		switch v := interface{}(m.GetTokenEstimation()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RequestInfoValidationError{
+					field:  "TokenEstimation",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RequestInfoValidationError{
+					field:  "TokenEstimation",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTokenEstimation()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RequestInfoValidationError{
+				field:  "TokenEstimation",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return RequestInfoMultiError(errors)
 	}
@@ -136,3 +165,117 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RequestInfoValidationError{}
+
+// Validate checks the field values on RequestInfo_TokenEstimation with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *RequestInfo_TokenEstimation) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RequestInfo_TokenEstimation with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RequestInfo_TokenEstimationMultiError, or nil if none found.
+func (m *RequestInfo_TokenEstimation) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RequestInfo_TokenEstimation) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if val := m.GetTokensPerByte(); val <= 0 || val > 1 {
+		err := RequestInfo_TokenEstimationValidationError{
+			field:  "TokensPerByte",
+			reason: "value must be inside range (0, 1]",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return RequestInfo_TokenEstimationMultiError(errors)
+	}
+
+	return nil
+}
+
+// RequestInfo_TokenEstimationMultiError is an error wrapping multiple
+// validation errors returned by RequestInfo_TokenEstimation.ValidateAll() if
+// the designated constraints aren't met.
+type RequestInfo_TokenEstimationMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RequestInfo_TokenEstimationMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RequestInfo_TokenEstimationMultiError) AllErrors() []error { return m }
+
+// RequestInfo_TokenEstimationValidationError is the validation error returned
+// by RequestInfo_TokenEstimation.Validate if the designated constraints
+// aren't met.
+type RequestInfo_TokenEstimationValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RequestInfo_TokenEstimationValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RequestInfo_TokenEstimationValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RequestInfo_TokenEstimationValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RequestInfo_TokenEstimationValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RequestInfo_TokenEstimationValidationError) ErrorName() string {
+	return "RequestInfo_TokenEstimationValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RequestInfo_TokenEstimationValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRequestInfo_TokenEstimation.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RequestInfo_TokenEstimationValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RequestInfo_TokenEstimationValidationError{}

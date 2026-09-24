@@ -49,6 +49,16 @@ func (m *RequestInfo) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.EstimatedInputTokens != nil {
+		size, err := (*wrapperspb.UInt64Value)(m.EstimatedInputTokens).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x3a
+	}
 	if m.ToolCount != nil {
 		size, err := (*wrapperspb.UInt32Value)(m.ToolCount).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -131,6 +141,10 @@ func (m *RequestInfo) SizeVT() (n int) {
 	}
 	if m.ToolCount != nil {
 		l = (*wrapperspb.UInt32Value)(m.ToolCount).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.EstimatedInputTokens != nil {
+		l = (*wrapperspb.UInt64Value)(m.EstimatedInputTokens).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)

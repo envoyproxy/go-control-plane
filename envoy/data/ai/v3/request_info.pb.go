@@ -27,9 +27,10 @@ const (
 
 // Request attributes published as typed dynamic metadata by the :ref:`request info AI
 // filter <envoy_v3_api_msg_extensions.http.ai_filters.request_info.v3.RequestInfo>`. Values are
-// client-declared and unverified. A value the client sent that Envoy cannot use, such as one
-// of the wrong type, out of range, or a string over 256 bytes, is ignored.
-// [#next-free-field: 7]
+// client-declared and unverified, apart from “estimated_input_tokens“, which Envoy computes.
+// A value the client sent that Envoy cannot use, such as one of the wrong type, out of range,
+// or a string over 256 bytes, is ignored.
+// [#next-free-field: 8]
 type RequestInfo struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The route's declared wire API. When unspecified, only “model“ and “stream“ are read.
@@ -43,9 +44,14 @@ type RequestInfo struct {
 	// Number of messages in the conversation.
 	MessageCount *wrapperspb.UInt32Value `protobuf:"bytes,5,opt,name=message_count,json=messageCount,proto3" json:"message_count,omitempty"`
 	// Number of tools declared.
-	ToolCount     *wrapperspb.UInt32Value `protobuf:"bytes,6,opt,name=tool_count,json=toolCount,proto3" json:"tool_count,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	ToolCount *wrapperspb.UInt32Value `protobuf:"bytes,6,opt,name=tool_count,json=toolCount,proto3" json:"tool_count,omitempty"`
+	// Envoy's estimate of the input tokens, published only when :ref:`token_estimation
+	// <envoy_v3_api_field_extensions.http.ai_filters.request_info.v3.RequestInfo.token_estimation>`
+	// is configured: “ceil(tokens_per_byte * request payload bytes)“. A size heuristic, not a
+	// tokenizer result, and independent of the wire API.
+	EstimatedInputTokens *wrapperspb.UInt64Value `protobuf:"bytes,7,opt,name=estimated_input_tokens,json=estimatedInputTokens,proto3" json:"estimated_input_tokens,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *RequestInfo) Reset() {
@@ -120,11 +126,18 @@ func (x *RequestInfo) GetToolCount() *wrapperspb.UInt32Value {
 	return nil
 }
 
+func (x *RequestInfo) GetEstimatedInputTokens() *wrapperspb.UInt64Value {
+	if x != nil {
+		return x.EstimatedInputTokens
+	}
+	return nil
+}
+
 var File_envoy_data_ai_v3_request_info_proto protoreflect.FileDescriptor
 
 const file_envoy_data_ai_v3_request_info_proto_rawDesc = "" +
 	"\n" +
-	"#envoy/data/ai/v3/request_info.proto\x12\x10envoy.data.ai.v3\x1a#envoy/type/ai/v3/llm_protocol.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\"\xee\x02\n" +
+	"#envoy/data/ai/v3/request_info.proto\x12\x10envoy.data.ai.v3\x1a#envoy/type/ai/v3/llm_protocol.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\"\xc2\x03\n" +
 	"\vRequestInfo\x12K\n" +
 	"\x12input_llm_protocol\x18\x01 \x01(\x0e2\x1d.envoy.type.ai.v3.LLMProtocolR\x10inputLlmProtocol\x12\x14\n" +
 	"\x05model\x18\x02 \x01(\tR\x05model\x122\n" +
@@ -132,7 +145,8 @@ const file_envoy_data_ai_v3_request_info_proto_rawDesc = "" +
 	"\x11max_output_tokens\x18\x04 \x01(\v2\x1c.google.protobuf.UInt64ValueR\x0fmaxOutputTokens\x12A\n" +
 	"\rmessage_count\x18\x05 \x01(\v2\x1c.google.protobuf.UInt32ValueR\fmessageCount\x12;\n" +
 	"\n" +
-	"tool_count\x18\x06 \x01(\v2\x1c.google.protobuf.UInt32ValueR\ttoolCountB\x82\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
+	"tool_count\x18\x06 \x01(\v2\x1c.google.protobuf.UInt32ValueR\ttoolCount\x12R\n" +
+	"\x16estimated_input_tokens\x18\a \x01(\v2\x1c.google.protobuf.UInt64ValueR\x14estimatedInputTokensB\x82\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
 	"\x1eio.envoyproxy.envoy.data.ai.v3B\x10RequestInfoProtoP\x01Z<github.com/envoyproxy/go-control-plane/envoy/data/ai/v3;aiv3b\x06proto3"
 
 var (
@@ -161,11 +175,12 @@ var file_envoy_data_ai_v3_request_info_proto_depIdxs = []int32{
 	3, // 2: envoy.data.ai.v3.RequestInfo.max_output_tokens:type_name -> google.protobuf.UInt64Value
 	4, // 3: envoy.data.ai.v3.RequestInfo.message_count:type_name -> google.protobuf.UInt32Value
 	4, // 4: envoy.data.ai.v3.RequestInfo.tool_count:type_name -> google.protobuf.UInt32Value
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	3, // 5: envoy.data.ai.v3.RequestInfo.estimated_input_tokens:type_name -> google.protobuf.UInt64Value
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_envoy_data_ai_v3_request_info_proto_init() }

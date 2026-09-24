@@ -9,6 +9,7 @@ package request_infov3
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	_ "github.com/cncf/xds/go/xds/annotations/v3"
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -30,8 +31,10 @@ type RequestInfo struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Metadata namespace. Defaults to “envoy.ai.request_info“.
 	MetadataNamespace string `protobuf:"bytes,1,opt,name=metadata_namespace,json=metadataNamespace,proto3" json:"metadata_namespace,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	// When unset, no estimate is published.
+	TokenEstimation *RequestInfo_TokenEstimation `protobuf:"bytes,2,opt,name=token_estimation,json=tokenEstimation,proto3" json:"token_estimation,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *RequestInfo) Reset() {
@@ -71,13 +74,72 @@ func (x *RequestInfo) GetMetadataNamespace() string {
 	return ""
 }
 
+func (x *RequestInfo) GetTokenEstimation() *RequestInfo_TokenEstimation {
+	if x != nil {
+		return x.TokenEstimation
+	}
+	return nil
+}
+
+// Estimates the input tokens from the size of the request payload, for consumers that must
+// budget before the provider reports what it actually charged.
+type RequestInfo_TokenEstimation struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Estimated input tokens, as “ceil(tokens_per_byte * request payload bytes)“. No token
+	// spans fewer than one byte, so the ratio cannot exceed 1.0; “0.5“ is a rough fit for
+	// JSON chat payloads.
+	TokensPerByte float64 `protobuf:"fixed64,1,opt,name=tokens_per_byte,json=tokensPerByte,proto3" json:"tokens_per_byte,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RequestInfo_TokenEstimation) Reset() {
+	*x = RequestInfo_TokenEstimation{}
+	mi := &file_envoy_extensions_http_ai_filters_request_info_v3_request_info_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RequestInfo_TokenEstimation) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RequestInfo_TokenEstimation) ProtoMessage() {}
+
+func (x *RequestInfo_TokenEstimation) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_http_ai_filters_request_info_v3_request_info_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RequestInfo_TokenEstimation.ProtoReflect.Descriptor instead.
+func (*RequestInfo_TokenEstimation) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_http_ai_filters_request_info_v3_request_info_proto_rawDescGZIP(), []int{0, 0}
+}
+
+func (x *RequestInfo_TokenEstimation) GetTokensPerByte() float64 {
+	if x != nil {
+		return x.TokensPerByte
+	}
+	return 0
+}
+
 var File_envoy_extensions_http_ai_filters_request_info_v3_request_info_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_http_ai_filters_request_info_v3_request_info_proto_rawDesc = "" +
 	"\n" +
-	"Cenvoy/extensions/http/ai_filters/request_info/v3/request_info.proto\x120envoy.extensions.http.ai_filters.request_info.v3\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\"<\n" +
+	"Cenvoy/extensions/http/ai_filters/request_info/v3/request_info.proto\x120envoy.extensions.http.ai_filters.request_info.v3\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x8a\x02\n" +
 	"\vRequestInfo\x12-\n" +
-	"\x12metadata_namespace\x18\x01 \x01(\tR\x11metadataNamespaceB\xcc\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
+	"\x12metadata_namespace\x18\x01 \x01(\tR\x11metadataNamespace\x12x\n" +
+	"\x10token_estimation\x18\x02 \x01(\v2M.envoy.extensions.http.ai_filters.request_info.v3.RequestInfo.TokenEstimationR\x0ftokenEstimation\x1aR\n" +
+	"\x0fTokenEstimation\x12?\n" +
+	"\x0ftokens_per_byte\x18\x01 \x01(\x01B\x17\xfaB\x14\x12\x12\x19\x00\x00\x00\x00\x00\x00\xf0?!\x00\x00\x00\x00\x00\x00\x00\x00R\rtokensPerByteB\xcc\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
 	">io.envoyproxy.envoy.extensions.http.ai_filters.request_info.v3B\x10RequestInfoProtoP\x01Zfgithub.com/envoyproxy/go-control-plane/envoy/extensions/http/ai_filters/request_info/v3;request_infov3b\x06proto3"
 
 var (
@@ -92,16 +154,18 @@ func file_envoy_extensions_http_ai_filters_request_info_v3_request_info_proto_ra
 	return file_envoy_extensions_http_ai_filters_request_info_v3_request_info_proto_rawDescData
 }
 
-var file_envoy_extensions_http_ai_filters_request_info_v3_request_info_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_envoy_extensions_http_ai_filters_request_info_v3_request_info_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_envoy_extensions_http_ai_filters_request_info_v3_request_info_proto_goTypes = []any{
-	(*RequestInfo)(nil), // 0: envoy.extensions.http.ai_filters.request_info.v3.RequestInfo
+	(*RequestInfo)(nil),                 // 0: envoy.extensions.http.ai_filters.request_info.v3.RequestInfo
+	(*RequestInfo_TokenEstimation)(nil), // 1: envoy.extensions.http.ai_filters.request_info.v3.RequestInfo.TokenEstimation
 }
 var file_envoy_extensions_http_ai_filters_request_info_v3_request_info_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	1, // 0: envoy.extensions.http.ai_filters.request_info.v3.RequestInfo.token_estimation:type_name -> envoy.extensions.http.ai_filters.request_info.v3.RequestInfo.TokenEstimation
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_http_ai_filters_request_info_v3_request_info_proto_init() }
@@ -115,7 +179,7 @@ func file_envoy_extensions_http_ai_filters_request_info_v3_request_info_proto_in
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_http_ai_filters_request_info_v3_request_info_proto_rawDesc), len(file_envoy_extensions_http_ai_filters_request_info_v3_request_info_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
