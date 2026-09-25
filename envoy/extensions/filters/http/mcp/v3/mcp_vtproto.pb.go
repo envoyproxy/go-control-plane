@@ -115,6 +115,16 @@ func (m *Mcp) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.MaxSupportedProtocolVersion != nil {
+		size, err := (*wrapperspb.StringValue)(m.MaxSupportedProtocolVersion).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x5a
+	}
 	if m.EarlyTerminateWhenRoutable {
 		i--
 		if m.EarlyTerminateWhenRoutable {
@@ -497,6 +507,10 @@ func (m *Mcp) SizeVT() (n int) {
 	}
 	if m.EarlyTerminateWhenRoutable {
 		n += 2
+	}
+	if m.MaxSupportedProtocolVersion != nil {
+		l = (*wrapperspb.StringValue)(m.MaxSupportedProtocolVersion).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
