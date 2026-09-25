@@ -438,7 +438,8 @@ type Bootstrap struct {
 	// Optional gRPC async client manager config.
 	GrpcAsyncClientManagerConfig *Bootstrap_GrpcAsyncClientManagerConfig `protobuf:"bytes,40,opt,name=grpc_async_client_manager_config,json=grpcAsyncClientManagerConfig,proto3" json:"grpc_async_client_manager_config,omitempty"`
 	// Optional configuration for memory allocation manager.
-	// Memory releasing is only supported for `tcmalloc allocator <https://github.com/google/tcmalloc>`_.
+	// Memory releasing is supported with `tcmalloc <https://github.com/google/tcmalloc>`_ and
+	// `gperftools <https://github.com/gperftools/gperftools>`_.
 	MemoryAllocatorManager *MemoryAllocatorManager `protobuf:"bytes,41,opt,name=memory_allocator_manager,json=memoryAllocatorManager,proto3" json:"memory_allocator_manager,omitempty"`
 	// When enabled, Envoy pins each worker thread to a distinct CPU from the process affinity mask,
 	// worker “i“ to the “i-th“ CPU in ascending order. This improves CPU cache and “NUMA“
@@ -1618,12 +1619,13 @@ func (x *CustomInlineHeader) GetInlineHeaderType() CustomInlineHeader_InlineHead
 // [#next-free-field: 6]
 type MemoryAllocatorManager struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Configures tcmalloc to perform background release of free memory in amount of bytes per “memory_release_interval“ interval.
-	// If equals to “0“, no memory release will occur. Defaults to “0“.
+	// Configures tcmalloc to perform background release of free memory in amount of bytes per
+	// “memory_release_interval“ interval. If equals to “0“, no memory release will occur.
+	// Defaults to “0“.
 	BytesToRelease uint64 `protobuf:"varint,1,opt,name=bytes_to_release,json=bytesToRelease,proto3" json:"bytes_to_release,omitempty"`
-	// Interval in milliseconds for memory releasing. If specified, during every
-	// interval Envoy will try to release “bytes_to_release“ of free memory back to operating system for reuse.
-	// Defaults to “1000“ milliseconds.
+	// Interval in milliseconds for memory releasing. If specified, during every interval Envoy will
+	// try to release “bytes_to_release“ of free memory back to operating system for reuse. If set
+	// to “0“, no memory release will occur. Defaults to “1000“ milliseconds.
 	MemoryReleaseInterval *durationpb.Duration `protobuf:"bytes,2,opt,name=memory_release_interval,json=memoryReleaseInterval,proto3" json:"memory_release_interval,omitempty"`
 	// Sets the soft memory limit for tcmalloc. When the total memory used by tcmalloc exceeds this
 	// limit, background release will be performed more aggressively to bring memory usage below the
