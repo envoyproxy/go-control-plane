@@ -27,6 +27,58 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// How the request body is written out once the :ref:`AI filters
+// <envoy_v3_api_field_extensions.filters.http.ai_protocol_manager.v3.AiProtocolManager.filters>`
+// finish.
+type RequestHandling_BodyReserialization int32
+
+const (
+	// Re-serialize the parsed document, so the edits AI filters make to it reach the upstream.
+	RequestHandling_ALWAYS RequestHandling_BodyReserialization = 0
+	// Forward the received body byte for byte. Edits AI filters make to the parsed document are
+	// not sent, so use this only with AI filters that read the request, such as request info.
+	RequestHandling_DISABLE RequestHandling_BodyReserialization = 1
+)
+
+// Enum value maps for RequestHandling_BodyReserialization.
+var (
+	RequestHandling_BodyReserialization_name = map[int32]string{
+		0: "ALWAYS",
+		1: "DISABLE",
+	}
+	RequestHandling_BodyReserialization_value = map[string]int32{
+		"ALWAYS":  0,
+		"DISABLE": 1,
+	}
+)
+
+func (x RequestHandling_BodyReserialization) Enum() *RequestHandling_BodyReserialization {
+	p := new(RequestHandling_BodyReserialization)
+	*p = x
+	return p
+}
+
+func (x RequestHandling_BodyReserialization) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (RequestHandling_BodyReserialization) Descriptor() protoreflect.EnumDescriptor {
+	return file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_enumTypes[0].Descriptor()
+}
+
+func (RequestHandling_BodyReserialization) Type() protoreflect.EnumType {
+	return &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_enumTypes[0]
+}
+
+func (x RequestHandling_BodyReserialization) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use RequestHandling_BodyReserialization.Descriptor instead.
+func (RequestHandling_BodyReserialization) EnumDescriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDescGZIP(), []int{1, 0}
+}
+
 // Stream signals emitted upon publishing token usage metadata.
 type TokenUsageExtraction_UsageSignal int32
 
@@ -62,11 +114,11 @@ func (x TokenUsageExtraction_UsageSignal) String() string {
 }
 
 func (TokenUsageExtraction_UsageSignal) Descriptor() protoreflect.EnumDescriptor {
-	return file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_enumTypes[0].Descriptor()
+	return file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_enumTypes[1].Descriptor()
 }
 
 func (TokenUsageExtraction_UsageSignal) Type() protoreflect.EnumType {
-	return &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_enumTypes[0]
+	return &file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_enumTypes[1]
 }
 
 func (x TokenUsageExtraction_UsageSignal) Number() protoreflect.EnumNumber {
@@ -181,9 +233,12 @@ type RequestHandling struct {
 	// request until it sees a response the held upstream cannot produce.
 	ParseUnconfiguredRoutes bool `protobuf:"varint,1,opt,name=parse_unconfigured_routes,json=parseUnconfiguredRoutes,proto3" json:"parse_unconfigured_routes,omitempty"`
 	// Request-path parsing limits. Defaults apply when unset.
-	Limits        *RequestParsingLimits `protobuf:"bytes,2,opt,name=limits,proto3" json:"limits,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Limits *RequestParsingLimits `protobuf:"bytes,2,opt,name=limits,proto3" json:"limits,omitempty"`
+	// Whether the parsed request is re-serialized once the AI filters finish. Defaults to “ALWAYS“.
+	// Requests that run no AI filters are forwarded as received either way.
+	ReserializeBody RequestHandling_BodyReserialization `protobuf:"varint,3,opt,name=reserialize_body,json=reserializeBody,proto3,enum=envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandling_BodyReserialization" json:"reserialize_body,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *RequestHandling) Reset() {
@@ -228,6 +283,13 @@ func (x *RequestHandling) GetLimits() *RequestParsingLimits {
 		return x.Limits
 	}
 	return nil
+}
+
+func (x *RequestHandling) GetReserializeBody() RequestHandling_BodyReserialization {
+	if x != nil {
+		return x.ReserializeBody
+	}
+	return RequestHandling_ALWAYS
 }
 
 // Per-stream limits for request payload parsing.
@@ -712,10 +774,15 @@ const file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_mana
 	"\x11AiProtocolManager\x12p\n" +
 	"\x10request_handling\x18\x01 \x01(\v2E.envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandlingR\x0frequestHandling\x12s\n" +
 	"\x11response_handling\x18\x02 \x01(\v2F.envoy.extensions.filters.http.ai_protocol_manager.v3.ResponseHandlingR\x10responseHandling\x12D\n" +
-	"\afilters\x18\x03 \x03(\v2*.envoy.config.core.v3.TypedExtensionConfigR\afilters\"\xb1\x01\n" +
+	"\afilters\x18\x03 \x03(\v2*.envoy.config.core.v3.TypedExtensionConfigR\afilters\"\xf2\x02\n" +
 	"\x0fRequestHandling\x12:\n" +
 	"\x19parse_unconfigured_routes\x18\x01 \x01(\bR\x17parseUnconfiguredRoutes\x12b\n" +
-	"\x06limits\x18\x02 \x01(\v2J.envoy.extensions.filters.http.ai_protocol_manager.v3.RequestParsingLimitsR\x06limits\"\x84\x01\n" +
+	"\x06limits\x18\x02 \x01(\v2J.envoy.extensions.filters.http.ai_protocol_manager.v3.RequestParsingLimitsR\x06limits\x12\x8e\x01\n" +
+	"\x10reserialize_body\x18\x03 \x01(\x0e2Y.envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandling.BodyReserializationB\b\xfaB\x05\x82\x01\x02\x10\x01R\x0freserializeBody\".\n" +
+	"\x13BodyReserialization\x12\n" +
+	"\n" +
+	"\x06ALWAYS\x10\x00\x12\v\n" +
+	"\aDISABLE\x10\x01\"\x84\x01\n" +
 	"\x14RequestParsingLimits\x12l\n" +
 	"\x1dinline_string_threshold_bytes\x18\x01 \x01(\v2\x1c.google.protobuf.UInt32ValueB\v\xfaB\b*\x06\x18\x80\x80@(@R\x1ainlineStringThresholdBytes\"\x7f\n" +
 	"\x10ResponseHandling\x12k\n" +
@@ -755,45 +822,47 @@ func file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manag
 	return file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDescData
 }
 
-var file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_goTypes = []any{
-	(TokenUsageExtraction_UsageSignal)(0), // 0: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.UsageSignal
-	(*AiProtocolManager)(nil),             // 1: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManager
-	(*RequestHandling)(nil),               // 2: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandling
-	(*RequestParsingLimits)(nil),          // 3: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestParsingLimits
-	(*ResponseHandling)(nil),              // 4: envoy.extensions.filters.http.ai_protocol_manager.v3.ResponseHandling
-	(*TokenUsageExtraction)(nil),          // 5: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction
-	(*TokenUsageExtractionLimits)(nil),    // 6: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits
-	(*AiProtocolManagerPerRoute)(nil),     // 7: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute
-	(*RequestPerRoute)(nil),               // 8: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestPerRoute
-	(*ResponsePerRoute)(nil),              // 9: envoy.extensions.filters.http.ai_protocol_manager.v3.ResponsePerRoute
-	(*v3.TypedExtensionConfig)(nil),       // 10: envoy.config.core.v3.TypedExtensionConfig
-	(*wrapperspb.UInt32Value)(nil),        // 11: google.protobuf.UInt32Value
-	(v31.LLMProtocol)(0),                  // 12: envoy.type.ai.v3.LLMProtocol
+	(RequestHandling_BodyReserialization)(0), // 0: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandling.BodyReserialization
+	(TokenUsageExtraction_UsageSignal)(0),    // 1: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.UsageSignal
+	(*AiProtocolManager)(nil),                // 2: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManager
+	(*RequestHandling)(nil),                  // 3: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandling
+	(*RequestParsingLimits)(nil),             // 4: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestParsingLimits
+	(*ResponseHandling)(nil),                 // 5: envoy.extensions.filters.http.ai_protocol_manager.v3.ResponseHandling
+	(*TokenUsageExtraction)(nil),             // 6: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction
+	(*TokenUsageExtractionLimits)(nil),       // 7: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits
+	(*AiProtocolManagerPerRoute)(nil),        // 8: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute
+	(*RequestPerRoute)(nil),                  // 9: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestPerRoute
+	(*ResponsePerRoute)(nil),                 // 10: envoy.extensions.filters.http.ai_protocol_manager.v3.ResponsePerRoute
+	(*v3.TypedExtensionConfig)(nil),          // 11: envoy.config.core.v3.TypedExtensionConfig
+	(*wrapperspb.UInt32Value)(nil),           // 12: google.protobuf.UInt32Value
+	(v31.LLMProtocol)(0),                     // 13: envoy.type.ai.v3.LLMProtocol
 }
 var file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_depIdxs = []int32{
-	2,  // 0: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManager.request_handling:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandling
-	4,  // 1: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManager.response_handling:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.ResponseHandling
-	10, // 2: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManager.filters:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	3,  // 3: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandling.limits:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.RequestParsingLimits
-	11, // 4: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestParsingLimits.inline_string_threshold_bytes:type_name -> google.protobuf.UInt32Value
-	5,  // 5: envoy.extensions.filters.http.ai_protocol_manager.v3.ResponseHandling.token_usage:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction
-	12, // 6: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.default_llm_protocol:type_name -> envoy.type.ai.v3.LLMProtocol
-	6,  // 7: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.limits:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits
-	0,  // 8: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.usage_signal:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.UsageSignal
-	11, // 9: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits.max_sse_event_size:type_name -> google.protobuf.UInt32Value
-	11, // 10: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits.max_json_body_size:type_name -> google.protobuf.UInt32Value
-	11, // 11: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits.max_parsed_sse_events:type_name -> google.protobuf.UInt32Value
-	8,  // 12: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute.request:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.RequestPerRoute
-	9,  // 13: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute.response:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.ResponsePerRoute
-	12, // 14: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestPerRoute.llm_protocol:type_name -> envoy.type.ai.v3.LLMProtocol
-	12, // 15: envoy.extensions.filters.http.ai_protocol_manager.v3.ResponsePerRoute.llm_protocol:type_name -> envoy.type.ai.v3.LLMProtocol
-	16, // [16:16] is the sub-list for method output_type
-	16, // [16:16] is the sub-list for method input_type
-	16, // [16:16] is the sub-list for extension type_name
-	16, // [16:16] is the sub-list for extension extendee
-	0,  // [0:16] is the sub-list for field type_name
+	3,  // 0: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManager.request_handling:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandling
+	5,  // 1: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManager.response_handling:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.ResponseHandling
+	11, // 2: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManager.filters:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	4,  // 3: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandling.limits:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.RequestParsingLimits
+	0,  // 4: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandling.reserialize_body:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandling.BodyReserialization
+	12, // 5: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestParsingLimits.inline_string_threshold_bytes:type_name -> google.protobuf.UInt32Value
+	6,  // 6: envoy.extensions.filters.http.ai_protocol_manager.v3.ResponseHandling.token_usage:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction
+	13, // 7: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.default_llm_protocol:type_name -> envoy.type.ai.v3.LLMProtocol
+	7,  // 8: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.limits:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits
+	1,  // 9: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.usage_signal:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.UsageSignal
+	12, // 10: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits.max_sse_event_size:type_name -> google.protobuf.UInt32Value
+	12, // 11: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits.max_json_body_size:type_name -> google.protobuf.UInt32Value
+	12, // 12: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits.max_parsed_sse_events:type_name -> google.protobuf.UInt32Value
+	9,  // 13: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute.request:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.RequestPerRoute
+	10, // 14: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute.response:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.ResponsePerRoute
+	13, // 15: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestPerRoute.llm_protocol:type_name -> envoy.type.ai.v3.LLMProtocol
+	13, // 16: envoy.extensions.filters.http.ai_protocol_manager.v3.ResponsePerRoute.llm_protocol:type_name -> envoy.type.ai.v3.LLMProtocol
+	17, // [17:17] is the sub-list for method output_type
+	17, // [17:17] is the sub-list for method input_type
+	17, // [17:17] is the sub-list for extension type_name
+	17, // [17:17] is the sub-list for extension extendee
+	0,  // [0:17] is the sub-list for field type_name
 }
 
 func init() {
@@ -808,7 +877,7 @@ func file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manag
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDesc), len(file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      2,
 			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,

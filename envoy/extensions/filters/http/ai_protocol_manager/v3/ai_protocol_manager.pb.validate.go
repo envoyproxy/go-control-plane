@@ -287,6 +287,17 @@ func (m *RequestHandling) validate(all bool) error {
 		}
 	}
 
+	if _, ok := RequestHandling_BodyReserialization_name[int32(m.GetReserializeBody())]; !ok {
+		err := RequestHandlingValidationError{
+			field:  "ReserializeBody",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if len(errors) > 0 {
 		return RequestHandlingMultiError(errors)
 	}

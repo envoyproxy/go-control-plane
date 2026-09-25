@@ -127,6 +127,11 @@ func (m *RequestHandling) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error)
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.ReserializeBody != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.ReserializeBody))
+		i--
+		dAtA[i] = 0x18
+	}
 	if m.Limits != nil {
 		size, err := m.Limits.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -540,6 +545,9 @@ func (m *RequestHandling) SizeVT() (n int) {
 	if m.Limits != nil {
 		l = m.Limits.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.ReserializeBody != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.ReserializeBody))
 	}
 	n += len(m.unknownFields)
 	return n
