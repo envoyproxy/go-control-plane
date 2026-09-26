@@ -621,9 +621,16 @@ type StatsdSink struct {
 	//
 	//	envoy.test_counter:1|c
 	//	envoy.test_timer:5|ms
-	Prefix        string `protobuf:"bytes,3,opt,name=prefix,proto3" json:"prefix,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Prefix string `protobuf:"bytes,3,opt,name=prefix,proto3" json:"prefix,omitempty"`
+	// If true, histogram samples are scaled to milliseconds according to the histogram's unit
+	// before being reported as timers: samples of histograms recording microseconds are divided by
+	// 1000 and reported as a fractional millisecond value, while histograms recording milliseconds
+	// or without a declared unit are reported unchanged. By default every sample is reported
+	// unchanged with an “ms“ suffix regardless of the histogram's unit, so histograms recording
+	// microseconds are reported a factor of 1000 off.
+	ScaleHistogramUnitsToMilliseconds bool `protobuf:"varint,4,opt,name=scale_histogram_units_to_milliseconds,json=scaleHistogramUnitsToMilliseconds,proto3" json:"scale_histogram_units_to_milliseconds,omitempty"`
+	unknownFields                     protoimpl.UnknownFields
+	sizeCache                         protoimpl.SizeCache
 }
 
 func (x *StatsdSink) Reset() {
@@ -688,6 +695,13 @@ func (x *StatsdSink) GetPrefix() string {
 	return ""
 }
 
+func (x *StatsdSink) GetScaleHistogramUnitsToMilliseconds() bool {
+	if x != nil {
+		return x.ScaleHistogramUnitsToMilliseconds
+	}
+	return false
+}
+
 type isStatsdSink_StatsdSpecifier interface {
 	isStatsdSink_StatsdSpecifier()
 }
@@ -715,6 +729,7 @@ func (*StatsdSink_TcpClusterName) isStatsdSink_StatsdSpecifier() {}
 // compatible tags. Tags are configurable via :ref:`StatsConfig
 // <envoy_v3_api_msg_config.metrics.v3.StatsConfig>`.
 // [#extension: envoy.stat_sinks.dog_statsd]
+// [#next-free-field: 6]
 type DogStatsdSink struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to DogStatsdSpecifier:
@@ -731,8 +746,13 @@ type DogStatsdSink struct {
 	//
 	// Note that this value may not be respected if smaller than a single metric.
 	MaxBytesPerDatagram *wrapperspb.UInt64Value `protobuf:"bytes,4,opt,name=max_bytes_per_datagram,json=maxBytesPerDatagram,proto3" json:"max_bytes_per_datagram,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	// If true, histogram samples are scaled to milliseconds according to the histogram's unit
+	// before being reported as timers. See :ref:`StatsdSink's scale_histogram_units_to_milliseconds
+	// field <envoy_v3_api_field_config.metrics.v3.StatsdSink.scale_histogram_units_to_milliseconds>`
+	// for more details.
+	ScaleHistogramUnitsToMilliseconds bool `protobuf:"varint,5,opt,name=scale_histogram_units_to_milliseconds,json=scaleHistogramUnitsToMilliseconds,proto3" json:"scale_histogram_units_to_milliseconds,omitempty"`
+	unknownFields                     protoimpl.UnknownFields
+	sizeCache                         protoimpl.SizeCache
 }
 
 func (x *DogStatsdSink) Reset() {
@@ -793,6 +813,13 @@ func (x *DogStatsdSink) GetMaxBytesPerDatagram() *wrapperspb.UInt64Value {
 		return x.MaxBytesPerDatagram
 	}
 	return nil
+}
+
+func (x *DogStatsdSink) GetScaleHistogramUnitsToMilliseconds() bool {
+	if x != nil {
+		return x.ScaleHistogramUnitsToMilliseconds
+	}
+	return false
 }
 
 type isDogStatsdSink_DogStatsdSpecifier interface {
@@ -907,18 +934,20 @@ const file_envoy_config_metrics_v3_stats_proto_rawDesc = "" +
 	"\x17HistogramBucketSettings\x12D\n" +
 	"\x05match\x18\x01 \x01(\v2$.envoy.type.matcher.v3.StringMatcherB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x05match\x12/\n" +
 	"\abuckets\x18\x02 \x03(\x01B\x15\xfaB\x12\x92\x01\x0f\x18\x01\"\v\x12\t!\x00\x00\x00\x00\x00\x00\x00\x00R\abuckets\x12=\n" +
-	"\x04bins\x18\x03 \x01(\v2\x1c.google.protobuf.UInt32ValueB\v\xfaB\b*\x06\x18\x82\xe8\x02 \x00R\x04bins\"\xcf\x01\n" +
+	"\x04bins\x18\x03 \x01(\v2\x1c.google.protobuf.UInt32ValueB\v\xfaB\b*\x06\x18\x82\xe8\x02 \x00R\x04bins\"\xa1\x02\n" +
 	"\n" +
 	"StatsdSink\x129\n" +
 	"\aaddress\x18\x01 \x01(\v2\x1d.envoy.config.core.v3.AddressH\x00R\aaddress\x12*\n" +
 	"\x10tcp_cluster_name\x18\x02 \x01(\tH\x00R\x0etcpClusterName\x12\x16\n" +
-	"\x06prefix\x18\x03 \x01(\tR\x06prefix:)\x9aň\x1e$\n" +
+	"\x06prefix\x18\x03 \x01(\tR\x06prefix\x12P\n" +
+	"%scale_histogram_units_to_milliseconds\x18\x04 \x01(\bR!scaleHistogramUnitsToMilliseconds:)\x9aň\x1e$\n" +
 	"\"envoy.config.metrics.v2.StatsdSinkB\x17\n" +
-	"\x10statsd_specifier\x12\x03\xf8B\x01\"\x8f\x02\n" +
+	"\x10statsd_specifier\x12\x03\xf8B\x01\"\xe1\x02\n" +
 	"\rDogStatsdSink\x129\n" +
 	"\aaddress\x18\x01 \x01(\v2\x1d.envoy.config.core.v3.AddressH\x00R\aaddress\x12\x16\n" +
 	"\x06prefix\x18\x03 \x01(\tR\x06prefix\x12Z\n" +
-	"\x16max_bytes_per_datagram\x18\x04 \x01(\v2\x1c.google.protobuf.UInt64ValueB\a\xfaB\x042\x02 \x00R\x13maxBytesPerDatagram:,\x9aň\x1e'\n" +
+	"\x16max_bytes_per_datagram\x18\x04 \x01(\v2\x1c.google.protobuf.UInt64ValueB\a\xfaB\x042\x02 \x00R\x13maxBytesPerDatagram\x12P\n" +
+	"%scale_histogram_units_to_milliseconds\x18\x05 \x01(\bR!scaleHistogramUnitsToMilliseconds:,\x9aň\x1e'\n" +
 	"%envoy.config.metrics.v2.DogStatsdSinkB\x1b\n" +
 	"\x14dog_statsd_specifier\x12\x03\xf8B\x01J\x04\b\x02\x10\x03\"Z\n" +
 	"\vHystrixSink\x12\x1f\n" +

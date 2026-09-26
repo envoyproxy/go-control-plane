@@ -50,6 +50,16 @@ func (m *GraphiteStatsdSink) MarshalToSizedBufferVTStrict(dAtA []byte) (int, err
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.ScaleHistogramUnitsToMilliseconds {
+		i--
+		if m.ScaleHistogramUnitsToMilliseconds {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x28
+	}
 	if m.MaxBytesPerDatagram != nil {
 		size, err := (*wrapperspb.UInt64Value)(m.MaxBytesPerDatagram).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -128,6 +138,9 @@ func (m *GraphiteStatsdSink) SizeVT() (n int) {
 	if m.MaxBytesPerDatagram != nil {
 		l = (*wrapperspb.UInt64Value)(m.MaxBytesPerDatagram).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.ScaleHistogramUnitsToMilliseconds {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n
