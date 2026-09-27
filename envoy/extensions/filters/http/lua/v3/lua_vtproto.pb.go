@@ -51,6 +51,13 @@ func (m *Lua) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.SharedVmId) > 0 {
+		i -= len(m.SharedVmId)
+		copy(dAtA[i:], m.SharedVmId)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.SharedVmId)))
+		i--
+		dAtA[i] = 0x4a
+	}
 	if len(m.PackageCpaths) > 0 {
 		for iNdEx := len(m.PackageCpaths) - 1; iNdEx >= 0; iNdEx-- {
 			i -= len(m.PackageCpaths[iNdEx])
@@ -191,6 +198,13 @@ func (m *LuaPerRoute) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if len(m.SharedVmId) > 0 {
+		i -= len(m.SharedVmId)
+		copy(dAtA[i:], m.SharedVmId)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.SharedVmId)))
+		i--
+		dAtA[i] = 0x3a
 	}
 	if len(m.PackageCpaths) > 0 {
 		for iNdEx := len(m.PackageCpaths) - 1; iNdEx >= 0; iNdEx-- {
@@ -373,6 +387,10 @@ func (m *Lua) SizeVT() (n int) {
 			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 		}
 	}
+	l = len(m.SharedVmId)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
 	n += len(m.unknownFields)
 	return n
 }
@@ -401,6 +419,10 @@ func (m *LuaPerRoute) SizeVT() (n int) {
 			l = len(s)
 			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 		}
+	}
+	l = len(m.SharedVmId)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n

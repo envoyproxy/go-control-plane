@@ -27,7 +27,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// [#next-free-field: 9]
+// [#next-free-field: 10]
 type Lua struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The Lua code that Envoy will execute. This can be a very small script that
@@ -122,6 +122,35 @@ type Lua struct {
 	// “package.cpath“, i.e. modules which are loadable C libraries rather than Lua source, for
 	// example “/etc/envoy/lua/?.so“.
 	PackageCpaths []string `protobuf:"bytes,8,rep,name=package_cpaths,json=packageCpaths,proto3" json:"package_cpaths,omitempty"`
+	// If set, the Lua VMs this filter builds are shared with every other Lua filter configuration
+	// that sets the same “shared_vm_id“ and configures the same script, rather than each
+	// configuration building its own. This applies to every script this message configures:
+	// :ref:`default_source_code
+	// <envoy_v3_api_field_extensions.filters.http.lua.v3.Lua.default_source_code>`,
+	// :ref:`inline_code <envoy_v3_api_field_extensions.filters.http.lua.v3.Lua.inline_code>` and
+	// every entry of :ref:`source_codes
+	// <envoy_v3_api_field_extensions.filters.http.lua.v3.Lua.source_codes>`.
+	//
+	// Sharing is decided per script, not per configuration: two configurations that agree on this
+	// id share a VM only for the scripts whose contents match, and whose :ref:`package_paths
+	// <envoy_v3_api_field_extensions.filters.http.lua.v3.Lua.package_paths>` and
+	// :ref:`package_cpaths
+	// <envoy_v3_api_field_extensions.filters.http.lua.v3.Lua.package_cpaths>` match, since a
+	// script that resolves its “require“ calls differently does not produce an equivalent VM.
+	// A :ref:`LuaPerRoute.shared_vm_id
+	// <envoy_v3_api_field_extensions.filters.http.lua.v3.LuaPerRoute.shared_vm_id>` participates in
+	// the same sharing, so a route's inline script can reuse a VM built here and the other way
+	// around.
+	//
+	// A VM is not only an amount of memory, it is also a set of Lua globals that outlive a request.
+	// Scripts sharing a VM therefore see each other's globals, exactly as separate requests through
+	// one configuration already do. Leave this field unset, which is the default, to keep every
+	// configuration's scripts in VMs of their own.
+	//
+	// A shared VM lives for as long as at least one configuration using it is alive. Once the last
+	// one is drained the VM is torn down, and the next configuration asking for that id and script
+	// builds a fresh one.
+	SharedVmId    string `protobuf:"bytes,9,opt,name=shared_vm_id,json=sharedVmId,proto3" json:"shared_vm_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -213,7 +242,14 @@ func (x *Lua) GetPackageCpaths() []string {
 	return nil
 }
 
-// [#next-free-field: 7]
+func (x *Lua) GetSharedVmId() string {
+	if x != nil {
+		return x.SharedVmId
+	}
+	return ""
+}
+
+// [#next-free-field: 8]
 type LuaPerRoute struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to Override:
@@ -254,6 +290,17 @@ type LuaPerRoute struct {
 	// <envoy_v3_api_field_extensions.filters.http.lua.v3.LuaPerRoute.package_paths>`, but for
 	// “package.cpath“.
 	PackageCpaths []string `protobuf:"bytes,6,rep,name=package_cpaths,json=packageCpaths,proto3" json:"package_cpaths,omitempty"`
+	// As :ref:`Lua.shared_vm_id
+	// <envoy_v3_api_field_extensions.filters.http.lua.v3.Lua.shared_vm_id>`, but for the VM built
+	// from this route's :ref:`source_code
+	// <envoy_v3_api_field_extensions.filters.http.lua.v3.LuaPerRoute.source_code>`. Routes and
+	// filter configurations share one pool of VMs, so a route setting the same id as a filter
+	// configuration reuses that configuration's VM when the script matches.
+	//
+	// Setting this has no effect when this route selects a script by :ref:`name
+	// <envoy_v3_api_field_extensions.filters.http.lua.v3.LuaPerRoute.name>`, or configures no
+	// script at all, since that VM belongs to the filter and follows the filter's setting.
+	SharedVmId    string `protobuf:"bytes,7,opt,name=shared_vm_id,json=sharedVmId,proto3" json:"shared_vm_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -343,6 +390,13 @@ func (x *LuaPerRoute) GetPackageCpaths() []string {
 	return nil
 }
 
+func (x *LuaPerRoute) GetSharedVmId() string {
+	if x != nil {
+		return x.SharedVmId
+	}
+	return ""
+}
+
 type isLuaPerRoute_Override interface {
 	isLuaPerRoute_Override()
 }
@@ -374,7 +428,7 @@ var File_envoy_extensions_filters_http_lua_v3_lua_proto protoreflect.FileDescrip
 
 const file_envoy_extensions_filters_http_lua_v3_lua_proto_rawDesc = "" +
 	"\n" +
-	".envoy/extensions/filters/http/lua/v3/lua.proto\x12$envoy.extensions.filters.http.lua.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\x83\x05\n" +
+	".envoy/extensions/filters/http/lua/v3/lua.proto\x12$envoy.extensions.filters.http.lua.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xa5\x05\n" +
 	"\x03Lua\x12,\n" +
 	"\vinline_code\x18\x01 \x01(\tB\v\x92ǆ\xd8\x04\x033.0\x18\x01R\n" +
 	"inlineCode\x12]\n" +
@@ -385,11 +439,13 @@ const file_envoy_extensions_filters_http_lua_v3_lua_proto_rawDesc = "" +
 	"\x11clear_route_cache\x18\x05 \x01(\v2\x1a.google.protobuf.BoolValueR\x0fclearRouteCache\x12>\n" +
 	"\x0efilter_context\x18\x06 \x01(\v2\x17.google.protobuf.StructR\rfilterContext\x121\n" +
 	"\rpackage_paths\x18\a \x03(\tB\f\xfaB\t\x92\x01\x06\"\x04r\x02\x10\x01R\fpackagePaths\x123\n" +
-	"\x0epackage_cpaths\x18\b \x03(\tB\f\xfaB\t\x92\x01\x06\"\x04r\x02\x10\x01R\rpackageCpaths\x1a`\n" +
+	"\x0epackage_cpaths\x18\b \x03(\tB\f\xfaB\t\x92\x01\x06\"\x04r\x02\x10\x01R\rpackageCpaths\x12 \n" +
+	"\fshared_vm_id\x18\t \x01(\tR\n" +
+	"sharedVmId\x1a`\n" +
 	"\x10SourceCodesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x126\n" +
 	"\x05value\x18\x02 \x01(\v2 .envoy.config.core.v3.DataSourceR\x05value:\x028\x01:*\x9aň\x1e%\n" +
-	"#envoy.config.filter.http.lua.v2.Lua\"\xcc\x02\n" +
+	"#envoy.config.filter.http.lua.v2.Lua\"\xee\x02\n" +
 	"\vLuaPerRoute\x12%\n" +
 	"\bdisabled\x18\x01 \x01(\bB\a\xfaB\x04j\x02\b\x01H\x00R\bdisabled\x12\x1d\n" +
 	"\x04name\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x01H\x00R\x04name\x12C\n" +
@@ -397,7 +453,9 @@ const file_envoy_extensions_filters_http_lua_v3_lua_proto_rawDesc = "" +
 	"sourceCode\x12>\n" +
 	"\x0efilter_context\x18\x04 \x01(\v2\x17.google.protobuf.StructR\rfilterContext\x121\n" +
 	"\rpackage_paths\x18\x05 \x03(\tB\f\xfaB\t\x92\x01\x06\"\x04r\x02\x10\x01R\fpackagePaths\x123\n" +
-	"\x0epackage_cpaths\x18\x06 \x03(\tB\f\xfaB\t\x92\x01\x06\"\x04r\x02\x10\x01R\rpackageCpathsB\n" +
+	"\x0epackage_cpaths\x18\x06 \x03(\tB\f\xfaB\t\x92\x01\x06\"\x04r\x02\x10\x01R\rpackageCpaths\x12 \n" +
+	"\fshared_vm_id\x18\a \x01(\tR\n" +
+	"sharedVmIdB\n" +
 	"\n" +
 	"\boverrideB\x9b\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"2io.envoyproxy.envoy.extensions.filters.http.lua.v3B\bLuaProtoP\x01ZQgithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/lua/v3;luav3b\x06proto3"

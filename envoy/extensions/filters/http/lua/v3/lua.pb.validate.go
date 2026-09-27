@@ -226,6 +226,8 @@ func (m *Lua) validate(all bool) error {
 
 	}
 
+	// no validation rules for SharedVmId
+
 	if len(errors) > 0 {
 		return LuaMultiError(errors)
 	}
@@ -385,6 +387,8 @@ func (m *LuaPerRoute) validate(all bool) error {
 		}
 
 	}
+
+	// no validation rules for SharedVmId
 
 	switch v := m.Override.(type) {
 	case *LuaPerRoute_Disabled:
