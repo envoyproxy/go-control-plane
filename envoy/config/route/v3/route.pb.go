@@ -164,6 +164,7 @@ type RouteConfiguration struct {
 	//	and return no route. Then Envoy will treat it as route not found and result in 404 response.
 	//
 	// See :ref:`route specifiers <config_http_conn_man_route_specifiers>` for more details.
+	// [#extension-category: envoy.router.route_specifiers]
 	RouteSpecifiers []*v3.TypedExtensionConfig `protobuf:"bytes,19,rep,name=route_specifiers,json=routeSpecifiers,proto3" json:"route_specifiers,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
