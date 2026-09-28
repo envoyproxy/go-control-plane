@@ -25,9 +25,9 @@ const (
 
 type ClientCertConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// If true, the optional “Client-Cert-Chain“ header is also emitted, containing the
+	// If true, the optional ``Client-Cert-Chain`` header is also emitted, containing the
 	// validated certificate chain of the downstream client certificate (excluding the leaf
-	// certificate, which is carried by “Client-Cert“). Disabled by default because the
+	// certificate, which is carried by ``Client-Cert``). Disabled by default because the
 	// header can be large for long certificate chains.
 	SetClientCertChain bool `protobuf:"varint,1,opt,name=set_client_cert_chain,json=setClientCertChain,proto3" json:"set_client_cert_chain,omitempty"`
 	unknownFields      protoimpl.UnknownFields

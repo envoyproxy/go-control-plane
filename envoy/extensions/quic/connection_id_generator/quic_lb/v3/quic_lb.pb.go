@@ -46,7 +46,7 @@ type Config struct {
 	// This can be useful if the ID may contain binary data and must be transmitted as a string, for example in
 	// an environment variable.
 	ServerIdBase64Encoded bool `protobuf:"varint,6,opt,name=server_id_base64_encoded,json=serverIdBase64Encoded,proto3" json:"server_id_base64_encoded,omitempty"`
-	// Optional validation of the expected server ID length. If this is non-zero and the value in “server_id“
+	// Optional validation of the expected server ID length. If this is non-zero and the value in ``server_id``
 	// does not have a matching length, a configuration error is generated. This can be useful for validating
 	// that the server ID is valid.
 	ExpectedServerIdLength uint32 `protobuf:"varint,3,opt,name=expected_server_id_length,json=expectedServerIdLength,proto3" json:"expected_server_id_length,omitempty"`
@@ -69,8 +69,8 @@ type Config struct {
 	//
 	// Note that in this mode, :ref:`encryption_parameters
 	// <envoy_v3_api_field_extensions.quic.connection_id_generator.quic_lb.v3.Config.encryption_parameters>`
-	// is still required because it contains “configuration_version“, which is still
-	// needed. “encryption_key“ can be set to “inline_string: '0000000000000000'“.
+	// is still required because it contains ``configuration_version``, which is still
+	// needed. ``encryption_key`` can be set to ``inline_string: '0000000000000000'``.
 	UnencryptedMode bool `protobuf:"varint,1,opt,name=unencrypted_mode,json=unencryptedMode,proto3" json:"unencrypted_mode,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache

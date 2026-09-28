@@ -34,20 +34,20 @@ type RedisProxy_ProtocolVersion int32
 
 const (
 	// Default. The listener speaks RESP2 on both downstream connections and
-	// every routed upstream conn pool: no “HELLO 3“ is sent upstream and a
-	// downstream “HELLO 3“ is rejected with “-NOPROTO“. (RESP3-aware
-	// handling such as the local “HELLO“ reply, “CLIENT SETINFO“ /
-	// “SETNAME“ acceptance, and the RESP3 decoder is always present; this
+	// every routed upstream conn pool: no ``HELLO 3`` is sent upstream and a
+	// downstream ``HELLO 3`` is rejected with ``-NOPROTO``. (RESP3-aware
+	// handling such as the local ``HELLO`` reply, ``CLIENT SETINFO`` /
+	// ``SETNAME`` acceptance, and the RESP3 decoder is always present; this
 	// value only controls the negotiated wire version.)
 	RedisProxy_RESP2 RedisProxy_ProtocolVersion = 0
 	// The listener speaks RESP3 on both downstream connections and every
-	// routed upstream conn pool. Upstream conn pools negotiate “HELLO 3“
-	// (combined with “AUTH“ when credentials or AWS IAM authentication are
-	// configured) on each new connection; “upstream_resp3_hello_failure“
+	// routed upstream conn pool. Upstream conn pools negotiate ``HELLO 3``
+	// (combined with ``AUTH`` when credentials or AWS IAM authentication are
+	// configured) on each new connection; ``upstream_resp3_hello_failure``
 	// tracks negotiation failures. Downstream clients must perform an
-	// explicit “HELLO 3“ handshake before any data command — bare “HELLO“
+	// explicit ``HELLO 3`` handshake before any data command — bare ``HELLO``
 	// on a fresh connection or any non-HELLO/AUTH/QUIT command before
-	// “HELLO 3“ is rejected with “-NOPROTO“.
+	// ``HELLO 3`` is rejected with ``-NOPROTO``.
 	RedisProxy_RESP3 RedisProxy_ProtocolVersion = 1
 )
 
@@ -243,20 +243,20 @@ type RedisProxy struct {
 	//
 	// .. code-block:: yaml
 	//
-	//	prefix_routes:
-	//	  routes:
-	//	    - prefix: "ab"
-	//	      cluster: "cluster_a"
-	//	    - prefix: "abc"
-	//	      cluster: "cluster_b"
+	//    prefix_routes:
+	//      routes:
+	//        - prefix: "ab"
+	//          cluster: "cluster_a"
+	//        - prefix: "abc"
+	//          cluster: "cluster_b"
 	//
 	// When using the above routes, the following prefixes would be sent to:
 	//
-	//   - “get abc:users“ would retrieve the key 'abc:users' from cluster_b.
-	//   - “get ab:users“ would retrieve the key 'ab:users' from cluster_a.
-	//   - “get z:users“ would return a NoUpstreamHost error. A :ref:`catch-all
-	//     route<envoy_v3_api_field_extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.catch_all_route>`
-	//     would have retrieved the key from that cluster instead.
+	// * ``get abc:users`` would retrieve the key 'abc:users' from cluster_b.
+	// * ``get ab:users`` would retrieve the key 'ab:users' from cluster_a.
+	// * ``get z:users`` would return a NoUpstreamHost error. A :ref:`catch-all
+	//   route<envoy_v3_api_field_extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.catch_all_route>`
+	//   would have retrieved the key from that cluster instead.
 	//
 	// See the :ref:`configuration section
 	// <arch_overview_redis_configuration>` of the architecture overview for recommendations on
@@ -272,9 +272,8 @@ type RedisProxy struct {
 	// AUTH, but no password is set" error will be returned.
 	//
 	// .. attention::
-	//
-	//	This field is deprecated. Use :ref:`downstream_auth_passwords
-	//	<envoy_v3_api_field_extensions.filters.network.redis_proxy.v3.RedisProxy.downstream_auth_passwords>`.
+	//   This field is deprecated. Use :ref:`downstream_auth_passwords
+	//   <envoy_v3_api_field_extensions.filters.network.redis_proxy.v3.RedisProxy.downstream_auth_passwords>`.
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/filters/network/redis_proxy/v3/redis_proxy.proto.
 	DownstreamAuthPassword *v3.DataSource `protobuf:"bytes,6,opt,name=downstream_auth_password,json=downstreamAuthPassword,proto3" json:"downstream_auth_password,omitempty"`
@@ -295,64 +294,63 @@ type RedisProxy struct {
 	//
 	// .. code-block:: yaml
 	//
-	//	faults:
-	//	- fault_type: ERROR
-	//	  fault_enabled:
-	//	    default_value:
-	//	      numerator: 10
-	//	      denominator: HUNDRED
-	//	    runtime_key: "bogus_key"
-	//	    commands:
-	//	    - GET
-	//	  - fault_type: DELAY
-	//	    fault_enabled:
-	//	      default_value:
-	//	        numerator: 10
-	//	        denominator: HUNDRED
-	//	      runtime_key: "bogus_key"
-	//	    delay: 2s
+	//    faults:
+	//    - fault_type: ERROR
+	//      fault_enabled:
+	//        default_value:
+	//          numerator: 10
+	//          denominator: HUNDRED
+	//        runtime_key: "bogus_key"
+	//        commands:
+	//        - GET
+	//      - fault_type: DELAY
+	//        fault_enabled:
+	//          default_value:
+	//            numerator: 10
+	//            denominator: HUNDRED
+	//          runtime_key: "bogus_key"
+	//        delay: 2s
 	//
 	// See the :ref:`fault injection section
 	// <config_network_filters_redis_proxy_fault_injection>` for more information on how to configure this.
 	Faults []*RedisProxy_RedisFault `protobuf:"bytes,8,rep,name=faults,proto3" json:"faults,omitempty"`
 	// If a username is provided an ACL style AUTH command will be required with a username and password.
 	// Authenticate Redis client connections locally by forcing downstream clients to issue a `Redis
-	// AUTH command <https://redis.io/commands/auth>`_ with this username and the “downstream_auth_password“
+	// AUTH command <https://redis.io/commands/auth>`_ with this username and the ``downstream_auth_password``
 	// before enabling any other command. If an AUTH command's username and password matches this username
-	// and the “downstream_auth_password“ , an "OK" response will be returned to the client. If the AUTH
-	// command username or password does not match this username or the “downstream_auth_password“, then an
+	// and the ``downstream_auth_password`` , an "OK" response will be returned to the client. If the AUTH
+	// command username or password does not match this username or the ``downstream_auth_password``, then an
 	// "WRONGPASS invalid username-password pair" error will be returned. If any other command is received before AUTH when this
 	// password is set, then a "NOAUTH Authentication required." error response will be sent to the
 	// client. If an AUTH command is received when the password is not set, then an "ERR Client sent
 	// AUTH, but no ACL is set" error will be returned.
 	DownstreamAuthUsername *v3.DataSource `protobuf:"bytes,7,opt,name=downstream_auth_username,json=downstreamAuthUsername,proto3" json:"downstream_auth_username,omitempty"`
-	// External authentication configuration. If set, instead of validating username and password against “downstream_auth_username“ and “downstream_auth_password“,
+	// External authentication configuration. If set, instead of validating username and password against ``downstream_auth_username`` and ``downstream_auth_password``,
 	// the filter will call an external gRPC service to authenticate the client.
 	// A typical usage of this feature is for situations where the password is a one-time token that needs to be validated against a remote service, like a sidecar.
 	// Expiration is also supported, which will disable any further commands from the client after the expiration time, unless a new AUTH command is received and the external auth service returns a new expiration time.
 	// If the external auth service returns an error, authentication is considered failed.
-	// If this setting is set together with “downstream_auth_username“ and “downstream_auth_password“, the external auth service will be source of truth, but those fields will still be used for downstream authentication to the cluster.
+	// If this setting is set together with ``downstream_auth_username`` and ``downstream_auth_password``, the external auth service will be source of truth, but those fields will still be used for downstream authentication to the cluster.
 	// The API is defined by :ref:`RedisProxyExternalAuthRequest <envoy_v3_api_msg_service.redis_auth.v3.RedisProxyExternalAuthRequest>`.
 	ExternalAuthProvider *RedisExternalAuthProvider `protobuf:"bytes,10,opt,name=external_auth_provider,json=externalAuthProvider,proto3" json:"external_auth_provider,omitempty"`
 	// Optional configure redis custom commands for the proxy, eg -> ["my_custom_cmd1", "my_custom_cmd2"]
 	//
 	// .. note::
-	//
-	//	The is to support redis's feature wherein new commands can be added using redis' modules api:
-	//	https://redis.io/docs/latest/develop/reference/modules/
+	//   The is to support redis's feature wherein new commands can be added using redis' modules api:
+	//   https://redis.io/docs/latest/develop/reference/modules/
 	CustomCommands []string `protobuf:"bytes,11,rep,name=custom_commands,json=customCommands,proto3" json:"custom_commands,omitempty"`
 	// RESP protocol version enforced for both downstream connections and every
 	// routed upstream conn pool for this listener. Mismatched negotiation is
-	// rejected at HELLO (“HELLO N“ where “N“ does not match returns
-	// “-NOPROTO“) and, when set to “RESP3“, at every non-HELLO/AUTH/QUIT
+	// rejected at HELLO (``HELLO N`` where ``N`` does not match returns
+	// ``-NOPROTO``) and, when set to ``RESP3``, at every non-HELLO/AUTH/QUIT
 	// command on a connection that has not yet negotiated RESP3 (so clients
-	// must perform an explicit “HELLO 3“ handshake before any data command).
+	// must perform an explicit ``HELLO 3`` handshake before any data command).
 	//
-	// When “protocol_version“ is “RESP3“, every routed upstream
-	// Redis-compatible backend must support “HELLO 3“ / RESP3 (e.g.
+	// When ``protocol_version`` is ``RESP3``, every routed upstream
+	// Redis-compatible backend must support ``HELLO 3`` / RESP3 (e.g.
 	// Redis 6.0+, where RESP3 was introduced). Misconfigured upstreams will
 	// fail every connection's HELLO 3 negotiation, surfaced as
-	// “upstream_resp3_hello_failure“ stat increments.
+	// ``upstream_resp3_hello_failure`` stat increments.
 	ProtocolVersion RedisProxy_ProtocolVersion `protobuf:"varint,12,opt,name=protocol_version,json=protocolVersion,proto3,enum=envoy.extensions.filters.network.redis_proxy.v3.RedisProxy_ProtocolVersion" json:"protocol_version,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
@@ -471,21 +469,21 @@ func (x *RedisProxy) GetProtocolVersion() RedisProxy_ProtocolVersion {
 // keyed by the name “envoy.filters.network.redis_proxy“.
 type RedisProtocolOptions struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Upstream server password as defined by the “requirepass“ directive
+	// Upstream server password as defined by the ``requirepass`` directive
 	// `<https://redis.io/topics/config>`_ in the server's configuration file.
-	// If “aws_iam“ is set, this field is ignored.
+	// If ``aws_iam`` is set, this field is ignored.
 	AuthPassword *v3.DataSource `protobuf:"bytes,1,opt,name=auth_password,json=authPassword,proto3" json:"auth_password,omitempty"`
-	// Upstream server username as defined by the “user“ directive
+	// Upstream server username as defined by the ``user`` directive
 	// `<https://redis.io/topics/acl>`_ in the server's configuration file.
-	// If “aws_iam``` is set, this field will be used as the authenticating user for redis IAM authentication.
-	// See “Create a new IAM-enabled user“ under `Setup <https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/auth-iam.html#auth-iam-setup>`_ for more details.
+	// If ``aws_iam``` is set, this field will be used as the authenticating user for redis IAM authentication.
+	// See ``Create a new IAM-enabled user`` under `Setup <https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/auth-iam.html#auth-iam-setup>`_ for more details.
 	AuthUsername *v3.DataSource `protobuf:"bytes,2,opt,name=auth_username,json=authUsername,proto3" json:"auth_username,omitempty"`
 	// The cluster level configuration for AWS IAM authentication
 	AwsIam *AwsIam `protobuf:"bytes,3,opt,name=aws_iam,json=awsIam,proto3" json:"aws_iam,omitempty"`
 	// If specified, these credentials are used when connecting to upstream endpoints. Which
-	// credential is used is determined by matching the resolved “address“ field here with each
-	// endpoint's resolved “address“ field. The first entry for a given “address“ here takes precedence.
-	// If no entry in “credentials“ matches, then the “auth_password“ and “auth_username“ fields
+	// credential is used is determined by matching the resolved ``address`` field here with each
+	// endpoint's resolved ``address`` field. The first entry for a given ``address`` here takes precedence.
+	// If no entry in ``credentials`` matches, then the ``auth_password`` and ``auth_username`` fields
 	// are used as defaults.
 	Credentials   []*RedisProtocolOptions_Credential `protobuf:"bytes,4,rep,name=credentials,proto3" json:"credentials,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -557,8 +555,8 @@ type AwsIam struct {
 	CredentialProvider *v31.AwsCredentialProvider `protobuf:"bytes,1,opt,name=credential_provider,json=credentialProvider,proto3" json:"credential_provider,omitempty"`
 	// The name of the cache, used when generating the authentication token.
 	CacheName string `protobuf:"bytes,2,opt,name=cache_name,json=cacheName,proto3" json:"cache_name,omitempty"`
-	// The optional service name to be used in AWS IAM authentication. If not provided, the service name will be set to “elasticache“. For Amazon MemoryDB
-	// the service name should be set to “memorydb“.
+	// The optional service name to be used in AWS IAM authentication. If not provided, the service name will be set to ``elasticache``. For Amazon MemoryDB
+	// the service name should be set to ``memorydb``.
 	ServiceName string `protobuf:"bytes,3,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty"`
 	// The optional AWS region that your cache is located in. If not provided, the region will be deduced using the region provider chain
 	// as described in :ref:`config_http_filters_aws_request_signing_region`.
@@ -729,7 +727,7 @@ type RedisProxy_ConnPoolSettings struct {
 	// need to be known to the cluster manager. If the command cannot be redirected, then the
 	// original error is passed downstream unchanged. By default, this support is not enabled.
 	EnableRedirection bool `protobuf:"varint,3,opt,name=enable_redirection,json=enableRedirection,proto3" json:"enable_redirection,omitempty"`
-	// If “enable_redirection“ is set to true this option configures the DNS cache that the
+	// If ``enable_redirection`` is set to true this option configures the DNS cache that the
 	// connection pool will use to resolve hostnames that are returned with MOVED and ASK responses.
 	// If no configuration is provided, DNS lookups will not be performed (and thus the MOVED/ASK errors
 	// will be propagated verbatim to the user).
@@ -743,18 +741,18 @@ type RedisProxy_ConnPoolSettings struct {
 	// Recommended size (if enabled) is 1024 bytes.
 	MaxBufferSizeBeforeFlush uint32 `protobuf:"varint,4,opt,name=max_buffer_size_before_flush,json=maxBufferSizeBeforeFlush,proto3" json:"max_buffer_size_before_flush,omitempty"`
 	// The encoded request buffer is flushed N milliseconds after the first request has been
-	// encoded, unless the buffer size has already exceeded “max_buffer_size_before_flush“.
-	// If “max_buffer_size_before_flush“ is not set, this flush timer is not used. Otherwise,
+	// encoded, unless the buffer size has already exceeded ``max_buffer_size_before_flush``.
+	// If ``max_buffer_size_before_flush`` is not set, this flush timer is not used. Otherwise,
 	// the timer should be set according to the number of clients, overall request rate and
 	// desired maximum latency for a single command. For example, if there are many requests
 	// being batched together at a high rate, the buffer will likely be filled before the timer
 	// fires. Alternatively, if the request rate is lower the buffer will not be filled as often
 	// before the timer fires.
-	// If “max_buffer_size_before_flush“ is set, but “buffer_flush_timeout“ is not, the latter
+	// If ``max_buffer_size_before_flush`` is set, but ``buffer_flush_timeout`` is not, the latter
 	// defaults to 3ms.
 	BufferFlushTimeout *durationpb.Duration `protobuf:"bytes,5,opt,name=buffer_flush_timeout,json=bufferFlushTimeout,proto3" json:"buffer_flush_timeout,omitempty"`
-	// “max_upstream_unknown_connections“ controls how many upstream connections to unknown hosts
-	// can be created at any given time by any given worker thread (see “enable_redirection“ for
+	// ``max_upstream_unknown_connections`` controls how many upstream connections to unknown hosts
+	// can be created at any given time by any given worker thread (see ``enable_redirection`` for
 	// more details). If the host is unknown and a connection cannot be created due to enforcing
 	// this limit, then redirection will fail and the original redirection error will be passed
 	// downstream unchanged. This limit defaults to 100.
@@ -1272,10 +1270,10 @@ type RedisProtocolOptions_Credential struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The address to which this username and password applies.
 	Address *v3.Address `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
-	// Upstream server password as defined by the “requirepass“ directive
+	// Upstream server password as defined by the ``requirepass`` directive
 	// `<https://redis.io/topics/config>`_ in the server's configuration file.
 	AuthPassword *v3.DataSource `protobuf:"bytes,2,opt,name=auth_password,json=authPassword,proto3" json:"auth_password,omitempty"`
-	// Upstream server username as defined by the “user“ directive
+	// Upstream server username as defined by the ``user`` directive
 	// `<https://redis.io/topics/acl>`_ in the server's configuration file.
 	AuthUsername  *v3.DataSource `protobuf:"bytes,3,opt,name=auth_username,json=authUsername,proto3" json:"auth_username,omitempty"`
 	unknownFields protoimpl.UnknownFields

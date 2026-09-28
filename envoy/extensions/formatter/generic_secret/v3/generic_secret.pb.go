@@ -54,7 +54,7 @@ const (
 type GenericSecret struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Map from formatter lookup name to SDS secret configuration. The map key is the name used
-	// in the “%SECRET(name)%“ command operator.
+	// in the ``%SECRET(name)%`` command operator.
 	SecretConfigs map[string]*v3.SdsSecretConfig `protobuf:"bytes,1,rep,name=secret_configs,json=secretConfigs,proto3" json:"secret_configs,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

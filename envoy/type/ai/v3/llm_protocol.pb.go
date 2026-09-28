@@ -37,13 +37,13 @@ type LLMProtocol int32
 
 const (
 	LLMProtocol_LLM_PROTOCOL_UNSPECIFIED LLMProtocol = 0
-	// OpenAI-compatible “/v1/chat/completions“ API.
+	// OpenAI-compatible ``/v1/chat/completions`` API.
 	LLMProtocol_OPENAI_CHAT_COMPLETIONS LLMProtocol = 1
-	// OpenAI-compatible “/v1/responses“ API.
+	// OpenAI-compatible ``/v1/responses`` API.
 	LLMProtocol_OPENAI_RESPONSES LLMProtocol = 2
-	// Anthropic-compatible “/v1/messages“ API.
+	// Anthropic-compatible ``/v1/messages`` API.
 	LLMProtocol_ANTHROPIC_MESSAGES LLMProtocol = 3
-	// Gemini “generateContent“ / “streamGenerateContent“ APIs.
+	// Gemini ``generateContent`` / ``streamGenerateContent`` APIs.
 	LLMProtocol_GEMINI_GENERATE_CONTENT LLMProtocol = 4
 )
 

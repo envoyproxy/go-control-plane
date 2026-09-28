@@ -122,8 +122,8 @@ type TapConfig struct {
 	//
 	// .. note::
 	//
-	//	This field defaults to 100/:ref:`HUNDRED
-	//	<envoy_api_enum_type.FractionalPercent.DenominatorType>`.
+	//   This field defaults to 100/:ref:`HUNDRED
+	//   <envoy_api_enum_type.FractionalPercent.DenominatorType>`.
 	TapEnabled    *core.RuntimeFractionalPercent `protobuf:"bytes,3,opt,name=tap_enabled,json=tapEnabled,proto3" json:"tap_enabled,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -597,10 +597,10 @@ type OutputSink_StreamingAdmin struct {
 	//
 	// .. attention::
 	//
-	//	It is only allowed to specify the streaming admin output sink if the tap is being
-	//	configured from the :http:post:`/tap` admin endpoint. Thus, if an extension has
-	//	been configured to receive tap configuration from some other source (e.g., static
-	//	file, XDS, etc.) configuring the streaming admin output type will fail.
+	//   It is only allowed to specify the streaming admin output sink if the tap is being
+	//   configured from the :http:post:`/tap` admin endpoint. Thus, if an extension has
+	//   been configured to receive tap configuration from some other source (e.g., static
+	//   file, XDS, etc.) configuring the streaming admin output type will fail.
 	StreamingAdmin *StreamingAdminSink `protobuf:"bytes,2,opt,name=streaming_admin,json=streamingAdmin,proto3,oneof"`
 }
 

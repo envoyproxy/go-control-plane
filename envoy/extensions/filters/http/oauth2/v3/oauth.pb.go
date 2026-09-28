@@ -85,11 +85,11 @@ func (CookieConfig_SameSite) EnumDescriptor() ([]byte, []int) {
 type PrivateKeyJwtConfig_SigningAlgorithm int32
 
 const (
-	// “RSASSA-PKCS1-v1_5“ using SHA-256.
+	// ``RSASSA-PKCS1-v1_5`` using SHA-256.
 	PrivateKeyJwtConfig_RS256 PrivateKeyJwtConfig_SigningAlgorithm = 0
-	// “RSASSA-PKCS1-v1_5“ using SHA-384.
+	// ``RSASSA-PKCS1-v1_5`` using SHA-384.
 	PrivateKeyJwtConfig_RS384 PrivateKeyJwtConfig_SigningAlgorithm = 1
-	// “RSASSA-PKCS1-v1_5“ using SHA-512.
+	// ``RSASSA-PKCS1-v1_5`` using SHA-512.
 	PrivateKeyJwtConfig_RS512 PrivateKeyJwtConfig_SigningAlgorithm = 2
 	// ECDSA using P-256 and SHA-256.
 	PrivateKeyJwtConfig_ES256 PrivateKeyJwtConfig_SigningAlgorithm = 3
@@ -149,22 +149,22 @@ func (PrivateKeyJwtConfig_SigningAlgorithm) EnumDescriptor() ([]byte, []int) {
 type OAuth2Config_AuthType int32
 
 const (
-	// The “client_id“ and “client_secret“ will be sent in the URL encoded request body.
+	// The ``client_id`` and ``client_secret`` will be sent in the URL encoded request body.
 	// This type should only be used when Auth server does not support Basic authentication.
 	OAuth2Config_URL_ENCODED_BODY OAuth2Config_AuthType = 0
-	// The “client_id“ and “client_secret“ will be sent using HTTP Basic authentication scheme.
+	// The ``client_id`` and ``client_secret`` will be sent using HTTP Basic authentication scheme.
 	OAuth2Config_BASIC_AUTH OAuth2Config_AuthType = 1
 	// The client will be authenticated using mutual TLS (mTLS) with a client certificate.
-	// The “client_secret“ is not required and will not be sent in the request to the
+	// The ``client_secret`` is not required and will not be sent in the request to the
 	// authorization server.
-	// The client certificate must be configured in the cluster used by “token_endpoint“ via
+	// The client certificate must be configured in the cluster used by ``token_endpoint`` via
 	// transport socket configuration.
 	// This implements OAuth 2.0 Mutual-TLS Client Authentication as defined in RFC 8705.
 	OAuth2Config_TLS_CLIENT_AUTH OAuth2Config_AuthType = 2
 	// The client authenticates using a signed JWT assertion (RFC 7523).
-	// The “token_secret“ in credentials must contain the PEM-encoded private key used to sign the assertion.
-	// The JWT assertion is sent as “client_assertion“ in the token request body along with
-	// “client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer“.
+	// The ``token_secret`` in credentials must contain the PEM-encoded private key used to sign the assertion.
+	// The JWT assertion is sent as ``client_assertion`` in the token request body along with
+	// ``client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer``.
 	OAuth2Config_PRIVATE_KEY_JWT OAuth2Config_AuthType = 3
 )
 
@@ -223,15 +223,15 @@ type CookieConfig struct {
 	// The CSRF cookie (nonce cookie) can be configured with a different path than session cookies
 	// to support flows where the callback URL is on a different path.
 	//
-	// If not specified, defaults to “/“.
+	// If not specified, defaults to ``/``.
 	Path string `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty"`
-	// If true, the “Partitioned“ attribute will be set on the cookie.
+	// If true, the ``Partitioned`` attribute will be set on the cookie.
 	//
 	// Modern browsers (Firefox, Chrome with third-party cookie deprecation) warn or block
-	// "foreign" cookies unless they carry the “Partitioned“ attribute alongside “SameSite=None; Secure“.
+	// "foreign" cookies unless they carry the ``Partitioned`` attribute alongside ``SameSite=None; Secure``.
 	// When Envoy is used in a gateway/IdP flow that sets OAuth/OIDC cookies for a parent domain
-	// (e.g., “Domain=.example.com“) while running on a different host, those cookies are
-	// considered third-party and will be rejected without “Partitioned“.
+	// (e.g., ``Domain=.example.com``) while running on a different host, those cookies are
+	// considered third-party and will be rejected without ``Partitioned``.
 	//
 	// See `CHIPS <https://developers.google.com/privacy-sandbox/3pcd/chips>`_ for more information.
 	//
@@ -399,21 +399,21 @@ type OAuth2Credentials struct {
 	ClientId string `protobuf:"bytes,1,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
 	// The secret used to retrieve the access token. This value will be URL encoded when sent to the OAuth server.
 	// This field is required unless :ref:`auth_type <envoy_v3_api_field_extensions.filters.http.oauth2.v3.OAuth2Config.auth_type>`
-	// is set to “TLS_CLIENT_AUTH“, in which case authentication is done via the client certificate.
-	// When “auth_type“ is “PRIVATE_KEY_JWT“, this field must contain the PEM-encoded private key
+	// is set to ``TLS_CLIENT_AUTH``, in which case authentication is done via the client certificate.
+	// When ``auth_type`` is ``PRIVATE_KEY_JWT``, this field must contain the PEM-encoded private key
 	// used to sign the JWT client assertion. The key may be supplied in either of two forms:
 	//
-	//   - As a single-value generic secret holding the PEM-encoded private key. No “kid“ header
-	//     parameter is included in the client assertion.
-	//   - As a multi-entry generic secret with a “private_key“ entry holding the PEM-encoded private
-	//     key and an optional “key_id“ entry. When present, the “key_id“ value is set as the
-	//     “kid“ header parameter of the client assertion, per
-	//     `RFC 7515 Section 4.1.4 <https://datatracker.ietf.org/doc/html/rfc7515#section-4.1.4>`_.
-	//     Identity providers use it to select the correct verification key when more than one key is
-	//     registered for the client. Distributing both in one secret means the key ID is always
-	//     rotated together with the key it identifies.
+	// * As a single-value generic secret holding the PEM-encoded private key. No ``kid`` header
+	//   parameter is included in the client assertion.
+	// * As a multi-entry generic secret with a ``private_key`` entry holding the PEM-encoded private
+	//   key and an optional ``key_id`` entry. When present, the ``key_id`` value is set as the
+	//   ``kid`` header parameter of the client assertion, per
+	//   `RFC 7515 Section 4.1.4 <https://datatracker.ietf.org/doc/html/rfc7515#section-4.1.4>`_.
+	//   Identity providers use it to select the correct verification key when more than one key is
+	//   registered for the client. Distributing both in one secret means the key ID is always
+	//   rotated together with the key it identifies.
 	//
-	// The multi-entry form is only read when “auth_type“ is “PRIVATE_KEY_JWT“. The other auth
+	// The multi-entry form is only read when ``auth_type`` is ``PRIVATE_KEY_JWT``. The other auth
 	// types read the single-value form only.
 	TokenSecret *v3.SdsSecretConfig `protobuf:"bytes,2,opt,name=token_secret,json=tokenSecret,proto3" json:"token_secret,omitempty"`
 	// Configures how the secret token should be created.
@@ -520,18 +520,18 @@ func (*OAuth2Credentials_HmacSecret) isOAuth2Credentials_TokenFormation() {}
 type PrivateKeyJwtConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The signing algorithm to use for the JWT assertion.
-	// The private key provided in “token_secret“ must match the algorithm family: an RSA key for
-	// the “RS*“ algorithms, or an EC key for the “ES*“ algorithms.
-	// Default: “RS256“.
+	// The private key provided in ``token_secret`` must match the algorithm family: an RSA key for
+	// the ``RS*`` algorithms, or an EC key for the ``ES*`` algorithms.
+	// Default: ``RS256``.
 	SigningAlgorithm PrivateKeyJwtConfig_SigningAlgorithm `protobuf:"varint,1,opt,name=signing_algorithm,json=signingAlgorithm,proto3,enum=envoy.extensions.filters.http.oauth2.v3.PrivateKeyJwtConfig_SigningAlgorithm" json:"signing_algorithm,omitempty"`
 	// The lifetime of the JWT assertion. After this duration, the assertion expires.
-	// The value is truncated to whole seconds, so it must be at least “1s“ when set.
-	// Default: “60s“.
+	// The value is truncated to whole seconds, so it must be at least ``1s`` when set.
+	// Default: ``60s``.
 	AssertionLifetime *durationpb.Duration `protobuf:"bytes,2,opt,name=assertion_lifetime,json=assertionLifetime,proto3" json:"assertion_lifetime,omitempty"`
-	// The value to use as the “aud“ (audience) claim in the JWT client assertion.
+	// The value to use as the ``aud`` (audience) claim in the JWT client assertion.
 	//
 	// `RFC 7523 Section 3 <https://datatracker.ietf.org/doc/html/rfc7523#section-3>`_ requires the
-	// “aud“ claim to identify the authorization server, and allows the token endpoint URL to be
+	// ``aud`` claim to identify the authorization server, and allows the token endpoint URL to be
 	// used for this purpose.
 	// `RFC 9126 Section 2.1 <https://datatracker.ietf.org/doc/html/rfc9126#section-2.1>`_ recommends
 	// the authorization server's issuer identifier instead, and
@@ -539,7 +539,7 @@ type PrivateKeyJwtConfig struct {
 	// single canonical value identifies the server regardless of which endpoint receives the
 	// assertion.
 	//
-	// If not set, defaults to the configured “token_endpoint“ URI.
+	// If not set, defaults to the configured ``token_endpoint`` URI.
 	AssertionAudience string `protobuf:"bytes,3,opt,name=assertion_audience,json=assertionAudience,proto3" json:"assertion_audience,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
@@ -600,7 +600,7 @@ func (x *PrivateKeyJwtConfig) GetAssertionAudience() string {
 type OAuth2TokenForwarding struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The upstream request header that will carry the token.
-	// Pseudo-headers (names starting with “:“) and the “Host“ header are not allowed.
+	// Pseudo-headers (names starting with ``:``) and the ``Host`` header are not allowed.
 	Header        string `protobuf:"bytes,1,opt,name=header,proto3" json:"header,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -717,13 +717,13 @@ type isPostLogoutRedirectUri_Config interface {
 }
 
 type PostLogoutRedirectUri_Disabled struct {
-	// Do not include the “post_logout_redirect_uri“ parameter in requests to the
-	// configured “end_session_endpoint“.
+	// Do not include the ``post_logout_redirect_uri`` parameter in requests to the
+	// configured ``end_session_endpoint``.
 	Disabled bool `protobuf:"varint,1,opt,name=disabled,proto3,oneof"`
 }
 
 type PostLogoutRedirectUri_Uri struct {
-	// URI to send as the “post_logout_redirect_uri“ parameter. Supports header formatting
+	// URI to send as the ``post_logout_redirect_uri`` parameter. Supports header formatting
 	// tokens, and will be percent-encoded automatically when building the logout URL.
 	//
 	// The URI should be registered with the authorization server.
@@ -752,13 +752,13 @@ type OAuth2Config struct {
 	//
 	// If configured, the OAuth2 filter will redirect users to this endpoint when they access the signout_path.
 	EndSessionEndpoint string `protobuf:"bytes,23,opt,name=end_session_endpoint,json=endSessionEndpoint,proto3" json:"end_session_endpoint,omitempty"`
-	// Optional control for the “post_logout_redirect_uri“ parameter sent to the “end_session_endpoint“ when a user
-	// accesses the “signout_path“.
-	// This field should be set only if “openid“ is in the “auth_scopes“, the “end_session_endpoint“ is configured,
+	// Optional control for the ``post_logout_redirect_uri`` parameter sent to the ``end_session_endpoint`` when a user
+	// accesses the ``signout_path``.
+	// This field should be set only if ``openid`` is in the ``auth_scopes``, the ``end_session_endpoint`` is configured,
 	// and the authorization server supports the OpenID Connect RP-Initiated Logout specification.
 	//
-	// If unset, Envoy preserves the historical behavior and sends “<scheme>://<host>/“, constructed from the inbound
-	// request, as “post_logout_redirect_uri“.
+	// If unset, Envoy preserves the historical behavior and sends ``<scheme>://<host>/``, constructed from the inbound
+	// request, as ``post_logout_redirect_uri``.
 	PostLogoutRedirectUri *PostLogoutRedirectUri `protobuf:"bytes,33,opt,name=post_logout_redirect_uri,json=postLogoutRedirectUri,proto3" json:"post_logout_redirect_uri,omitempty"`
 	// Credentials used for OAuth.
 	Credentials *OAuth2Credentials `protobuf:"bytes,3,opt,name=credentials,proto3" json:"credentials,omitempty"`
@@ -776,15 +776,15 @@ type OAuth2Config struct {
 	ForwardBearerToken bool `protobuf:"varint,7,opt,name=forward_bearer_token,json=forwardBearerToken,proto3" json:"forward_bearer_token,omitempty"`
 	// Forward the OIDC ID token to the upstream.
 	//
-	// If the configured header is “Authorization“, Envoy forwards the ID token using the
-	// “Bearer“ prefix. For any other header, Envoy forwards the raw token value.
+	// If the configured header is ``Authorization``, Envoy forwards the ID token using the
+	// ``Bearer`` prefix. For any other header, Envoy forwards the raw token value.
 	// If not specified, the ID token will not be forwarded.
 	//
 	// This can not be configured with :ref:`forward_bearer_token
 	// <envoy_v3_api_field_extensions.filters.http.oauth2.v3.OAuth2Config.forward_bearer_token>`
 	// or :ref:`preserve_authorization_header
 	// <envoy_v3_api_field_extensions.filters.http.oauth2.v3.OAuth2Config.preserve_authorization_header>`
-	// when the header is “Authorization“.
+	// when the header is ``Authorization``.
 	ForwardIdToken *OAuth2TokenForwarding `protobuf:"bytes,31,opt,name=forward_id_token,json=forwardIdToken,proto3" json:"forward_id_token,omitempty"`
 	// If set to true, preserve the existing authorization header.
 	// By default the client strips the existing authorization header before forwarding upstream.
@@ -800,7 +800,7 @@ type OAuth2Config struct {
 	// Optional resource parameter for authorization request
 	// RFC: https://tools.ietf.org/html/rfc8707
 	Resources []string `protobuf:"bytes,10,rep,name=resources,proto3" json:"resources,omitempty"`
-	// Defines how “client_id“ and “client_secret“ are sent in OAuth client to OAuth server requests.
+	// Defines how ``client_id`` and ``client_secret`` are sent in OAuth client to OAuth server requests.
 	// RFC https://datatracker.ietf.org/doc/html/rfc6749#section-2.3.1
 	AuthType OAuth2Config_AuthType `protobuf:"varint,11,opt,name=auth_type,json=authType,proto3,enum=envoy.extensions.filters.http.oauth2.v3.OAuth2Config_AuthType" json:"auth_type,omitempty"`
 	// If set to true, allows automatic access token refresh using the associated refresh token (see
@@ -809,7 +809,7 @@ type OAuth2Config struct {
 	UseRefreshToken *wrapperspb.BoolValue `protobuf:"bytes,12,opt,name=use_refresh_token,json=useRefreshToken,proto3" json:"use_refresh_token,omitempty"`
 	// The default lifetime in seconds of the access token, if omitted by the authorization server.
 	//
-	// If this value is not set, it will default to “0s“. In this case, the expiry must be set by
+	// If this value is not set, it will default to ``0s``. In this case, the expiry must be set by
 	// the authorization server or the OAuth flow will fail.
 	DefaultExpiresIn *durationpb.Duration `protobuf:"bytes,13,opt,name=default_expires_in,json=defaultExpiresIn,proto3" json:"default_expires_in,omitempty"`
 	// Any request that matches any of the provided matchers won't be redirected to OAuth server when tokens are not valid.
@@ -818,9 +818,9 @@ type OAuth2Config struct {
 	DenyRedirectMatcher []*v33.HeaderMatcher `protobuf:"bytes,14,rep,name=deny_redirect_matcher,json=denyRedirectMatcher,proto3" json:"deny_redirect_matcher,omitempty"`
 	// The default lifetime in seconds of the refresh token, if the exp (expiration time) claim is omitted in the refresh token or the refresh token is not JWT.
 	//
-	// If this value is not set, it will default to “604800s“. In this case, the cookie with the refresh token will be expired
+	// If this value is not set, it will default to ``604800s``. In this case, the cookie with the refresh token will be expired
 	// in a week.
-	// This setting is only considered if “use_refresh_token“ is set to true, otherwise the authorization server expiration or “default_expires_in“ is used.
+	// This setting is only considered if ``use_refresh_token`` is set to true, otherwise the authorization server expiration or ``default_expires_in`` is used.
 	DefaultRefreshTokenExpiresIn *durationpb.Duration `protobuf:"bytes,15,opt,name=default_refresh_token_expires_in,json=defaultRefreshTokenExpiresIn,proto3" json:"default_refresh_token_expires_in,omitempty"`
 	// If set to true, the client will not set a cookie for ID Token even if one is received from the Identity Provider. This may be useful in cases where the ID
 	// Token is too large for HTTP cookies (longer than 4096 characters). Enabling this option will only disable setting the cookie response header, the filter
@@ -843,12 +843,12 @@ type OAuth2Config struct {
 	StatPrefix string `protobuf:"bytes,22,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// Optional expiration time for the CSRF protection token cookie.
 	// The CSRF token prevents cross-site request forgery attacks during the OAuth2 flow.
-	// If not specified, defaults to “600s“ (10 minutes), which should provide sufficient time
+	// If not specified, defaults to ``600s`` (10 minutes), which should provide sufficient time
 	// for users to complete the OAuth2 authorization flow.
 	CsrfTokenExpiresIn *durationpb.Duration `protobuf:"bytes,24,opt,name=csrf_token_expires_in,json=csrfTokenExpiresIn,proto3" json:"csrf_token_expires_in,omitempty"`
 	// Optional expiration time for the code verifier cookie.
 	// The code verifier is stored in a secure, HTTP-only cookie during the OAuth2 authorization process.
-	// If not specified, defaults to “600s“ (10 minutes), which should provide sufficient time
+	// If not specified, defaults to ``600s`` (10 minutes), which should provide sufficient time
 	// for users to complete the OAuth2 authorization flow.
 	CodeVerifierTokenExpiresIn *durationpb.Duration `protobuf:"bytes,25,opt,name=code_verifier_token_expires_in,json=codeVerifierTokenExpiresIn,proto3" json:"code_verifier_token_expires_in,omitempty"`
 	// Disable token encryption. When set to true, both the access token and the ID token will be stored in plain text.
@@ -861,26 +861,26 @@ type OAuth2Config struct {
 	// enabling graceful degradation patterns.
 	//
 	// When triggered, all OAuth cookies are stripped from the request and the request proceeds as unauthenticated.
-	// Context headers “x-envoy-oauth-status: failed“ and “x-envoy-oauth-failure-reason“ are added to inform upstream.
+	// Context headers ``x-envoy-oauth-status: failed`` and ``x-envoy-oauth-failure-reason`` are added to inform upstream.
 	//
 	// Note: If a request matches pass_through_matcher, it bypasses OAuth validation and this matcher won't be evaluated.
 	// This matcher takes precedence over deny_redirect_matcher.
 	AllowFailedMatcher []*v33.HeaderMatcher `protobuf:"bytes,27,rep,name=allow_failed_matcher,json=allowFailedMatcher,proto3" json:"allow_failed_matcher,omitempty"`
-	// Optional base URI (scheme + host, e.g. “https://app.example.com“) used to build the
-	// original request URI that is encoded into the OAuth2 “state“ parameter.
+	// Optional base URI (scheme + host, e.g. ``https://app.example.com``) used to build the
+	// original request URI that is encoded into the OAuth2 ``state`` parameter.
 	// This URI will be used later to redirect users on a successful OAuth.
 	//
 	// This is useful when Envoy sits behind a gateway or load balancer that terminates the
-	// user-facing hostname: In that case, the post-authentication redirect derived from “state“ would
+	// user-facing hostname: In that case, the post-authentication redirect derived from ``state`` would
 	// send the user to an internal host they didn't request.
 	//
 	// Supports request header formatting tokens.
 	//
 	// Example:
 	//
-	//	original_request_uri: "%REQ(x-forwarded-proto?:scheme)%://%REQ(x-forwarded-host?:authority)%"
+	//    original_request_uri: "%REQ(x-forwarded-proto?:scheme)%://%REQ(x-forwarded-host?:authority)%"
 	//
-	// If not set, defaults to “<:scheme>://<:authority>“ of the incoming request.
+	// If not set, defaults to ``<:scheme>://<:authority>`` of the incoming request.
 	OriginalRequestUri string `protobuf:"bytes,28,opt,name=original_request_uri,json=originalRequestUri,proto3" json:"original_request_uri,omitempty"`
 	// Optional list of domains that are allowed as
 	// 1. redirect_uri: which is what the IdP calls after OAuth
@@ -888,29 +888,29 @@ type OAuth2Config struct {
 	//
 	// This mitigates:
 	// - injecting a malicious x-forwarded-host or any header that is used to template the redirect urls
-	// - open redirect attacks where an attacker crafts a “state“ value pointing to an untrusted host.
+	// - open redirect attacks where an attacker crafts a ``state`` value pointing to an untrusted host.
 	//
 	// Each entry is matched against the host (with any port stripped) extracted from the
-	// formatted “redirect_uri“, the formatted “original_request_uri“, and the URL decoded from
-	// the “state“ parameter on callback. Matching is case-insensitive and supports two forms:
+	// formatted ``redirect_uri``, the formatted ``original_request_uri``, and the URL decoded from
+	// the ``state`` parameter on callback. Matching is case-insensitive and supports two forms:
 	//
-	//   - Exact match, e.g. “example.com“ matches only “example.com“.
-	//   - Wildcard subdomain match using a leading “*.“, e.g. “*.example.com“ matches
-	//     “foo.example.com“ and “bar.baz.example.com“ but not “example.com“ itself.
+	// * Exact match, e.g. ``example.com`` matches only ``example.com``.
+	// * Wildcard subdomain match using a leading ``*.``, e.g. ``*.example.com`` matches
+	//   ``foo.example.com`` and ``bar.baz.example.com`` but not ``example.com`` itself.
 	//
-	// IPv6 literals must be configured without surrounding brackets (e.g. “::1“, not “[::1]“).
+	// IPv6 literals must be configured without surrounding brackets (e.g. ``::1``, not ``[::1]``).
 	//
 	// If this list is empty (the default), all hosts are allowed and no validation is performed.
 	AllowedRedirectDomains []string `protobuf:"bytes,29,rep,name=allowed_redirect_domains,json=allowedRedirectDomains,proto3" json:"allowed_redirect_domains,omitempty"`
 	// If set to true, the expiration time for the ID token cookie will always be derived from the
-	// “expires_in“ field of the access token response rather than from the “exp“ claim in the
+	// ``expires_in`` field of the access token response rather than from the ``exp`` claim in the
 	// ID token JWT. This is useful when the access token response advertises a longer lifetime than
 	// the ID token and you want the ID token cookie to remain valid for that full duration.
-	// Default is false (use the ID token's own “exp“ claim when available).
+	// Default is false (use the ID token's own ``exp`` claim when available).
 	UseAccessTokenExpiryForIdTokenCookie bool `protobuf:"varint,30,opt,name=use_access_token_expiry_for_id_token_cookie,json=useAccessTokenExpiryForIdTokenCookie,proto3" json:"use_access_token_expiry_for_id_token_cookie,omitempty"`
-	// Configuration for “PRIVATE_KEY_JWT“ client authentication.
+	// Configuration for ``PRIVATE_KEY_JWT`` client authentication.
 	// Only used when :ref:`auth_type <envoy_v3_api_field_extensions.filters.http.oauth2.v3.OAuth2Config.auth_type>`
-	// is set to “PRIVATE_KEY_JWT“.
+	// is set to ``PRIVATE_KEY_JWT``.
 	PrivateKeyJwtConfig *PrivateKeyJwtConfig `protobuf:"bytes,32,opt,name=private_key_jwt_config,json=privateKeyJwtConfig,proto3" json:"private_key_jwt_config,omitempty"`
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
@@ -1280,19 +1280,19 @@ type OAuth2Credentials_CookieNames struct {
 	// client and returns an authorization token back to the OAuth filter, no matter what format
 	// that token is, if :ref:`forward_bearer_token <envoy_v3_api_field_extensions.filters.http.oauth2.v3.OAuth2Config.forward_bearer_token>`
 	// is set to true the filter will send over the bearer token as a cookie with this name to the
-	// upstream. Defaults to “BearerToken“.
+	// upstream. Defaults to ``BearerToken``.
 	BearerToken string `protobuf:"bytes,1,opt,name=bearer_token,json=bearerToken,proto3" json:"bearer_token,omitempty"`
-	// Cookie name to hold OAuth HMAC value. Defaults to “OauthHMAC“.
+	// Cookie name to hold OAuth HMAC value. Defaults to ``OauthHMAC``.
 	OauthHmac string `protobuf:"bytes,2,opt,name=oauth_hmac,json=oauthHmac,proto3" json:"oauth_hmac,omitempty"`
-	// Cookie name to hold OAuth expiry value. Defaults to “OauthExpires“.
+	// Cookie name to hold OAuth expiry value. Defaults to ``OauthExpires``.
 	OauthExpires string `protobuf:"bytes,3,opt,name=oauth_expires,json=oauthExpires,proto3" json:"oauth_expires,omitempty"`
-	// Cookie name to hold the id token. Defaults to “IdToken“.
+	// Cookie name to hold the id token. Defaults to ``IdToken``.
 	IdToken string `protobuf:"bytes,4,opt,name=id_token,json=idToken,proto3" json:"id_token,omitempty"`
-	// Cookie name to hold the refresh token. Defaults to “RefreshToken“.
+	// Cookie name to hold the refresh token. Defaults to ``RefreshToken``.
 	RefreshToken string `protobuf:"bytes,5,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
-	// Cookie name to hold the nonce value. Defaults to “OauthNonce“.
+	// Cookie name to hold the nonce value. Defaults to ``OauthNonce``.
 	OauthNonce string `protobuf:"bytes,6,opt,name=oauth_nonce,json=oauthNonce,proto3" json:"oauth_nonce,omitempty"`
-	// Cookie name to hold the PKCE code verifier. Defaults to “OauthCodeVerifier“.
+	// Cookie name to hold the PKCE code verifier. Defaults to ``OauthCodeVerifier``.
 	CodeVerifier  string `protobuf:"bytes,7,opt,name=code_verifier,json=codeVerifier,proto3" json:"code_verifier,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

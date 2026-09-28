@@ -36,9 +36,9 @@ type GcpAuthnFilterConfig struct {
 	//
 	// This field is deprecated because it does not match the API surface provided by the google auth libraries.
 	// Control planes should not attempt to override the metadata server URI.
-	// The cluster and timeout can be configured using the “cluster“ and “timeout“ fields instead.
+	// The cluster and timeout can be configured using the ``cluster`` and ``timeout`` fields instead.
 	// For backward compatibility, the cluster and timeout configured in this field will be used
-	// if the new “cluster“ and “timeout“ fields are not set.
+	// if the new ``cluster`` and ``timeout`` fields are not set.
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/filters/http/gcp_authn/v3/gcp_authn.proto.
 	HttpUri *v3.HttpUri `protobuf:"bytes,1,opt,name=http_uri,json=httpUri,proto3" json:"http_uri,omitempty"`
@@ -49,11 +49,11 @@ type GcpAuthnFilterConfig struct {
 	CacheConfig *TokenCacheConfig `protobuf:"bytes,3,opt,name=cache_config,json=cacheConfig,proto3" json:"cache_config,omitempty"`
 	// Request header location to extract the token. By default (i.e. if this field is not specified), the token
 	// is extracted to the Authorization HTTP header, in the format "Authorization: Bearer <token>".
-	// If “token_metadata_key“ is set, this field takes no effect.
+	// If ``token_metadata_key`` is set, this field takes no effect.
 	// Not supported by all data planes.
 	TokenHeader *TokenHeader `protobuf:"bytes,4,opt,name=token_header,json=tokenHeader,proto3" json:"token_header,omitempty"`
 	// Optional dynamic metadata key to save the token. The metadata uses the filter config name as the namespace.
-	// Takes precedence over “token_header“.
+	// Takes precedence over ``token_header``.
 	TokenMetadataKey string `protobuf:"bytes,7,opt,name=token_metadata_key,json=tokenMetadataKey,proto3" json:"token_metadata_key,omitempty"`
 	// Cluster to send traffic to the GCE metadata server. Not supported
 	// by all data planes; a data plane may instead have its own mechanism
@@ -163,16 +163,16 @@ type Audience struct {
 	// The audience URL, used for fetching unbound JWT token.
 	Url string `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
 	// If defined, the filter will fetch unbound Access Token instead of JWT.
-	// It takes precedence over “url“.
+	// It takes precedence over ``url``.
 	AccessToken *Audience_AccessToken `protobuf:"bytes,2,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
 	// If defined, the filter will fetch bound JWT token instead of unbound.
-	// It takes precedence over “access_token“ and “url“.
+	// It takes precedence over ``access_token`` and ``url``.
 	BoundJwt *Audience_BoundJwt `protobuf:"bytes,3,opt,name=bound_jwt,json=boundJwt,proto3" json:"bound_jwt,omitempty"`
 	// If defined, the filter will fetch bound Access Token instead of unbound.
-	// It takes precedence over “bound_jwt“, “access_token“ and “url“.
+	// It takes precedence over ``bound_jwt``, ``access_token`` and ``url``.
 	BoundAccessToken *Audience_BoundAccessToken `protobuf:"bytes,4,opt,name=bound_access_token,json=boundAccessToken,proto3" json:"bound_access_token,omitempty"`
 	// If defined, the filter will fetch an access token for a service account.
-	// It takes precedence over “bound_access_token“, “bound_jwt“, “access_token“, and “url“.
+	// It takes precedence over ``bound_access_token``, ``bound_jwt``, ``access_token``, and ``url``.
 	// Requires inlined audience definition in the filter configuration.
 	IamAccessToken *Audience_IAMAccessToken `protobuf:"bytes,5,opt,name=iam_access_token,json=iamAccessToken,proto3" json:"iam_access_token,omitempty"`
 	unknownFields  protoimpl.UnknownFields
@@ -293,7 +293,7 @@ func (x *TokenCacheConfig) GetCacheSize() *wrapperspb.UInt64Value {
 
 type TokenHeader struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The HTTP header's name. Defaults to “Authorization“ if not specified.
+	// The HTTP header's name. Defaults to ``Authorization`` if not specified.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The header's prefix. The format is "value_prefix<token>"
 	// For example, for "Authorization: Bearer <token>", value_prefix="Bearer " with a space at the
@@ -301,8 +301,8 @@ type TokenHeader struct {
 	ValuePrefix string `protobuf:"bytes,2,opt,name=value_prefix,json=valuePrefix,proto3" json:"value_prefix,omitempty"`
 	// If set, the filter checks if the target header is already present (by header key existence,
 	// even if the header value is empty). If present, it skips token fetching and preserves the
-	// existing header intact (“value_prefix“ has no effect on the preserved header). If absent,
-	// a new token is fetched and written using “name“ and “value_prefix“.
+	// existing header intact (``value_prefix`` has no effect on the preserved header). If absent,
+	// a new token is fetched and written using ``name`` and ``value_prefix``.
 	// If not set, the default behavior is to unconditionally overwrite the header.
 	PreserveExisting *TokenHeader_PreserveExisting `protobuf:"bytes,3,opt,name=preserve_existing,json=preserveExisting,proto3" json:"preserve_existing,omitempty"`
 	unknownFields    protoimpl.UnknownFields
@@ -481,10 +481,10 @@ func (*Audience_BoundAccessToken) Descriptor() ([]byte, []int) {
 type Audience_IAMAccessToken struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// A template string for the account email or unique ID for which the credentials are requested,
-	// e.g. “my-sa-%DYNAMIC_METADATA(my_filter:tenant_project)%@my-project.iam.gserviceaccount.com“.
+	// e.g. ``my-sa-%DYNAMIC_METADATA(my_filter:tenant_project)%@my-project.iam.gserviceaccount.com``.
 	Account string `protobuf:"bytes,1,opt,name=account,proto3" json:"account,omitempty"`
 	// A template string for the authorization header value,
-	// e.g. “Bearer %DYNAMIC_METADATA(gcp_authn:token)%“.
+	// e.g. ``Bearer %DYNAMIC_METADATA(gcp_authn:token)%``.
 	Authorization string `protobuf:"bytes,2,opt,name=authorization,proto3" json:"authorization,omitempty"`
 	// Optional custom scopes for the token request.
 	// Default scope is https://www.googleapis.com/auth/cloud-platform.

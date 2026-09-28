@@ -81,13 +81,13 @@ type MappedAttributeBuilder struct {
 	// for the re-mapping of attributes, which is not supported by the native attribute building
 	// logic.
 	MappedRequestAttributes map[string]string `protobuf:"bytes,1,rep,name=mapped_request_attributes,json=mappedRequestAttributes,proto3" json:"mapped_request_attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	// Similar to “mapped_request_attributes“, but for response attributes. The "response"
+	// Similar to ``mapped_request_attributes``, but for response attributes. The "response"
 	// nomenclature here indicates that the attributes, whatever they may be, are sent with a
 	// response headers, body, or trailers ext_proc call.
 	//
-	// If a value contains a request key (e.g., “request.host“), then the attribute would just be
+	// If a value contains a request key (e.g., ``request.host``), then the attribute would just be
 	// sent along in the response. This is useful if a given ext_proc extension is only enabled for
-	// response handling (e.g., “RESPONSE_HEADERS“) but the backend wants to access request
+	// response handling (e.g., ``RESPONSE_HEADERS``) but the backend wants to access request
 	// metadata.
 	MappedResponseAttributes map[string]string `protobuf:"bytes,2,rep,name=mapped_response_attributes,json=mappedResponseAttributes,proto3" json:"mapped_response_attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields            protoimpl.UnknownFields

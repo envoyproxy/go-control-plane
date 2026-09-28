@@ -84,15 +84,15 @@ type TransformConfig struct {
 	//
 	// .. note::
 	//
-	//	If set then the entire request headers and body will always be buffered on a JSON request
-	//	even if only headers are transformed.
+	//   If set then the entire request headers and body will always be buffered on a JSON request
+	//   even if only headers are transformed.
 	RequestTransformation *Transformation `protobuf:"bytes,1,opt,name=request_transformation,json=requestTransformation,proto3" json:"request_transformation,omitempty"`
 	// Configuration for transforming response.
 	//
 	// .. note::
 	//
-	//	If set then the entire response headers and body will always be buffered on a JSON response
-	//	even if only headers are transformed.
+	//   If set then the entire response headers and body will always be buffered on a JSON response
+	//   even if only headers are transformed.
 	ResponseTransformation *Transformation `protobuf:"bytes,2,opt,name=response_transformation,json=responseTransformation,proto3" json:"response_transformation,omitempty"`
 	// If true and the request headers are transformed, Envoy will re-evaluate the target
 	// cluster in the same route. Please ensure the cluster specifier in the route supports
@@ -100,13 +100,13 @@ type TransformConfig struct {
 	// :ref:`matcher cluster specifier
 	// <envoy_v3_api_msg_extensions.router.cluster_specifiers.matcher.v3.MatcherClusterSpecifier>`.
 	//
-	// Only one of “clear_cluster_cache“ and “clear_route_cache“ can be true.
+	// Only one of ``clear_cluster_cache`` and ``clear_route_cache`` can be true.
 	ClearClusterCache bool `protobuf:"varint,3,opt,name=clear_cluster_cache,json=clearClusterCache,proto3" json:"clear_cluster_cache,omitempty"`
 	// If true and the request headers are transformed, Envoy will clear the route cache for
 	// the current request and force re-evaluation of the route. This has performance penalty and
 	// should only be used when the route match criteria depends on the transformed headers.
 	//
-	// Only one of “clear_cluster_cache“ and “clear_route_cache“ can be true.
+	// Only one of ``clear_cluster_cache`` and ``clear_route_cache`` can be true.
 	ClearRouteCache bool `protobuf:"varint,4,opt,name=clear_route_cache,json=clearRouteCache,proto3" json:"clear_route_cache,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
@@ -176,10 +176,10 @@ type Transformation struct {
 	// The :ref:`substitution format specifier <config_access_log_format>` could be applied here.
 	// In addition to the commonly used format specifiers, this filter introduces additional format specifiers:
 	//
-	//   - “%REQUEST_BODY(KEY*)%“: the request body. And “Key“ KEY is an optional
-	//     lookup key in the namespace with the option of specifying nested keys separated by ':'.
-	//   - “%RESPONSE_BODY(KEY*)%“: the response body. And “Key“ KEY is an optional
-	//     lookup key in the namespace with the option of specifying nested keys separated by ':'.
+	// * ``%REQUEST_BODY(KEY*)%``: the request body. And ``Key`` KEY is an optional
+	//   lookup key in the namespace with the option of specifying nested keys separated by ':'.
+	// * ``%RESPONSE_BODY(KEY*)%``: the response body. And ``Key`` KEY is an optional
+	//   lookup key in the namespace with the option of specifying nested keys separated by ':'.
 	HeadersMutations []*v3.HeaderMutation `protobuf:"bytes,1,rep,name=headers_mutations,json=headersMutations,proto3" json:"headers_mutations,omitempty"`
 	// The body transformation configuration. If not set, no body transformation will be performed.
 	BodyTransformation *BodyTransformation `protobuf:"bytes,2,opt,name=body_transformation,json=bodyTransformation,proto3" json:"body_transformation,omitempty"`
@@ -237,13 +237,13 @@ type BodyTransformation struct {
 	// to generate the transformed new body content.
 	// The :ref:`substitution format specifier <config_access_log_format>` could be applied here.
 	// And except the commonly used format specifiers, the additional format specifiers
-	// “%REQUEST_BODY(KEY*)%“ and “%RESPONSE_BODY(KEY*)%“ could also be used here.
+	// ``%REQUEST_BODY(KEY*)%`` and ``%RESPONSE_BODY(KEY*)%`` could also be used here.
 	BodyFormat *v31.SubstitutionFormatString `protobuf:"bytes,1,opt,name=body_format,json=bodyFormat,proto3" json:"body_format,omitempty"`
 	// The action to perform for new body content and original body content.
-	// For example, if “MERGE“ is used, then the new body content generated from the “body_format“
+	// For example, if ``MERGE`` is used, then the new body content generated from the ``body_format``
 	// will be merged into the original body content.
 	//
-	// Default is “MERGE“.
+	// Default is ``MERGE``.
 	Action        BodyTransformation_TransformAction `protobuf:"varint,2,opt,name=action,proto3,enum=envoy.extensions.filters.http.transform.v3.BodyTransformation_TransformAction" json:"action,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

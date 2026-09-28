@@ -38,8 +38,8 @@ type DynamicModuleHeaderFormatter struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Specifies the shared-object level configuration. This field is required.
 	//
-	// Only sources that are available synchronously are supported, i.e. “name“, “module.local“,
-	// and a “module.remote“ that is already present in the on-disk cache. A remote source that
+	// Only sources that are available synchronously are supported, i.e. ``name``, ``module.local``,
+	// and a ``module.remote`` that is already present in the on-disk cache. A remote source that
 	// would need to be fetched is rejected, since the codec must be able to format headers for the
 	// first message the connection serves.
 	DynamicModuleConfig *v3.DynamicModuleConfig `protobuf:"bytes,1,opt,name=dynamic_module_config,json=dynamicModuleConfig,proto3" json:"dynamic_module_config,omitempty"`
@@ -48,35 +48,36 @@ type DynamicModuleHeaderFormatter struct {
 	//
 	// This can be used to distinguish between different header formatter implementations inside a
 	// dynamic module. When Envoy receives this configuration, it passes the
-	// “header_formatter_name“ to the dynamic module's header formatter config init function
-	// together with the “header_formatter_config“. That way a module can decide which in-module
+	// ``header_formatter_name`` to the dynamic module's header formatter config init function
+	// together with the ``header_formatter_config``. That way a module can decide which in-module
 	// implementation to use based on the name at load time.
 	HeaderFormatterName string `protobuf:"bytes,2,opt,name=header_formatter_name,json=headerFormatterName,proto3" json:"header_formatter_name,omitempty"`
-	// The configuration for the header formatter chosen by “header_formatter_name“. If not
+	// The configuration for the header formatter chosen by ``header_formatter_name``. If not
 	// specified, an empty configuration is passed to the module.
 	//
 	// This is passed to the module's header formatter initialization function. Together with the
-	// “header_formatter_name“, the module can decide which in-module implementation to use and
+	// ``header_formatter_name``, the module can decide which in-module implementation to use and
 	// fine-tune its behavior.
 	//
-	// “google.protobuf.Struct“ and the “value“ field of “xds.type.v3.TypedStruct“ are
+	// ``google.protobuf.Struct`` and the ``value`` field of ``xds.type.v3.TypedStruct`` are
 	// serialized as JSON before passing them to the module.
-	// “google.protobuf.BytesValue“ and “google.protobuf.StringValue“ are passed directly
+	// ``google.protobuf.BytesValue`` and ``google.protobuf.StringValue`` are passed directly
 	// without the wrapper.
 	//
 	// .. code-block:: yaml
 	//
-	//	# Passing a JSON struct configuration
-	//	header_formatter_config:
-	//	  "@type": "type.googleapis.com/google.protobuf.Struct"
-	//	  value:
-	//	    known_headers:
-	//	    - X-Request-ID
+	//  # Passing a JSON struct configuration
+	//  header_formatter_config:
+	//    "@type": "type.googleapis.com/google.protobuf.Struct"
+	//    value:
+	//      known_headers:
+	//      - X-Request-ID
 	//
-	//	# Passing a simple string configuration
-	//	header_formatter_config:
-	//	  "@type": "type.googleapis.com/google.protobuf.StringValue"
-	//	  value: "proper_case"
+	//  # Passing a simple string configuration
+	//  header_formatter_config:
+	//    "@type": "type.googleapis.com/google.protobuf.StringValue"
+	//    value: "proper_case"
+	//
 	HeaderFormatterConfig *anypb.Any `protobuf:"bytes,3,opt,name=header_formatter_config,json=headerFormatterConfig,proto3" json:"header_formatter_config,omitempty"`
 	unknownFields         protoimpl.UnknownFields
 	sizeCache             protoimpl.SizeCache

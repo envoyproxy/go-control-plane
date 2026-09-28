@@ -82,7 +82,7 @@ func (x *ReverseConnectionReporterClient) GetTypedConfig() *anypb.Any {
 type EventReporterConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Stat prefix for this reporter's metrics.
-	// Metrics will be emitted as “{stat_prefix}.events_pushed“, etc.
+	// Metrics will be emitted as ``{stat_prefix}.events_pushed``, etc.
 	StatPrefix string `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// List of clients to report to.
 	Clients       []*ReverseConnectionReporterClient `protobuf:"bytes,2,rep,name=clients,proto3" json:"clients,omitempty"`

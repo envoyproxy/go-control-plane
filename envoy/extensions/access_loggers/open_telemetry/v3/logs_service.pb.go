@@ -38,26 +38,26 @@ const (
 type OpenTelemetryAccessLogConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// [#comment:TODO(itamarkam): add 'filter_state_objects_to_log' to logs.]
-	// Deprecated. Use “grpc_service“ or “http_service“ instead.
+	// Deprecated. Use ``grpc_service`` or ``http_service`` instead.
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/access_loggers/open_telemetry/v3/logs_service.proto.
 	CommonConfig *v3.CommonGrpcAccessLogConfig `protobuf:"bytes,1,opt,name=common_config,json=commonConfig,proto3" json:"common_config,omitempty"`
 	// The upstream HTTP cluster that will receive OTLP logs via
 	// `OTLP/HTTP <https://opentelemetry.io/docs/specs/otlp/#otlphttp>`_.
-	// Note: Only one of “common_config“, “grpc_service“, or “http_service“ may be used.
+	// Note: Only one of ``common_config``, ``grpc_service``, or ``http_service`` may be used.
 	//
 	// .. note::
 	//
-	//	The ``request_headers_to_add`` property in the OTLP HTTP exporter service supports
-	//	substitution formatters. The formatters cannot access any HTTP or connection properties, but
-	//	can load content such as environment variables or files or secrets.
+	//   The ``request_headers_to_add`` property in the OTLP HTTP exporter service supports
+	//   substitution formatters. The formatters cannot access any HTTP or connection properties, but
+	//   can load content such as environment variables or files or secrets.
 	HttpService *v31.HttpService `protobuf:"bytes,8,opt,name=http_service,json=httpService,proto3" json:"http_service,omitempty"`
 	// The upstream gRPC cluster that will receive OTLP logs.
-	// Note: Only one of “common_config“, “grpc_service“, or “http_service“ may be used.
-	// This field is preferred over “common_config.grpc_service“.
+	// Note: Only one of ``common_config``, ``grpc_service``, or ``http_service`` may be used.
+	// This field is preferred over ``common_config.grpc_service``.
 	GrpcService *v31.GrpcService `protobuf:"bytes,9,opt,name=grpc_service,json=grpcService,proto3" json:"grpc_service,omitempty"`
 	// If specified, Envoy will not generate built-in resource labels
-	// like “log_name“, “zone_name“, “cluster_name“, “node_name“.
+	// like ``log_name``, ``zone_name``, ``cluster_name``, ``node_name``.
 	//
 	// Built-in labels have the lowest precedence and can be overridden by matching keys in
 	// :ref:`resource_detectors <envoy_v3_api_field_extensions.access_loggers.open_telemetry.v3.OpenTelemetryAccessLogConfig.resource_detectors>`
@@ -65,9 +65,9 @@ type OpenTelemetryAccessLogConfig struct {
 	DisableBuiltinLabels bool `protobuf:"varint,5,opt,name=disable_builtin_labels,json=disableBuiltinLabels,proto3" json:"disable_builtin_labels,omitempty"`
 	// OpenTelemetry `Resource <https://github.com/open-telemetry/opentelemetry-proto/blob/main/opentelemetry/proto/logs/v1/logs.proto#L51>`_
 	// attributes are filled with Envoy node info.
-	// Example: “resource_attributes { values { key: "region" value { string_value: "cn-north-7" } } }“.
+	// Example: ``resource_attributes { values { key: "region" value { string_value: "cn-north-7" } } }``.
 	//
-	// Attributes configured here take highest precedence (“resource_attributes“ > “resource_detectors“ > built-in labels)
+	// Attributes configured here take highest precedence (``resource_attributes`` > ``resource_detectors`` > built-in labels)
 	// and will override any matching keys.
 	ResourceAttributes *v1.KeyValueList `protobuf:"bytes,4,opt,name=resource_attributes,json=resourceAttributes,proto3" json:"resource_attributes,omitempty"`
 	// An ordered list of resource detectors to detect OpenTelemetry resource information such as
@@ -75,21 +75,21 @@ type OpenTelemetryAccessLogConfig struct {
 	//
 	// Attributes detected here override built-in labels with matching keys, but are overridden by
 	// :ref:`resource_attributes <envoy_v3_api_field_extensions.access_loggers.open_telemetry.v3.OpenTelemetryAccessLogConfig.resource_attributes>`
-	// (precedence: “resource_attributes“ > “resource_detectors“ > built-in labels).
+	// (precedence: ``resource_attributes`` > ``resource_detectors`` > built-in labels).
 	// [#extension-category: envoy.tracers.opentelemetry.resource_detectors]
 	ResourceDetectors []*v31.TypedExtensionConfig `protobuf:"bytes,15,rep,name=resource_detectors,json=resourceDetectors,proto3" json:"resource_detectors,omitempty"`
 	// OpenTelemetry `LogResource <https://github.com/open-telemetry/opentelemetry-proto/blob/main/opentelemetry/proto/logs/v1/logs.proto>`_
 	// fields, following `Envoy access logging formatting <https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage>`_.
 	//
 	// See 'body' in the LogResource proto for more details.
-	// Example: “body { string_value: "%PROTOCOL%" }“.
+	// Example: ``body { string_value: "%PROTOCOL%" }``.
 	Body *v1.AnyValue `protobuf:"bytes,2,opt,name=body,proto3" json:"body,omitempty"`
 	// See 'attributes' in the LogResource proto for more details.
-	// Example: “attributes { values { key: "user_agent" value { string_value: "%REQ(USER-AGENT)%" } } }“.
+	// Example: ``attributes { values { key: "user_agent" value { string_value: "%REQ(USER-AGENT)%" } } }``.
 	Attributes *v1.KeyValueList `protobuf:"bytes,3,opt,name=attributes,proto3" json:"attributes,omitempty"`
 	// Optional. Additional prefix to use on OpenTelemetry access logger stats. If empty, the stats will be rooted at
-	// “access_logs.open_telemetry_access_log.“. If non-empty, stats will be rooted at
-	// “access_logs.open_telemetry_access_log.<stat_prefix>.“.
+	// ``access_logs.open_telemetry_access_log.``. If non-empty, stats will be rooted at
+	// ``access_logs.open_telemetry_access_log.<stat_prefix>.``.
 	StatPrefix string `protobuf:"bytes,6,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// Specifies a collection of Formatter plugins that can be called from the access log configuration.
 	// See the formatters extensions documentation for details.

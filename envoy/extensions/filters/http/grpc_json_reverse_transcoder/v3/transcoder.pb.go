@@ -37,15 +37,15 @@ type GrpcJsonReverseTranscoder struct {
 	// Supplies the filename of
 	// :ref:`the proto descriptor set
 	// <config_grpc_json_reverse_transcoder_generate_proto_descriptor_set>` for the gRPC services.
-	// If set, takes precedence over the “descriptor_binary“ field.
+	// If set, takes precedence over the ``descriptor_binary`` field.
 	DescriptorPath string `protobuf:"bytes,1,opt,name=descriptor_path,json=descriptorPath,proto3" json:"descriptor_path,omitempty"`
 	// Supplies the binary content of
 	// :ref:`the proto descriptor set
 	// <config_grpc_json_reverse_transcoder_generate_proto_descriptor_set>` for the gRPC services.
-	// If “descriptor_path“ is set, this field is not used.
+	// If ``descriptor_path`` is set, this field is not used.
 	DescriptorBinary []byte `protobuf:"bytes,2,opt,name=descriptor_binary,json=descriptorBinary,proto3" json:"descriptor_binary,omitempty"`
 	// The maximum size of a request body to be transcoded, in bytes. A body exceeding this size will
-	// provoke a “gRPC status: ResourceExhausted“ response.
+	// provoke a ``gRPC status: ResourceExhausted`` response.
 	//
 	// Large values may cause envoy to use a lot of memory if there are many
 	// concurrent requests.
@@ -53,7 +53,7 @@ type GrpcJsonReverseTranscoder struct {
 	// If unset, the current stream buffer size is used.
 	MaxRequestBodySize *wrapperspb.UInt32Value `protobuf:"bytes,3,opt,name=max_request_body_size,json=maxRequestBodySize,proto3" json:"max_request_body_size,omitempty"`
 	// The maximum size of a response body to be transcoded, in bytes. A body exceeding this size will
-	// provoke a “gRPC status: Internal“ response.
+	// provoke a ``gRPC status: Internal`` response.
 	//
 	// Large values may cause envoy to use a lot of memory if there are many
 	// concurrent requests.
@@ -153,52 +153,53 @@ type GrpcJsonReverseTranscoder_PrintOptions struct {
 	// Whether to always print enums as ints. By default they are rendered
 	// as strings. Defaults to false.
 	AlwaysPrintEnumsAsInts bool `protobuf:"varint,2,opt,name=always_print_enums_as_ints,json=alwaysPrintEnumsAsInts,proto3" json:"always_print_enums_as_ints,omitempty"`
-	// Whether to convert the proto field names to “json_name“ annotation value, or lower camel case,
-	// in absence of “json_name“. By default the field names will be preserved after conversion.
+	// Whether to convert the proto field names to ``json_name`` annotation value, or lower camel case,
+	// in absence of ``json_name``. By default the field names will be preserved after conversion.
 	// Setting this flag will convert the field names to their canonical form. Defaults to false.
 	//
 	// Example:
 	//
 	// .. code-block:: proto
 	//
-	//	message Author {
-	//	  int64 id = 1;
-	//	  enum Gender {
-	//	    UNKNOWN = 0;
-	//	    MALE = 1;
-	//	    FEMALE = 2;
-	//	  };
-	//	  Gender gender = 2;
-	//	  string first_name = 3;
-	//	  string last_name = 4 [json_name = "lname"];
-	//	}
+	//     message Author {
+	//       int64 id = 1;
+	//       enum Gender {
+	//         UNKNOWN = 0;
+	//         MALE = 1;
+	//         FEMALE = 2;
+	//       };
+	//       Gender gender = 2;
+	//       string first_name = 3;
+	//       string last_name = 4 [json_name = "lname"];
+	//     }
 	//
 	// The above proto message after being transcoded to JSON with
-	// “use_canonical_field_names“ set to “false“ will have the
+	// ``use_canonical_field_names`` set to ``false`` will have the
 	// field names same as in the proto message, as follows:
 	//
 	// .. code-block:: json
 	//
-	//	{
-	//	  "id": "12345",
-	//	  "gender": "MALE",
-	//	  "first_name": "John",
-	//	  "last_name": "Doe"
-	//	}
+	//     {
+	//       "id": "12345",
+	//       "gender": "MALE",
+	//       "first_name": "John",
+	//       "last_name": "Doe"
+	//     }
 	//
-	// and with the “use_canonical_field_names“ set to “true“, the
-	// transcoded JSON will have “first_name“ converted to camelCase
-	// and “last_name“ converted to its “json_name“ annotation value,
+	// and with the ``use_canonical_field_names`` set to ``true``, the
+	// transcoded JSON will have ``first_name`` converted to camelCase
+	// and ``last_name`` converted to its ``json_name`` annotation value,
 	// as follows:
 	//
 	// .. code-block:: json
 	//
-	//	{
-	//	  "id": "12345",
-	//	  "gender": "MALE",
-	//	  "firstName": "John",
-	//	  "lname": "Doe"
-	//	}
+	//     {
+	//       "id": "12345",
+	//       "gender": "MALE",
+	//       "firstName": "John",
+	//       "lname": "Doe"
+	//     }
+	//
 	UseCanonicalFieldNames bool `protobuf:"varint,3,opt,name=use_canonical_field_names,json=useCanonicalFieldNames,proto3" json:"use_canonical_field_names,omitempty"`
 	unknownFields          protoimpl.UnknownFields
 	sizeCache              protoimpl.SizeCache

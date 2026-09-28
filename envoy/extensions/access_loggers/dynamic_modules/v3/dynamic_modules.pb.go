@@ -42,41 +42,42 @@ type DynamicModuleAccessLog struct {
 	// This can be used to distinguish between different logger implementations inside a dynamic
 	// module. For example, a module can have completely different logger implementations (e.g.,
 	// file logger, gRPC logger, metrics logger). When Envoy receives this configuration, it passes
-	// the “logger_name“ to the dynamic module's access logger config init function together with
-	// the “logger_config“. That way a module can decide which in-module logger implementation to
+	// the ``logger_name`` to the dynamic module's access logger config init function together with
+	// the ``logger_config``. That way a module can decide which in-module logger implementation to
 	// use based on the name at load time.
 	LoggerName string `protobuf:"bytes,2,opt,name=logger_name,json=loggerName,proto3" json:"logger_name,omitempty"`
-	// The configuration for the logger chosen by “logger_name“. If not specified, an empty
+	// The configuration for the logger chosen by ``logger_name``. If not specified, an empty
 	// configuration is passed to the module.
 	//
 	// This is passed to the module's access logger initialization function. Together with the
-	// “logger_name“, the module can decide which in-module logger implementation to use and
+	// ``logger_name``, the module can decide which in-module logger implementation to use and
 	// fine-tune the behavior of the logger.
 	//
 	// For example, if a module has two logger implementations, one for file output and one for
-	// sending to an external service, “logger_name“ is used to choose either file or external.
-	// The “logger_config“ can be used to configure file paths, service endpoints, batching
+	// sending to an external service, ``logger_name`` is used to choose either file or external.
+	// The ``logger_config`` can be used to configure file paths, service endpoints, batching
 	// parameters, format strings, etc.
 	//
-	// “google.protobuf.Struct“ and the “value“ field of “xds.type.v3.TypedStruct“ are
+	// ``google.protobuf.Struct`` and the ``value`` field of ``xds.type.v3.TypedStruct`` are
 	// serialized as JSON before passing them to the module.
-	// “google.protobuf.BytesValue“ and “google.protobuf.StringValue“ are passed directly
+	// ``google.protobuf.BytesValue`` and ``google.protobuf.StringValue`` are passed directly
 	// without the wrapper.
 	//
 	// .. code-block:: yaml
 	//
-	//	# Passing a JSON struct configuration
-	//	logger_config:
-	//	  "@type": "type.googleapis.com/google.protobuf.Struct"
-	//	  value:
-	//	    output_path: "/var/log/envoy/access.log"
-	//	    format: "json"
-	//	    buffer_size: 1000
+	//  # Passing a JSON struct configuration
+	//  logger_config:
+	//    "@type": "type.googleapis.com/google.protobuf.Struct"
+	//    value:
+	//      output_path: "/var/log/envoy/access.log"
+	//      format: "json"
+	//      buffer_size: 1000
 	//
-	//	# Passing a simple string configuration
-	//	logger_config:
-	//	  "@type": "type.googleapis.com/google.protobuf.StringValue"
-	//	  value: "/var/log/envoy/access.log"
+	//  # Passing a simple string configuration
+	//  logger_config:
+	//    "@type": "type.googleapis.com/google.protobuf.StringValue"
+	//    value: "/var/log/envoy/access.log"
+	//
 	LoggerConfig  *anypb.Any `protobuf:"bytes,3,opt,name=logger_config,json=loggerConfig,proto3" json:"logger_config,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

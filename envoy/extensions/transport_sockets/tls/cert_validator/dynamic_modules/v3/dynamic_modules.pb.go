@@ -46,7 +46,7 @@ type DynamicModuleCertValidatorConfig struct {
 	// <envoy_v3_api_msg_extensions.dynamic_modules.v3.DynamicModuleConfig>` for details.
 	DynamicModuleConfig *v3.DynamicModuleConfig `protobuf:"bytes,1,opt,name=dynamic_module_config,json=dynamicModuleConfig,proto3" json:"dynamic_module_config,omitempty"`
 	// The name of the cert validator implementation in the dynamic module.
-	// This is passed to the module's “envoy_dynamic_module_on_cert_validator_config_new“
+	// This is passed to the module's ``envoy_dynamic_module_on_cert_validator_config_new``
 	// function.
 	ValidatorName string `protobuf:"bytes,2,opt,name=validator_name,json=validatorName,proto3" json:"validator_name,omitempty"`
 	// Optional configuration for the cert validator. This is passed as bytes to the dynamic module.

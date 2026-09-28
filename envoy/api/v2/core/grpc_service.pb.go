@@ -42,7 +42,7 @@ type GrpcService struct {
 	Timeout *durationpb.Duration `protobuf:"bytes,3,opt,name=timeout,proto3" json:"timeout,omitempty"`
 	// Additional metadata to include in streams initiated to the GrpcService.
 	// This can be used for scenarios in which additional ad hoc authorization
-	// headers (e.g. “x-foo-bar: baz-key“) are to be injected.
+	// headers (e.g. ``x-foo-bar: baz-key``) are to be injected.
 	InitialMetadata []*HeaderValue `protobuf:"bytes,5,rep,name=initial_metadata,json=initialMetadata,proto3" json:"initial_metadata,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
@@ -201,12 +201,11 @@ type GrpcService_GoogleGrpc struct {
 	// service.
 	//
 	// .. csv-table::
+	//    :header: Name, Type, Description
+	//    :widths: 1, 1, 2
 	//
-	//	:header: Name, Type, Description
-	//	:widths: 1, 1, 2
-	//
-	//	streams_total, Counter, Total number of streams opened
-	//	streams_closed_<gRPC status code>, Counter, Total streams closed with <gRPC status code>
+	//    streams_total, Counter, Total number of streams opened
+	//    streams_closed_<gRPC status code>, Counter, Total streams closed with <gRPC status code>
 	StatPrefix string `protobuf:"bytes,4,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// The name of the Google gRPC credentials factory to use. This must have been registered with
 	// Envoy. If this is empty, a default credentials factory will be used that sets up channel

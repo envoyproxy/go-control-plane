@@ -40,30 +40,31 @@ type DynamicModuleStatsSink struct {
 	// The name for this sink configuration. If not specified, defaults to an empty string.
 	//
 	// This can be used to distinguish between different sink implementations inside a dynamic
-	// module. When Envoy receives this configuration, it passes the “sink_name“ to the dynamic
-	// module's sink config init function together with the “sink_config“.
+	// module. When Envoy receives this configuration, it passes the ``sink_name`` to the dynamic
+	// module's sink config init function together with the ``sink_config``.
 	SinkName string `protobuf:"bytes,2,opt,name=sink_name,json=sinkName,proto3" json:"sink_name,omitempty"`
-	// The configuration for the sink chosen by “sink_name“. If not specified, an empty
+	// The configuration for the sink chosen by ``sink_name``. If not specified, an empty
 	// configuration is passed to the module.
 	//
-	// “google.protobuf.Struct“ and the “value“ field of “xds.type.v3.TypedStruct“ are
+	// ``google.protobuf.Struct`` and the ``value`` field of ``xds.type.v3.TypedStruct`` are
 	// serialized as JSON before passing them to the module.
-	// “google.protobuf.BytesValue“ and “google.protobuf.StringValue“ are passed directly
+	// ``google.protobuf.BytesValue`` and ``google.protobuf.StringValue`` are passed directly
 	// without the wrapper.
 	//
 	// .. code-block:: yaml
 	//
-	//	# Passing a JSON struct configuration
-	//	sink_config:
-	//	  "@type": "type.googleapis.com/google.protobuf.Struct"
-	//	  value:
-	//	    endpoint: "metrics.example.com:9125"
-	//	    prefix: "envoy"
+	//  # Passing a JSON struct configuration
+	//  sink_config:
+	//    "@type": "type.googleapis.com/google.protobuf.Struct"
+	//    value:
+	//      endpoint: "metrics.example.com:9125"
+	//      prefix: "envoy"
 	//
-	//	# Passing a simple string configuration
-	//	sink_config:
-	//	  "@type": "type.googleapis.com/google.protobuf.StringValue"
-	//	  value: "metrics.example.com:9125"
+	//  # Passing a simple string configuration
+	//  sink_config:
+	//    "@type": "type.googleapis.com/google.protobuf.StringValue"
+	//    value: "metrics.example.com:9125"
+	//
 	SinkConfig    *anypb.Any `protobuf:"bytes,3,opt,name=sink_config,json=sinkConfig,proto3" json:"sink_config,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

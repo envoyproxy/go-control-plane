@@ -188,12 +188,11 @@ type EndpointHealth struct {
 	//
 	// Well-known keys:
 	//
-	// “http_status_code“ (number)
-	//
-	//	Set by the HTTP health checker. Contains the HTTP response status code
-	//	returned by the upstream endpoint during the most recent health check,
-	//	e.g. ``200``, ``503``. Only present when the health check received a
-	//	complete HTTP response; absent on connection failures or timeouts.
+	// ``http_status_code`` (number)
+	//   Set by the HTTP health checker. Contains the HTTP response status code
+	//   returned by the upstream endpoint during the most recent health check,
+	//   e.g. ``200``, ``503``. Only present when the health check received a
+	//   complete HTTP response; absent on connection failures or timeouts.
 	HealthMetadata *structpb.Struct `protobuf:"bytes,3,opt,name=health_metadata,json=healthMetadata,proto3" json:"health_metadata,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache

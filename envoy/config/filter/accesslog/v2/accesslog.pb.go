@@ -186,16 +186,11 @@ type AccessLog struct {
 	// configurations include:
 	//
 	// #. "envoy.access_loggers.file": :ref:`FileAccessLog
-	//
-	//	<envoy_api_msg_config.accesslog.v2.FileAccessLog>`
-	//
+	//    <envoy_api_msg_config.accesslog.v2.FileAccessLog>`
 	// #. "envoy.access_loggers.http_grpc": :ref:`HttpGrpcAccessLogConfig
-	//
-	//	<envoy_api_msg_config.accesslog.v2.HttpGrpcAccessLogConfig>`
-	//
+	//    <envoy_api_msg_config.accesslog.v2.HttpGrpcAccessLogConfig>`
 	// #. "envoy.access_loggers.tcp_grpc": :ref:`TcpGrpcAccessLogConfig
-	//
-	//	<envoy_api_msg_config.accesslog.v2.TcpGrpcAccessLogConfig>`
+	//    <envoy_api_msg_config.accesslog.v2.TcpGrpcAccessLogConfig>`
 	//
 	// Types that are valid to be assigned to ConfigType:
 	//

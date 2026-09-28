@@ -48,8 +48,8 @@ type DynamicModuleEarlyHeaderMutation struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Specifies the shared-object level configuration. This field is required.
 	//
-	// Only sources that are available synchronously are supported, i.e. “name“, “module.local“,
-	// and a “module.remote“ that is already present in the on-disk cache. A remote source that
+	// Only sources that are available synchronously are supported, i.e. ``name``, ``module.local``,
+	// and a ``module.remote`` that is already present in the on-disk cache. A remote source that
 	// would need to be fetched is rejected, since the extension must be usable for the first request
 	// the connection manager serves.
 	DynamicModuleConfig *v3.DynamicModuleConfig `protobuf:"bytes,1,opt,name=dynamic_module_config,json=dynamicModuleConfig,proto3" json:"dynamic_module_config,omitempty"`
@@ -58,38 +58,39 @@ type DynamicModuleEarlyHeaderMutation struct {
 	//
 	// This can be used to distinguish between different early header mutation implementations inside
 	// a dynamic module. When Envoy receives this configuration, it passes the
-	// “early_header_mutation_name“ to the dynamic module's early header mutation config init
-	// function together with the “early_header_mutation_config“. That way a module can decide which
+	// ``early_header_mutation_name`` to the dynamic module's early header mutation config init
+	// function together with the ``early_header_mutation_config``. That way a module can decide which
 	// in-module implementation to use based on the name at load time.
 	//
-	// This is also used as the “config_name“ tag of the “dynamic_modules.module_load_error“ and
-	// “dynamic_modules.config_init_error“ counters.
+	// This is also used as the ``config_name`` tag of the ``dynamic_modules.module_load_error`` and
+	// ``dynamic_modules.config_init_error`` counters.
 	EarlyHeaderMutationName string `protobuf:"bytes,2,opt,name=early_header_mutation_name,json=earlyHeaderMutationName,proto3" json:"early_header_mutation_name,omitempty"`
-	// The configuration for the early header mutation chosen by “early_header_mutation_name“. If
+	// The configuration for the early header mutation chosen by ``early_header_mutation_name``. If
 	// not specified, an empty configuration is passed to the module.
 	//
 	// This is passed to the module's early header mutation initialization function. Together with the
-	// “early_header_mutation_name“, the module can decide which in-module implementation to use and
+	// ``early_header_mutation_name``, the module can decide which in-module implementation to use and
 	// fine-tune its behavior.
 	//
-	// “google.protobuf.Struct“ and the “value“ field of “xds.type.v3.TypedStruct“ are
+	// ``google.protobuf.Struct`` and the ``value`` field of ``xds.type.v3.TypedStruct`` are
 	// serialized as JSON before passing them to the module.
-	// “google.protobuf.BytesValue“ and “google.protobuf.StringValue“ are passed directly
+	// ``google.protobuf.BytesValue`` and ``google.protobuf.StringValue`` are passed directly
 	// without the wrapper.
 	//
 	// .. code-block:: yaml
 	//
-	//	# Passing a JSON struct configuration
-	//	early_header_mutation_config:
-	//	  "@type": "type.googleapis.com/google.protobuf.Struct"
-	//	  value:
-	//	    copy_headers:
-	//	    - x-original-authority
+	//  # Passing a JSON struct configuration
+	//  early_header_mutation_config:
+	//    "@type": "type.googleapis.com/google.protobuf.Struct"
+	//    value:
+	//      copy_headers:
+	//      - x-original-authority
 	//
-	//	# Passing a simple string configuration
-	//	early_header_mutation_config:
-	//	  "@type": "type.googleapis.com/google.protobuf.StringValue"
-	//	  value: "x-tenant-id"
+	//  # Passing a simple string configuration
+	//  early_header_mutation_config:
+	//    "@type": "type.googleapis.com/google.protobuf.StringValue"
+	//    value: "x-tenant-id"
+	//
 	EarlyHeaderMutationConfig *anypb.Any `protobuf:"bytes,3,opt,name=early_header_mutation_config,json=earlyHeaderMutationConfig,proto3" json:"early_header_mutation_config,omitempty"`
 	unknownFields             protoimpl.UnknownFields
 	sizeCache                 protoimpl.SizeCache

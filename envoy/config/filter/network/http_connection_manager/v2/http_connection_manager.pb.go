@@ -395,16 +395,14 @@ type HttpConnectionManager struct {
 	// The default timeout is 1000 ms if this option is not specified.
 	//
 	// .. NOTE::
-	//
-	//	To be useful in avoiding the race condition described above, this timeout must be set
-	//	to *at least* <max round trip time expected between clients and Envoy>+<100ms to account for
-	//	a reasonable "worst" case processing time for a full iteration of Envoy's event loop>.
+	//    To be useful in avoiding the race condition described above, this timeout must be set
+	//    to *at least* <max round trip time expected between clients and Envoy>+<100ms to account for
+	//    a reasonable "worst" case processing time for a full iteration of Envoy's event loop>.
 	//
 	// .. WARNING::
-	//
-	//	A value of 0 will completely disable delayed close processing. When disabled, the downstream
-	//	connection's socket will be closed immediately after the write flush is completed or will
-	//	never close if the write flush does not complete.
+	//    A value of 0 will completely disable delayed close processing. When disabled, the downstream
+	//    connection's socket will be closed immediately after the write flush is completed or will
+	//    never close if the write flush does not complete.
 	DelayedCloseTimeout *durationpb.Duration `protobuf:"bytes,26,opt,name=delayed_close_timeout,json=delayedCloseTimeout,proto3" json:"delayed_close_timeout,omitempty"`
 	// Configuration for :ref:`HTTP access logs <arch_overview_access_logs>`
 	// emitted by the connection manager.
@@ -1249,8 +1247,7 @@ type HttpConnectionManager_Tracing struct {
 	// specified on the parent listener, then it is used instead of this field.
 	//
 	// .. attention::
-	//
-	//	This field has been deprecated in favor of `traffic_direction`.
+	//  This field has been deprecated in favor of `traffic_direction`.
 	//
 	// Deprecated: Marked as deprecated in envoy/config/filter/network/http_connection_manager/v2/http_connection_manager.proto.
 	OperationName HttpConnectionManager_Tracing_OperationName `protobuf:"varint,1,opt,name=operation_name,json=operationName,proto3,enum=envoy.config.filter.network.http_connection_manager.v2.HttpConnectionManager_Tracing_OperationName" json:"operation_name,omitempty"`
@@ -1259,9 +1256,8 @@ type HttpConnectionManager_Tracing struct {
 	// created if the specified header name is present in the request's headers.
 	//
 	// .. attention::
-	//
-	//	This field has been deprecated in favor of :ref:`custom_tags
-	//	<envoy_api_field_config.filter.network.http_connection_manager.v2.HttpConnectionManager.tracing.custom_tags>`.
+	//  This field has been deprecated in favor of :ref:`custom_tags
+	//  <envoy_api_field_config.filter.network.http_connection_manager.v2.HttpConnectionManager.tracing.custom_tags>`.
 	//
 	// Deprecated: Marked as deprecated in envoy/config/filter/network/http_connection_manager/v2/http_connection_manager.proto.
 	RequestHeadersForTags []string `protobuf:"bytes,2,rep,name=request_headers_for_tags,json=requestHeadersForTags,proto3" json:"request_headers_for_tags,omitempty"`
@@ -1764,7 +1760,7 @@ type ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor struct {
 	//
 	// .. note::
 	//
-	//	If the header appears multiple times only the first value is used.
+	//   If the header appears multiple times only the first value is used.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The element separator (e.g., ';' separates 'a;b;c;d').
 	// Default: empty string. This causes the entirety of the header field to be extracted.

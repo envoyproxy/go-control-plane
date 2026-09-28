@@ -34,7 +34,7 @@ const (
 type HealthStatus int32
 
 const (
-	// The health status is not known. This is interpreted by Envoy as “HEALTHY“.
+	// The health status is not known. This is interpreted by Envoy as ``HEALTHY``.
 	HealthStatus_UNKNOWN HealthStatus = 0
 	// Healthy.
 	HealthStatus_HEALTHY HealthStatus = 1
@@ -44,10 +44,10 @@ const (
 	// `<https://aws.amazon.com/blogs/aws/elb-connection-draining-remove-instances-from-service-with-care/>`_
 	// or
 	// `<https://cloud.google.com/compute/docs/load-balancing/enabling-connection-draining>`_.
-	// This is interpreted by Envoy as “UNHEALTHY“.
+	// This is interpreted by Envoy as ``UNHEALTHY``.
 	HealthStatus_DRAINING HealthStatus = 3
 	// Health check timed out. This is part of HDS and is interpreted by Envoy as
-	// “UNHEALTHY“.
+	// ``UNHEALTHY``.
 	HealthStatus_TIMEOUT HealthStatus = 4
 	// Degraded.
 	HealthStatus_DEGRADED HealthStatus = 5
@@ -161,14 +161,14 @@ type HealthCheck struct {
 	// interval Envoy will add interval_jitter to the wait time.
 	IntervalJitter *durationpb.Duration `protobuf:"bytes,3,opt,name=interval_jitter,json=intervalJitter,proto3" json:"interval_jitter,omitempty"`
 	// An optional jitter amount as a percentage of interval_ms. If specified,
-	// during every interval Envoy will add “interval_ms“ *
-	// “interval_jitter_percent“ / 100 to the wait time.
+	// during every interval Envoy will add ``interval_ms`` *
+	// ``interval_jitter_percent`` / 100 to the wait time.
 	//
 	// If interval_jitter_ms and interval_jitter_percent are both set, both of
 	// them will be used to increase the wait time.
 	IntervalJitterPercent uint32 `protobuf:"varint,18,opt,name=interval_jitter_percent,json=intervalJitterPercent,proto3" json:"interval_jitter_percent,omitempty"`
 	// The number of unhealthy health checks required before a host is marked
-	// unhealthy. Note that for “http“ health checking if a host responds with a code not in
+	// unhealthy. Note that for ``http`` health checking if a host responds with a code not in
 	// :ref:`expected_statuses <envoy_v3_api_field_config.core.v3.HealthCheck.HttpHealthCheck.expected_statuses>`
 	// or :ref:`retriable_statuses <envoy_v3_api_field_config.core.v3.HealthCheck.HttpHealthCheck.retriable_statuses>`,
 	// this threshold is ignored and the host is considered immediately unhealthy.
@@ -202,7 +202,7 @@ type HealthCheck struct {
 	// (including new hosts) when the cluster has received no traffic.
 	//
 	// This is useful for when we want to send frequent health checks with
-	// “no_traffic_interval“ but then revert to lower frequency “no_traffic_healthy_interval“ once
+	// ``no_traffic_interval`` but then revert to lower frequency ``no_traffic_healthy_interval`` once
 	// a host in the cluster is marked as healthy.
 	//
 	// Once a cluster has been used for traffic routing, Envoy will shift back to using the
@@ -233,11 +233,10 @@ type HealthCheck struct {
 	// Specifies the path to the :ref:`health check event log <arch_overview_health_check_logging>`.
 	//
 	// .. attention::
-	//
-	//	This field is deprecated in favor of the extension
-	//	:ref:`event_logger <envoy_v3_api_field_config.core.v3.HealthCheck.event_logger>` and
-	//	:ref:`event_log_path <envoy_v3_api_field_extensions.health_check.event_sinks.file.v3.HealthCheckEventFileSink.event_log_path>`
-	//	in the file sink extension.
+	//   This field is deprecated in favor of the extension
+	//   :ref:`event_logger <envoy_v3_api_field_config.core.v3.HealthCheck.event_logger>` and
+	//   :ref:`event_log_path <envoy_v3_api_field_extensions.health_check.event_sinks.file.v3.HealthCheckEventFileSink.event_log_path>`
+	//   in the file sink extension.
 	//
 	// Deprecated: Marked as deprecated in envoy/config/core/v3/health_check.proto.
 	EventLogPath string `protobuf:"bytes,17,opt,name=event_log_path,json=eventLogPath,proto3" json:"event_log_path,omitempty"`
@@ -264,22 +263,22 @@ type HealthCheck struct {
 	//
 	// .. code-block:: yaml
 	//
-	//	transport_socket_match_criteria:
-	//	  useMTLS: true
+	//  transport_socket_match_criteria:
+	//    useMTLS: true
 	//
 	// Will match the following :ref:`cluster socket match <envoy_v3_api_msg_config.cluster.v3.Cluster.TransportSocketMatch>`
 	//
 	// .. code-block:: yaml
 	//
-	//	transport_socket_matches:
-	//	- name: "useMTLS"
-	//	  match:
-	//	    useMTLS: true
-	//	  transport_socket:
-	//	    name: envoy.transport_sockets.tls
-	//	    config: { ... } # tls socket configuration
+	//  transport_socket_matches:
+	//  - name: "useMTLS"
+	//    match:
+	//      useMTLS: true
+	//    transport_socket:
+	//      name: envoy.transport_sockets.tls
+	//      config: { ... } # tls socket configuration
 	//
-	// If this field is set, then for health checks it will supersede an entry of “envoy.transport_socket“ in the
+	// If this field is set, then for health checks it will supersede an entry of ``envoy.transport_socket`` in the
 	// :ref:`LbEndpoint.Metadata <envoy_v3_api_field_config.endpoint.v3.LbEndpoint.metadata>`.
 	// This allows using different transport socket capabilities for health checking versus proxying to the
 	// endpoint.
@@ -640,20 +639,20 @@ type HealthCheck_HttpHealthCheck struct {
 	// :ref:`hostname <envoy_v3_api_field_config.endpoint.v3.Endpoint.HealthCheckConfig.hostname>` field.
 	Host string `protobuf:"bytes,1,opt,name=host,proto3" json:"host,omitempty"`
 	// Specifies the HTTP path that will be requested during health checking. For example
-	// “/healthcheck“.
+	// ``/healthcheck``.
 	Path string `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty"`
 	// HTTP specific payload to be sent as the request body during health checking.
 	// If specified, the method should support a request body (POST, PUT, PATCH, etc.).
 	Send *HealthCheck_Payload `protobuf:"bytes,3,opt,name=send,proto3" json:"send,omitempty"`
-	// Specifies a list of HTTP expected responses to match in the first “response_buffer_size“ bytes of the response body.
+	// Specifies a list of HTTP expected responses to match in the first ``response_buffer_size`` bytes of the response body.
 	// If it is set, both the expected response check and status code determine the health check.
 	// When checking the response, “fuzzy” matching is performed such that each payload block must be found,
 	// and in the order specified, but not necessarily contiguous.
 	//
 	// .. note::
 	//
-	//	It is recommended to set ``response_buffer_size`` based on the total Payload size for efficiency.
-	//	The default buffer size is 1024 bytes when it is not set.
+	//   It is recommended to set ``response_buffer_size`` based on the total Payload size for efficiency.
+	//   The default buffer size is 1024 bytes when it is not set.
 	Receive []*HealthCheck_Payload `protobuf:"bytes,4,rep,name=receive,proto3" json:"receive,omitempty"`
 	// Specifies the size of response buffer in bytes that is used to Payload match.
 	// The default value is 1024. Setting to 0 implies that the Payload will be matched against the entire response.
@@ -822,8 +821,8 @@ type HealthCheck_TcpHealthCheck struct {
 	// necessarily contiguous.
 	Receive []*HealthCheck_Payload `protobuf:"bytes,2,rep,name=receive,proto3" json:"receive,omitempty"`
 	// When setting this value, it tries to attempt health check request with ProxyProtocol.
-	// When “send“ is presented, they are sent after preceding ProxyProtocol header.
-	// Only ProxyProtocol header is sent when “send“ is not presented.
+	// When ``send`` is presented, they are sent after preceding ProxyProtocol header.
+	// Only ProxyProtocol header is sent when ``send`` is not presented.
 	// It allows to use both ProxyProtocol V1 and V2. In V1, it presents L3/L4. In V2, it includes
 	// LOCAL command and doesn't include L3/L4.
 	ProxyProtocolConfig *ProxyProtocolConfig `protobuf:"bytes,3,opt,name=proxy_protocol_config,json=proxyProtocolConfig,proto3" json:"proxy_protocol_config,omitempty"`
@@ -884,7 +883,7 @@ func (x *HealthCheck_TcpHealthCheck) GetProxyProtocolConfig() *ProxyProtocolConf
 
 type HealthCheck_RedisHealthCheck struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// If set, optionally perform “EXISTS <key>“ instead of “PING“. A return value
+	// If set, optionally perform ``EXISTS <key>`` instead of ``PING``. A return value
 	// from Redis of 0 (does not exist) is considered a passing healthcheck. A return value other
 	// than 0 is considered a failure. This allows the user to mark a Redis instance for maintenance
 	// by setting the specified key to any value and waiting for traffic to drain.

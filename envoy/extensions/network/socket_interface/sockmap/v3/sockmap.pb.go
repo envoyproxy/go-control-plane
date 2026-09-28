@@ -37,32 +37,32 @@ const (
 // [#next-free-field: 6]
 type Sockmap struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Filesystem path to the compiled eBPF object that holds the “sock_ops“ and “sk_msg“
-	// programs and the “sockhash“ map. Envoy does not ship this object. Build it from the
-	// extension's “sockmap_kern.c“ source, or supply a custom build that exports the
-	// “envoy_sockops“ and “envoy_sk_msg“ programs and the “envoy_sockhash“ map with a matching
+	// Filesystem path to the compiled eBPF object that holds the ``sock_ops`` and ``sk_msg``
+	// programs and the ``sockhash`` map. Envoy does not ship this object. Build it from the
+	// extension's ``sockmap_kern.c`` source, or supply a custom build that exports the
+	// ``envoy_sockops`` and ``envoy_sk_msg`` programs and the ``envoy_sockhash`` map with a matching
 	// key layout. If not specified, acceleration is disabled and all sockets use the standard
 	// datapath.
 	BpfProgramPath string `protobuf:"bytes,1,opt,name=bpf_program_path,json=bpfProgramPath,proto3" json:"bpf_program_path,omitempty"`
-	// Path to the cgroup v2 directory the “sock_ops“ program is attached to. While attached, every
-	// socket that reaches the established state inside this cgroup is added to the “sockhash“,
-	// which accelerates application-to-proxy hops. If not specified, the “sock_ops“ program
+	// Path to the cgroup v2 directory the ``sock_ops`` program is attached to. While attached, every
+	// socket that reaches the established state inside this cgroup is added to the ``sockhash``,
+	// which accelerates application-to-proxy hops. If not specified, the ``sock_ops`` program
 	// is not attached and only sockets accepted or connected by Envoy are registered, which still
 	// accelerates proxy-to-proxy hops on the same host.
 	CgroupPath string `protobuf:"bytes,2,opt,name=cgroup_path,json=cgroupPath,proto3" json:"cgroup_path,omitempty"`
-	// Maximum number of entries in the “sockhash“ map. Each accelerated socket consumes one entry.
-	// If not specified, defaults to “65536“.
+	// Maximum number of entries in the ``sockhash`` map. Each accelerated socket consumes one entry.
+	// If not specified, defaults to ``65536``.
 	SockhashMaxEntries *wrapperspb.UInt32Value `protobuf:"bytes,3,opt,name=sockhash_max_entries,json=sockhashMaxEntries,proto3" json:"sockhash_max_entries,omitempty"`
-	// Whether sockets accepted or connected by Envoy are registered into the “sockhash“ from user
-	// space. This is independent of “cgroup_path“ and lets proxy-to-proxy hops be accelerated
-	// without attaching the “sock_ops“ program. If not specified, defaults to “true“.
+	// Whether sockets accepted or connected by Envoy are registered into the ``sockhash`` from user
+	// space. This is independent of ``cgroup_path`` and lets proxy-to-proxy hops be accelerated
+	// without attaching the ``sock_ops`` program. If not specified, defaults to ``true``.
 	RegisterUserSpaceSockets *wrapperspb.BoolValue `protobuf:"bytes,4,opt,name=register_user_space_sockets,json=registerUserSpaceSockets,proto3" json:"register_user_space_sockets,omitempty"`
-	// Proxy listener port ranges that scope which connections the “sock_ops“ program adds to the
-	// “sockhash“. Each range is half-open “[start, end)“ with “1 <= start < end <= 65536“, so a
-	// single port “P“ is “{ start: P, end: P + 1 }“. When set, only a connection whose local or
+	// Proxy listener port ranges that scope which connections the ``sock_ops`` program adds to the
+	// ``sockhash``. Each range is half-open ``[start, end)`` with ``1 <= start < end <= 65536``, so a
+	// single port ``P`` is ``{ start: P, end: P + 1 }``. When set, only a connection whose local or
 	// peer port falls in one of these ranges is registered, so other same-host connections in the
-	// cgroup stay on the standard datapath. This applies only when “cgroup_path“ is set. If empty,
-	// every such connection is registered. At most “128“ ranges are allowed.
+	// cgroup stay on the standard datapath. This applies only when ``cgroup_path`` is set. If empty,
+	// every such connection is registered. At most ``128`` ranges are allowed.
 	AcceleratedPorts []*v3.Int64Range `protobuf:"bytes,5,rep,name=accelerated_ports,json=acceleratedPorts,proto3" json:"accelerated_ports,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache

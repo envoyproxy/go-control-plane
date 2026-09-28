@@ -103,8 +103,7 @@ type AdaptiveConcurrency struct {
 	// Defaults to 503 (Service Unavailable).
 	//
 	// .. note::
-	//
-	//	If this is set to < 400, 503 will be used instead.
+	//   If this is set to < 400, 503 will be used instead.
 	ConcurrencyLimitExceededStatus *v3.HttpStatus `protobuf:"bytes,3,opt,name=concurrency_limit_exceeded_status,json=concurrencyLimitExceededStatus,proto3" json:"concurrency_limit_exceeded_status,omitempty"`
 	unknownFields                  protoimpl.UnknownFields
 	sizeCache                      protoimpl.SizeCache

@@ -29,7 +29,7 @@ type Mutations struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The request mutations are applied before the request is forwarded to the upstream cluster.
 	RequestMutations []*v3.HeaderMutation `protobuf:"bytes,1,rep,name=request_mutations,json=requestMutations,proto3" json:"request_mutations,omitempty"`
-	// The “path“ header query parameter mutations are applied after “request_mutations“ and before the request
+	// The ``path`` header query parameter mutations are applied after ``request_mutations`` and before the request
 	// is forwarded to the next filter in the filter chain.
 	QueryParameterMutations []*v31.KeyValueMutation `protobuf:"bytes,3,rep,name=query_parameter_mutations,json=queryParameterMutations,proto3" json:"query_parameter_mutations,omitempty"`
 	// The response mutations are applied before the response is sent to the downstream client.

@@ -236,7 +236,7 @@ type ScaledTrigger struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// If the resource pressure is greater than this value, the trigger will be in the
 	// :ref:`scaling <arch_overview_overload_manager-triggers-state>` state with value
-	// “(pressure - scaling_threshold) / (saturation_threshold - scaling_threshold)“.
+	// ``(pressure - scaling_threshold) / (saturation_threshold - scaling_threshold)``.
 	ScalingThreshold float64 `protobuf:"fixed64,1,opt,name=scaling_threshold,json=scalingThreshold,proto3" json:"scaling_threshold,omitempty"`
 	// If the resource pressure is greater than this value, the trigger will enter saturation.
 	SaturationThreshold float64 `protobuf:"fixed64,2,opt,name=saturation_threshold,json=saturationThreshold,proto3" json:"saturation_threshold,omitempty"`
@@ -491,9 +491,9 @@ func (x *ShrinkHeapConfig) GetMaxUnfreedMemoryBytes() *wrapperspb.UInt64Value {
 type OverloadAction struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The action name. Most actions use a well-known string for listener callback registration.
-	// “ScaleTimersOverloadActionConfig“ actions may use unique custom names for independently
-	// triggered “reduce_timeouts“ instances. Custom names must not use the reserved
-	// “envoy.overload_actions.“ prefix. No action name may duplicate a “LoadShedPoint“ name.
+	// ``ScaleTimersOverloadActionConfig`` actions may use unique custom names for independently
+	// triggered ``reduce_timeouts`` instances. Custom names must not use the reserved
+	// ``envoy.overload_actions.`` prefix. No action name may duplicate a ``LoadShedPoint`` name.
 	// Valid known overload actions include:
 	// - envoy.overload_actions.stop_accepting_requests
 	// - envoy.overload_actions.disable_http_keepalive
@@ -513,7 +513,7 @@ type OverloadAction struct {
 	Triggers []*Trigger `protobuf:"bytes,2,rep,name=triggers,proto3" json:"triggers,omitempty"`
 	// Optional implementation configuration. Well-known names identify the action directly; for a
 	// custom name, this configuration's type identifies it. Currently only
-	// “ScaleTimersOverloadActionConfig“ supports custom names, identifying a “reduce_timeouts“
+	// ``ScaleTimersOverloadActionConfig`` supports custom names, identifying a ``reduce_timeouts``
 	// instance.
 	TypedConfig   *anypb.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3" json:"typed_config,omitempty"`
 	unknownFields protoimpl.UnknownFields

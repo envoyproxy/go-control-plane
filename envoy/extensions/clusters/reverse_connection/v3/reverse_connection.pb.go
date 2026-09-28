@@ -38,19 +38,19 @@ type ReverseConnectionClusterConfig struct {
 	// the host identifier for selecting the reverse connection endpoint. The format string
 	// supports Envoy's standard formatter syntax, including:
 	//
-	// * “%REQ(header-name)%“: Extract request header value.
-	// * “%DYNAMIC_METADATA(namespace:key)%“: Extract dynamic metadata value.
-	// * “%CEL(expression)%“: Evaluate CEL expression.
-	// * “%DOWNSTREAM_REMOTE_ADDRESS%“: Downstream connection address.
-	// * “%DOWNSTREAM_LOCAL_ADDRESS%“: Downstream local address.
+	// * ``%REQ(header-name)%``: Extract request header value.
+	// * ``%DYNAMIC_METADATA(namespace:key)%``: Extract dynamic metadata value.
+	// * ``%CEL(expression)%``: Evaluate CEL expression.
+	// * ``%DOWNSTREAM_REMOTE_ADDRESS%``: Downstream connection address.
+	// * ``%DOWNSTREAM_LOCAL_ADDRESS%``: Downstream local address.
 	// * Plain text and combinations of the above.
 	//
 	// Examples:
 	//
-	// * “%REQ(x-remote-node-id)%“: Use the value of the “x-remote-node-id“ header.
-	// * “%REQ(host):EXTRACT_FIRST_PART%“: Extract the first part of the Host header before a dot.
-	// * “%CEL(request.headers['x-node-id'] | orValue('default'))%“: Use CEL with fallback.
-	// * “node-%REQ(x-tenant-id)%-%REQ(x-region)%“: Combine multiple values.
+	// * ``%REQ(x-remote-node-id)%``: Use the value of the ``x-remote-node-id`` header.
+	// * ``%REQ(host):EXTRACT_FIRST_PART%``: Extract the first part of the Host header before a dot.
+	// * ``%CEL(request.headers['x-node-id'] | orValue('default'))%``: Use CEL with fallback.
+	// * ``node-%REQ(x-tenant-id)%-%REQ(x-region)%``: Combine multiple values.
 	//
 	// If the format string evaluates to an empty value, the request will not be routed.
 	HostIdFormat string `protobuf:"bytes,2,opt,name=host_id_format,json=hostIdFormat,proto3" json:"host_id_format,omitempty"`
@@ -58,9 +58,9 @@ type ReverseConnectionClusterConfig struct {
 	//
 	// This format string is evaluated against the downstream request context to compute
 	// the tenant identifier when tenant isolation is enabled. The format string supports
-	// the same Envoy formatter syntax as “host_id_format“.
+	// the same Envoy formatter syntax as ``host_id_format``.
 	//
-	// **REQUIRED** when tenant isolation is enabled (via “enable_tenant_isolation“ in the
+	// **REQUIRED** when tenant isolation is enabled (via ``enable_tenant_isolation`` in the
 	// reverse tunnel filter configuration).
 	//
 	// When tenant isolation is enabled and this field is set, the tenant identifier must be
@@ -70,13 +70,13 @@ type ReverseConnectionClusterConfig struct {
 	//
 	// Examples:
 	//
-	// * “%REQ(x-tenant-id)%“: Extract tenant ID from request header.
-	// * “%DYNAMIC_METADATA(envoy.filters.network.reverse_tunnel:tenant_id)%“: Use metadata from reverse tunnel filter.
-	// * “%CEL(request.headers['x-tenant-id'] | orValue('default'))%“: Use CEL with fallback.
+	// * ``%REQ(x-tenant-id)%``: Extract tenant ID from request header.
+	// * ``%DYNAMIC_METADATA(envoy.filters.network.reverse_tunnel:tenant_id)%``: Use metadata from reverse tunnel filter.
+	// * ``%CEL(request.headers['x-tenant-id'] | orValue('default'))%``: Use CEL with fallback.
 	//
 	// The delimiter used for concatenation is internal and not configurable. Users should
 	// ensure that tenant identifiers and host identifiers do not contain the delimiter character
-	// (“:“) to avoid ambiguity.
+	// (``:``) to avoid ambiguity.
 	TenantIdFormat string `protobuf:"bytes,3,opt,name=tenant_id_format,json=tenantIdFormat,proto3" json:"tenant_id_format,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache

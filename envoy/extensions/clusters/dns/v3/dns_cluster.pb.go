@@ -48,7 +48,7 @@ type DnsCluster struct {
 	// or any other DNS resolver types and the related parameters.
 	// For example, an object of
 	// :ref:`CaresDnsResolverConfig<envoy_v3_api_msg_extensions.network.dns_resolver.cares.v3.CaresDnsResolverConfig>`
-	// can be packed into this “typed_dns_resolver_config“. This configuration replaces the
+	// can be packed into this ``typed_dns_resolver_config``. This configuration replaces the
 	// :ref:`Cluster.typed_dns_resolver_config<envoy_v3_api_field_config.cluster.v3.Cluster.typed_dns_resolver_config>`
 	// configuration which replaces :ref:`Cluster.dns_resolution_config<envoy_v3_api_field_config.cluster.v3.Cluster.dns_resolution_config>`.
 	// During the transition period when

@@ -50,7 +50,7 @@ const (
 type ExternalProcessorClient interface {
 	// This begins the bidirectional stream that the data plane will use to
 	// give the server control over what the filter does. The actual
-	// protocol is described by the “ProcessingRequest“ and “ProcessingResponse“
+	// protocol is described by the ``ProcessingRequest`` and ``ProcessingResponse``
 	// messages below.
 	Process(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[ProcessingRequest, ProcessingResponse], error)
 }
@@ -104,7 +104,7 @@ type ExternalProcessor_ProcessClient = grpc.BidiStreamingClient[ProcessingReques
 type ExternalProcessorServer interface {
 	// This begins the bidirectional stream that the data plane will use to
 	// give the server control over what the filter does. The actual
-	// protocol is described by the “ProcessingRequest“ and “ProcessingResponse“
+	// protocol is described by the ``ProcessingRequest`` and ``ProcessingResponse``
 	// messages below.
 	Process(grpc.BidiStreamingServer[ProcessingRequest, ProcessingResponse]) error
 }

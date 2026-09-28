@@ -28,13 +28,13 @@ type GrpcFieldExtractionConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The proto descriptor set binary for the gRPC services.
 	//
-	// It could be passed by a local file through “Datasource.filename“ or embedded in the
-	// “Datasource.inline_bytes“.
+	// It could be passed by a local file through ``Datasource.filename`` or embedded in the
+	// ``Datasource.inline_bytes``.
 	DescriptorSet *v3.DataSource `protobuf:"bytes,1,opt,name=descriptor_set,json=descriptorSet,proto3" json:"descriptor_set,omitempty"`
 	// Specify the extraction info.
 	// The key is the fully qualified gRPC method name.
-	// “${package}.${Service}.${Method}“, like
-	// “endpoints.examples.bookstore.BookStore.GetShelf“
+	// ``${package}.${Service}.${Method}``, like
+	// ``endpoints.examples.bookstore.BookStore.GetShelf``
 	//
 	// The value is the field extractions for individual gRPC method.
 	ExtractionsByMethod map[string]*FieldExtractions `protobuf:"bytes,2,rep,name=extractions_by_method,json=extractionsByMethod,proto3" json:"extractions_by_method,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
@@ -92,22 +92,22 @@ type FieldExtractions struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The field extractions for requests.
 	// The key is the field path within the grpc request.
-	// For example, we can define “foo.bar.name“ if we want to extract
-	// “Request.foo.bar.name“.
+	// For example, we can define ``foo.bar.name`` if we want to extract
+	// ``Request.foo.bar.name``.
 	//
 	// .. code-block:: proto
 	//
-	//	message Request {
-	//	  Foo foo = 1;
-	//	}
+	//  message Request {
+	//    Foo foo = 1;
+	//  }
 	//
-	//	message Foo {
-	//	  Bar bar = 1;
-	//	}
+	//  message Foo {
+	//    Bar bar = 1;
+	//  }
 	//
-	//	message Bar {
-	//	  string name = 1;
-	//	}
+	//  message Bar {
+	//    string name = 1;
+	//  }
 	RequestFieldExtractions map[string]*RequestFieldValueDisposition `protobuf:"bytes,1,rep,name=request_field_extractions,json=requestFieldExtractions,proto3" json:"request_field_extractions,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields           protoimpl.UnknownFields
 	sizeCache               protoimpl.SizeCache
@@ -157,7 +157,7 @@ type RequestFieldValueDisposition struct {
 	//	*RequestFieldValueDisposition_DynamicMetadata
 	Disposition isRequestFieldValueDisposition_Disposition `protobuf_oneof:"disposition"`
 	// The key that the extracted value is written to within the dynamic metadata.
-	// If empty, the field path (the key of “request_field_extractions“) is used.
+	// If empty, the field path (the key of ``request_field_extractions``) is used.
 	//
 	// This is useful for normalizing the metadata written by different gRPC methods whose
 	// request messages name the same logical field differently.

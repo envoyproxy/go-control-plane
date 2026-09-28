@@ -152,12 +152,12 @@ type AwsEventstreamParser_HeaderRule struct {
 	// Controls how many times this rule should successfully match before stopping evaluation
 	// of this rule for subsequent messages.
 	//
-	//   - If set to 0 (default): This rule is evaluated against all messages.
-	//     Later matches overwrite earlier values, effectively extracting the LAST occurrence.
+	// - If set to 0 (default): This rule is evaluated against all messages.
+	//   Later matches overwrite earlier values, effectively extracting the LAST occurrence.
 	//
-	//   - If set to 1: Stop evaluating this rule after the first successful match.
-	//     This is useful for extracting header values that appear early in the stream
-	//     to avoid unnecessary processing of subsequent messages.
+	// - If set to 1: Stop evaluating this rule after the first successful match.
+	//   This is useful for extracting header values that appear early in the stream
+	//   to avoid unnecessary processing of subsequent messages.
 	//
 	// - If set to N > 1: Reserved for future use. Values > 1 are currently rejected.
 	//

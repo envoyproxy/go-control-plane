@@ -138,9 +138,9 @@ type A2A struct {
 	// Configures how the filter handles non-A2A traffic.
 	TrafficMode A2A_TrafficMode `protobuf:"varint,1,opt,name=traffic_mode,json=trafficMode,proto3,enum=envoy.extensions.filters.http.a2a.v3.A2A_TrafficMode" json:"traffic_mode,omitempty"`
 	// Maximum size of the request body to buffer for JSON-RPC validation.
-	// If the request body exceeds this size, the request is rejected with “413
-	// Payload Too Large“. This limit applies to both “REJECT“ and
-	// “PASS_THROUGH“ modes to prevent unbounded buffering.
+	// If the request body exceeds this size, the request is rejected with ``413
+	// Payload Too Large``. This limit applies to both ``REJECT`` and
+	// ``PASS_THROUGH`` modes to prevent unbounded buffering.
 	//
 	// It defaults to 8KB (8192 bytes) and the maximum allowed value is 10MB
 	// (10485760 bytes).
@@ -220,7 +220,7 @@ type MethodParsingConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The group/category name to assign to this method (e.g., "tasks", "message").
 	// If provided, this overrides any built-in classification for the method.
-	// This will be emitted to dynamic metadata under the key specified by “group_metadata_key“.
+	// This will be emitted to dynamic metadata under the key specified by ``group_metadata_key``.
 	Group string `protobuf:"bytes,1,opt,name=group,proto3" json:"group,omitempty"`
 	// List of attributes to extract for this method, specified by their JSON paths (e.g., "params.name").
 	Paths         []string `protobuf:"bytes,2,rep,name=paths,proto3" json:"paths,omitempty"`

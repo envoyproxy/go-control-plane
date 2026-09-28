@@ -85,16 +85,16 @@ type DynamicModuleDataInput struct {
 	// The name for this data input configuration. If not specified, defaults to an empty string.
 	//
 	// This can be used to distinguish between different data input implementations inside a dynamic
-	// module. When Envoy receives this configuration, it passes the “input_name“ to the dynamic
-	// module's data input config init function together with the “input_config“. That way a module
+	// module. When Envoy receives this configuration, it passes the ``input_name`` to the dynamic
+	// module's data input config init function together with the ``input_config``. That way a module
 	// can decide which in-module implementation to use based on the name at load time.
 	InputName string `protobuf:"bytes,2,opt,name=input_name,json=inputName,proto3" json:"input_name,omitempty"`
-	// The configuration for the data input chosen by “input_name“. If not specified, an empty
+	// The configuration for the data input chosen by ``input_name``. If not specified, an empty
 	// configuration is passed to the module.
 	//
-	// “google.protobuf.Struct“ and the “value“ field of “xds.type.v3.TypedStruct“ are
+	// ``google.protobuf.Struct`` and the ``value`` field of ``xds.type.v3.TypedStruct`` are
 	// serialized as JSON before passing them to the module.
-	// “google.protobuf.BytesValue“ and “google.protobuf.StringValue“ are passed directly without
+	// ``google.protobuf.BytesValue`` and ``google.protobuf.StringValue`` are passed directly without
 	// the wrapper.
 	InputConfig   *anypb.Any `protobuf:"bytes,3,opt,name=input_config,json=inputConfig,proto3" json:"input_config,omitempty"`
 	unknownFields protoimpl.UnknownFields

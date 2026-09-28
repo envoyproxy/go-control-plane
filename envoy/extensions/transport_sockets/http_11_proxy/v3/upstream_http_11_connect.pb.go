@@ -47,7 +47,7 @@ type Http11ProxyUpstreamTransport struct {
 	// The underlying transport socket being wrapped. Defaults to plaintext (raw_buffer) if unset.
 	TransportSocket *v3.TransportSocket `protobuf:"bytes,1,opt,name=transport_socket,json=transportSocket,proto3" json:"transport_socket,omitempty"`
 	// Specifies the default proxy address to use if the proxy address is not present in the
-	// “typed_filter_metadata“ of the endpoint.
+	// ``typed_filter_metadata`` of the endpoint.
 	DefaultProxyAddress *v3.Address `protobuf:"bytes,2,opt,name=default_proxy_address,json=defaultProxyAddress,proto3" json:"default_proxy_address,omitempty"`
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache

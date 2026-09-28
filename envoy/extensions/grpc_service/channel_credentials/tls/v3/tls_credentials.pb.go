@@ -103,7 +103,7 @@ func file_envoy_extensions_grpc_service_channel_credentials_tls_v3_tls_credentia
 
 var file_envoy_extensions_grpc_service_channel_credentials_tls_v3_tls_credentials_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_envoy_extensions_grpc_service_channel_credentials_tls_v3_tls_credentials_proto_goTypes = []any{
-	(*TlsCredentials)(nil),                                  // 0: envoy.extensions.grpc_service.channel_credentials.tls.v3.TlsCredentials
+	(*TlsCredentials)(nil), // 0: envoy.extensions.grpc_service.channel_credentials.tls.v3.TlsCredentials
 	(*v3.CommonTlsContext_CertificateProviderInstance)(nil), // 1: envoy.extensions.transport_sockets.tls.v3.CommonTlsContext.CertificateProviderInstance
 }
 var file_envoy_extensions_grpc_service_channel_credentials_tls_v3_tls_credentials_proto_depIdxs = []int32{

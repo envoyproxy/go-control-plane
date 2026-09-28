@@ -42,8 +42,8 @@ type Matcher struct {
 	//	*Matcher_MatcherList_
 	//	*Matcher_MatcherTree_
 	MatcherType isMatcher_MatcherType `protobuf_oneof:"matcher_type"`
-	// Optional “OnMatch“ to use if the matcher failed.
-	// If specified, the “OnMatch“ is used, and the matcher is considered
+	// Optional ``OnMatch`` to use if the matcher failed.
+	// If specified, the ``OnMatch`` is used, and the matcher is considered
 	// to have matched.
 	// If not specified, the matcher is considered not to have matched.
 	OnNoMatch     *Matcher_OnMatch `protobuf:"bytes,3,opt,name=on_no_match,json=onNoMatch,proto3" json:"on_no_match,omitempty"`

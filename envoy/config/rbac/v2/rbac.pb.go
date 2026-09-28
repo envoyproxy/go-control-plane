@@ -131,8 +131,8 @@ type RBAC struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The action to take if a policy matches. The request is allowed if and only if:
 	//
-	//   - `action` is "ALLOWED" and at least one policy matches
-	//   - `action` is "DENY" and none of the policies match
+	//   * `action` is "ALLOWED" and at least one policy matches
+	//   * `action` is "DENY" and none of the policies match
 	Action RBAC_Action `protobuf:"varint,1,opt,name=action,proto3,enum=envoy.config.rbac.v2.RBAC_Action" json:"action,omitempty"`
 	// Maps from policy name to policy. A match occurs when at least one policy matches the request.
 	Policies      map[string]*Policy `protobuf:"bytes,2,rep,name=policies,proto3" json:"policies,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
@@ -464,17 +464,17 @@ type Permission_RequestedServerName struct {
 	//
 	// .. attention::
 	//
-	//	The behavior of this field may be affected by how Envoy is configured
-	//	as explained below.
+	//   The behavior of this field may be affected by how Envoy is configured
+	//   as explained below.
 	//
-	//	* If the :ref:`TLS Inspector <config_listener_filters_tls_inspector>`
-	//	  filter is not added, and if a `FilterChainMatch` is not defined for
-	//	  the :ref:`server name <envoy_api_field_listener.FilterChainMatch.server_names>`,
-	//	  a TLS connection's requested SNI server name will be treated as if it
-	//	  wasn't present.
+	//   * If the :ref:`TLS Inspector <config_listener_filters_tls_inspector>`
+	//     filter is not added, and if a `FilterChainMatch` is not defined for
+	//     the :ref:`server name <envoy_api_field_listener.FilterChainMatch.server_names>`,
+	//     a TLS connection's requested SNI server name will be treated as if it
+	//     wasn't present.
 	//
-	//	* A :ref:`listener filter <arch_overview_listener_filters>` may
-	//	  overwrite a connection's requested server name within Envoy.
+	//   * A :ref:`listener filter <arch_overview_listener_filters>` may
+	//     overwrite a connection's requested server name within Envoy.
 	//
 	// Please refer to :ref:`this FAQ entry <faq_how_to_setup_sni>` to learn to
 	// setup SNI.

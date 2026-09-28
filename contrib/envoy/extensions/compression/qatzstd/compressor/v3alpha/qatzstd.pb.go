@@ -123,7 +123,7 @@ type Qatzstd struct {
 	// they don't have to change the config too much or prepare for another config that has software zstd compressor and just changing the value of this filed.
 	EnableQatZstd bool `protobuf:"varint,6,opt,name=enable_qat_zstd,json=enableQatZstd,proto3" json:"enable_qat_zstd,omitempty"`
 	// Fallback to software for Qatzstd when input size is less than this value.
-	// Valid only “enable_qat_zstd“ is “true“. 0 means no fallback at all. If not set, defaults to 4000.
+	// Valid only ``enable_qat_zstd`` is ``true``. 0 means no fallback at all. If not set, defaults to 4000.
 	QatZstdFallbackThreshold *wrapperspb.UInt32Value `protobuf:"bytes,7,opt,name=qat_zstd_fallback_threshold,json=qatZstdFallbackThreshold,proto3" json:"qat_zstd_fallback_threshold,omitempty"`
 	unknownFields            protoimpl.UnknownFields
 	sizeCache                protoimpl.SizeCache

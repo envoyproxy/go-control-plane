@@ -87,8 +87,8 @@ type HttpProtocolOptions struct {
 	// Optional HTTP filters for the upstream HTTP filter chain.
 	//
 	// .. note::
+	//   Upstream HTTP filters are currently in alpha.
 	//
-	//	Upstream HTTP filters are currently in alpha.
 	//
 	// These filters will be applied for all HTTP streams which flow through this
 	// cluster. Unlike downstream HTTP filters, they will *not* be applied to terminated CONNECT requests.
@@ -102,7 +102,7 @@ type HttpProtocolOptions struct {
 	// UHV is an extensible mechanism for checking validity of HTTP responses.
 	//
 	// [#comment:TODO(yanavlasov): Make it a link to the default header validator doc when it becomes visible.]
-	// Leaving this field unspecified, selects the default header validator “envoy.http.header_validators.envoy_default“.
+	// Leaving this field unspecified, selects the default header validator ``envoy.http.header_validators.envoy_default``.
 	//
 	// [#not-implemented-hide:]
 	// [#extension-category: envoy.http.header_validators]
@@ -114,8 +114,8 @@ type HttpProtocolOptions struct {
 	//
 	// .. note::
 	//
-	//	Mirroring will not be triggered if the :ref:`primary cluster
-	//	<envoy_v3_api_field_config.route.v3.RouteAction.cluster>` does not exist.
+	//   Mirroring will not be triggered if the :ref:`primary cluster
+	//   <envoy_v3_api_field_config.route.v3.RouteAction.cluster>` does not exist.
 	RequestMirrorPolicies []*v32.RouteAction_RequestMirrorPolicy `protobuf:"bytes,9,rep,name=request_mirror_policies,json=requestMirrorPolicies,proto3" json:"request_mirror_policies,omitempty"`
 	// Specifies a list of hash policies for consistent hashing load balancing (e.g., Ring Hash or
 	// Maglev) for requests routed to this cluster. When configured, cluster-level policies override
@@ -127,9 +127,9 @@ type HttpProtocolOptions struct {
 	//
 	// .. note::
 	//
-	//	Hash policies are only effective when the cluster is configured with a hash-based load
-	//	balancing policy (e.g., :ref:`RING_HASH <envoy_v3_api_enum_value_config.cluster.v3.Cluster.LbPolicy.RING_HASH>`
-	//	or :ref:`MAGLEV <envoy_v3_api_enum_value_config.cluster.v3.Cluster.LbPolicy.MAGLEV>`).
+	//   Hash policies are only effective when the cluster is configured with a hash-based load
+	//   balancing policy (e.g., :ref:`RING_HASH <envoy_v3_api_enum_value_config.cluster.v3.Cluster.LbPolicy.RING_HASH>`
+	//   or :ref:`MAGLEV <envoy_v3_api_enum_value_config.cluster.v3.Cluster.LbPolicy.MAGLEV>`).
 	HashPolicy []*v32.RouteAction_HashPolicy `protobuf:"bytes,10,rep,name=hash_policy,json=hashPolicy,proto3" json:"hash_policy,omitempty"`
 	// Specifies the retry policy for requests routed to this cluster. When configured,
 	// cluster-level retry policy overrides route-level retry policy. When not configured,
@@ -137,8 +137,8 @@ type HttpProtocolOptions struct {
 	//
 	// .. note::
 	//
-	//	Cluster-level retry policy will override route-level retry policy entirely. Policies are
-	//	not merged.
+	//   Cluster-level retry policy will override route-level retry policy entirely. Policies are
+	//   not merged.
 	RetryPolicy   *v32.RetryPolicy `protobuf:"bytes,11,opt,name=retry_policy,json=retryPolicy,proto3" json:"retry_policy,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -269,7 +269,7 @@ type isHttpProtocolOptions_UpstreamProtocolOptions interface {
 }
 
 type HttpProtocolOptions_ExplicitHttpConfig_ struct {
-	// To explicitly configure either HTTP/1 or HTTP/2 (but not both!) use “explicit_http_config“.
+	// To explicitly configure either HTTP/1 or HTTP/2 (but not both!) use ``explicit_http_config``.
 	ExplicitHttpConfig *HttpProtocolOptions_ExplicitHttpConfig `protobuf:"bytes,3,opt,name=explicit_http_config,json=explicitHttpConfig,proto3,oneof"`
 }
 
@@ -484,8 +484,7 @@ type HttpProtocolOptions_AutoHttpConfig struct {
 	// advertise supporting it.
 	//
 	// .. note::
-	//
-	//	This is required when HTTP/3 is enabled.
+	//   This is required when HTTP/3 is enabled.
 	AlternateProtocolsCacheOptions *v3.AlternateProtocolsCacheOptions `protobuf:"bytes,4,opt,name=alternate_protocols_cache_options,json=alternateProtocolsCacheOptions,proto3" json:"alternate_protocols_cache_options,omitempty"`
 	unknownFields                  protoimpl.UnknownFields
 	sizeCache                      protoimpl.SizeCache

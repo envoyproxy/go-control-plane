@@ -120,15 +120,13 @@ type FilterConfig_StatsForAllMethods struct {
 	// service/method granularity is not needed, or if each cluster only receives a single method.
 	//
 	// .. attention::
-	//
-	//	This option is only safe if all clients are trusted. If this option is enabled
-	//	with untrusted clients, the clients could cause unbounded growth in the number of stats in
-	//	Envoy, using unbounded memory and potentially slowing down stats pipelines.
+	//   This option is only safe if all clients are trusted. If this option is enabled
+	//   with untrusted clients, the clients could cause unbounded growth in the number of stats in
+	//   Envoy, using unbounded memory and potentially slowing down stats pipelines.
 	//
 	// .. attention::
-	//
-	//	If neither `individual_method_stats_allowlist` nor `stats_for_all_methods` is set, the
-	//	behavior will default to `stats_for_all_methods=false`.
+	//   If neither `individual_method_stats_allowlist` nor `stats_for_all_methods` is set, the
+	//   behavior will default to `stats_for_all_methods=false`.
 	StatsForAllMethods *wrapperspb.BoolValue `protobuf:"bytes,3,opt,name=stats_for_all_methods,json=statsForAllMethods,proto3,oneof"`
 }
 

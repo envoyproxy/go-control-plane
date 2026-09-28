@@ -43,21 +43,21 @@ type UpstreamReverseConnectionSocketInterface struct {
 	// the socket interface instantiates a reporter via the configured factory.
 	// If unset, no reporting is done.
 	ReporterConfig *v3.TypedExtensionConfig `protobuf:"bytes,4,opt,name=reporter_config,json=reporterConfig,proto3" json:"reporter_config,omitempty"`
-	// Enables tenant-aware isolation for reverse connections. When set to “true“, the socket
+	// Enables tenant-aware isolation for reverse connections. When set to ``true``, the socket
 	// interface requires tenant identifiers in addition to node and cluster identifiers and derives
-	// composite “tenant:node“ and “tenant:cluster“ keys for socket tracking. Identifiers
-	// containing the “:“ delimiter are rejected to avoid ambiguity.
-	// Defaults to “false“ for backwards compatibility.
+	// composite ``tenant:node`` and ``tenant:cluster`` keys for socket tracking. Identifiers
+	// containing the ``:`` delimiter are rejected to avoid ambiguity.
+	// Defaults to ``false`` for backwards compatibility.
 	EnableTenantIsolation *wrapperspb.BoolValue `protobuf:"bytes,5,opt,name=enable_tenant_isolation,json=enableTenantIsolation,proto3" json:"enable_tenant_isolation,omitempty"`
 	// Access logs emitted for reverse tunnel lifecycle events. Entries are generated for tunnel setup,
 	// socket handoff, tunnel close, and post-handoff HTTP/2 keepalive timeout observations.
 	AccessLog []*v31.AccessLog `protobuf:"bytes,6,rep,name=access_log,json=accessLog,proto3" json:"access_log,omitempty"`
 	// Maximum number of concurrently accepted reverse connections per node (and per tenant
 	// when tenant isolation is enabled). The cap is only consulted for reverse tunnel network
-	// filters that opt in via “enable_connection_limit“; filters that leave it disabled ignore it.
+	// filters that opt in via ``enable_connection_limit``; filters that leave it disabled ignore it.
 	// The cap is enforced per worker thread, so the effective ceiling is roughly this value
 	// multiplied by the number of workers; it is also only approximate when rebalancing is enabled.
-	// Defaults to 0; combined with “enable_connection_limit: true“ a value of 0 rejects all
+	// Defaults to 0; combined with ``enable_connection_limit: true`` a value of 0 rejects all
 	// connections, so set a non-zero value whenever a filter enables the limit.
 	MaxConnectionsPerNode uint32 `protobuf:"varint,7,opt,name=max_connections_per_node,json=maxConnectionsPerNode,proto3" json:"max_connections_per_node,omitempty"`
 	unknownFields         protoimpl.UnknownFields

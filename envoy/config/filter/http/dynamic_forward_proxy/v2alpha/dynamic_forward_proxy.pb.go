@@ -171,7 +171,7 @@ type PerRouteConfig_AutoHostRewriteHeader struct {
 	//
 	// .. note::
 	//
-	//	If the header appears multiple times only the first value is used.
+	//   If the header appears multiple times only the first value is used.
 	AutoHostRewriteHeader string `protobuf:"bytes,2,opt,name=auto_host_rewrite_header,json=autoHostRewriteHeader,proto3,oneof"`
 }
 

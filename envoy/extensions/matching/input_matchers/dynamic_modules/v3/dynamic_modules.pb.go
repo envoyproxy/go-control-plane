@@ -91,29 +91,29 @@ type DynamicModuleMatcher struct {
 	// This can be used to distinguish between different matcher implementations inside a dynamic
 	// module. For example, a module can have completely different matcher implementations (e.g.,
 	// OAuth token matcher, geo-IP matcher). When Envoy receives this configuration, it passes
-	// the “matcher_name“ to the dynamic module's matcher config init function together with the
-	// “matcher_config“. That way a module can decide which in-module matcher implementation to
+	// the ``matcher_name`` to the dynamic module's matcher config init function together with the
+	// ``matcher_config``. That way a module can decide which in-module matcher implementation to
 	// use based on the name at load time.
 	MatcherName string `protobuf:"bytes,2,opt,name=matcher_name,json=matcherName,proto3" json:"matcher_name,omitempty"`
-	// The configuration for the matcher chosen by “matcher_name“. If not specified, an empty
+	// The configuration for the matcher chosen by ``matcher_name``. If not specified, an empty
 	// configuration is passed to the module.
 	//
 	// This is passed to the module's matcher initialization function. Together with the
-	// “matcher_name“, the module can decide which in-module matcher implementation to use and
+	// ``matcher_name``, the module can decide which in-module matcher implementation to use and
 	// fine-tune the behavior of the matcher.
 	//
-	// “google.protobuf.Struct“ and the “value“ field of “xds.type.v3.TypedStruct“ are
+	// ``google.protobuf.Struct`` and the ``value`` field of ``xds.type.v3.TypedStruct`` are
 	// serialized as JSON before passing them to the module.
-	// “google.protobuf.BytesValue“ and “google.protobuf.StringValue“ are passed directly
+	// ``google.protobuf.BytesValue`` and ``google.protobuf.StringValue`` are passed directly
 	// without the wrapper.
 	MatcherConfig *anypb.Any `protobuf:"bytes,3,opt,name=matcher_config,json=matcherConfig,proto3" json:"matcher_config,omitempty"`
 	// The result applied for an evaluation that the module could not complete, for example when the
 	// module's match hook panics. A panic is caught at the ABI boundary and cannot report a match
 	// result, so the matcher applies this policy for that single evaluation. If not specified,
-	// defaults to “NO_MATCH“.
+	// defaults to ``NO_MATCH``.
 	//
-	// “NO_MATCH“ is safe for allow-on-match trees where a missed match denies the request.
-	// “MATCH“ is safe for deny-on-match trees where a missed match would let a request bypass the
+	// ``NO_MATCH`` is safe for allow-on-match trees where a missed match denies the request.
+	// ``MATCH`` is safe for deny-on-match trees where a missed match would let a request bypass the
 	// rule.
 	OnError       DynamicModuleMatcher_OnError `protobuf:"varint,4,opt,name=on_error,json=onError,proto3,enum=envoy.extensions.matching.input_matchers.dynamic_modules.v3.DynamicModuleMatcher_OnError" json:"on_error,omitempty"`
 	unknownFields protoimpl.UnknownFields

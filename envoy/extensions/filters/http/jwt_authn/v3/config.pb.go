@@ -64,24 +64,25 @@ type JwtProvider struct {
 	// Specify the `principal <https://tools.ietf.org/html/rfc7519#section-4.1.1>`_ that issued
 	// the JWT, usually a URL or an email address.
 	//
-	// It is optional. If specified, it has to match the “iss“ field in JWT,
-	// otherwise the JWT “iss“ field is not checked.
+	// It is optional. If specified, it has to match the ``iss`` field in JWT,
+	// otherwise the JWT ``iss`` field is not checked.
 	//
 	// .. note::
 	//
-	//	``JwtRequirement`` :ref:`allow_missing <envoy_v3_api_field_extensions.filters.http.jwt_authn.v3.JwtRequirement.allow_missing>`
-	//	and :ref:`allow_missing_or_failed <envoy_v3_api_field_extensions.filters.http.jwt_authn.v3.JwtRequirement.allow_missing_or_failed>`
-	//	are implemented differently than other ``JwtRequirements``. Hence the usage of this field
-	//	is different as follows if ``allow_missing`` or ``allow_missing_or_failed`` is used:
+	//     ``JwtRequirement`` :ref:`allow_missing <envoy_v3_api_field_extensions.filters.http.jwt_authn.v3.JwtRequirement.allow_missing>`
+	//     and :ref:`allow_missing_or_failed <envoy_v3_api_field_extensions.filters.http.jwt_authn.v3.JwtRequirement.allow_missing_or_failed>`
+	//     are implemented differently than other ``JwtRequirements``. Hence the usage of this field
+	//     is different as follows if ``allow_missing`` or ``allow_missing_or_failed`` is used:
 	//
-	//	* If a JWT has ``iss`` field, it needs to be specified by this field in one of ``JwtProviders``.
-	//	* If a JWT doesn't have ``iss`` field, one of ``JwtProviders`` should fill this field empty.
-	//	* Multiple ``JwtProviders`` should not have same value in this field.
+	//     * If a JWT has ``iss`` field, it needs to be specified by this field in one of ``JwtProviders``.
+	//     * If a JWT doesn't have ``iss`` field, one of ``JwtProviders`` should fill this field empty.
+	//     * Multiple ``JwtProviders`` should not have same value in this field.
 	//
 	// Examples:
 	//
 	// * https://securetoken.google.com
 	// * Example: 1234567-compute@developer.gserviceaccount.com
+	//
 	Issuer string `protobuf:"bytes,1,opt,name=issuer,proto3" json:"issuer,omitempty"`
 	// The list of JWT `audiences <https://tools.ietf.org/html/rfc7519#section-4.1.3>`_ are
 	// allowed to access. A JWT containing any of these audiences will be accepted. If not specified,
@@ -91,9 +92,10 @@ type JwtProvider struct {
 	//
 	// .. code-block:: yaml
 	//
-	//	audiences:
-	//	- bookstore_android.apps.googleusercontent.com
-	//	- bookstore_web.apps.googleusercontent.com
+	//     audiences:
+	//     - bookstore_android.apps.googleusercontent.com
+	//     - bookstore_web.apps.googleusercontent.com
+	//
 	Audiences []string `protobuf:"bytes,2,rep,name=audiences,proto3" json:"audiences,omitempty"`
 	// Restrict the `subjects <https://tools.ietf.org/html/rfc7519#section-4.1.2>`_
 	// that the JwtProvider can assert. For instance, this could implement JWT-SVID
@@ -104,32 +106,35 @@ type JwtProvider struct {
 	//
 	// .. code-block:: yaml
 	//
-	//	subjects:
-	//	  prefix: spiffe://spiffe.example.com/
+	//     subjects:
+	//       prefix: spiffe://spiffe.example.com/
+	//
 	Subjects *v3.StringMatcher `protobuf:"bytes,19,opt,name=subjects,proto3" json:"subjects,omitempty"`
 	// Requires that the credential contains an `expiration <https://tools.ietf.org/html/rfc7519#section-4.1.4>`_.
 	// For instance, this could implement JWT-SVID
 	// `expiration restrictions <https://github.com/spiffe/spiffe/blob/main/standards/JWT-SVID.md#33-expiration-time>`_.
-	// Unlike “max_lifetime“, this only requires that expiration is present, where “max_lifetime“ also checks the value.
+	// Unlike ``max_lifetime``, this only requires that expiration is present, where ``max_lifetime`` also checks the value.
 	//
 	// Example:
 	//
 	// .. code-block:: yaml
 	//
-	//	require_expiration: true
+	//     require_expiration: true
+	//
 	RequireExpiration bool `protobuf:"varint,20,opt,name=require_expiration,json=requireExpiration,proto3" json:"require_expiration,omitempty"`
 	// Restrict the maximum remaining lifetime of a credential from the JwtProvider. Credential lifetime
 	// is the difference between the current time and the expiration of the credential. For instance,
 	// the following example will reject credentials that have a lifetime longer than 24 hours. If not set,
 	// expiration checking still occurs, but there is no limit on credential lifetime. If set, takes precedence
-	// over “require_expiration“.
+	// over ``require_expiration``.
 	//
 	// Example:
 	//
 	// .. code-block:: yaml
 	//
-	//	max_lifetime:
-	//	  seconds: 86400
+	//     max_lifetime:
+	//       seconds: 86400
+	//
 	MaxLifetime *durationpb.Duration `protobuf:"bytes,21,opt,name=max_lifetime,json=maxLifetime,proto3" json:"max_lifetime,omitempty"`
 	// `JSON Web Key Set (JWKS) <https://tools.ietf.org/html/rfc7517#appendix-A>`_ is needed to
 	// validate signature of a JWT. This field specifies where to fetch JWKS.
@@ -150,7 +155,7 @@ type JwtProvider struct {
 	// 1. The Authorization header using the `Bearer schema
 	// <https://tools.ietf.org/html/rfc6750#section-2.1>`_. Example::
 	//
-	//	Authorization: Bearer <token>.
+	//    Authorization: Bearer <token>.
 	//
 	// 2. `access_token <https://tools.ietf.org/html/rfc6750#section-2.3>`_ query parameter.
 	//
@@ -161,41 +166,44 @@ type JwtProvider struct {
 	//
 	// .. code-block:: yaml
 	//
-	//	from_headers:
-	//	- name: x-goog-iap-jwt-assertion
+	//   from_headers:
+	//   - name: x-goog-iap-jwt-assertion
 	//
 	// can be used to extract token from header::
 	//
-	//	``x-goog-iap-jwt-assertion: <JWT>``.
+	//   ``x-goog-iap-jwt-assertion: <JWT>``.
+	//
 	FromHeaders []*JwtHeader `protobuf:"bytes,6,rep,name=from_headers,json=fromHeaders,proto3" json:"from_headers,omitempty"`
-	// JWT is sent in a query parameter. “jwt_params“ represents the query parameter names.
+	// JWT is sent in a query parameter. ``jwt_params`` represents the query parameter names.
 	//
 	// For example, if config is:
 	//
 	// .. code-block:: yaml
 	//
-	//	from_params:
-	//	- jwt_token
+	//   from_params:
+	//   - jwt_token
 	//
 	// The JWT format in query parameter is::
 	//
-	//	/path?jwt_token=<JWT>
+	//    /path?jwt_token=<JWT>
+	//
 	FromParams []string `protobuf:"bytes,7,rep,name=from_params,json=fromParams,proto3" json:"from_params,omitempty"`
-	// JWT is sent in a cookie. “from_cookies“ represents the cookie names to extract from.
+	// JWT is sent in a cookie. ``from_cookies`` represents the cookie names to extract from.
 	//
 	// For example, if config is:
 	//
 	// .. code-block:: yaml
 	//
-	//	from_cookies:
-	//	- auth-token
+	//   from_cookies:
+	//   - auth-token
 	//
-	// Then JWT will be extracted from “auth-token“ cookie in the request.
+	// Then JWT will be extracted from ``auth-token`` cookie in the request.
+	//
 	FromCookies []string `protobuf:"bytes,13,rep,name=from_cookies,json=fromCookies,proto3" json:"from_cookies,omitempty"`
 	// This field specifies the header name to forward a successfully verified JWT payload to the
 	// backend. The forwarded data is::
 	//
-	//	base64url_encoded(jwt_payload_in_JSON)
+	//    base64url_encoded(jwt_payload_in_JSON)
 	//
 	// If it is not specified, the payload will not be forwarded.
 	ForwardPayloadHeader string `protobuf:"bytes,8,opt,name=forward_payload_header,json=forwardPayloadHeader,proto3" json:"forward_payload_header,omitempty"`
@@ -208,80 +216,82 @@ type JwtProvider struct {
 	// is specified.
 	PadForwardPayloadHeader bool `protobuf:"varint,11,opt,name=pad_forward_payload_header,json=padForwardPayloadHeader,proto3" json:"pad_forward_payload_header,omitempty"`
 	// If non empty, successfully verified JWT payloads will be written to StreamInfo DynamicMetadata
-	// in the format as: “namespace“ is the jwt_authn filter name as ````envoy.filters.http.jwt_authn````
-	// The value is the “protobuf::Struct“. The value of this field will be the key for its “fields“
-	// and the value is the “protobuf::Struct“ converted from JWT JSON payload.
+	// in the format as: ``namespace`` is the jwt_authn filter name as ````envoy.filters.http.jwt_authn````
+	// The value is the ``protobuf::Struct``. The value of this field will be the key for its ``fields``
+	// and the value is the ``protobuf::Struct`` converted from JWT JSON payload.
 	//
-	// For example, if payload_in_metadata is “my_payload“:
+	// For example, if payload_in_metadata is ``my_payload``:
 	//
 	// .. code-block:: yaml
 	//
-	//	envoy.filters.http.jwt_authn:
-	//	  my_payload:
-	//	    iss: https://example.com
-	//	    sub: test@example.com
-	//	    aud: https://example.com
-	//	    exp: 1501281058
+	//   envoy.filters.http.jwt_authn:
+	//     my_payload:
+	//       iss: https://example.com
+	//       sub: test@example.com
+	//       aud: https://example.com
+	//       exp: 1501281058
+	//
 	PayloadInMetadata string `protobuf:"bytes,9,opt,name=payload_in_metadata,json=payloadInMetadata,proto3" json:"payload_in_metadata,omitempty"`
 	// Normalizes the payload representation in the request metadata.
 	NormalizePayloadInMetadata *JwtProvider_NormalizePayload `protobuf:"bytes,18,opt,name=normalize_payload_in_metadata,json=normalizePayloadInMetadata,proto3" json:"normalize_payload_in_metadata,omitempty"`
 	// If not empty, similar to :ref:`payload_in_metadata <envoy_v3_api_field_extensions.filters.http.jwt_authn.v3.JwtProvider.payload_in_metadata>`,
 	// a successfully verified JWT header will be written to :ref:`Dynamic State <arch_overview_data_sharing_between_filters>`
-	// as an entry (“protobuf::Struct“) in “envoy.filters.http.jwt_authn“ “namespace“ with the
+	// as an entry (``protobuf::Struct``) in ``envoy.filters.http.jwt_authn`` ``namespace`` with the
 	// value of this field as the key.
 	//
-	// For example, if “header_in_metadata“ is “my_header“:
+	// For example, if ``header_in_metadata`` is ``my_header``:
 	//
 	// .. code-block:: yaml
 	//
-	//	envoy.filters.http.jwt_authn:
-	//	  my_header:
-	//	    alg: JWT
-	//	    kid: EF71iSaosbC5C4tC6Syq1Gm647M
-	//	    alg: PS256
+	//   envoy.filters.http.jwt_authn:
+	//     my_header:
+	//       alg: JWT
+	//       kid: EF71iSaosbC5C4tC6Syq1Gm647M
+	//       alg: PS256
 	//
-	// When the metadata has “envoy.filters.http.jwt_authn“ entry already (for example if
+	// When the metadata has ``envoy.filters.http.jwt_authn`` entry already (for example if
 	// :ref:`payload_in_metadata <envoy_v3_api_field_extensions.filters.http.jwt_authn.v3.JwtProvider.payload_in_metadata>`
-	// is not empty), it will be inserted as a new entry in the same “namespace“ as shown below:
+	// is not empty), it will be inserted as a new entry in the same ``namespace`` as shown below:
 	//
 	// .. code-block:: yaml
 	//
-	//	envoy.filters.http.jwt_authn:
-	//	  my_payload:
-	//	    iss: https://example.com
-	//	    sub: test@example.com
-	//	    aud: https://example.com
-	//	    exp: 1501281058
-	//	  my_header:
-	//	    alg: JWT
-	//	    kid: EF71iSaosbC5C4tC6Syq1Gm647M
-	//	    alg: PS256
+	//   envoy.filters.http.jwt_authn:
+	//     my_payload:
+	//       iss: https://example.com
+	//       sub: test@example.com
+	//       aud: https://example.com
+	//       exp: 1501281058
+	//     my_header:
+	//       alg: JWT
+	//       kid: EF71iSaosbC5C4tC6Syq1Gm647M
+	//       alg: PS256
 	//
 	// .. warning::
 	//
-	//	Using the same key name for :ref:`header_in_metadata <envoy_v3_api_field_extensions.filters.http.jwt_authn.v3.JwtProvider.payload_in_metadata>`
-	//	and :ref:`payload_in_metadata <envoy_v3_api_field_extensions.filters.http.jwt_authn.v3.JwtProvider.payload_in_metadata>`
-	//	is not suggested due to potential override of existing entry, while it is not enforced during
-	//	config validation.
+	//    Using the same key name for :ref:`header_in_metadata <envoy_v3_api_field_extensions.filters.http.jwt_authn.v3.JwtProvider.payload_in_metadata>`
+	//    and :ref:`payload_in_metadata <envoy_v3_api_field_extensions.filters.http.jwt_authn.v3.JwtProvider.payload_in_metadata>`
+	//    is not suggested due to potential override of existing entry, while it is not enforced during
+	//    config validation.
+	//
 	HeaderInMetadata string `protobuf:"bytes,14,opt,name=header_in_metadata,json=headerInMetadata,proto3" json:"header_in_metadata,omitempty"`
-	// If non empty, the failure status “::google::jwt_verify::Status“ for a non verified JWT will be written to StreamInfo DynamicMetadata
-	// in the format as: “namespace“ is the jwt_authn filter name as “envoy.filters.http.jwt_authn“
-	// The value is the “protobuf::Struct“. The values of this field will be “code“ and “message“
+	// If non empty, the failure status ``::google::jwt_verify::Status`` for a non verified JWT will be written to StreamInfo DynamicMetadata
+	// in the format as: ``namespace`` is the jwt_authn filter name as ``envoy.filters.http.jwt_authn``
+	// The value is the ``protobuf::Struct``. The values of this field will be ``code`` and ``message``
 	// and they will contain the JWT authentication failure status code and a message describing the failure.
 	//
-	// For example, if failed_status_in_metadata is “my_auth_failure_status“:
+	// For example, if failed_status_in_metadata is ``my_auth_failure_status``:
 	//
 	// .. code-block:: yaml
 	//
-	//	envoy.filters.http.jwt_authn:
-	//	  my_auth_failure_status:
-	//	    code: 3
-	//	    message: Jwt expired
+	//   envoy.filters.http.jwt_authn:
+	//     my_auth_failure_status:
+	//       code: 3
+	//       message: Jwt expired
 	FailedStatusInMetadata string `protobuf:"bytes,16,opt,name=failed_status_in_metadata,json=failedStatusInMetadata,proto3" json:"failed_status_in_metadata,omitempty"`
 	// Specify the clock skew in seconds when verifying JWT time constraint,
-	// such as “exp“, and “nbf“. If not specified, default is 60 seconds.
+	// such as ``exp``, and ``nbf``. If not specified, default is 60 seconds.
 	ClockSkewSeconds uint32 `protobuf:"varint,10,opt,name=clock_skew_seconds,json=clockSkewSeconds,proto3" json:"clock_skew_seconds,omitempty"`
-	// Enables JWT cache, its size is specified by “jwt_cache_size“.
+	// Enables JWT cache, its size is specified by ``jwt_cache_size``.
 	// Only valid JWTs are cached.
 	JwtCacheConfig *JwtCacheConfig `protobuf:"bytes,12,opt,name=jwt_cache_config,json=jwtCacheConfig,proto3" json:"jwt_cache_config,omitempty"`
 	// Add JWT claim to HTTP Header
@@ -290,22 +300,22 @@ type JwtProvider struct {
 	// object are serialized to JSON and copied base64-encoded.
 	//
 	// .. literalinclude:: /_configs/repo/jwt_authn.yaml
-	//
-	//	:language: yaml
-	//	:lines: 44-51
-	//	:linenos:
-	//	:lineno-start: 44
-	//	:caption: :download:`jwt_authn.yaml </_configs/repo/jwt_authn.yaml>`
+	//    :language: yaml
+	//    :lines: 44-51
+	//    :linenos:
+	//    :lineno-start: 44
+	//    :caption: :download:`jwt_authn.yaml </_configs/repo/jwt_authn.yaml>`
 	//
 	// This header is only reserved for jwt claim; any other value will be overwritten.
 	ClaimToHeaders []*JwtClaimToHeader `protobuf:"bytes,15,rep,name=claim_to_headers,json=claimToHeaders,proto3" json:"claim_to_headers,omitempty"`
 	// Clears route cache in order to allow the JWT to correctly affect
 	// routing decisions. Filter clears all cached routes when:
 	//
-	// 1. The field is set to “true“.
+	// 1. The field is set to ``true``.
 	//
-	//  2. At least one “claim_to_headers“ header is added to the request OR
-	//     if “payload_in_metadata“ is set.
+	// 2. At least one ``claim_to_headers`` header is added to the request OR
+	//    if ``payload_in_metadata`` is set.
+	//
 	ClearRouteCache bool `protobuf:"varint,17,opt,name=clear_route_cache,json=clearRouteCache,proto3" json:"clear_route_cache,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
@@ -511,13 +521,14 @@ type JwtProvider_RemoteJwks struct {
 	//
 	// .. code-block:: yaml
 	//
-	//	remote_jwks:
-	//	  http_uri:
-	//	    uri: https://www.googleapis.com/oauth2/v1/certs
-	//	    cluster: jwt.www.googleapis.com|443
-	//	    timeout: 1s
-	//	  cache_duration:
-	//	    seconds: 300
+	//    remote_jwks:
+	//      http_uri:
+	//        uri: https://www.googleapis.com/oauth2/v1/certs
+	//        cluster: jwt.www.googleapis.com|443
+	//        timeout: 1s
+	//      cache_duration:
+	//        seconds: 300
+	//
 	RemoteJwks *RemoteJwks `protobuf:"bytes,3,opt,name=remote_jwks,json=remoteJwks,proto3,oneof"`
 }
 
@@ -529,15 +540,16 @@ type JwtProvider_LocalJwks struct {
 	//
 	// .. code-block:: yaml
 	//
-	//	local_jwks:
-	//	  filename: /etc/envoy/jwks/jwks1.txt
+	//    local_jwks:
+	//      filename: /etc/envoy/jwks/jwks1.txt
 	//
 	// Example: inline_string
 	//
 	// .. code-block:: yaml
 	//
-	//	local_jwks:
-	//	  inline_string: ACADADADADA
+	//    local_jwks:
+	//      inline_string: ACADADADADA
+	//
 	LocalJwks *v31.DataSource `protobuf:"bytes,4,opt,name=local_jwks,json=localJwks,proto3,oneof"`
 }
 
@@ -609,10 +621,11 @@ type RemoteJwks struct {
 	//
 	// .. code-block:: yaml
 	//
-	//	http_uri:
-	//	  uri: https://www.googleapis.com/oauth2/v1/certs
-	//	  cluster: jwt.www.googleapis.com|443
-	//	  timeout: 1s
+	//    http_uri:
+	//      uri: https://www.googleapis.com/oauth2/v1/certs
+	//      cluster: jwt.www.googleapis.com|443
+	//      timeout: 1s
+	//
 	HttpUri *v31.HttpUri `protobuf:"bytes,1,opt,name=http_uri,json=httpUri,proto3" json:"http_uri,omitempty"`
 	// Duration after which the cached JWKS should be expired. If not specified, default cache
 	// duration is 10 minutes.
@@ -622,15 +635,16 @@ type RemoteJwks struct {
 	//
 	// If this feature is not enabled:
 	//
-	//   - The Jwks is fetched on-demand when the requests come. During the fetching, first
-	//     few requests are paused until the Jwks is fetched.
-	//   - Each worker thread fetches its own Jwks since Jwks cache is per worker thread.
+	// * The Jwks is fetched on-demand when the requests come. During the fetching, first
+	//   few requests are paused until the Jwks is fetched.
+	// * Each worker thread fetches its own Jwks since Jwks cache is per worker thread.
 	//
 	// If this feature is enabled:
 	//
-	//   - Fetched Jwks is done in the main thread before the listener is activated. Its fetched
-	//     Jwks can be used by all worker threads. Each worker thread doesn't need to fetch its own.
-	//   - Jwks is ready when the requests come, not need to wait for the Jwks fetching.
+	// * Fetched Jwks is done in the main thread before the listener is activated. Its fetched
+	//   Jwks can be used by all worker threads. Each worker thread doesn't need to fetch its own.
+	// * Jwks is ready when the requests come, not need to wait for the Jwks fetching.
+	//
 	AsyncFetch *JwksAsyncFetch `protobuf:"bytes,3,opt,name=async_fetch,json=asyncFetch,proto3" json:"async_fetch,omitempty"`
 	// Retry policy for fetching Jwks. optional. turned off by default.
 	//
@@ -638,26 +652,29 @@ type RemoteJwks struct {
 	//
 	// .. code-block:: yaml
 	//
-	//	retry_policy:
-	//	  retry_back_off:
-	//	    base_interval: 0.01s
-	//	    max_interval: 20s
-	//	  num_retries: 10
+	//   retry_policy:
+	//     retry_back_off:
+	//       base_interval: 0.01s
+	//       max_interval: 20s
+	//     num_retries: 10
 	//
 	// will yield a randomized truncated exponential backoff policy with an initial delay of 10ms
 	// 10 maximum attempts spaced at most 20s seconds.
 	//
 	// .. code-block:: yaml
 	//
-	//	retry_policy:
-	//	  num_retries:1
+	//   retry_policy:
+	//     num_retries:1
 	//
 	// uses the default :ref:`retry backoff strategy <envoy_v3_api_msg_config.core.v3.BackoffStrategy>`.
 	// with the default base interval is 1000 milliseconds. and the default maximum interval of 10 times the base interval.
 	//
 	// if num_retries is omitted, the default is to allow only one retry.
 	//
+	//
 	// If enabled, the retry policy will apply to all Jwks fetching approaches, e.g. on demand or asynchronously in background.
+	//
+	//
 	RetryPolicy   *v31.RetryPolicy `protobuf:"bytes,4,opt,name=retry_policy,json=retryPolicy,proto3" json:"retry_policy,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1114,21 +1131,22 @@ type JwtRequirement_ExtractOnlyWithoutValidation struct {
 	//
 	// .. warning::
 	//
-	//	SECURITY WARNING: This mode does NOT verify JWT signatures. Any party
-	//	can forge a JWT with arbitrary claims, and those claims will be extracted
-	//	and forwarded as HTTP headers. Headers set by this mode are
-	//	INDISTINGUISHABLE from headers set by fully validated JWTs unless the
-	//	``verification_status_header`` is checked by downstream filters
-	//	(set to ``false`` by default on all extract-only requests).
+	//    SECURITY WARNING: This mode does NOT verify JWT signatures. Any party
+	//    can forge a JWT with arbitrary claims, and those claims will be extracted
+	//    and forwarded as HTTP headers. Headers set by this mode are
+	//    INDISTINGUISHABLE from headers set by fully validated JWTs unless the
+	//    ``verification_status_header`` is checked by downstream filters
+	//    (set to ``false`` by default on all extract-only requests).
 	//
-	//	DO NOT use this mode if:
-	//	  - RBAC policies match on JWT-derived headers
-	//	  - ext_authz services trust JWT-derived headers
-	//	  - Backend services use JWT-derived headers for authorization
-	//	  - The JWT source is not cryptographically authenticated by other means
+	//    DO NOT use this mode if:
+	//      - RBAC policies match on JWT-derived headers
+	//      - ext_authz services trust JWT-derived headers
+	//      - Backend services use JWT-derived headers for authorization
+	//      - The JWT source is not cryptographically authenticated by other means
 	//
-	//	Use only when signature verification is PROVABLY performed elsewhere
-	//	in the request path (e.g., by an upstream mTLS-authenticated service).
+	//    Use only when signature verification is PROVABLY performed elsewhere
+	//    in the request path (e.g., by an upstream mTLS-authenticated service).
+	//
 	ExtractOnlyWithoutValidation *ExtractOnlyWithoutValidation `protobuf:"bytes,7,opt,name=extract_only_without_validation,json=extractOnlyWithoutValidation,proto3,oneof"`
 }
 
@@ -1169,12 +1187,12 @@ type ExtractOnlyWithoutValidation struct {
 	// header (or its non-"false" value) before trusting JWT-derived claim headers
 	// for authorization decisions.
 	//
-	// Default (unset or empty): “x-jwt-signature-verified“.
+	// Default (unset or empty): ``x-jwt-signature-verified``.
 	//
 	// Custom value: uses the specified header name.
 	//
 	// The header-setting behavior is guarded by the
-	// “envoy.reloadable_features.jwt_authn_add_verification_status_header“
+	// ``envoy.reloadable_features.jwt_authn_add_verification_status_header``
 	// runtime flag (default on). If removal is needed downstream, use header
 	// mutation in a subsequent filter.
 	//
@@ -1183,7 +1201,8 @@ type ExtractOnlyWithoutValidation struct {
 	//
 	// .. code-block:: yaml
 	//
-	//	x-jwt-signature-verified: false
+	//    x-jwt-signature-verified: false
+	//
 	VerificationStatusHeader string `protobuf:"bytes,1,opt,name=verification_status_header,json=verificationStatusHeader,proto3" json:"verification_status_header,omitempty"`
 	unknownFields            protoimpl.UnknownFields
 	sizeCache                protoimpl.SizeCache
@@ -1350,8 +1369,9 @@ type RequirementRule struct {
 	//
 	// .. code-block:: yaml
 	//
-	//	match:
-	//	  prefix: /
+	//    match:
+	//      prefix: /
+	//
 	Match *v32.RouteMatch `protobuf:"bytes,1,opt,name=match,proto3" json:"match,omitempty"`
 	// Specify a Jwt requirement.
 	// If not specified, Jwt verification is disabled.
@@ -1440,7 +1460,7 @@ type RequirementRule_RequirementName struct {
 	// Use requirement_name to specify a Jwt requirement.
 	// This requirement_name MUST be specified at the
 	// :ref:`requirement_map <envoy_v3_api_field_extensions.filters.http.jwt_authn.v3.JwtAuthentication.requirement_map>`
-	// in “JwtAuthentication“.
+	// in ``JwtAuthentication``.
 	RequirementName string `protobuf:"bytes,3,opt,name=requirement_name,json=requirementName,proto3,oneof"`
 }
 
@@ -1467,10 +1487,10 @@ func (*RequirementRule_RequirementName) isRequirementRule_RequirementType() {}
 // jwt_authn filter will use JwtRequirement{"provider_name": "issuer1"} to verify.
 type FilterStateRule struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The filter state name to retrieve the “Router::StringAccessor“ object.
+	// The filter state name to retrieve the ``Router::StringAccessor`` object.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// A map of string keys to requirements. The string key is the string value
-	// in the FilterState with the name specified in the “name“ field above.
+	// in the FilterState with the name specified in the ``name`` field above.
 	Requires      map[string]*JwtRequirement `protobuf:"bytes,3,rep,name=requires,proto3" json:"requires,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1569,54 +1589,56 @@ type JwtAuthentication struct {
 	//
 	// .. code-block:: yaml
 	//
-	//	providers:
-	//	  provider1:
-	//	     issuer: issuer1
-	//	     audiences:
-	//	     - audience1
-	//	     - audience2
-	//	     remote_jwks:
-	//	       http_uri:
-	//	         uri: https://example.com/.well-known/jwks.json
-	//	         cluster: example_jwks_cluster
-	//	         timeout: 1s
-	//	   provider2:
-	//	     issuer: provider2
-	//	     local_jwks:
-	//	       inline_string: jwks_string
+	//   providers:
+	//     provider1:
+	//        issuer: issuer1
+	//        audiences:
+	//        - audience1
+	//        - audience2
+	//        remote_jwks:
+	//          http_uri:
+	//            uri: https://example.com/.well-known/jwks.json
+	//            cluster: example_jwks_cluster
+	//            timeout: 1s
+	//      provider2:
+	//        issuer: provider2
+	//        local_jwks:
+	//          inline_string: jwks_string
+	//
 	Providers map[string]*JwtProvider `protobuf:"bytes,1,rep,name=providers,proto3" json:"providers,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// Specifies requirements based on the route matches. The first matched requirement will be
 	// applied. If there are overlapped match conditions, please put the most specific match first.
 	//
-	// # Examples
+	// Examples
 	//
 	// .. code-block:: yaml
 	//
-	//	rules:
-	//	  - match:
-	//	      prefix: /healthz
-	//	  - match:
-	//	      prefix: /baz
-	//	    requires:
-	//	      provider_name: provider1
-	//	  - match:
-	//	      prefix: /foo
-	//	    requires:
-	//	      requires_any:
-	//	        requirements:
-	//	          - provider_name: provider1
-	//	          - provider_name: provider2
-	//	  - match:
-	//	      prefix: /bar
-	//	    requires:
-	//	      requires_all:
-	//	        requirements:
-	//	          - provider_name: provider1
-	//	          - provider_name: provider2
+	//   rules:
+	//     - match:
+	//         prefix: /healthz
+	//     - match:
+	//         prefix: /baz
+	//       requires:
+	//         provider_name: provider1
+	//     - match:
+	//         prefix: /foo
+	//       requires:
+	//         requires_any:
+	//           requirements:
+	//             - provider_name: provider1
+	//             - provider_name: provider2
+	//     - match:
+	//         prefix: /bar
+	//       requires:
+	//         requires_all:
+	//           requirements:
+	//             - provider_name: provider1
+	//             - provider_name: provider2
+	//
 	Rules []*RequirementRule `protobuf:"bytes,2,rep,name=rules,proto3" json:"rules,omitempty"`
 	// This message specifies Jwt requirements based on stream_info.filterState.
 	// Other HTTP filters can use it to specify Jwt requirements dynamically.
-	// The “rules“ field above is checked first, if it could not find any matches,
+	// The ``rules`` field above is checked first, if it could not find any matches,
 	// check this one.
 	FilterStateRules *FilterStateRule `protobuf:"bytes,3,opt,name=filter_state_rules,json=filterStateRules,proto3" json:"filter_state_rules,omitempty"`
 	// When set to true, bypass the `CORS preflight request
@@ -1625,7 +1647,7 @@ type JwtAuthentication struct {
 	BypassCorsPreflight bool `protobuf:"varint,4,opt,name=bypass_cors_preflight,json=bypassCorsPreflight,proto3" json:"bypass_cors_preflight,omitempty"`
 	// A map of unique requirement_names to JwtRequirements.
 	// :ref:`requirement_name <envoy_v3_api_field_extensions.filters.http.jwt_authn.v3.PerRouteConfig.requirement_name>`
-	// in “PerRouteConfig“ uses this map to specify a JwtRequirement.
+	// in ``PerRouteConfig`` uses this map to specify a JwtRequirement.
 	RequirementMap map[string]*JwtRequirement `protobuf:"bytes,5,rep,name=requirement_map,json=requirementMap,proto3" json:"requirement_map,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// A request failing the verification process will receive a 401 downstream with the failure response details
 	// in the body along with WWWAuthenticate header value set with "invalid token". If this value is set to true,
@@ -1796,7 +1818,7 @@ type PerRouteConfig_RequirementName struct {
 	// Use requirement_name to specify a JwtRequirement.
 	// This requirement_name MUST be specified at the
 	// :ref:`requirement_map <envoy_v3_api_field_extensions.filters.http.jwt_authn.v3.JwtAuthentication.requirement_map>`
-	// in “JwtAuthentication“. If no, the requests using this route will be rejected with 403.
+	// in ``JwtAuthentication``. If no, the requests using this route will be rejected with 403.
 	RequirementName string `protobuf:"bytes,2,opt,name=requirement_name,json=requirementName,proto3,oneof"`
 }
 
@@ -1812,44 +1834,44 @@ type JwtClaimToHeader struct {
 	// (including on paths that bypass JWT verification) and then replaced with the claim value when
 	// verification succeeds.
 	HeaderName string `protobuf:"bytes,1,opt,name=header_name,json=headerName,proto3" json:"header_name,omitempty"`
-	// The name of the claim to copy, split on "." to address nested claims: “sub“ selects the
-	// top-level “sub“ claim, and “nested.claim.key“ selects “key“ inside “claim“ inside
-	// “nested“.
+	// The name of the claim to copy, split on "." to address nested claims: ``sub`` selects the
+	// top-level ``sub`` claim, and ``nested.claim.key`` selects ``key`` inside ``claim`` inside
+	// ``nested``.
 	//
 	// Because the name is always split, a claim whose own name contains a dot -- a URL-namespaced
-	// claim such as “http://example.org/parent_token“ -- is not addressable this way. Use
+	// claim such as ``http://example.org/parent_token`` -- is not addressable this way. Use
 	// :ref:`claim_path
 	// <envoy_v3_api_field_extensions.filters.http.jwt_authn.v3.JwtClaimToHeader.claim_path>` for
 	// those.
 	//
-	// Exactly one of “claim_name“ and “claim_path“ must be set.
+	// Exactly one of ``claim_name`` and ``claim_path`` must be set.
 	ClaimName string `protobuf:"bytes,2,opt,name=claim_name,json=claimName,proto3" json:"claim_name,omitempty"`
 	// The path to the claim to copy, given as an explicit list of segments. Each segment is matched
 	// in full against a key of the enclosing JSON object, so claim names containing dots are
-	// addressable. For the payload “{"a.b": {"c.d": "x.y.z"}}“, the value “x.y.z“ is selected
+	// addressable. For the payload ``{"a.b": {"c.d": "x.y.z"}}``, the value ``x.y.z`` is selected
 	// by:
 	//
 	// .. code-block:: yaml
 	//
-	//	claim_to_headers:
-	//	- header_name: x-jwt-claim
-	//	  claim_path:
-	//	  - key: a.b
-	//	  - key: c.d
+	//   claim_to_headers:
+	//   - header_name: x-jwt-claim
+	//     claim_path:
+	//     - key: a.b
+	//     - key: c.d
 	//
 	// and a URL-namespaced top-level claim by:
 	//
 	// .. code-block:: yaml
 	//
-	//	claim_to_headers:
-	//	- header_name: x-jwt-claim
-	//	  claim_path:
-	//	  - key: http://example.org/parent_token
+	//   claim_to_headers:
+	//   - header_name: x-jwt-claim
+	//     claim_path:
+	//     - key: http://example.org/parent_token
 	//
-	// Exactly one of “claim_name“ and “claim_path“ must be set.
+	// Exactly one of ``claim_name`` and ``claim_path`` must be set.
 	//
-	// [#comment: A “min_items“ PGV rule cannot express this: a repeated field has no presence, so
-	// “min_items: 1“ would make “claim_path“ mandatory and reject every “claim_name“ config.]
+	// [#comment: A ``min_items`` PGV rule cannot express this: a repeated field has no presence, so
+	// ``min_items: 1`` would make ``claim_path`` mandatory and reject every ``claim_name`` config.]
 	ClaimPath     []*JwtClaimToHeader_PathSegment `protobuf:"bytes,3,rep,name=claim_path,json=claimPath,proto3" json:"claim_path,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1911,9 +1933,9 @@ type JwtProvider_NormalizePayload struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Each claim in this list will be interpreted as a space-delimited string
 	// and converted to a list of strings based on the delimited values.
-	// Example: a token with a claim “scope: "email profile"“ is translated
-	// to dynamic metadata  “scope: ["email", "profile"]“ if this field is
-	// set value “["scope"]“. This special handling of “scope“ is
+	// Example: a token with a claim ``scope: "email profile"`` is translated
+	// to dynamic metadata  ``scope: ["email", "profile"]`` if this field is
+	// set value ``["scope"]``. This special handling of ``scope`` is
 	// recommended by `RFC8693
 	// <https://datatracker.ietf.org/doc/html/rfc8693#name-scope-scopes-claim>`_.
 	SpaceDelimitedClaims []string `protobuf:"bytes,1,rep,name=space_delimited_claims,json=spaceDelimitedClaims,proto3" json:"space_delimited_claims,omitempty"`

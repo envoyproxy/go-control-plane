@@ -91,13 +91,13 @@ type ClientConfig struct {
 	// that configured by :ref:`Bootstrap node <envoy_v3_api_field_config.bootstrap.v3.Bootstrap.node>`
 	// message's :ref:`cluster <envoy_v3_api_field_config.core.v3.Node.cluster>` field or command line
 	// option :option:`--service-cluster` will be used. If both this field and local service cluster
-	// name are empty, “EnvoyProxy“ is used as the service name by default.
+	// name are empty, ``EnvoyProxy`` is used as the service name by default.
 	ServiceName string `protobuf:"bytes,1,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty"`
 	// Service instance name for SkyWalking tracer. If this field is empty, then local service node
 	// that configured by :ref:`Bootstrap node <envoy_v3_api_field_config.bootstrap.v3.Bootstrap.node>`
 	// message's :ref:`id <envoy_v3_api_field_config.core.v3.Node.id>` field or command line  option
 	// :option:`--service-node` will be used. If both this field and local service node are empty,
-	// “EnvoyProxy“ is used as the instance name by default.
+	// ``EnvoyProxy`` is used as the instance name by default.
 	InstanceName string `protobuf:"bytes,2,opt,name=instance_name,json=instanceName,proto3" json:"instance_name,omitempty"`
 	// Authentication token config for SkyWalking. SkyWalking can use token authentication to secure
 	// that monitoring application data can be trusted. In current version, Token is considered as a

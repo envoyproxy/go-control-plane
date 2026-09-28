@@ -30,7 +30,7 @@ type PostgresInspector struct {
 	// Enable extraction of connection metadata (user, database, application name) from
 	// the startup message. This metadata is made available for access logging and stats.
 	//
-	// Defaults to “true“.
+	// Defaults to ``true``.
 	EnableMetadataExtraction *wrapperspb.BoolValue `protobuf:"bytes,1,opt,name=enable_metadata_extraction,json=enableMetadataExtraction,proto3" json:"enable_metadata_extraction,omitempty"`
 	// The maximum size of the startup message that the postgres inspector will accept.
 	// Messages larger than this will be rejected. If not specified, defaults to 10KB.

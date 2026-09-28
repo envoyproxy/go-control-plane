@@ -145,8 +145,8 @@ func (x *ProtoApiScrubberConfig) GetScrubUnknownFields() bool {
 // Specifies the descriptor set for proto services.
 type DescriptorSet struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// It could be passed by a local file through “Datasource.filename“ or
-	// embedded in the “Datasource.inline_bytes“.
+	// It could be passed by a local file through ``Datasource.filename`` or
+	// embedded in the ``Datasource.inline_bytes``.
 	DataSource    *v3.DataSource `protobuf:"bytes,1,opt,name=data_source,json=dataSource,proto3" json:"data_source,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -193,11 +193,11 @@ func (x *DescriptorSet) GetDataSource() *v3.DataSource {
 type Restrictions struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Specifies the method restrictions.
-	// Key - Fully qualified method name e.g., “endpoints.examples.bookstore.BookStore/GetShelf“.
+	// Key - Fully qualified method name e.g., ``endpoints.examples.bookstore.BookStore/GetShelf``.
 	// Value - Method restrictions.
 	MethodRestrictions map[string]*MethodRestrictions `protobuf:"bytes,1,rep,name=method_restrictions,json=methodRestrictions,proto3" json:"method_restrictions,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// Specifies the message restrictions.
-	// Key - Fully qualified message name e.g., “endpoints.examples.bookstore.Book“.
+	// Key - Fully qualified message name e.g., ``endpoints.examples.bookstore.Book``.
 	// Value - Message restrictions.
 	MessageRestrictions map[string]*MessageRestrictions `protobuf:"bytes,2,rep,name=message_restrictions,json=messageRestrictions,proto3" json:"message_restrictions,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields       protoimpl.UnknownFields
@@ -267,9 +267,9 @@ type MethodRestrictions struct {
 	// message-level rules. The 'matcher' within RestrictionConfig will determine
 	// if the method is denied/scrubbed. If the matcher evaluates to true:
 	//
-	//   - The request is **denied**, and further processing is stopped.
-	//   - The implementation should generate an immediate error response
-	//     (e.g., an HTTP 403 Forbidden status) and send it to the client.
+	// - The request is **denied**, and further processing is stopped.
+	// - The implementation should generate an immediate error response
+	//   (e.g., an HTTP 403 Forbidden status) and send it to the client.
 	MethodRestriction *RestrictionConfig `protobuf:"bytes,3,opt,name=method_restriction,json=methodRestriction,proto3" json:"method_restriction,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache

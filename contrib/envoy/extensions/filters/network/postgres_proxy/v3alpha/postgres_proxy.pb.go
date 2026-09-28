@@ -117,12 +117,12 @@ type PostgresProxy struct {
 	// SSL connection to Envoy and Postgres filter is configured to terminate SSL.
 	// In order for upstream encryption to work, the corresponding cluster must be configured to use
 	// :ref:`starttls transport socket <envoy_v3_api_msg_extensions.transport_sockets.starttls.v3.UpstreamStartTlsConfig>`.
-	// Defaults to “DISABLE“.
+	// Defaults to ``DISABLE``.
 	UpstreamSsl PostgresProxy_SSLMode `protobuf:"varint,4,opt,name=upstream_ssl,json=upstreamSsl,proto3,enum=envoy.extensions.filters.network.postgres_proxy.v3alpha.PostgresProxy_SSLMode" json:"upstream_ssl,omitempty"`
 	// Controls whether to close downstream connections that refuse to upgrade to SSL.
 	// If enabled, the filter chain must use
 	// :ref:`starttls transport socket <envoy_v3_api_msg_extensions.transport_sockets.starttls.v3.UpstreamStartTlsConfig>`.
-	// Defaults to “DISABLE“.
+	// Defaults to ``DISABLE``.
 	DownstreamSsl PostgresProxy_SSLMode `protobuf:"varint,5,opt,name=downstream_ssl,json=downstreamSsl,proto3,enum=envoy.extensions.filters.network.postgres_proxy.v3alpha.PostgresProxy_SSLMode" json:"downstream_ssl,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

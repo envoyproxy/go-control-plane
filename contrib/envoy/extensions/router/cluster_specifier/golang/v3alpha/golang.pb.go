@@ -38,16 +38,17 @@ type Config struct {
 	// Default cluster.
 	//
 	// It will be used when the specifier interface return empty string or panic.
+	//
 	DefaultCluster string `protobuf:"bytes,3,opt,name=default_cluster,json=defaultCluster,proto3" json:"default_cluster,omitempty"`
 	// Configuration for the Go cluster specifier plugin.
 	//
 	// .. note::
+	//     This configuration is only parsed in the go cluster specifier, and is therefore not validated
+	//     by Envoy.
 	//
-	//	This configuration is only parsed in the go cluster specifier, and is therefore not validated
-	//	by Envoy.
+	//     See the :repo:`StreamFilter API <contrib/golang/router/cluster_specifier/source/go/pkg/cluster_specifier/config.go>`
+	//     for more information about how the plugin's configuration data can be accessed.
 	//
-	//	See the :repo:`StreamFilter API <contrib/golang/router/cluster_specifier/source/go/pkg/cluster_specifier/config.go>`
-	//	for more information about how the plugin's configuration data can be accessed.
 	Config        *anypb.Any `protobuf:"bytes,4,opt,name=config,proto3" json:"config,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

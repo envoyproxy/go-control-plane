@@ -30,14 +30,14 @@ const (
 type FailurePolicy int32
 
 const (
-	// No policy is specified. The default policy will be used. The default policy is “FAIL_CLOSED“.
+	// No policy is specified. The default policy will be used. The default policy is ``FAIL_CLOSED``.
 	FailurePolicy_UNSPECIFIED FailurePolicy = 0
 	// New plugin instance will be created for the new request if the VM is failed. Note this will only
 	// be applied to the following failures:
 	//
-	// * “proxy_wasm::FailState::RuntimeError“
+	// * ``proxy_wasm::FailState::RuntimeError``
 	//
-	// This will fallback to the “FAIL_CLOSED“ for all other failures.
+	// This will fallback to the ``FAIL_CLOSED`` for all other failures.
 	FailurePolicy_FAIL_RELOAD FailurePolicy = 1
 	// All plugins associated with the VM will return an HTTP 503 error.
 	FailurePolicy_FAIL_CLOSED FailurePolicy = 2
@@ -139,7 +139,7 @@ func (x *ReloadConfig) GetBackoff() *v3.BackoffStrategy {
 type CapabilityRestrictionConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The Proxy-Wasm capabilities which will be allowed. Capabilities are mapped by
-	// name. The “SanitizationConfig“ which each capability maps to is currently unimplemented and ignored,
+	// name. The ``SanitizationConfig`` which each capability maps to is currently unimplemented and ignored,
 	// and so should be left empty.
 	//
 	// The capability names are given in the
@@ -147,8 +147,8 @@ type CapabilityRestrictionConfig struct {
 	// Additionally, the following WASI capabilities from
 	// `this list <https://github.com/WebAssembly/WASI/blob/master/phases/snapshot/docs.md#modules>`_
 	// are implemented and can be allowed:
-	// “fd_write“, “fd_read“, “fd_seek“, “fd_close“, “fd_fdstat_get“, “environ_get“, “environ_sizes_get“,
-	// “args_get“, “args_sizes_get“, “proc_exit“, “clock_time_get“, “random_get“.
+	// ``fd_write``, ``fd_read``, ``fd_seek``, ``fd_close``, ``fd_fdstat_get``, ``environ_get``, ``environ_sizes_get``,
+	// ``args_get``, ``args_sizes_get``, ``proc_exit``, ``clock_time_get``, ``random_get``.
 	AllowedCapabilities map[string]*SanitizationConfig `protobuf:"bytes,1,rep,name=allowed_capabilities,json=allowedCapabilities,proto3" json:"allowed_capabilities,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
@@ -238,7 +238,7 @@ type VmConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// An ID which will be used along with a hash of the wasm code (or the name of the registered Null
 	// VM plugin) to determine which VM will be used for the plugin. All plugins which use the same
-	// “vm_id“ and code will use the same VM. May be left blank. Sharing a VM between plugins can
+	// ``vm_id`` and code will use the same VM. May be left blank. Sharing a VM between plugins can
 	// reduce memory utilization and make sharing of data easier which may have security implications.
 	// [#comment: TODO: add ref for details.]
 	VmId string `protobuf:"bytes,1,opt,name=vm_id,json=vmId,proto3" json:"vm_id,omitempty"`
@@ -250,7 +250,7 @@ type VmConfig struct {
 	// .. _extension_envoy.wasm.runtime.null:
 	//
 	// **envoy.wasm.runtime.null**: Null sandbox, the Wasm module must be compiled and linked into the
-	// Envoy binary. The registered name is given in the “code“ field as “inline_string“.
+	// Envoy binary. The registered name is given in the ``code`` field as ``inline_string``.
 	//
 	// .. _extension_envoy.wasm.runtime.v8:
 	//
@@ -271,30 +271,28 @@ type VmConfig struct {
 	// The Wasm code that Envoy will execute.
 	Code *v3.AsyncDataSource `protobuf:"bytes,3,opt,name=code,proto3" json:"code,omitempty"`
 	// The Wasm configuration used in initialization of a new VM
-	// (“proxy_on_start“). “google.protobuf.Struct“ is serialized as JSON before
-	// passing it to the plugin. “google.protobuf.BytesValue“ and
-	// “google.protobuf.StringValue“ are passed directly without the wrapper.
+	// (``proxy_on_start``). ``google.protobuf.Struct`` is serialized as JSON before
+	// passing it to the plugin. ``google.protobuf.BytesValue`` and
+	// ``google.protobuf.StringValue`` are passed directly without the wrapper.
 	Configuration *anypb.Any `protobuf:"bytes,4,opt,name=configuration,proto3" json:"configuration,omitempty"`
 	// Allow the wasm file to include pre-compiled code on VMs which support it.
 	//
 	// .. warning::
-	//
-	//	This should only be enabled for trusted sources as the precompiled code is not
-	//	verified.
+	//   This should only be enabled for trusted sources as the precompiled code is not
+	//   verified.
 	AllowPrecompiled bool `protobuf:"varint,5,opt,name=allow_precompiled,json=allowPrecompiled,proto3" json:"allow_precompiled,omitempty"`
 	// If true and the code needs to be remotely fetched and it is not in the cache then NACK the configuration
 	// update and do a background fetch to fill the cache, otherwise fetch the code asynchronously and enter
 	// warming state.
 	NackOnCodeCacheMiss bool `protobuf:"varint,6,opt,name=nack_on_code_cache_miss,json=nackOnCodeCacheMiss,proto3" json:"nack_on_code_cache_miss,omitempty"`
 	// Specifies environment variables to be injected to this VM which will be available through
-	// WASI's “environ_get“ and “environ_get_sizes“ system calls. Note that these functions
+	// WASI's ``environ_get`` and ``environ_get_sizes`` system calls. Note that these functions
 	// are generally called implicitly by your language's standard library. Therefore, you do not
 	// need to call them directly. You can access environment variables in the same way you would
 	// on native platforms.
 	//
 	// .. warning::
-	//
-	//	Envoy rejects the configuration if there's conflict of key space.
+	//   Envoy rejects the configuration if there's conflict of key space.
 	EnvironmentVariables *EnvironmentVariables `protobuf:"bytes,7,opt,name=environment_variables,json=environmentVariables,proto3" json:"environment_variables,omitempty"`
 	// Configuration for restricting Proxy-Wasm capabilities available to modules.
 	//
@@ -451,12 +449,12 @@ func (x *EnvironmentVariables) GetKeyValues() map[string]string {
 type PluginConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// A unique name for a filters/services in a VM for use in identifying the filter/service if
-	// multiple filters/services are handled by the same “vm_id“ and “root_id“ and for
+	// multiple filters/services are handled by the same ``vm_id`` and ``root_id`` and for
 	// logging/debugging.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// A unique ID for a set of filters/services in a VM which will share a RootContext and Contexts
 	// if applicable (e.g. an Wasm HttpFilter and an Wasm AccessLog). If left blank, all
-	// filters/services with a blank root_id with the same “vm_id“ will share Context(s).
+	// filters/services with a blank root_id with the same ``vm_id`` will share Context(s).
 	RootId string `protobuf:"bytes,2,opt,name=root_id,json=rootId,proto3" json:"root_id,omitempty"`
 	// Configuration for finding or starting VM.
 	//
@@ -465,34 +463,33 @@ type PluginConfig struct {
 	//	*PluginConfig_VmConfig
 	Vm isPluginConfig_Vm `protobuf_oneof:"vm"`
 	// Filter/service configuration used to configure or reconfigure a plugin
-	// (“proxy_on_configure“).
-	// “google.protobuf.Struct“ is serialized as JSON before
-	// passing it to the plugin. “google.protobuf.BytesValue“ and
-	// “google.protobuf.StringValue“ are passed directly without the wrapper.
+	// (``proxy_on_configure``).
+	// ``google.protobuf.Struct`` is serialized as JSON before
+	// passing it to the plugin. ``google.protobuf.BytesValue`` and
+	// ``google.protobuf.StringValue`` are passed directly without the wrapper.
 	Configuration *anypb.Any `protobuf:"bytes,4,opt,name=configuration,proto3" json:"configuration,omitempty"`
-	// If there is a fatal error on the VM (e.g. exception, “abort()“, “on_start“ or “on_configure“ return false),
+	// If there is a fatal error on the VM (e.g. exception, ``abort()``, ``on_start`` or ``on_configure`` return false),
 	// then all plugins associated with the VM will either fail closed (by default), e.g. by returning an HTTP 503 error,
 	// or fail open (if 'fail_open' is set to true) by bypassing the filter.
 	//
 	// .. note::
+	//   When ``on_start`` or ``on_configure`` return ``false`` during xDS updates the xDS configuration will be rejected and when ``on_start`` or ``on_configure`` return ``false`` on
+	//   initial startup the proxy will not start.
 	//
-	//	When ``on_start`` or ``on_configure`` return ``false`` during xDS updates the xDS configuration will be rejected and when ``on_start`` or ``on_configure`` return ``false`` on
-	//	initial startup the proxy will not start.
-	//
-	// This field is deprecated in favor of the “failure_policy“ field.
+	// This field is deprecated in favor of the ``failure_policy`` field.
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/wasm/v3/wasm.proto.
 	FailOpen bool `protobuf:"varint,5,opt,name=fail_open,json=failOpen,proto3" json:"fail_open,omitempty"`
 	// The failure policy for the plugin.
 	FailurePolicy FailurePolicy `protobuf:"varint,7,opt,name=failure_policy,json=failurePolicy,proto3,enum=envoy.extensions.wasm.v3.FailurePolicy" json:"failure_policy,omitempty"`
-	// Reload configuration. This is only applied when “failure_policy“ is set to “FAIL_RELOAD“.
+	// Reload configuration. This is only applied when ``failure_policy`` is set to ``FAIL_RELOAD``.
 	ReloadConfig *ReloadConfig `protobuf:"bytes,8,opt,name=reload_config,json=reloadConfig,proto3" json:"reload_config,omitempty"`
 	// Configuration for restricting Proxy-Wasm capabilities available to modules.
 	//
 	// This field is deprecated in favor of the :ref:`vm_config.capability_restriction_config
 	// <envoy_v3_api_field_extensions.wasm.v3.VmConfig.capability_restriction_config>` field, because
 	// the restrictions are applied to the Wasm VM and are therefore shared by every plugin running in
-	// it. If this field is set and “vm_config.capability_restriction_config“ is not, this field is
+	// it. If this field is set and ``vm_config.capability_restriction_config`` is not, this field is
 	// used to populate it.
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/wasm/v3/wasm.proto.

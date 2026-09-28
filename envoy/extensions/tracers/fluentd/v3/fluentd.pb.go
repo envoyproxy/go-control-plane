@@ -36,7 +36,7 @@ type FluentdConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The upstream cluster to connect to for streaming the Fluentd messages.
 	Cluster string `protobuf:"bytes,1,opt,name=cluster,proto3" json:"cluster,omitempty"`
-	// A tag is a string separated with “.“ (e.g. “log.type“) to categorize events.
+	// A tag is a string separated with ``.`` (e.g. ``log.type``) to categorize events.
 	// See: https://github.com/fluent/fluentd/wiki/Forward-Protocol-Specification-v1#message-modes
 	Tag string `protobuf:"bytes,2,opt,name=tag,proto3" json:"tag,omitempty"`
 	// The prefix to use when emitting tracer stats.

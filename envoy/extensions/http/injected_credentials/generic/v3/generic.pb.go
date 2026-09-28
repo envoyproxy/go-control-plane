@@ -34,12 +34,12 @@ type Generic struct {
 	// It must be a generic secret.
 	Credential *v3.SdsSecretConfig `protobuf:"bytes,1,opt,name=credential,proto3" json:"credential,omitempty"`
 	// The header that will be injected to the HTTP request with the provided credential.
-	// If not set, filter will default to: “Authorization“
+	// If not set, filter will default to: ``Authorization``
 	Header string `protobuf:"bytes,2,opt,name=header,proto3" json:"header,omitempty"`
 	// The prefix to prepend to the credential value before injecting it into the header.
-	// This is useful for adding a scheme such as “Bearer “ or “Basic “ to the credential.
-	// For example, if the credential is “xyz123“ and the prefix is “Bearer “, the
-	// final header value will be “Bearer xyz123“.
+	// This is useful for adding a scheme such as ``Bearer `` or ``Basic `` to the credential.
+	// For example, if the credential is ``xyz123`` and the prefix is ``Bearer ``, the
+	// final header value will be ``Bearer xyz123``.
 	// If not set, the raw credential value will be injected without any prefix.
 	HeaderValuePrefix string `protobuf:"bytes,3,opt,name=header_value_prefix,json=headerValuePrefix,proto3" json:"header_value_prefix,omitempty"`
 	unknownFields     protoimpl.UnknownFields

@@ -82,7 +82,7 @@ type CredentialInjector struct {
 	// Whether to send the request to upstream if the credential is not present or if the credential injection
 	// to the request fails.
 	//
-	// By default, a request will fail with “401 Unauthorized“ if the
+	// By default, a request will fail with ``401 Unauthorized`` if the
 	// credential is not present or the injection of the credential to the request fails.
 	// If set to true, the request will be sent to upstream without the credential.
 	AllowRequestWithoutCredential bool `protobuf:"varint,2,opt,name=allow_request_without_credential,json=allowRequestWithoutCredential,proto3" json:"allow_request_without_credential,omitempty"`

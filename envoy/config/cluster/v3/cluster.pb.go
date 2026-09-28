@@ -376,12 +376,12 @@ type Cluster_LbSubsetConfig_LbSubsetMetadataFallbackPolicy int32
 const (
 	// No fallback. Route metadata will be used as-is.
 	Cluster_LbSubsetConfig_METADATA_NO_FALLBACK Cluster_LbSubsetConfig_LbSubsetMetadataFallbackPolicy = 0
-	// A special metadata key “fallback_list“ will be used to provide variants of metadata to try.
-	// Value of “fallback_list“ key has to be a list. Every list element has to be a struct - it will
+	// A special metadata key ``fallback_list`` will be used to provide variants of metadata to try.
+	// Value of ``fallback_list`` key has to be a list. Every list element has to be a struct - it will
 	// be merged with route metadata, overriding keys that appear in both places.
-	// “fallback_list“ entries will be used in order until a host is found.
+	// ``fallback_list`` entries will be used in order until a host is found.
 	//
-	// “fallback_list“ key itself is removed from metadata before subset load balancing is performed.
+	// ``fallback_list`` key itself is removed from metadata before subset load balancing is performed.
 	//
 	// Example:
 	//
@@ -389,30 +389,30 @@ const (
 	//
 	// .. code-block:: yaml
 	//
-	//	version: 1.0
-	//	fallback_list:
-	//	  - version: 2.0
-	//	    hardware: c64
-	//	  - hardware: c32
-	//	  - version: 3.0
+	//   version: 1.0
+	//   fallback_list:
+	//     - version: 2.0
+	//       hardware: c64
+	//     - hardware: c32
+	//     - version: 3.0
 	//
 	// at first, metadata:
 	//
 	// .. code-block:: json
 	//
-	//	{"version": "2.0", "hardware": "c64"}
+	//   {"version": "2.0", "hardware": "c64"}
 	//
 	// will be used for load balancing. If no host is found, metadata:
 	//
 	// .. code-block:: json
 	//
-	//	{"version": "1.0", "hardware": "c32"}
+	//   {"version": "1.0", "hardware": "c32"}
 	//
 	// is next to try. If it still results in no host, finally metadata:
 	//
 	// .. code-block:: json
 	//
-	//	{"version": "3.0"}
+	//   {"version": "3.0"}
 	//
 	// is used.
 	Cluster_LbSubsetConfig_FALLBACK_LIST Cluster_LbSubsetConfig_LbSubsetMetadataFallbackPolicy = 1
@@ -683,7 +683,7 @@ func (x *ClusterCollection) GetEntries() *v3.CollectionEntry {
 type Cluster struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Configuration to use different transport sockets for different endpoints. The entry of
-	// “envoy.transport_socket_match“ in the :ref:`LbEndpoint.Metadata
+	// ``envoy.transport_socket_match`` in the :ref:`LbEndpoint.Metadata
 	// <envoy_v3_api_field_config.endpoint.v3.LbEndpoint.metadata>` is used to match against the
 	// transport sockets as they appear in the list. If a match is not found, the search continues in
 	// :ref:`LocalityLbEndpoints.Metadata
@@ -693,29 +693,29 @@ type Cluster struct {
 	//
 	// .. code-block:: yaml
 	//
-	//	transport_socket_matches:
-	//	- name: "enableMTLS"
-	//	  match:
-	//	    acceptMTLS: true
-	//	  transport_socket:
-	//	    name: envoy.transport_sockets.tls
-	//	    config: { ... } # tls socket configuration
-	//	- name: "defaultToPlaintext"
-	//	  match: {}
-	//	  transport_socket:
-	//	    name: envoy.transport_sockets.raw_buffer
+	//  transport_socket_matches:
+	//  - name: "enableMTLS"
+	//    match:
+	//      acceptMTLS: true
+	//    transport_socket:
+	//      name: envoy.transport_sockets.tls
+	//      config: { ... } # tls socket configuration
+	//  - name: "defaultToPlaintext"
+	//    match: {}
+	//    transport_socket:
+	//      name: envoy.transport_sockets.raw_buffer
 	//
-	// Connections to the endpoints whose metadata value under “envoy.transport_socket_match“
+	// Connections to the endpoints whose metadata value under ``envoy.transport_socket_match``
 	// having "acceptMTLS"/"true" key/value pair use the "enableMTLS" socket configuration.
 	//
 	// If a :ref:`socket match <envoy_v3_api_msg_config.cluster.v3.Cluster.TransportSocketMatch>` with empty match
 	// criteria is provided, that always match any endpoint. For example, the "defaultToPlaintext"
 	// socket match in case above.
 	//
-	// If an endpoint metadata's value under “envoy.transport_socket_match“ does not match any
-	// “TransportSocketMatch“, the locality metadata is then checked for a match. Barring any
+	// If an endpoint metadata's value under ``envoy.transport_socket_match`` does not match any
+	// ``TransportSocketMatch``, the locality metadata is then checked for a match. Barring any
 	// matches in the endpoint or locality metadata, the socket configuration fallbacks to use the
-	// “tls_context“ or “transport_socket“ specified in this cluster.
+	// ``tls_context`` or ``transport_socket`` specified in this cluster.
 	//
 	// This field allows gradual and flexible transport socket configuration changes.
 	//
@@ -726,8 +726,8 @@ type Cluster struct {
 	//
 	// Then the xDS server can configure the CDS to a client, Envoy A, to send mutual TLS
 	// traffic for endpoints with "acceptMTLS": "true", by adding a corresponding
-	// “TransportSocketMatch“ in this field. Other client Envoys receive CDS without
-	// “transport_socket_match“ set, and still send plain text traffic to the same cluster.
+	// ``TransportSocketMatch`` in this field. Other client Envoys receive CDS without
+	// ``transport_socket_match`` set, and still send plain text traffic to the same cluster.
 	//
 	// This field can be used to specify custom transport socket configurations for health
 	// checks by adding matching key/value pairs in a health check's
@@ -743,25 +743,20 @@ type Cluster struct {
 	//
 	// Supported matching inputs:
 	//
-	//   - “endpoint_metadata“: Extract values from the selected endpoint's metadata.
-	//
-	//   - “locality_metadata“: Extract values from the endpoint's locality metadata.
-	//
-	//   - “transport_socket_filter_state“: Extract values from filter state that was explicitly shared from
-	//     downstream to upstream via “TransportSocketOptions“. This enables flexible
-	//     downstream-connection-based matching, such as:
+	// * ``endpoint_metadata``: Extract values from the selected endpoint's metadata.
+	// * ``locality_metadata``: Extract values from the endpoint's locality metadata.
+	// * ``transport_socket_filter_state``: Extract values from filter state that was explicitly shared from
+	//   downstream to upstream via ``TransportSocketOptions``. This enables flexible
+	//   downstream-connection-based matching, such as:
 	//
 	//   - Network namespace matching.
-	//
 	//   - Custom connection attributes.
-	//
 	//   - Any data explicitly passed via filter state.
 	//
 	// .. note::
-	//
-	//	Filter state sharing follows the same pattern as tunneling in Envoy. Filters must explicitly
-	//	share data by setting filter state with the appropriate sharing mode. The filter state is
-	//	then accessible via the ``transport_socket_filter_state`` input during transport socket selection.
+	//   Filter state sharing follows the same pattern as tunneling in Envoy. Filters must explicitly
+	//   share data by setting filter state with the appropriate sharing mode. The filter state is
+	//   then accessible via the ``transport_socket_filter_state`` input during transport socket selection.
 	//
 	// If this field is set, it takes precedence over legacy metadata-based selection
 	// performed by :ref:`transport_socket_matches
@@ -771,14 +766,14 @@ type Cluster struct {
 	//
 	// When using this field, each entry in
 	// :ref:`transport_socket_matches <envoy_v3_api_field_config.cluster.v3.Cluster.transport_socket_matches>`
-	// must have a unique “name“. The matcher outcome is expected to reference one of
+	// must have a unique ``name``. The matcher outcome is expected to reference one of
 	// these names.
 	TransportSocketMatcher *v31.Matcher `protobuf:"bytes,59,opt,name=transport_socket_matcher,json=transportSocketMatcher,proto3" json:"transport_socket_matcher,omitempty"`
 	// Supplies the name of the cluster which must be unique across all clusters.
 	// The cluster name is used when emitting
 	// :ref:`statistics <config_cluster_manager_cluster_stats>` if :ref:`alt_stat_name
 	// <envoy_v3_api_field_config.cluster.v3.Cluster.alt_stat_name>` is not provided.
-	// Any “:“ in the cluster name will be converted to “_“ when emitting statistics.
+	// Any ``:`` in the cluster name will be converted to ``_`` when emitting statistics.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// An optional alternative to the cluster name to be used for observability. This name is used
 	// for emitting stats for the cluster and access logging the cluster name. This will appear as
@@ -787,9 +782,8 @@ type Cluster struct {
 	// and as an additional tag "upstream_cluster.name" while tracing.
 	//
 	// .. note::
-	//
-	//	Any ``:`` in the name will be converted to ``_`` when emitting statistics. This should not be confused with
-	//	:ref:`Router Filter Header <config_http_filters_router_x-envoy-upstream-alt-stat-name>`.
+	//   Any ``:`` in the name will be converted to ``_`` when emitting statistics. This should not be confused with
+	//   :ref:`Router Filter Header <config_http_filters_router_x-envoy-upstream-alt-stat-name>`.
 	AltStatName string `protobuf:"bytes,28,opt,name=alt_stat_name,json=altStatName,proto3" json:"alt_stat_name,omitempty"`
 	// Optional stats matcher that can be used to configure which stats are instantiated for this
 	// cluster. If configured, this overrides the bootstrap :ref:`stats_config
@@ -820,12 +814,13 @@ type Cluster struct {
 	// :ref:`STATIC<envoy_v3_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.STATIC>`,
 	// :ref:`STRICT_DNS<envoy_v3_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.STRICT_DNS>`
 	// or :ref:`LOGICAL_DNS<envoy_v3_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.LOGICAL_DNS>` clusters.
-	// This field supersedes the “hosts“ field in the v2 API.
+	// This field supersedes the ``hosts`` field in the v2 API.
 	//
 	// .. attention::
 	//
-	//	Setting this allows non-EDS cluster types to contain embedded EDS equivalent
-	//	:ref:`endpoint assignments<envoy_v3_api_msg_config.endpoint.v3.ClusterLoadAssignment>`.
+	//   Setting this allows non-EDS cluster types to contain embedded EDS equivalent
+	//   :ref:`endpoint assignments<envoy_v3_api_msg_config.endpoint.v3.ClusterLoadAssignment>`.
+	//
 	LoadAssignment *v33.ClusterLoadAssignment `protobuf:"bytes,33,opt,name=load_assignment,json=loadAssignment,proto3" json:"load_assignment,omitempty"`
 	// Optional :ref:`active health checking <arch_overview_health_checking>`
 	// configuration for the cluster. If no
@@ -838,8 +833,7 @@ type Cluster struct {
 	// parameter to 1 will effectively disable keep alive.
 	//
 	// .. attention::
-	//
-	//	This field has been deprecated in favor of the :ref:`max_requests_per_connection <envoy_v3_api_field_config.core.v3.HttpProtocolOptions.max_requests_per_connection>` field.
+	//   This field has been deprecated in favor of the :ref:`max_requests_per_connection <envoy_v3_api_field_config.core.v3.HttpProtocolOptions.max_requests_per_connection>` field.
 	//
 	// Deprecated: Marked as deprecated in envoy/config/cluster/v3/cluster.proto.
 	MaxRequestsPerConnection *wrapperspb.UInt32Value `protobuf:"bytes,9,opt,name=max_requests_per_connection,json=maxRequestsPerConnection,proto3" json:"max_requests_per_connection,omitempty"`
@@ -886,7 +880,7 @@ type Cluster struct {
 	// set so that Envoy will assume that the upstream supports HTTP/2 when
 	// making new HTTP connection pool connections. Currently, Envoy only
 	// supports prior knowledge for upstream connections. Even if TLS is used
-	// with ALPN, “http2_protocol_options“ must be specified. As an aside this allows HTTP/2
+	// with ALPN, ``http2_protocol_options`` must be specified. As an aside this allows HTTP/2
 	// connections to happen over plain text.
 	// This has been deprecated in favor of http2_protocol_options fields in the
 	// :ref:`http_protocol_options <envoy_v3_api_msg_extensions.upstreams.http.v3.HttpProtocolOptions>`
@@ -981,13 +975,13 @@ type Cluster struct {
 	// :ref:`STRICT_DNS<envoy_v3_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.STRICT_DNS>`
 	// and :ref:`LOGICAL_DNS<envoy_v3_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.LOGICAL_DNS>`
 	// this setting is ignored.
-	// This field is deprecated in favor of “dns_resolution_config“
+	// This field is deprecated in favor of ``dns_resolution_config``
 	// which aggregates all of the DNS resolver configuration in a single message.
 	//
 	// Deprecated: Marked as deprecated in envoy/config/cluster/v3/cluster.proto.
 	DnsResolvers []*v34.Address `protobuf:"bytes,18,rep,name=dns_resolvers,json=dnsResolvers,proto3" json:"dns_resolvers,omitempty"`
 	// Always use TCP queries instead of UDP queries for DNS lookups.
-	// This field is deprecated in favor of “dns_resolution_config“
+	// This field is deprecated in favor of ``dns_resolution_config``
 	// which aggregates all of the DNS resolver configuration in a single message.
 	//
 	// Deprecated: Marked as deprecated in envoy/config/cluster/v3/cluster.proto.
@@ -1002,12 +996,12 @@ type Cluster struct {
 	// or any other DNS resolver types and the related parameters.
 	// For example, an object of
 	// :ref:`CaresDnsResolverConfig <envoy_v3_api_msg_extensions.network.dns_resolver.cares.v3.CaresDnsResolverConfig>`
-	// can be packed into this “typed_dns_resolver_config“. This configuration replaces the
+	// can be packed into this ``typed_dns_resolver_config``. This configuration replaces the
 	// :ref:`dns_resolution_config <envoy_v3_api_field_config.cluster.v3.Cluster.dns_resolution_config>`
 	// configuration.
-	// During the transition period when both “dns_resolution_config“ and “typed_dns_resolver_config“ exists,
-	// when “typed_dns_resolver_config“ is in place, Envoy will use it and ignore “dns_resolution_config“.
-	// When “typed_dns_resolver_config“ is missing, the default behavior is in place.
+	// During the transition period when both ``dns_resolution_config`` and ``typed_dns_resolver_config`` exists,
+	// when ``typed_dns_resolver_config`` is in place, Envoy will use it and ignore ``dns_resolution_config``.
+	// When ``typed_dns_resolver_config`` is missing, the default behavior is in place.
 	// Also note that this field is deprecated for logical dns and strict dns clusters and will be ignored when
 	// :ref:`cluster_type<envoy_v3_api_field_config.cluster.v3.Cluster.cluster_type>` is configured with
 	// :ref:`DnsCluster<envoy_v3_api_msg_extensions.clusters.dns.v3.DnsCluster>`.
@@ -1064,8 +1058,8 @@ type Cluster struct {
 	// Common configuration for all load balancer implementations.
 	CommonLbConfig *Cluster_CommonLbConfig `protobuf:"bytes,27,opt,name=common_lb_config,json=commonLbConfig,proto3" json:"common_lb_config,omitempty"`
 	// Optional custom transport socket implementation to use for upstream connections.
-	// To setup TLS, set a transport socket with name “envoy.transport_sockets.tls“ and
-	// :ref:`UpstreamTlsContexts <envoy_v3_api_msg_extensions.transport_sockets.tls.v3.UpstreamTlsContext>` in the “typed_config“.
+	// To setup TLS, set a transport socket with name ``envoy.transport_sockets.tls`` and
+	// :ref:`UpstreamTlsContexts <envoy_v3_api_msg_extensions.transport_sockets.tls.v3.UpstreamTlsContext>` in the ``typed_config``.
 	// If no transport socket configuration is specified, new connections
 	// will be set up with plaintext.
 	TransportSocket *v34.TransportSocket `protobuf:"bytes,24,opt,name=transport_socket,json=transportSocket,proto3" json:"transport_socket,omitempty"`
@@ -1073,7 +1067,7 @@ type Cluster struct {
 	// cluster. It can be used for stats, logging, and varying filter behavior.
 	// Fields should use reverse DNS notation to denote which entity within Envoy
 	// will need the information. For instance, if the metadata is intended for
-	// the Router filter, the filter name should be specified as “envoy.filters.http.router“.
+	// the Router filter, the filter name should be specified as ``envoy.filters.http.router``.
 	Metadata *v34.Metadata `protobuf:"bytes,25,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	// Determines how Envoy selects the protocol used to speak to upstream hosts.
 	// This has been deprecated in favor of setting explicit protocol selection
@@ -1091,14 +1085,14 @@ type Cluster struct {
 	//
 	// .. note::
 	//
-	//	This is currently only supported for connections created by tcp_proxy.
+	//   This is currently only supported for connections created by tcp_proxy.
 	//
 	// .. note::
 	//
-	//	The current implementation of this feature closes all connections immediately when
-	//	the unhealthy status is detected. If there are a large number of connections open
-	//	to an upstream host that becomes unhealthy, Envoy may spend a substantial amount of
-	//	time exclusively closing these connections, and not processing any other traffic.
+	//   The current implementation of this feature closes all connections immediately when
+	//   the unhealthy status is detected. If there are a large number of connections open
+	//   to an upstream host that becomes unhealthy, Envoy may spend a substantial amount of
+	//   time exclusively closing these connections, and not processing any other traffic.
 	CloseConnectionsOnHostHealthFailure bool `protobuf:"varint,31,opt,name=close_connections_on_host_health_failure,json=closeConnectionsOnHostHealthFailure,proto3" json:"close_connections_on_host_health_failure,omitempty"`
 	// If set to true, Envoy will ignore the health value of a host when processing its removal
 	// from service discovery. This means that if active health checking is used, Envoy will *not*
@@ -1130,16 +1124,16 @@ type Cluster struct {
 	//
 	// If not specified, then ORCA load reports will not be propagated to LRS.
 	//
-	// For map fields in the ORCA proto, the string will be of the form “<map_field_name>.<map_key>“.
-	// For example, the string “named_metrics.foo“ will mean to look for the key “foo“ in the ORCA
+	// For map fields in the ORCA proto, the string will be of the form ``<map_field_name>.<map_key>``.
+	// For example, the string ``named_metrics.foo`` will mean to look for the key ``foo`` in the ORCA
 	// :ref:`named_metrics <envoy_v3_api_field_.xds.data.orca.v3.OrcaLoadReport.named_metrics>` field.
 	//
-	// The special map key “*“ means to report all entries in the map (e.g., “named_metrics.*“ means to
+	// The special map key ``*`` means to report all entries in the map (e.g., ``named_metrics.*`` means to
 	// report all entries in the ORCA named_metrics field). Note that this should be used only with trusted
 	// backends.
 	//
 	// The metric names in LRS will follow the same semantics as this field. In other words, if this field
-	// contains “named_metrics.foo“, then the LRS load report will include the data with that same string
+	// contains ``named_metrics.foo``, then the LRS load report will include the data with that same string
 	// as the key.
 	LrsReportEndpointMetrics []string `protobuf:"bytes,57,rep,name=lrs_report_endpoint_metrics,json=lrsReportEndpointMetrics,proto3" json:"lrs_report_endpoint_metrics,omitempty"`
 	// If track_timeout_budgets is true, the :ref:`timeout budget histograms
@@ -1150,8 +1144,8 @@ type Cluster struct {
 	//
 	// .. attention::
 	//
-	//	This field has been deprecated in favor of ``timeout_budgets``, part of
-	//	:ref:`track_cluster_stats <envoy_v3_api_field_config.cluster.v3.Cluster.track_cluster_stats>`.
+	//   This field has been deprecated in favor of ``timeout_budgets``, part of
+	//   :ref:`track_cluster_stats <envoy_v3_api_field_config.cluster.v3.Cluster.track_cluster_stats>`.
 	//
 	// Deprecated: Marked as deprecated in envoy/config/cluster/v3/cluster.proto.
 	TrackTimeoutBudgets bool `protobuf:"varint,47,opt,name=track_timeout_budgets,json=trackTimeoutBudgets,proto3" json:"track_timeout_budgets,omitempty"`
@@ -1161,7 +1155,7 @@ type Cluster struct {
 	// TCP upstreams.
 	//
 	// For HTTP traffic, Envoy will generally take downstream HTTP and send it upstream as upstream
-	// HTTP, using the http connection pool and the codec from “http2_protocol_options“
+	// HTTP, using the http connection pool and the codec from ``http2_protocol_options``
 	//
 	// For routes where CONNECT termination is configured, Envoy will take downstream CONNECT
 	// requests and forward the CONNECT payload upstream over raw TCP using the tcp connection pool.
@@ -1178,7 +1172,7 @@ type Cluster struct {
 	TrackClusterStats *TrackClusterStats `protobuf:"bytes,49,opt,name=track_cluster_stats,json=trackClusterStats,proto3" json:"track_cluster_stats,omitempty"`
 	// Preconnect configuration for this cluster.
 	PreconnectPolicy *Cluster_PreconnectPolicy `protobuf:"bytes,50,opt,name=preconnect_policy,json=preconnectPolicy,proto3" json:"preconnect_policy,omitempty"`
-	// If “connection_pool_per_downstream_connection“ is true, the cluster will use a separate
+	// If ``connection_pool_per_downstream_connection`` is true, the cluster will use a separate
 	// connection pool for every downstream connection
 	ConnectionPoolPerDownstreamConnection bool `protobuf:"varint,51,opt,name=connection_pool_per_downstream_connection,json=connectionPoolPerDownstreamConnection,proto3" json:"connection_pool_per_downstream_connection,omitempty"`
 	// Queueing policies for the cluster (e.g. the queue policy for cluster pending requests).
@@ -1861,7 +1855,7 @@ type TrackClusterStats struct {
 	// <config_cluster_manager_cluster_stats_request_response_sizes>`  tracking header and body sizes
 	// of requests and responses will be published. Additionally, number of headers in the requests and responses will be tracked.
 	RequestResponseSizes bool `protobuf:"varint,2,opt,name=request_response_sizes,json=requestResponseSizes,proto3" json:"request_response_sizes,omitempty"`
-	// If true, some stats will be emitted per-endpoint, similar to the stats in admin “/clusters“
+	// If true, some stats will be emitted per-endpoint, similar to the stats in admin ``/clusters``
 	// output.
 	//
 	// This does not currently output correct stats during a hot-restart.
@@ -1939,7 +1933,7 @@ type Cluster_TransportSocketMatch struct {
 	// Optional metadata match criteria.
 	// The connection to the endpoint with metadata matching what is set in this field
 	// will use the transport socket configuration specified here.
-	// The endpoint's metadata entry in “envoy.transport_socket_match“ is used to match
+	// The endpoint's metadata entry in ``envoy.transport_socket_match`` is used to match
 	// against the values specified in this field.
 	Match *structpb.Struct `protobuf:"bytes,2,opt,name=match,proto3" json:"match,omitempty"`
 	// The configuration of the transport socket.
@@ -2127,21 +2121,21 @@ type Cluster_LbSubsetConfig struct {
 	// fallback_policy is
 	// :ref:`DEFAULT_SUBSET<envoy_v3_api_enum_value_config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetFallbackPolicy.DEFAULT_SUBSET>`.
 	// Each field in default_subset is
-	// compared to the matching LbEndpoint.Metadata under the “envoy.lb“
+	// compared to the matching LbEndpoint.Metadata under the ``envoy.lb``
 	// namespace. It is valid for no hosts to match, in which case the behavior
 	// is the same as a fallback_policy of
 	// :ref:`NO_FALLBACK<envoy_v3_api_enum_value_config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetFallbackPolicy.NO_FALLBACK>`.
 	DefaultSubset *structpb.Struct `protobuf:"bytes,2,opt,name=default_subset,json=defaultSubset,proto3" json:"default_subset,omitempty"`
 	// For each entry, LbEndpoint.Metadata's
-	// “envoy.lb“ namespace is traversed and a subset is created for each unique
+	// ``envoy.lb`` namespace is traversed and a subset is created for each unique
 	// combination of key and value. For example:
 	//
 	// .. code-block:: json
 	//
-	//	{ "subset_selectors": [
-	//	    { "keys": [ "version" ] },
-	//	    { "keys": [ "stage", "hardware_type" ] }
-	//	]}
+	//   { "subset_selectors": [
+	//       { "keys": [ "version" ] },
+	//       { "keys": [ "stage", "hardware_type" ] }
+	//   ]}
 	//
 	// A subset is matched when the metadata from the selected route and
 	// weighted cluster contains the same keys and values as the subset's
@@ -2286,8 +2280,8 @@ type Cluster_SlowStartConfig struct {
 	// By tuning the parameter, is possible to achieve polynomial or exponential shape of ramp-up curve.
 	//
 	// During slow start window, effective weight of an endpoint would be scaled with time factor and aggression:
-	// “new_weight = weight * max(min_weight_percent, time_factor ^ (1 / aggression))“,
-	// where “time_factor=(time_since_start_seconds / slow_start_time_seconds)“.
+	// ``new_weight = weight * max(min_weight_percent, time_factor ^ (1 / aggression))``,
+	// where ``time_factor=(time_since_start_seconds / slow_start_time_seconds)``.
 	//
 	// As time progresses, more and more traffic would be sent to endpoint, which is in slow start window.
 	// Once host exits slow start, time_factor and aggression no longer affect its weight.
@@ -2407,18 +2401,18 @@ type Cluster_LeastRequestLbConfig struct {
 	// The following formula is used to calculate the dynamic weights when hosts have different load
 	// balancing weights:
 	//
-	// “weight = load_balancing_weight / (active_requests + 1)^active_request_bias“
+	// ``weight = load_balancing_weight / (active_requests + 1)^active_request_bias``
 	//
 	// The larger the active request bias is, the more aggressively active requests will lower the
 	// effective weight when all host weights are not equal.
 	//
-	// “active_request_bias“ must be greater than or equal to 0.0.
+	// ``active_request_bias`` must be greater than or equal to 0.0.
 	//
-	// When “active_request_bias == 0.0“ the Least Request Load Balancer doesn't consider the number
+	// When ``active_request_bias == 0.0`` the Least Request Load Balancer doesn't consider the number
 	// of active requests at the time it picks a host and behaves like the Round Robin Load
 	// Balancer.
 	//
-	// When “active_request_bias > 0.0“ the Least Request Load Balancer scales the load balancing
+	// When ``active_request_bias > 0.0`` the Least Request Load Balancer scales the load balancing
 	// weight by the number of active requests at the time it does a pick.
 	//
 	// The value is cached for performance reasons and refreshed whenever one of the Load Balancer's
@@ -2426,8 +2420,7 @@ type Cluster_LeastRequestLbConfig struct {
 	// weight change.
 	//
 	// .. note::
-	//
-	//	This setting only takes effect if all host weights are not equal.
+	//   This setting only takes effect if all host weights are not equal.
 	ActiveRequestBias *v34.RuntimeDouble `protobuf:"bytes,2,opt,name=active_request_bias,json=activeRequestBias,proto3" json:"active_request_bias,omitempty"`
 	// Configuration for slow start mode.
 	// If this configuration is not set, slow start will not be not enabled.
@@ -2619,13 +2612,13 @@ type Cluster_OriginalDstLbConfig struct {
 	//
 	// .. attention::
 	//
-	//	This header isn't sanitized by default, so enabling this feature allows HTTP clients to
-	//	route traffic to arbitrary hosts and/or ports, which may have serious security
-	//	consequences.
+	//   This header isn't sanitized by default, so enabling this feature allows HTTP clients to
+	//   route traffic to arbitrary hosts and/or ports, which may have serious security
+	//   consequences.
 	//
 	// .. note::
 	//
-	//	If the header appears multiple times only the first value is used.
+	//   If the header appears multiple times only the first value is used.
 	UseHttpHeader bool `protobuf:"varint,1,opt,name=use_http_header,json=useHttpHeader,proto3" json:"use_http_header,omitempty"`
 	// The http header to override destination address if :ref:`use_http_header <envoy_v3_api_field_config.cluster.v3.Cluster.OriginalDstLbConfig.use_http_header>`.
 	// is set to true. If the value is empty, :ref:`x-envoy-original-dst-host <config_http_conn_man_headers_x-envoy-original-dst-host>` will be used.
@@ -2707,8 +2700,7 @@ type Cluster_CommonLbConfig struct {
 	// To disable panic mode, set to 0%.
 	//
 	// .. note::
-	//
-	//	The specified percent will be truncated to the nearest 1%.
+	//   The specified percent will be truncated to the nearest 1%.
 	HealthyPanicThreshold *v35.Percent `protobuf:"bytes,1,opt,name=healthy_panic_threshold,json=healthyPanicThreshold,proto3" json:"healthy_panic_threshold,omitempty"`
 	// Types that are valid to be assigned to LocalityConfigSpecifier:
 	//
@@ -2727,16 +2719,15 @@ type Cluster_CommonLbConfig struct {
 	// window to 0.
 	//
 	// .. note::
-	//
-	//	Merging does not apply to cluster membership changes (e.g.: adds/removes); this is
-	//	because merging those updates isn't currently safe. See
-	//	https://github.com/envoyproxy/envoy/pull/3941.
+	//   Merging does not apply to cluster membership changes (e.g.: adds/removes); this is
+	//   because merging those updates isn't currently safe. See
+	//   https://github.com/envoyproxy/envoy/pull/3941.
 	UpdateMergeWindow *durationpb.Duration `protobuf:"bytes,4,opt,name=update_merge_window,json=updateMergeWindow,proto3" json:"update_merge_window,omitempty"`
 	// If set to true, Envoy will :ref:`exclude <arch_overview_load_balancing_excluded>` new hosts
 	// when computing load balancing weights until they have been health checked for the first time.
 	// This will have no effect unless active health checking is also configured.
 	IgnoreNewHostsUntilFirstHc bool `protobuf:"varint,5,opt,name=ignore_new_hosts_until_first_hc,json=ignoreNewHostsUntilFirstHc,proto3" json:"ignore_new_hosts_until_first_hc,omitempty"`
-	// If set to “true“, the cluster manager will drain all existing
+	// If set to ``true``, the cluster manager will drain all existing
 	// connections to upstream hosts whenever hosts are added or removed from the cluster.
 	CloseConnectionsOnHostSetChange bool `protobuf:"varint,6,opt,name=close_connections_on_host_set_change,json=closeConnectionsOnHostSetChange,proto3" json:"close_connections_on_host_set_change,omitempty"`
 	// Common Configuration for all consistent hashing load balancers (MaglevLb, RingHashLb, etc.)
@@ -2956,7 +2947,7 @@ type Cluster_PreconnectPolicy struct {
 	// Indicates how many streams (rounded up) can be anticipated across a cluster for each
 	// stream, useful for low QPS services. This is currently supported for a subset of
 	// deterministic non-hash-based load-balancing algorithms (weighted round robin, random).
-	// Unlike “per_upstream_preconnect_ratio“ this preconnects across the upstream instances in a
+	// Unlike ``per_upstream_preconnect_ratio`` this preconnects across the upstream instances in a
 	// cluster, doing best effort predictions of what upstream would be picked next and
 	// pre-establishing a connection.
 	//
@@ -3095,7 +3086,7 @@ type Cluster_LbSubsetConfig_LbSubsetSelector struct {
 	//
 	// If a match is found to a host, that host will be used regardless of priority levels.
 	//
-	// When this mode is enabled, configurations that contain more than one host with the same metadata value for the single key in “keys“
+	// When this mode is enabled, configurations that contain more than one host with the same metadata value for the single key in ``keys``
 	// will use only one of the hosts with the given key; no requests will be routed to the others. The cluster gauge
 	// :ref:`lb_subsets_single_host_per_subset_duplicate<config_cluster_manager_cluster_stats_subset_lb>` indicates how many duplicates are
 	// present in the current configuration.
@@ -3111,7 +3102,7 @@ type Cluster_LbSubsetConfig_LbSubsetSelector struct {
 	// For any other fallback policy the parameter is not used and should not be set.
 	// Only values also present in
 	// :ref:`keys<envoy_v3_api_field_config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetSelector.keys>` are allowed, but
-	// “fallback_keys_subset“ cannot be equal to “keys“.
+	// ``fallback_keys_subset`` cannot be equal to ``keys``.
 	FallbackKeysSubset []string `protobuf:"bytes,3,rep,name=fallback_keys_subset,json=fallbackKeysSubset,proto3" json:"fallback_keys_subset,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
@@ -3291,7 +3282,7 @@ func (*Cluster_CommonLbConfig_LocalityWeightedLbConfig) Descriptor() ([]byte, []
 // Common Configuration for all consistent hashing load balancers (MaglevLb, RingHashLb, etc.)
 type Cluster_CommonLbConfig_ConsistentHashingLbConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// If set to “true“, the cluster will use hostname instead of the resolved
+	// If set to ``true``, the cluster will use hostname instead of the resolved
 	// address as the key to consistently hash to an upstream host. Only valid for StrictDNS clusters with hostnames which resolve to a single IP address.
 	UseHostnameForHashing bool `protobuf:"varint,1,opt,name=use_hostname_for_hashing,json=useHostnameForHashing,proto3" json:"use_hostname_for_hashing,omitempty"`
 	// Configures percentage of average cluster load to bound per upstream host. For example, with a value of 150
@@ -3302,7 +3293,7 @@ type Cluster_CommonLbConfig_ConsistentHashingLbConfig struct {
 	// Applies to both Ring Hash and Maglev load balancers.
 	//
 	// This is implemented based on the method described in the paper https://arxiv.org/abs/1608.01350. For the specified
-	// “hash_balance_factor“, requests to any upstream host are capped at “hash_balance_factor/100“ times the average number of requests
+	// ``hash_balance_factor``, requests to any upstream host are capped at ``hash_balance_factor/100`` times the average number of requests
 	// across the cluster. When a request arrives for an upstream host that is currently serving at its max capacity, linear probing
 	// is used to identify an eligible host. Further, the linear probe is implemented using a random jump in hosts ring/table to identify
 	// the eligible host (this technique is as described in the paper https://arxiv.org/abs/1908.08762 - the random jump avoids the
@@ -3310,7 +3301,7 @@ type Cluster_CommonLbConfig_ConsistentHashingLbConfig struct {
 	//
 	// If weights are specified on the hosts, they are respected.
 	//
-	// This is an O(N) algorithm, unlike other load balancers. Using a lower “hash_balance_factor“ results in more hosts
+	// This is an O(N) algorithm, unlike other load balancers. Using a lower ``hash_balance_factor`` results in more hosts
 	// being probed, so use a higher value if you require better performance.
 	HashBalanceFactor *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=hash_balance_factor,json=hashBalanceFactor,proto3" json:"hash_balance_factor,omitempty"`
 	unknownFields     protoimpl.UnknownFields

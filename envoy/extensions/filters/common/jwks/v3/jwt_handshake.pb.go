@@ -42,9 +42,9 @@ const (
 // [#next-free-field: 9]
 type JwtHandshakeValidator struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Required. Expected token issuer. The JWT “iss“ claim must equal this value.
+	// Required. Expected token issuer. The JWT ``iss`` claim must equal this value.
 	Issuer string `protobuf:"bytes,1,opt,name=issuer,proto3" json:"issuer,omitempty"`
-	// Allowed audiences. If non-empty, the JWT must carry at least one of these in its “aud“ claim.
+	// Allowed audiences. If non-empty, the JWT must carry at least one of these in its ``aud`` claim.
 	// If empty, the audience is not checked.
 	Audiences []string `protobuf:"bytes,2,rep,name=audiences,proto3" json:"audiences,omitempty"`
 	// Source of the JSON Web Key Set (JWKS) used to verify the token signature. Exactly one source
@@ -56,19 +56,19 @@ type JwtHandshakeValidator struct {
 	//	*JwtHandshakeValidator_RemoteJwks
 	JwksSourceSpecifier isJwtHandshakeValidator_JwksSourceSpecifier `protobuf_oneof:"jwks_source_specifier"`
 	// Name of the header carrying the token. When unset, the consuming extension applies its own
-	// default (commonly “authorization“, with a leading “Bearer“ prefix stripped).
+	// default (commonly ``authorization``, with a leading ``Bearer`` prefix stripped).
 	TokenHeader string `protobuf:"bytes,4,opt,name=token_header,json=tokenHeader,proto3" json:"token_header,omitempty"`
 	// Namespace under which verified claims are emitted as dynamic metadata. If unset, the consuming
 	// extension's default namespace is used. Each top-level JWT claim is written as a field in this
-	// namespace so it can be referenced via “%DYNAMIC_METADATA(namespace:claim)%“ by the consuming
+	// namespace so it can be referenced via ``%DYNAMIC_METADATA(namespace:claim)%`` by the consuming
 	// extension's validation configuration.
 	ClaimsMetadataNamespace string `protobuf:"bytes,5,opt,name=claims_metadata_namespace,json=claimsMetadataNamespace,proto3" json:"claims_metadata_namespace,omitempty"`
-	// If “true“, a missing or invalid token does **not** fail validation; the verified claims are
-	// simply not published. Useful for a staged rollout or audit mode. Defaults to “false“. How a
+	// If ``true``, a missing or invalid token does **not** fail validation; the verified claims are
+	// simply not published. Useful for a staged rollout or audit mode. Defaults to ``false``. How a
 	// validation failure is handled is defined by the consuming extension.
 	AllowMissingOrFailed bool `protobuf:"varint,6,opt,name=allow_missing_or_failed,json=allowMissingOrFailed,proto3" json:"allow_missing_or_failed,omitempty"`
-	// Clock skew, in seconds, allowed when checking the “exp“ and “nbf“ time constraints. When
-	// unset (“0“), the consuming extension applies its own default.
+	// Clock skew, in seconds, allowed when checking the ``exp`` and ``nbf`` time constraints. When
+	// unset (``0``), the consuming extension applies its own default.
 	ClockSkewSeconds uint32 `protobuf:"varint,7,opt,name=clock_skew_seconds,json=clockSkewSeconds,proto3" json:"clock_skew_seconds,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
@@ -176,15 +176,15 @@ type isJwtHandshakeValidator_JwksSourceSpecifier interface {
 }
 
 type JwtHandshakeValidator_LocalJwks struct {
-	// The JWKS provided inline as a data source (“inline_string“, “inline_bytes“, or
-	// “filename“). The keys are read once when the configuration is loaded.
+	// The JWKS provided inline as a data source (``inline_string``, ``inline_bytes``, or
+	// ``filename``). The keys are read once when the configuration is loaded.
 	LocalJwks *v3.DataSource `protobuf:"bytes,3,opt,name=local_jwks,json=localJwks,proto3,oneof"`
 }
 
 type JwtHandshakeValidator_RemoteJwks struct {
 	// The JWKS fetched over HTTP. See :ref:`RemoteJwks
 	// <envoy_v3_api_msg_extensions.filters.common.jwks.v3.RemoteJwks>` for the fetch, cache,
-	// “async_fetch“, and “retry_policy“ options.
+	// ``async_fetch``, and ``retry_policy`` options.
 	RemoteJwks *RemoteJwks `protobuf:"bytes,8,opt,name=remote_jwks,json=remoteJwks,proto3,oneof"`
 }
 

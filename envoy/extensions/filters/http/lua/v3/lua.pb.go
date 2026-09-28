@@ -51,14 +51,15 @@ type Lua struct {
 	//
 	// .. code-block:: yaml
 	//
-	//	source_codes:
-	//	  hello.lua:
-	//	    inline_string: |
-	//	      function envoy_on_response(response_handle)
-	//	        -- Do something.
-	//	      end
-	//	  world.lua:
-	//	    filename: /etc/lua/world.lua
+	//   source_codes:
+	//     hello.lua:
+	//       inline_string: |
+	//         function envoy_on_response(response_handle)
+	//           -- Do something.
+	//         end
+	//     world.lua:
+	//       filename: /etc/lua/world.lua
+	//
 	SourceCodes map[string]*v3.DataSource `protobuf:"bytes,2,rep,name=source_codes,json=sourceCodes,proto3" json:"source_codes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// The default Lua code that Envoy will execute. If no per route config is provided
 	// for the request, this Lua code will be applied.
@@ -71,15 +72,16 @@ type Lua struct {
 	//
 	// .. code-block:: yaml
 	//
-	//	http_filters:
-	//	  - name: envoy.filters.http.lua
-	//	    typed_config:
-	//	      "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
-	//	      stat_prefix: foo_script # This emits lua.foo_script.errors etc.
-	//	  - name: envoy.filters.http.lua
-	//	    typed_config:
-	//	      "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
-	//	      stat_prefix: bar_script # This emits lua.bar_script.errors etc.
+	//   http_filters:
+	//     - name: envoy.filters.http.lua
+	//       typed_config:
+	//         "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+	//         stat_prefix: foo_script # This emits lua.foo_script.errors etc.
+	//     - name: envoy.filters.http.lua
+	//       typed_config:
+	//         "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+	//         stat_prefix: bar_script # This emits lua.bar_script.errors etc.
+	//
 	StatPrefix string `protobuf:"bytes,4,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// If set to true, the Lua filter will clear the route cache automatically if the request
 	// headers are modified by the Lua script. If set to false, the Lua filter will not clear the
@@ -89,28 +91,28 @@ type Lua struct {
 	// Optional filter context for the Lua script, accessed the same way as the per-route
 	// :ref:`filter_context
 	// <envoy_v3_api_field_extensions.filters.http.lua.v3.LuaPerRoute.filter_context>`, via
-	// “handle:filterContext()“. This is the context a request gets when it has no
-	// “LuaPerRoute“ configuration, or when the one it has does not set “filter_context“.
+	// ``handle:filterContext()``. This is the context a request gets when it has no
+	// ``LuaPerRoute`` configuration, or when the one it has does not set ``filter_context``.
 	//
-	// A “LuaPerRoute“ which does set “filter_context“ replaces this value rather than merging
-	// into it, so a route which sets an empty “filter_context“ sees an empty context rather than
-	// this one. Only the most specific “LuaPerRoute“ is consulted: a “filter_context“ on a less
-	// specific one, such as a virtual host when the route has its own “LuaPerRoute“, is not
+	// A ``LuaPerRoute`` which does set ``filter_context`` replaces this value rather than merging
+	// into it, so a route which sets an empty ``filter_context`` sees an empty context rather than
+	// this one. Only the most specific ``LuaPerRoute`` is consulted: a ``filter_context`` on a less
+	// specific one, such as a virtual host when the route has its own ``LuaPerRoute``, is not
 	// reached, and this value is used instead.
 	FilterContext *structpb.Struct `protobuf:"bytes,6,opt,name=filter_context,json=filterContext,proto3" json:"filter_context,omitempty"`
-	// Additional patterns for the Lua “package.path“ of every VM this filter creates, so that a
-	// script can “require“ modules from locations the interpreter does not search on its own.
-	// Each entry is one Lua path pattern; the entries are joined with “;“ in the order given and
+	// Additional patterns for the Lua ``package.path`` of every VM this filter creates, so that a
+	// script can ``require`` modules from locations the interpreter does not search on its own.
+	// Each entry is one Lua path pattern; the entries are joined with ``;`` in the order given and
 	// placed ahead of the interpreter's built-in default path, which is kept.
 	//
 	// .. code-block:: yaml
 	//
-	//	package_paths:
-	//	- /etc/envoy/lua/?.lua
-	//	- /etc/envoy/lua/?/init.lua
+	//   package_paths:
+	//   - /etc/envoy/lua/?.lua
+	//   - /etc/envoy/lua/?/init.lua
 	//
 	// The patterns are in place before any configured code runs, including the run that validates
-	// the configuration, so a “require“ at the top level of a script whose module cannot be found
+	// the configuration, so a ``require`` at the top level of a script whose module cannot be found
 	// is rejected as a configuration error rather than failing per request.
 	//
 	// Each worker builds its own VM and runs the script again to do so, after the configuration has
@@ -119,11 +121,11 @@ type Lua struct {
 	PackagePaths []string `protobuf:"bytes,7,rep,name=package_paths,json=packagePaths,proto3" json:"package_paths,omitempty"`
 	// As :ref:`package_paths
 	// <envoy_v3_api_field_extensions.filters.http.lua.v3.Lua.package_paths>`, but for
-	// “package.cpath“, i.e. modules which are loadable C libraries rather than Lua source, for
-	// example “/etc/envoy/lua/?.so“.
+	// ``package.cpath``, i.e. modules which are loadable C libraries rather than Lua source, for
+	// example ``/etc/envoy/lua/?.so``.
 	PackageCpaths []string `protobuf:"bytes,8,rep,name=package_cpaths,json=packageCpaths,proto3" json:"package_cpaths,omitempty"`
 	// If set, the Lua VMs this filter builds are shared with every other Lua filter configuration
-	// that sets the same “shared_vm_id“ and configures the same script, rather than each
+	// that sets the same ``shared_vm_id`` and configures the same script, rather than each
 	// configuration building its own. This applies to every script this message configures:
 	// :ref:`default_source_code
 	// <envoy_v3_api_field_extensions.filters.http.lua.v3.Lua.default_source_code>`,
@@ -136,7 +138,7 @@ type Lua struct {
 	// <envoy_v3_api_field_extensions.filters.http.lua.v3.Lua.package_paths>` and
 	// :ref:`package_cpaths
 	// <envoy_v3_api_field_extensions.filters.http.lua.v3.Lua.package_cpaths>` match, since a
-	// script that resolves its “require“ calls differently does not produce an equivalent VM.
+	// script that resolves its ``require`` calls differently does not produce an equivalent VM.
 	// A :ref:`LuaPerRoute.shared_vm_id
 	// <envoy_v3_api_field_extensions.filters.http.lua.v3.LuaPerRoute.shared_vm_id>` participates in
 	// the same sharing, so a route's inline script can reuse a VM built here and the other way
@@ -259,22 +261,22 @@ type LuaPerRoute struct {
 	//	*LuaPerRoute_SourceCode
 	Override isLuaPerRoute_Override `protobuf_oneof:"override"`
 	// Optional filter context for Lua script. This could be used to pass configuration
-	// to Lua script. The Lua script can access the filter context using “handle:filterContext()“.
+	// to Lua script. The Lua script can access the filter context using ``handle:filterContext()``.
 	// For example:
 	//
 	// .. code-block:: lua
 	//
-	//	function envoy_on_request(request_handle)
-	//	  local filter_context = request_handle:filterContext()
-	//	  local filter_context_value = filter_context:get("key")
-	//	  -- Do something with filter_context_value.
-	//	end
+	//   function envoy_on_request(request_handle)
+	//     local filter_context = request_handle:filterContext()
+	//     local filter_context_value = filter_context:get("key")
+	//     -- Do something with filter_context_value.
+	//   end
 	//
 	// This replaces the filter-level :ref:`filter_context
 	// <envoy_v3_api_field_extensions.filters.http.lua.v3.Lua.filter_context>` rather than merging
 	// into it.
 	FilterContext *structpb.Struct `protobuf:"bytes,4,opt,name=filter_context,json=filterContext,proto3" json:"filter_context,omitempty"`
-	// Additional patterns for the Lua “package.path“ of the VM built from this route's
+	// Additional patterns for the Lua ``package.path`` of the VM built from this route's
 	// :ref:`source_code
 	// <envoy_v3_api_field_extensions.filters.http.lua.v3.LuaPerRoute.source_code>`, with the same
 	// meaning as the filter-level :ref:`package_paths
@@ -288,7 +290,7 @@ type LuaPerRoute struct {
 	PackagePaths []string `protobuf:"bytes,5,rep,name=package_paths,json=packagePaths,proto3" json:"package_paths,omitempty"`
 	// As :ref:`package_paths
 	// <envoy_v3_api_field_extensions.filters.http.lua.v3.LuaPerRoute.package_paths>`, but for
-	// “package.cpath“.
+	// ``package.cpath``.
 	PackageCpaths []string `protobuf:"bytes,6,rep,name=package_cpaths,json=packageCpaths,proto3" json:"package_cpaths,omitempty"`
 	// As :ref:`Lua.shared_vm_id
 	// <envoy_v3_api_field_extensions.filters.http.lua.v3.Lua.shared_vm_id>`, but for the VM built

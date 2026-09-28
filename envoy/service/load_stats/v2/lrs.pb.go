@@ -94,12 +94,12 @@ type LoadStatsResponse struct {
 	// :ref:`client_features<envoy_api_field_core.Node.client_features>` field will honor this field.
 	SendAllClusters bool `protobuf:"varint,4,opt,name=send_all_clusters,json=sendAllClusters,proto3" json:"send_all_clusters,omitempty"`
 	// The minimum interval of time to collect stats over. This is only a minimum for two reasons:
-	//  1. There may be some delay from when the timer fires until stats sampling occurs.
-	//  2. For clusters that were already feature in the previous *LoadStatsResponse*, any traffic
-	//     that is observed in between the corresponding previous *LoadStatsRequest* and this
-	//     *LoadStatsResponse* will also be accumulated and billed to the cluster. This avoids a period
-	//     of inobservability that might otherwise exists between the messages. New clusters are not
-	//     subject to this consideration.
+	// 1. There may be some delay from when the timer fires until stats sampling occurs.
+	// 2. For clusters that were already feature in the previous *LoadStatsResponse*, any traffic
+	//    that is observed in between the corresponding previous *LoadStatsRequest* and this
+	//    *LoadStatsResponse* will also be accumulated and billed to the cluster. This avoids a period
+	//    of inobservability that might otherwise exists between the messages. New clusters are not
+	//    subject to this consideration.
 	LoadReportingInterval *durationpb.Duration `protobuf:"bytes,2,opt,name=load_reporting_interval,json=loadReportingInterval,proto3" json:"load_reporting_interval,omitempty"`
 	// Set to *true* if the management server supports endpoint granularity
 	// report.

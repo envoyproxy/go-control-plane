@@ -44,43 +44,44 @@ type DynamicModuleFilter struct {
 	//
 	// This can be used to distinguish between different filter implementations inside a dynamic
 	// module. For example, a module can have completely different filter implementations. When Envoy
-	// receives this configuration, it passes the “filter_name“ to the dynamic module's HTTP filter
-	// config init function together with the “filter_config“. That way a module can decide which
+	// receives this configuration, it passes the ``filter_name`` to the dynamic module's HTTP filter
+	// config init function together with the ``filter_config``. That way a module can decide which
 	// in-module filter implementation to use based on the name at load time.
 	FilterName string `protobuf:"bytes,2,opt,name=filter_name,json=filterName,proto3" json:"filter_name,omitempty"`
-	// The configuration for the filter chosen by “filter_name“.
+	// The configuration for the filter chosen by ``filter_name``.
 	//
 	// This is passed to the module's HTTP filter initialization function. Together with the
-	// “filter_name“, the module can decide which in-module filter implementation to use and
+	// ``filter_name``, the module can decide which in-module filter implementation to use and
 	// fine-tune the behavior of the filter.
 	//
 	// For example, if a module has two filter implementations, one for logging and one for header
-	// manipulation, “filter_name“ is used to choose either logging or header manipulation. The
-	// “filter_config“ can be used to configure the logging level or the header manipulation
+	// manipulation, ``filter_name`` is used to choose either logging or header manipulation. The
+	// ``filter_config`` can be used to configure the logging level or the header manipulation
 	// behavior.
 	//
-	// “google.protobuf.Struct“ and the “value“ field of “xds.type.v3.TypedStruct“ are
+	// ``google.protobuf.Struct`` and the ``value`` field of ``xds.type.v3.TypedStruct`` are
 	// serialized as JSON before passing them to the plugin.
-	// “google.protobuf.BytesValue“ and “google.protobuf.StringValue“ are passed directly without
+	// ``google.protobuf.BytesValue`` and ``google.protobuf.StringValue`` are passed directly without
 	// the wrapper.
 	//
 	// .. code-block:: yaml
 	//
-	//	# Passing in a string
-	//	filter_config:
-	//	  "@type": "type.googleapis.com/google.protobuf.StringValue"
-	//	  value: hello
+	//  # Passing in a string
+	//  filter_config:
+	//    "@type": "type.googleapis.com/google.protobuf.StringValue"
+	//    value: hello
 	//
-	//	# Passing in raw bytes
-	//	filter_config:
-	//	  "@type": "type.googleapis.com/google.protobuf.BytesValue"
-	//	  value: aGVsbG8= # echo -n "hello" | base64
+	//  # Passing in raw bytes
+	//  filter_config:
+	//    "@type": "type.googleapis.com/google.protobuf.BytesValue"
+	//    value: aGVsbG8= # echo -n "hello" | base64
+	//
 	FilterConfig *anypb.Any `protobuf:"bytes,3,opt,name=filter_config,json=filterConfig,proto3" json:"filter_config,omitempty"`
-	// If “true“, the dynamic module is a terminal filter to use without an upstream.
+	// If ``true``, the dynamic module is a terminal filter to use without an upstream.
 	//
 	// The dynamic module is responsible for creating and sending the response to downstream.
 	//
-	// Defaults to “false“.
+	// Defaults to ``false``.
 	TerminalFilter bool `protobuf:"varint,4,opt,name=terminal_filter,json=terminalFilter,proto3" json:"terminal_filter,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -153,16 +154,16 @@ type DynamicModuleFilterPerRoute struct {
 	//
 	// This can be used to distinguish between different filter implementations inside a dynamic
 	// module. For example, a module can have completely different filter implementations. When Envoy
-	// receives this configuration, it passes the “per_route_config_name“ to the dynamic module's
-	// HTTP per-route filter config init function together with the “filter_config“. That way a
+	// receives this configuration, it passes the ``per_route_config_name`` to the dynamic module's
+	// HTTP per-route filter config init function together with the ``filter_config``. That way a
 	// module can decide which in-module filter implementation to use based on the name at load time.
 	//
 	// .. note::
+	//   This is deprecated in favor of ``filter_name``. Please use ``filter_name`` instead of
+	//   ``per_route_config_name`` to specify the name for the filter implementation.
+	//   If both ``per_route_config_name`` and ``filter_name`` are specified, Envoy uses
+	//   ``filter_name`` and ignores ``per_route_config_name``.
 	//
-	//	This is deprecated in favor of ``filter_name``. Please use ``filter_name`` instead of
-	//	``per_route_config_name`` to specify the name for the filter implementation.
-	//	If both ``per_route_config_name`` and ``filter_name`` are specified, Envoy uses
-	//	``filter_name`` and ignores ``per_route_config_name``.
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/filters/http/dynamic_modules/v3/dynamic_modules.proto.
 	PerRouteConfigName string `protobuf:"bytes,2,opt,name=per_route_config_name,json=perRouteConfigName,proto3" json:"per_route_config_name,omitempty"`
@@ -170,36 +171,37 @@ type DynamicModuleFilterPerRoute struct {
 	//
 	// This can be used to distinguish between different filter implementations inside a dynamic
 	// module. For example, a module can have completely different filter implementations. When Envoy
-	// receives this configuration, it passes the “filter_name“ to the dynamic module's
-	// HTTP per-route filter config init function together with the “filter_config“. That way a
+	// receives this configuration, it passes the ``filter_name`` to the dynamic module's
+	// HTTP per-route filter config init function together with the ``filter_config``. That way a
 	// module can decide which in-module filter implementation to use based on the name at load time.
 	FilterName string `protobuf:"bytes,4,opt,name=filter_name,json=filterName,proto3" json:"filter_name,omitempty"`
-	// The configuration for the filter chosen by “filter_name“.
+	// The configuration for the filter chosen by ``filter_name``.
 	//
 	// This is passed to the module's HTTP per-route filter initialization function. Together with
-	// the “filter_name“, the module can decide which in-module filter implementation to use and fine-tune the behavior of the filter on a specific route.
+	// the ``filter_name``, the module can decide which in-module filter implementation to use and fine-tune the behavior of the filter on a specific route.
 	//
 	// For example, if a module has two filter implementations, one for logging and one for header
-	// manipulation, “filter_name“ is used to choose either logging or header
-	// manipulation. The “filter_config“ can be used to configure the logging level or the header
+	// manipulation, ``filter_name`` is used to choose either logging or header
+	// manipulation. The ``filter_config`` can be used to configure the logging level or the header
 	// manipulation behavior.
 	//
-	// “google.protobuf.Struct“ and the “value“ field of “xds.type.v3.TypedStruct“ are
+	// ``google.protobuf.Struct`` and the ``value`` field of ``xds.type.v3.TypedStruct`` are
 	// serialized as JSON before passing them to the plugin.
-	// “google.protobuf.BytesValue“ and “google.protobuf.StringValue“ are passed directly without
+	// ``google.protobuf.BytesValue`` and ``google.protobuf.StringValue`` are passed directly without
 	// the wrapper.
 	//
 	// .. code-block:: yaml
 	//
-	//	# Passing in a string
-	//	filter_config:
-	//	  "@type": "type.googleapis.com/google.protobuf.StringValue"
-	//	  value: hello
+	//  # Passing in a string
+	//  filter_config:
+	//    "@type": "type.googleapis.com/google.protobuf.StringValue"
+	//    value: hello
 	//
-	//	# Passing in raw bytes
-	//	filter_config:
-	//	  "@type": "type.googleapis.com/google.protobuf.BytesValue"
-	//	  value: aGVsbG8= # echo -n "hello" | base64
+	//  # Passing in raw bytes
+	//  filter_config:
+	//    "@type": "type.googleapis.com/google.protobuf.BytesValue"
+	//    value: aGVsbG8= # echo -n "hello" | base64
+	//
 	FilterConfig  *anypb.Any `protobuf:"bytes,3,opt,name=filter_config,json=filterConfig,proto3" json:"filter_config,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

@@ -42,13 +42,13 @@ type RouteActionOverride struct {
 	// the matched route configures.
 	RetryPolicy *v3.RetryPolicy `protobuf:"bytes,1,opt,name=retry_policy,json=retryPolicy,proto3" json:"retry_policy,omitempty"`
 	// Metadata match criteria replacing the criteria of the matched route, used by subset load
-	// balancing. Only the “envoy.lb“ entry of :ref:`filter_metadata
+	// balancing. Only the ``envoy.lb`` entry of :ref:`filter_metadata
 	// <envoy_v3_api_field_config.core.v3.Metadata.filter_metadata>` is used, matching the behavior of
 	// :ref:`RouteAction.metadata_match
 	// <envoy_v3_api_field_config.route.v3.RouteAction.metadata_match>`. If not specified, or if there
-	// is no “envoy.lb“ entry, the criteria of the matched route are used, so an entry cannot be used
+	// is no ``envoy.lb`` entry, the criteria of the matched route are used, so an entry cannot be used
 	// to remove the criteria that the matched route configures. An entry whose only property is a
-	// “metadata_match“ without an “envoy.lb“ entry therefore replaces nothing and is rejected.
+	// ``metadata_match`` without an ``envoy.lb`` entry therefore replaces nothing and is rejected.
 	MetadataMatch *v31.Metadata `protobuf:"bytes,2,opt,name=metadata_match,json=metadataMatch,proto3" json:"metadata_match,omitempty"`
 	// Request mirroring policies replacing the request mirroring policies of the matched route. If
 	// not specified, the request mirroring policies of the matched route are used, so an entry cannot
@@ -142,45 +142,45 @@ type DynamicModuleClusterSpecifier struct {
 	// Specifies the shared-object level configuration. This field is required.
 	//
 	// .. note::
-	//
-	//	This extension loads the module while the cluster specifier is configured, so it cannot wait
-	//	for an asynchronous fetch. A remote :ref:`module
-	//	<envoy_v3_api_field_extensions.dynamic_modules.v3.DynamicModuleConfig.module>` is therefore
-	//	accepted only when the module is already cached on disk, and is otherwise rejected. Setting
-	//	:ref:`nack_on_cache_miss
-	//	<envoy_v3_api_field_extensions.dynamic_modules.v3.DynamicModuleConfig.nack_on_cache_miss>` to
-	//	``true`` makes the rejection start a background fetch so that a later update succeeds. Prefer
-	//	``name`` or a local data source.
+	//   This extension loads the module while the cluster specifier is configured, so it cannot wait
+	//   for an asynchronous fetch. A remote :ref:`module
+	//   <envoy_v3_api_field_extensions.dynamic_modules.v3.DynamicModuleConfig.module>` is therefore
+	//   accepted only when the module is already cached on disk, and is otherwise rejected. Setting
+	//   :ref:`nack_on_cache_miss
+	//   <envoy_v3_api_field_extensions.dynamic_modules.v3.DynamicModuleConfig.nack_on_cache_miss>` to
+	//   ``true`` makes the rejection start a background fetch so that a later update succeeds. Prefer
+	//   ``name`` or a local data source.
 	DynamicModuleConfig *v32.DynamicModuleConfig `protobuf:"bytes,1,opt,name=dynamic_module_config,json=dynamicModuleConfig,proto3" json:"dynamic_module_config,omitempty"`
 	// The name for this cluster specifier configuration. If not specified, defaults to an empty
 	// string.
 	//
 	// This can be used to distinguish between different cluster specifier implementations inside a
-	// dynamic module. When Envoy receives this configuration, it passes the “specifier_name“ to the
-	// dynamic module's cluster specifier config init function together with the “specifier_config“.
+	// dynamic module. When Envoy receives this configuration, it passes the ``specifier_name`` to the
+	// dynamic module's cluster specifier config init function together with the ``specifier_config``.
 	// That way a module can decide which in-module implementation to use based on the name at load
 	// time.
 	SpecifierName string `protobuf:"bytes,2,opt,name=specifier_name,json=specifierName,proto3" json:"specifier_name,omitempty"`
-	// The configuration for the cluster specifier chosen by “specifier_name“. If not specified, an
+	// The configuration for the cluster specifier chosen by ``specifier_name``. If not specified, an
 	// empty configuration is passed to the module.
 	//
-	// “google.protobuf.Struct“ and the “value“ field of “xds.type.v3.TypedStruct“ are
+	// ``google.protobuf.Struct`` and the ``value`` field of ``xds.type.v3.TypedStruct`` are
 	// serialized as JSON before passing them to the module.
-	// “google.protobuf.BytesValue“ and “google.protobuf.StringValue“ are passed directly without
+	// ``google.protobuf.BytesValue`` and ``google.protobuf.StringValue`` are passed directly without
 	// the wrapper.
 	//
 	// .. code-block:: yaml
 	//
-	//	# Passing a JSON struct configuration
-	//	specifier_config:
-	//	  "@type": "type.googleapis.com/google.protobuf.Struct"
-	//	  value:
-	//	    cluster_name_prefix: shard-
+	//  # Passing a JSON struct configuration
+	//  specifier_config:
+	//    "@type": "type.googleapis.com/google.protobuf.Struct"
+	//    value:
+	//      cluster_name_prefix: shard-
 	//
-	//	# Passing a simple string configuration
-	//	specifier_config:
-	//	  "@type": "type.googleapis.com/google.protobuf.StringValue"
-	//	  value: "shard-"
+	//  # Passing a simple string configuration
+	//  specifier_config:
+	//    "@type": "type.googleapis.com/google.protobuf.StringValue"
+	//    value: "shard-"
+	//
 	SpecifierConfig *anypb.Any `protobuf:"bytes,3,opt,name=specifier_config,json=specifierConfig,proto3" json:"specifier_config,omitempty"`
 	// Route action overrides that the module may select by name for a request. If not specified, the
 	// module can only select the cluster, the timeout, the idle timeout, the priority, the request

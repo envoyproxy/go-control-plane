@@ -29,28 +29,28 @@ const (
 type PerWorkerSubset_PartitioningStrategy int32
 
 const (
-	// Deterministic, non-overlapping slice of “ceil(N/W)“ hosts from a
-	// stable address-sorted ordering, where “N“ is the cluster's host
-	// count and “W“ is the worker count. A process-local random starting
+	// Deterministic, non-overlapping slice of ``ceil(N/W)`` hosts from a
+	// stable address-sorted ordering, where ``N`` is the cluster's host
+	// count and ``W`` is the worker count. A process-local random starting
 	// offset rotates the assignment so the partition is not byte-identical
 	// across the fleet. Stability across Envoy restarts is not required.
-	// The slices cover all hosts, with up to “W*K - N“ wrap-around
-	// assignments when “N“ is not divisible by “W“.
+	// The slices cover all hosts, with up to ``W*K - N`` wrap-around
+	// assignments when ``N`` is not divisible by ``W``.
 	//
 	// Health-only updates do not change slice boundaries: partitioning is
 	// performed over the all-hosts list, then each worker filters its fixed
 	// slice by health. A host becoming unhealthy therefore affects only
 	// workers whose slice contains that host. Membership updates may change
-	// “N“ or “K“ and can repartition workers. “subset_size“ is treated
-	// as a subsetting-disable threshold (see “subset_size“ below). This is
+	// ``N`` or ``K`` and can repartition workers. ``subset_size`` is treated
+	// as a subsetting-disable threshold (see ``subset_size`` below). This is
 	// the default.
 	PerWorkerSubset_EQUAL_PARTITIONS PerWorkerSubset_PartitioningStrategy = 0
-	// Each worker independently samples “subset_size“ hosts uniformly at
+	// Each worker independently samples ``subset_size`` hosts uniformly at
 	// random without replacement. The sampled membership is retained across
 	// health-only updates so a health transition does not rotate unrelated
 	// connections. Membership updates retain sampled hosts that still exist
-	// and fill only vacancies created by removed hosts. “subset_size“ must
-	// be “> 0“ in this mode.
+	// and fill only vacancies created by removed hosts. ``subset_size`` must
+	// be ``> 0`` in this mode.
 	PerWorkerSubset_RANDOM_PARTITIONS PerWorkerSubset_PartitioningStrategy = 1
 )
 
@@ -113,22 +113,22 @@ const (
 	// can distinguish "explicitly chose ROUND_ROBIN" from "field not
 	// set" at the proto layer.
 	PerWorkerSubset_UNSPECIFIED PerWorkerSubset_HostSelectionStrategy = 0
-	// Minimal “next_index_ % K“ round-robin over the worker's subset
+	// Minimal ``next_index_ % K`` round-robin over the worker's subset
 	// implemented inline. No weight handling, no slow-start, no locality.
 	// Pick this when the partition itself is the only thing required.
 	PerWorkerSubset_SIMPLE_ROUND_ROBIN PerWorkerSubset_HostSelectionStrategy = 1
 	// Envoy's stock RoundRobin load balancer constructed against the
 	// worker's subset via a synthetic PrioritySet. Honors per-host weights
-	// (EDF scheduling) and “slow_start_config“. The synthetic PrioritySet
+	// (EDF scheduling) and ``slow_start_config``. The synthetic PrioritySet
 	// presents the subset as one locality, so locality-weighted balancing is
 	// intentionally not supported within the worker subset. Recommended
 	// default for tiers opting in.
 	PerWorkerSubset_ENVOY_ROUND_ROBIN PerWorkerSubset_HostSelectionStrategy = 2
 	// Power-of-two-choices over active request counts (the algorithm
 	// implemented by Envoy's stock LeastRequest load balancer with
-	// “choice_count=2“). Each “chooseHost“ samples two random subset
+	// ``choice_count=2``). Each ``chooseHost`` samples two random subset
 	// hosts and returns the one with fewer pending requests. Honors
-	// “slow_start_config“ and weighted hosts.
+	// ``slow_start_config`` and weighted hosts.
 	PerWorkerSubset_ENVOY_P2C PerWorkerSubset_HostSelectionStrategy = 3
 )
 
@@ -211,25 +211,25 @@ type PerWorkerSubset struct {
 	// :ref:`partitioning_strategy
 	// <envoy_v3_api_field_extensions.load_balancing_policies.per_worker_subset.v3alpha.PerWorkerSubset.partitioning_strategy>`:
 	//
-	// “EQUAL_PARTITIONS“: subset_size is a subsetting kill-switch. The
-	// actual K (hosts per worker) is auto-computed as “ceil(N/W)“ on every
+	// ``EQUAL_PARTITIONS``: subset_size is a subsetting kill-switch. The
+	// actual K (hosts per worker) is auto-computed as ``ceil(N/W)`` on every
 	// membership update, where W is the resolved total worker count and N
-	// is the cluster's host count. When “subset_size >= N“ the policy
+	// is the cluster's host count. When ``subset_size >= N`` the policy
 	// disables subsetting and each worker takes the entire cluster (the
 	// within-subset selection runs over the full cluster). The default of
 	// 0 means "always subset".
 	//
-	// “RANDOM_PARTITIONS“: subset_size is K, the number of hosts each worker
-	// samples. Must be “> 0“ in this mode. Setting it “>= N“ degenerates
+	// ``RANDOM_PARTITIONS``: subset_size is K, the number of hosts each worker
+	// samples. Must be ``> 0`` in this mode. Setting it ``>= N`` degenerates
 	// to within-subset selection over the full set.
 	SubsetSize uint32 `protobuf:"varint,1,opt,name=subset_size,json=subsetSize,proto3" json:"subset_size,omitempty"`
-	// Partition strategy. Defaults to “EQUAL_PARTITIONS“.
+	// Partition strategy. Defaults to ``EQUAL_PARTITIONS``.
 	PartitioningStrategy PerWorkerSubset_PartitioningStrategy `protobuf:"varint,2,opt,name=partitioning_strategy,json=partitioningStrategy,proto3,enum=envoy.extensions.load_balancing_policies.per_worker_subset.v3alpha.PerWorkerSubset_PartitioningStrategy" json:"partitioning_strategy,omitempty"`
 	// Within-subset host selection. Required when the extension is
-	// instantiated; leaving this at the proto default (“UNSPECIFIED“) is
-	// rejected by the factory's “loadConfig“ with “InvalidArgumentError“.
+	// instantiated; leaving this at the proto default (``UNSPECIFIED``) is
+	// rejected by the factory's ``loadConfig`` with ``InvalidArgumentError``.
 	HostSelectionStrategy PerWorkerSubset_HostSelectionStrategy `protobuf:"varint,3,opt,name=host_selection_strategy,json=hostSelectionStrategy,proto3,enum=envoy.extensions.load_balancing_policies.per_worker_subset.v3alpha.PerWorkerSubset_HostSelectionStrategy" json:"host_selection_strategy,omitempty"`
-	// Per-worker fallback threshold (percent points, “[0, 100]“).
+	// Per-worker fallback threshold (percent points, ``[0, 100]``).
 	// When the healthy hosts in a worker's slice drop below this fraction of
 	// K, degraded hosts are added before considering unhealthy hosts. The
 	// worker uses the full slice (including unhealthy hosts) only when
@@ -237,13 +237,13 @@ type PerWorkerSubset struct {
 	// Per-worker: workers fall back independently based on their own slice's
 	// health.
 	//
-	//   - Unset: defaults to 50.
-	//   - Set to 0: disables the percent check; healthy hosts are used when
-	//     present, otherwise degraded hosts, then the full slice.
-	//   - Set to 100: degraded hosts are added as soon as healthy hosts alone
-	//     cannot fill the slice; the full slice is used if healthy plus degraded
-	//     still cannot fill it.
-	//   - Values “> 100“: rejected by the factory.
+	// * Unset: defaults to 50.
+	// * Set to 0: disables the percent check; healthy hosts are used when
+	//   present, otherwise degraded hosts, then the full slice.
+	// * Set to 100: degraded hosts are added as soon as healthy hosts alone
+	//   cannot fill the slice; the full slice is used if healthy plus degraded
+	//   still cannot fill it.
+	// * Values ``> 100``: rejected by the factory.
 	//
 	// Independent of the cluster's
 	// :ref:`common_lb_config.healthy_panic_threshold
@@ -254,11 +254,11 @@ type PerWorkerSubset struct {
 	// second panic threshold.
 	FallbackThreshold *wrapperspb.UInt32Value `protobuf:"bytes,4,opt,name=fallback_threshold,json=fallbackThreshold,proto3" json:"fallback_threshold,omitempty"`
 	// Slow-start config forwarded to the inner stock LB when
-	// “host_selection_strategy“ is “ENVOY_ROUND_ROBIN“ or “ENVOY_P2C“.
-	// “SIMPLE_ROUND_ROBIN“ ignores it. Lives here, not at the cluster
+	// ``host_selection_strategy`` is ``ENVOY_ROUND_ROBIN`` or ``ENVOY_P2C``.
+	// ``SIMPLE_ROUND_ROBIN`` ignores it. Lives here, not at the cluster
 	// level, because Envoy ignores the legacy
-	// “round_robin_lb_config.slow_start_config“ field when
-	// “load_balancing_policy“ is set to a typed extension.
+	// ``round_robin_lb_config.slow_start_config`` field when
+	// ``load_balancing_policy`` is set to a typed extension.
 	SlowStartConfig *v3.SlowStartConfig `protobuf:"bytes,5,opt,name=slow_start_config,json=slowStartConfig,proto3" json:"slow_start_config,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache

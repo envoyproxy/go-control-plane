@@ -67,20 +67,20 @@ type Descriptor struct {
 	DescriptorKey string `protobuf:"bytes,1,opt,name=descriptor_key,json=descriptorKey,proto3" json:"descriptor_key,omitempty"`
 	// The name of the HTTP header containing the JWT, e.g. "authorization".
 	//
-	// Exactly one of “header_name“ or “cookie“ must be set.
+	// Exactly one of ``header_name`` or ``cookie`` must be set.
 	HeaderName string `protobuf:"bytes,2,opt,name=header_name,json=headerName,proto3" json:"header_name,omitempty"`
 	// The name of the cookie containing the JWT, e.g. "auth_token". The cookie
-	// is looked up in the request's “Cookie“ header.
+	// is looked up in the request's ``Cookie`` header.
 	//
-	// Exactly one of “header_name“ or “cookie“ must be set.
+	// Exactly one of ``header_name`` or ``cookie`` must be set.
 	Cookie string `protobuf:"bytes,7,opt,name=cookie,proto3" json:"cookie,omitempty"`
 	// The value prefix to strip before parsing the remainder as a JWT, e.g.
 	// "Bearer " (with a trailing space) for an "authorization" header
 	// formatted as "Authorization: Bearer <token>". If the header or cookie
 	// value does not start with this prefix, the descriptor is not populated
-	// (falls through to “default_value“/“skip_if_absent“ below).
+	// (falls through to ``default_value``/``skip_if_absent`` below).
 	//
-	// This is typically only needed for “header_name“; cookie values do not
+	// This is typically only needed for ``header_name``; cookie values do not
 	// usually carry a prefix.
 	ValuePrefix string `protobuf:"bytes,3,opt,name=value_prefix,json=valuePrefix,proto3" json:"value_prefix,omitempty"`
 	// The name of the JWT claim to extract. Can be a nested claim, dot-
@@ -97,7 +97,7 @@ type Descriptor struct {
 	// If true, Envoy skips this descriptor entry (rather than aborting the
 	// whole descriptor for this action list) when the header or cookie is
 	// absent, the JWT cannot be parsed, or the named claim is absent/non-string, and
-	// “default_value“ is not specified. An empty string-valued claim is
+	// ``default_value`` is not specified. An empty string-valued claim is
 	// present and produces an entry with an empty value regardless of this
 	// setting.
 	SkipIfAbsent  bool `protobuf:"varint,6,opt,name=skip_if_absent,json=skipIfAbsent,proto3" json:"skip_if_absent,omitempty"`

@@ -176,8 +176,8 @@ type ApiConfigSource struct {
 	//
 	// .. note::
 	//
-	//	The cluster with name ``cluster_name`` must be statically defined and its
-	//	type must not be ``EDS``.
+	//  The cluster with name ``cluster_name`` must be statically defined and its
+	//  type must not be ``EDS``.
 	ClusterNames []string `protobuf:"bytes,2,rep,name=cluster_names,json=clusterNames,proto3" json:"cluster_names,omitempty"`
 	// Multiple gRPC services be provided for GRPC. If > 1 cluster is defined,
 	// services will be cycled through if any kind of failure occurs.
@@ -194,7 +194,7 @@ type ApiConfigSource struct {
 	// A list of config validators that will be executed when a new update is
 	// received from the ApiConfigSource. Note that each validator handles a
 	// specific xDS service type, and only the validators corresponding to the
-	// type url (in “:ref: DiscoveryResponse“ or “:ref: DeltaDiscoveryResponse“)
+	// type url (in ``:ref: DiscoveryResponse`` or ``:ref: DeltaDiscoveryResponse``)
 	// will be invoked.
 	// If the validator returns false or throws an exception, the config will be rejected by
 	// the client, and a NACK will be sent.
@@ -454,37 +454,37 @@ type PathConfigSource struct {
 	//
 	// .. note::
 	//
-	//	The path to the source must exist at config load time.
+	//  The path to the source must exist at config load time.
 	//
 	// .. note::
 	//
-	//	If neither ``poll_interval`` nor ``watched_directory`` is configured, Envoy will watch the
-	//	file path for *moves*. This is because in general only moves are atomic. The same method of
-	//	swapping files as is demonstrated in the
-	//	:ref:`runtime documentation <config_runtime_symbolic_link_swap>` can be used here also.
-	//	One of ``poll_interval`` and ``watched_directory`` can also be configured; the configuration
-	//	is rejected if both are set. With ``poll_interval``, the same path is reloaded periodically.
-	//	With ``watched_directory``, no watch is placed directly on this path; events in the
-	//	configured directory trigger this path to be reloaded.
+	//   If neither ``poll_interval`` nor ``watched_directory`` is configured, Envoy will watch the
+	//   file path for *moves*. This is because in general only moves are atomic. The same method of
+	//   swapping files as is demonstrated in the
+	//   :ref:`runtime documentation <config_runtime_symbolic_link_swap>` can be used here also.
+	//   One of ``poll_interval`` and ``watched_directory`` can also be configured; the configuration
+	//   is rejected if both are set. With ``poll_interval``, the same path is reloaded periodically.
+	//   With ``watched_directory``, no watch is placed directly on this path; events in the
+	//   configured directory trigger this path to be reloaded.
 	Path string `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
 	// If configured, this directory will be watched for *moves*. When an entry in this directory is
-	// moved to, the “path“ will be reloaded. This is required in certain deployment scenarios.
+	// moved to, the ``path`` will be reloaded. This is required in certain deployment scenarios.
 	//
 	// Specifically, if trying to load an xDS resource using a
 	// `Kubernetes ConfigMap <https://kubernetes.io/docs/concepts/configuration/configmap/>`_, the
 	// following configuration might be used:
 	// 1. Store xds.yaml inside a ConfigMap.
-	// 2. Mount the ConfigMap to “/config_map/xds“
-	// 3. Configure path “/config_map/xds/xds.yaml“
-	// 4. Configure watched directory “/config_map/xds“
+	// 2. Mount the ConfigMap to ``/config_map/xds``
+	// 3. Configure path ``/config_map/xds/xds.yaml``
+	// 4. Configure watched directory ``/config_map/xds``
 	//
 	// The above configuration will ensure that Envoy watches the owning directory for moves which is
 	// required due to how Kubernetes manages ConfigMap symbolic links during atomic updates.
 	//
-	// This field cannot be used together with “poll_interval“.
+	// This field cannot be used together with ``poll_interval``.
 	WatchedDirectory *WatchedDirectory `protobuf:"bytes,2,opt,name=watched_directory,json=watchedDirectory,proto3" json:"watched_directory,omitempty"`
-	// If configured, the “path“ will be polled at this interval instead of watched for filesystem
-	// events on either the file or “watched_directory“. This is useful when the underlying
+	// If configured, the ``path`` will be polled at this interval instead of watched for filesystem
+	// events on either the file or ``watched_directory``. This is useful when the underlying
 	// filesystem does not reliably provide change notifications, or when a custom deployment model
 	// does not generate the move or modification events handled by watching the path or directory.
 	// The file is read on every poll, but an update is delivered only when its parsed contents
@@ -495,7 +495,7 @@ type PathConfigSource struct {
 	// files that are watched in event-based mode are polled at this interval. The last successfully
 	// loaded configuration or secret remains active when a poll fails.
 	//
-	// This field cannot be used together with “watched_directory“ and must be at least 1ms.
+	// This field cannot be used together with ``watched_directory`` and must be at least 1ms.
 	PollInterval  *durationpb.Duration `protobuf:"bytes,3,opt,name=poll_interval,json=pollInterval,proto3" json:"poll_interval,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -562,7 +562,7 @@ func (x *PathConfigSource) GetPollInterval() *durationpb.Duration {
 type ConfigSource struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Authorities that this config source may be used for. An authority specified in a xdstp:// URL
-	// is resolved to a “ConfigSource“ prior to configuration fetch. This field provides the
+	// is resolved to a ``ConfigSource`` prior to configuration fetch. This field provides the
 	// association between authority name and configuration source.
 	// [#not-implemented-hide:]
 	Authorities []*v3.Authority `protobuf:"bytes,7,rep,name=authorities,proto3" json:"authorities,omitempty"`
@@ -699,7 +699,7 @@ type isConfigSource_ConfigSourceSpecifier interface {
 }
 
 type ConfigSource_Path struct {
-	// Deprecated in favor of “path_config_source“. Use that field instead.
+	// Deprecated in favor of ``path_config_source``. Use that field instead.
 	//
 	// Deprecated: Marked as deprecated in envoy/config/core/v3/config_source.proto.
 	Path string `protobuf:"bytes,1,opt,name=path,proto3,oneof"`
@@ -762,7 +762,7 @@ type ExtensionConfigSource struct {
 	ConfigSource *ConfigSource          `protobuf:"bytes,1,opt,name=config_source,json=configSource,proto3" json:"config_source,omitempty"`
 	// Optional default configuration to use as the initial configuration if
 	// there is a failure to receive the initial extension configuration or if
-	// “apply_default_config_without_warming“ flag is set.
+	// ``apply_default_config_without_warming`` flag is set.
 	DefaultConfig *anypb.Any `protobuf:"bytes,2,opt,name=default_config,json=defaultConfig,proto3" json:"default_config,omitempty"`
 	// Use the default config as the initial configuration without warming and
 	// waiting for the first discovery response. Requires the default configuration

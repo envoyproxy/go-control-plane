@@ -34,20 +34,20 @@ type OpenTelemetryConfig struct {
 	// The upstream gRPC cluster that will receive OTLP traces.
 	// Note that the tracer drops traces if the server does not read data fast enough.
 	// This field can be left empty to disable reporting traces to the gRPC service.
-	// Only one of “grpc_service“, “http_service“, “exporter“ may be used.
+	// Only one of ``grpc_service``, ``http_service``, ``exporter`` may be used.
 	GrpcService *v3.GrpcService `protobuf:"bytes,1,opt,name=grpc_service,json=grpcService,proto3" json:"grpc_service,omitempty"`
 	// The upstream HTTP cluster that will receive OTLP traces.
 	// This field can be left empty to disable reporting traces to the HTTP service.
-	// Only one of “grpc_service“, “http_service“, “exporter“ may be used.
+	// Only one of ``grpc_service``, ``http_service``, ``exporter`` may be used.
 	//
 	// .. note::
 	//
-	//	The ``request_headers_to_add`` property in the OTLP HTTP exporter service supports
-	//	substitution formatters. The formatters cannot access any HTTP or connection properties, but
-	//	can load content such as environment variables or files or secrets.
+	//   The ``request_headers_to_add`` property in the OTLP HTTP exporter service supports
+	//   substitution formatters. The formatters cannot access any HTTP or connection properties, but
+	//   can load content such as environment variables or files or secrets.
 	HttpService *v3.HttpService `protobuf:"bytes,3,opt,name=http_service,json=httpService,proto3" json:"http_service,omitempty"`
 	// Specifies the custom exporter to be used by the OpenTelemetry tracer.
-	// Only one of “grpc_service“, “http_service“, “exporter“ may be used.
+	// Only one of ``grpc_service``, ``http_service``, ``exporter`` may be used.
 	//
 	// [#extension-category: envoy.tracers.opentelemetry.exporters]
 	// [#not-implemented-hide:]
@@ -78,7 +78,7 @@ type OpenTelemetryConfig struct {
 	//
 	// If not specified, the default is to set these attributes.
 	SetTelemetrySdkResourceAttributes *wrapperspb.BoolValue `protobuf:"bytes,7,opt,name=set_telemetry_sdk_resource_attributes,json=setTelemetrySdkResourceAttributes,proto3" json:"set_telemetry_sdk_resource_attributes,omitempty"`
-	// Specifies whether to set the “service.name“ resource attribute.
+	// Specifies whether to set the ``service.name`` resource attribute.
 	// If not specified, the default is to set this attribute.
 	SetServiceNameResourceAttribute *wrapperspb.BoolValue `protobuf:"bytes,8,opt,name=set_service_name_resource_attribute,json=setServiceNameResourceAttribute,proto3" json:"set_service_name_resource_attribute,omitempty"`
 	// Specifies whether to set the instrumentation scope name ("envoy") and version on emitted traces.

@@ -42,7 +42,7 @@ type FilterConfig struct {
 	// response. If this field is not configured, there will be no buffering and downstream datagrams
 	// that arrive while the authorization call is in progress will be dropped. In case this field is
 	// set but the options are not configured, the default values will be applied as described in the
-	// “BufferOptions“.
+	// ``BufferOptions``.
 	BufferOptions *FilterConfig_BufferOptions `protobuf:"bytes,4,opt,name=buffer_options,json=bufferOptions,proto3" json:"buffer_options,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

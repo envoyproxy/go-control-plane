@@ -30,15 +30,15 @@ const (
 type OAuth2_AuthType int32
 
 const (
-	// The “client_id“ and “client_secret“ will be sent using HTTP Basic authentication scheme.
+	// The ``client_id`` and ``client_secret`` will be sent using HTTP Basic authentication scheme.
 	OAuth2_BASIC_AUTH OAuth2_AuthType = 0
-	// The “client_id“ and “client_secret“ will be sent in the URL encoded request body.
+	// The ``client_id`` and ``client_secret`` will be sent in the URL encoded request body.
 	// This type should only be used when Auth server does not support Basic authentication.
 	OAuth2_URL_ENCODED_BODY OAuth2_AuthType = 1
 	// The client will be authenticated using mutual TLS (mTLS) with a client certificate.
-	// The “client_secret“ is not required and will not be sent in the request to the
+	// The ``client_secret`` is not required and will not be sent in the request to the
 	// authorization server.
-	// The client certificate must be configured in the cluster used by “token_endpoint“ via
+	// The client certificate must be configured in the cluster used by ``token_endpoint`` via
 	// transport socket configuration.
 	// This implements OAuth 2.0 Mutual-TLS Client Authentication as defined in RFC 8705.
 	OAuth2_TLS_CLIENT_AUTH OAuth2_AuthType = 2
@@ -209,7 +209,7 @@ type OAuth2_ClientCredentials struct {
 	// Refer to `RFC 6749: The OAuth 2.0 Authorization Framework <https://www.rfc-editor.org/rfc/rfc6749#section-2.3.1>`__ for details.
 	// This field is required unless :ref:`auth_type
 	// <envoy_v3_api_field_extensions.http.injected_credentials.oauth2.v3.OAuth2.ClientCredentials.auth_type>`
-	// is set to “TLS_CLIENT_AUTH“, in which case authentication is done via the client certificate.
+	// is set to ``TLS_CLIENT_AUTH``, in which case authentication is done via the client certificate.
 	ClientSecret *v31.SdsSecretConfig `protobuf:"bytes,2,opt,name=client_secret,json=clientSecret,proto3" json:"client_secret,omitempty"`
 	// The method to use when sending credentials to the authorization server.
 	// Refer to `RFC 6749: The OAuth 2.0 Authorization Framework <https://www.rfc-editor.org/rfc/rfc6749#section-2.3.1>`__ for details.

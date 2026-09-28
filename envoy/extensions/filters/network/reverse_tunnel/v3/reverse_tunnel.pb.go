@@ -33,15 +33,15 @@ const (
 type Validation struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Format string to extract the expected node identifier for validation.
-	// The formatted value is compared against the “x-envoy-reverse-tunnel-node-id“ header
+	// The formatted value is compared against the ``x-envoy-reverse-tunnel-node-id`` header
 	// from the incoming handshake request. If they do not match, the connection is rejected
-	// with HTTP “403 Forbidden“.
+	// with HTTP ``403 Forbidden``.
 	//
 	// Supports Envoy's :ref:`command operators <config_access_log_command_operators>`:
 	//
-	// * “%DYNAMIC_METADATA(namespace:key)%“: Extract expected value from dynamic metadata.
-	// * “%FILTER_STATE(key)%“: Extract expected value from filter state.
-	// * “%DOWNSTREAM_REMOTE_ADDRESS%“: Use downstream connection IP address.
+	// * ``%DYNAMIC_METADATA(namespace:key)%``: Extract expected value from dynamic metadata.
+	// * ``%FILTER_STATE(key)%``: Extract expected value from filter state.
+	// * ``%DOWNSTREAM_REMOTE_ADDRESS%``: Use downstream connection IP address.
 	// * Plain strings: Use a static expected value.
 	//
 	// If empty, node ID validation is skipped.
@@ -50,15 +50,16 @@ type Validation struct {
 	//
 	// .. code-block:: yaml
 	//
-	//	node_id_format: "%DYNAMIC_METADATA(envoy.reverse_tunnel.allowlist:expected_node_id)%"
+	//    node_id_format: "%DYNAMIC_METADATA(envoy.reverse_tunnel.allowlist:expected_node_id)%"
+	//
 	NodeIdFormat string `protobuf:"bytes,1,opt,name=node_id_format,json=nodeIdFormat,proto3" json:"node_id_format,omitempty"`
 	// Format string to extract the expected cluster identifier for validation.
-	// The formatted value is compared against the “x-envoy-reverse-tunnel-cluster-id“ header
+	// The formatted value is compared against the ``x-envoy-reverse-tunnel-cluster-id`` header
 	// from the incoming handshake request. If they do not match, the connection is rejected
-	// with HTTP “403 Forbidden“.
+	// with HTTP ``403 Forbidden``.
 	//
 	// Supports the same :ref:`command operators <config_access_log_command_operators>` as
-	// “node_id_format“.
+	// ``node_id_format``.
 	//
 	// If empty, cluster ID validation is skipped.
 	//
@@ -66,32 +67,33 @@ type Validation struct {
 	//
 	// .. code-block:: yaml
 	//
-	//	cluster_id_format: "%FILTER_STATE(expected_cluster_id)%"
+	//    cluster_id_format: "%FILTER_STATE(expected_cluster_id)%"
+	//
 	ClusterIdFormat string `protobuf:"bytes,2,opt,name=cluster_id_format,json=clusterIdFormat,proto3" json:"cluster_id_format,omitempty"`
 	// Format string to extract the expected tenant identifier for validation.
-	// The formatted value is compared against the “x-envoy-reverse-tunnel-tenant-id“ header
+	// The formatted value is compared against the ``x-envoy-reverse-tunnel-tenant-id`` header
 	// from the incoming handshake request. If they do not match, the connection is rejected
-	// with HTTP “403 Forbidden“.
+	// with HTTP ``403 Forbidden``.
 	//
 	// Supports the same :ref:`command operators <config_access_log_command_operators>` as
-	// “node_id_format“.
+	// ``node_id_format``.
 	//
 	// If empty, tenant ID validation is skipped.
 	TenantIdFormat string `protobuf:"bytes,5,opt,name=tenant_id_format,json=tenantIdFormat,proto3" json:"tenant_id_format,omitempty"`
 	// Whether to emit validation results as dynamic metadata.
 	// When enabled, the filter emits metadata under the namespace specified by
-	// “dynamic_metadata_namespace“ containing:
+	// ``dynamic_metadata_namespace`` containing:
 	//
-	// * “node_id“: The actual node ID from the handshake request.
-	// * “cluster_id“: The actual cluster ID from the handshake request.
-	// * “tenant_id“: The actual tenant ID from the handshake request.
-	// * “validation_result“: Either “allowed“ or “denied“.
+	// * ``node_id``: The actual node ID from the handshake request.
+	// * ``cluster_id``: The actual cluster ID from the handshake request.
+	// * ``tenant_id``: The actual tenant ID from the handshake request.
+	// * ``validation_result``: Either ``allowed`` or ``denied``.
 	//
 	// This metadata can be used by subsequent filters or for access logging.
-	// Defaults to “false“.
+	// Defaults to ``false``.
 	EmitDynamicMetadata bool `protobuf:"varint,3,opt,name=emit_dynamic_metadata,json=emitDynamicMetadata,proto3" json:"emit_dynamic_metadata,omitempty"`
-	// Namespace for emitted dynamic metadata when “emit_dynamic_metadata“ is “true“.
-	// If not specified, defaults to “envoy.filters.network.reverse_tunnel“.
+	// Namespace for emitted dynamic metadata when ``emit_dynamic_metadata`` is ``true``.
+	// If not specified, defaults to ``envoy.filters.network.reverse_tunnel``.
 	DynamicMetadataNamespace string `protobuf:"bytes,4,opt,name=dynamic_metadata_namespace,json=dynamicMetadataNamespace,proto3" json:"dynamic_metadata_namespace,omitempty"`
 	unknownFields            protoimpl.UnknownFields
 	sizeCache                protoimpl.SizeCache
@@ -169,37 +171,37 @@ func (x *Validation) GetDynamicMetadataNamespace() string {
 type ReverseTunnel struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Ping interval for health checks on established reverse tunnel connections.
-	// If not specified, defaults to “2 seconds“.
+	// If not specified, defaults to ``2 seconds``.
 	PingInterval *durationpb.Duration `protobuf:"bytes,1,opt,name=ping_interval,json=pingInterval,proto3" json:"ping_interval,omitempty"`
 	// Whether to automatically close connections after processing reverse tunnel requests.
 	//
-	// * When set to “true“, connections are closed after acceptance or rejection.
-	// * When set to “false“, connections remain open for potential reuse.
+	// * When set to ``true``, connections are closed after acceptance or rejection.
+	// * When set to ``false``, connections remain open for potential reuse.
 	//
-	// Defaults to “false“.
+	// Defaults to ``false``.
 	AutoCloseConnections bool `protobuf:"varint,2,opt,name=auto_close_connections,json=autoCloseConnections,proto3" json:"auto_close_connections,omitempty"`
 	// HTTP path to match for reverse tunnel requests.
-	// If not specified, defaults to “/reverse_connections/request“.
+	// If not specified, defaults to ``/reverse_connections/request``.
 	RequestPath string `protobuf:"bytes,3,opt,name=request_path,json=requestPath,proto3" json:"request_path,omitempty"`
 	// HTTP method to match for reverse tunnel requests.
-	// If not specified (“METHOD_UNSPECIFIED“), this defaults to “GET“.
+	// If not specified (``METHOD_UNSPECIFIED``), this defaults to ``GET``.
 	RequestMethod v3.RequestMethod `protobuf:"varint,4,opt,name=request_method,json=requestMethod,proto3,enum=envoy.config.core.v3.RequestMethod" json:"request_method,omitempty"`
 	// Optional validation configuration for node, cluster, and tenant identifiers.
-	// If specified, the filter validates the “x-envoy-reverse-tunnel-node-id“,
-	// “x-envoy-reverse-tunnel-cluster-id“, and “x-envoy-reverse-tunnel-tenant-id“ headers
+	// If specified, the filter validates the ``x-envoy-reverse-tunnel-node-id``,
+	// ``x-envoy-reverse-tunnel-cluster-id``, and ``x-envoy-reverse-tunnel-tenant-id`` headers
 	// against expected values extracted using format strings. Requests that fail validation
-	// are rejected with HTTP “403 Forbidden“.
+	// are rejected with HTTP ``403 Forbidden``.
 	Validation *Validation `protobuf:"bytes,5,opt,name=validation,proto3" json:"validation,omitempty"`
 	// Required cluster name for validating reverse tunnel connection initiations.
 	// When set, the filter validates that the upstream cluster of the initiator envoy matches this name
-	// via “x-envoy-reverse-tunnel-upstream-cluster-name“ header. Connections with mismatched or missing
-	// cluster names are rejected with HTTP “400 Bad Request“. When empty, no cluster name validation is performed.
+	// via ``x-envoy-reverse-tunnel-upstream-cluster-name`` header. Connections with mismatched or missing
+	// cluster names are rejected with HTTP ``400 Bad Request``. When empty, no cluster name validation is performed.
 	RequiredClusterName string `protobuf:"bytes,6,opt,name=required_cluster_name,json=requiredClusterName,proto3" json:"required_cluster_name,omitempty"`
-	// Accept the handshake as an HTTP/1.1 “Upgrade“ exchange (“Upgrade: reverse-tunnel“,
-	// reply “101“) so HTTP proxies can route the handshake and splice the tunnel
-	// afterward. Non-upgrade requests are rejected with “426“. The initiator must set this
+	// Accept the handshake as an HTTP/1.1 ``Upgrade`` exchange (``Upgrade: reverse-tunnel``,
+	// reply ``101``) so HTTP proxies can route the handshake and splice the tunnel
+	// afterward. Non-upgrade requests are rejected with ``426``. The initiator must set this
 	// flag to the same value.
-	// Defaults to “false“.
+	// Defaults to ``false``.
 	UseHttpUpgrade bool `protobuf:"varint,7,opt,name=use_http_upgrade,json=useHttpUpgrade,proto3" json:"use_http_upgrade,omitempty"`
 	// When true, skip worker-thread rebalancing for accepted reverse tunnel connections.
 	// This avoids the cross-worker lock in pickLeastLoadedSocketManager.
@@ -209,31 +211,31 @@ type ReverseTunnel struct {
 	// handshake request is verified before the connection is accepted or its socket registered, so a
 	// forged or expired token can never produce a usable reverse tunnel. This runs on the real
 	// accepted socket, before registration, so it does not interfere with socket reuse. A missing or
-	// invalid token rejects the handshake with HTTP “401 Unauthorized“ unless
-	// “allow_missing_or_failed“ is set.
+	// invalid token rejects the handshake with HTTP ``401 Unauthorized`` unless
+	// ``allow_missing_or_failed`` is set.
 	//
 	// On success, the verified claims are published as dynamic metadata (default namespace
-	// “envoy.filters.network.reverse_tunnel.jwt“) so the :ref:`Validation
+	// ``envoy.filters.network.reverse_tunnel.jwt``) so the :ref:`Validation
 	// <envoy_v3_api_msg_extensions.filters.network.reverse_tunnel.v3.Validation>` block can bind a
 	// claimed handshake identifier to a verified claim, e.g.::
 	//
-	//	tenant_id_format: "%DYNAMIC_METADATA(envoy.filters.network.reverse_tunnel.jwt:tenant)%"
+	//    tenant_id_format: "%DYNAMIC_METADATA(envoy.filters.network.reverse_tunnel.jwt:tenant)%"
 	//
-	// forces the “x-envoy-reverse-tunnel-tenant-id“ header to equal the verified “tenant“ claim.
+	// forces the ``x-envoy-reverse-tunnel-tenant-id`` header to equal the verified ``tenant`` claim.
 	// Without such a binding, a token minted for one tenant can open a tunnel claiming another.
 	//
-	// Token verification is synchronous. With “remote_jwks“ the keys are fetched and refreshed in the
-	// background (at startup and every “cache_duration“) and cached, never on the accept path. Before
+	// Token verification is synchronous. With ``remote_jwks`` the keys are fetched and refreshed in the
+	// background (at startup and every ``cache_duration``) and cached, never on the accept path. Before
 	// the first successful fetch, or while a refresh is failing with nothing cached, every token is
-	// rejected. “token_header“ defaults to “authorization“ and “clock_skew_seconds“ to 60.
+	// rejected. ``token_header`` defaults to ``authorization`` and ``clock_skew_seconds`` to 60.
 	//
 	// See :ref:`JwtHandshakeValidator
 	// <envoy_v3_api_msg_extensions.filters.common.jwks.v3.JwtHandshakeValidator>`.
 	JwtValidator *v31.JwtHandshakeValidator `protobuf:"bytes,10,opt,name=jwt_validator,json=jwtValidator,proto3" json:"jwt_validator,omitempty"`
-	// Enforces the per-node concurrent connection cap (“max_connections_per_node“, configured on
-	// the “UpstreamReverseConnectionSocketInterface“ bootstrap extension) for tunnels accepted by
+	// Enforces the per-node concurrent connection cap (``max_connections_per_node``, configured on
+	// the ``UpstreamReverseConnectionSocketInterface`` bootstrap extension) for tunnels accepted by
 	// this filter. The cap is checked on the accepting worker but the connection is counted on the
-	// worker it is finally rebalanced to, so it is best-effort unless “skip_rebalancing“ is “true“.
+	// worker it is finally rebalanced to, so it is best-effort unless ``skip_rebalancing`` is ``true``.
 	// Default: false.
 	EnableConnectionLimit bool `protobuf:"varint,9,opt,name=enable_connection_limit,json=enableConnectionLimit,proto3" json:"enable_connection_limit,omitempty"`
 	unknownFields         protoimpl.UnknownFields

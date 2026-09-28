@@ -151,9 +151,9 @@ const (
 	Mcp_BODY Mcp_AttributeSource = 0
 	// Use MCP attribute headers and verify that values parsed from the body agree.
 	Mcp_VERIFY Mcp_AttributeSource = 1
-	// Trust MCP attribute headers for “method“ and the method-specific
-	// identifier carried by “Mcp-Name“ (“params.name“, “params.uri“, or
-	// “params.taskId“), and avoid parsing the body when nothing else requires it.
+	// Trust MCP attribute headers for ``method`` and the method-specific
+	// identifier carried by ``Mcp-Name`` (``params.name``, ``params.uri``, or
+	// ``params.taskId``), and avoid parsing the body when nothing else requires it.
 	Mcp_HEADERS Mcp_AttributeSource = 2
 )
 
@@ -209,11 +209,11 @@ type Mcp struct {
 	// Defaults to false.
 	ClearRouteCache bool `protobuf:"varint,2,opt,name=clear_route_cache,json=clearRouteCache,proto3" json:"clear_route_cache,omitempty"`
 	// Maximum size of the request body to buffer for JSON-RPC parsing.
-	// Only the first “max_request_body_size“ bytes are parsed for MCP attribute extraction.
+	// Only the first ``max_request_body_size`` bytes are parsed for MCP attribute extraction.
 	//
 	// When the body exceeds this limit:
-	// - In “PASS_THROUGH“ mode: the request is allowed through with an “is_exceeding_limit“ marker in the dynamic metadata, indicating that the MCP payload was only partially parsed.
-	// - In “REJECT_NO_MCP“ mode: the request is rejected with “400 Bad Request“ because the complete root JSON object must fit within the size limit.
+	// - In ``PASS_THROUGH`` mode: the request is allowed through with an ``is_exceeding_limit`` marker in the dynamic metadata, indicating that the MCP payload was only partially parsed.
+	// - In ``REJECT_NO_MCP`` mode: the request is rejected with ``400 Bad Request`` because the complete root JSON object must fit within the size limit.
 	//
 	// It defaults to 8KB (8192 bytes) and the maximum allowed value is 10MB (10485760 bytes).
 	//
@@ -227,14 +227,14 @@ type Mcp struct {
 	RequestStorageMode Mcp_RequestStorageMode `protobuf:"varint,5,opt,name=request_storage_mode,json=requestStorageMode,proto3,enum=envoy.extensions.filters.http.mcp.v3.Mcp_RequestStorageMode" json:"request_storage_mode,omitempty"`
 	// If set, extract and validate W3C trace context from the MCP request body
 	// (params._meta.traceparent & params._meta.tracestate) and propagate it in HTTP headers
-	// “traceparent“ and “tracestate“ (respectively).
+	// ``traceparent`` and ``tracestate`` (respectively).
 	//
 	// The traceparent and tracestate fields are validated and propagated according to the spec at
-	// “https://www.w3.org/TR/trace-context/“.
+	// ``https://www.w3.org/TR/trace-context/``.
 	//
 	// If unset (default), do not extract or inject trace context.
 	PropagateTraceContext *Mcp_TraceContextPropagationConfig `protobuf:"bytes,6,opt,name=propagate_trace_context,json=propagateTraceContext,proto3" json:"propagate_trace_context,omitempty"`
-	// Note that this is independent of “propagate_trace_context“.
+	// Note that this is independent of ``propagate_trace_context``.
 	// Also note that if this is set, the downstream request's baggage header will be overwritten if
 	// the MCP request body contains a valid baggage field.
 	//
@@ -247,25 +247,25 @@ type Mcp struct {
 	// but don't reject the request.
 	RejectDuplicateKeys *wrapperspb.BoolValue `protobuf:"bytes,8,opt,name=reject_duplicate_keys,json=rejectDuplicateKeys,proto3" json:"reject_duplicate_keys,omitempty"`
 	// Controls whether MCP request attributes are obtained from the request body
-	// or from MCP request headers. Header-based extraction is limited to “method“
-	// and the method-specific identifier carried by “Mcp-Name“; other configured
+	// or from MCP request headers. Header-based extraction is limited to ``method``
+	// and the method-specific identifier carried by ``Mcp-Name``; other configured
 	// extraction rules still require body parsing.
 	AttributeSource Mcp_AttributeSource `protobuf:"varint,9,opt,name=attribute_source,json=attributeSource,proto3,enum=envoy.extensions.filters.http.mcp.v3.Mcp_AttributeSource" json:"attribute_source,omitempty"`
 	// When true, stop parsing (and buffering) the request body as soon as all the
 	// required routing attributes for the request's method have been collected
-	// (for example “method“ and “params.name“ for “tools/call“), even if
-	// optional attributes such as “params._meta“ or the remainder of the body
+	// (for example ``method`` and ``params.name`` for ``tools/call``), even if
+	// optional attributes such as ``params._meta`` or the remainder of the body
 	// have not been parsed yet. This decouples routing from body size, so a large
-	// trailing payload (for example “params.arguments“) does not need to be
+	// trailing payload (for example ``params.arguments``) does not need to be
 	// buffered at the proxy just to route the request.
 	//
 	// Early termination is intentionally skipped when it could change observable
 	// behavior, so it has no effect when any of the following holds:
 	//
-	//   - “reject_duplicate_keys“ is set (duplicate detection needs a full-body scan);
-	//   - “propagate_trace_context“ or “propagate_baggage“ is set (both read
-	//     “params._meta“, which may appear after the routing attributes);
-	//   - “attribute_source“ is not “BODY“.
+	// - ``reject_duplicate_keys`` is set (duplicate detection needs a full-body scan);
+	// - ``propagate_trace_context`` or ``propagate_baggage`` is set (both read
+	//   ``params._meta``, which may appear after the routing attributes);
+	// - ``attribute_source`` is not ``BODY``.
 	//
 	// Requests whose body arrives complete in a single chunk are unaffected, since
 	// the whole root object is observed before iteration continues.

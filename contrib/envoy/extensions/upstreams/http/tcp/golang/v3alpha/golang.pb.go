@@ -36,17 +36,18 @@ type Config struct {
 	LibraryPath string `protobuf:"bytes,2,opt,name=library_path,json=libraryPath,proto3" json:"library_path,omitempty"`
 	// Globally unique name of the Go plugin.
 	//
-	// This name **must** be consistent with the name registered in “tcp::RegisterHttpTcpBridgeFactoryAndConfigParser“
+	// This name **must** be consistent with the name registered in ``tcp::RegisterHttpTcpBridgeFactoryAndConfigParser``
+	//
 	PluginName string `protobuf:"bytes,3,opt,name=plugin_name,json=pluginName,proto3" json:"plugin_name,omitempty"`
 	// Configuration for the Go plugin.
 	//
 	// .. note::
+	//     This configuration is only parsed in the Golang plugin, and is therefore not validated
+	//     by Envoy.
 	//
-	//	This configuration is only parsed in the Golang plugin, and is therefore not validated
-	//	by Envoy.
+	//     See the :repo:`HttpTcpBridge API <contrib/golang/common/go/api/filter.go>`
+	//     for more information about how the plugin's configuration data can be accessed.
 	//
-	//	See the :repo:`HttpTcpBridge API <contrib/golang/common/go/api/filter.go>`
-	//	for more information about how the plugin's configuration data can be accessed.
 	PluginConfig  *anypb.Any `protobuf:"bytes,4,opt,name=plugin_config,json=pluginConfig,proto3" json:"plugin_config,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

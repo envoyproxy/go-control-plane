@@ -31,9 +31,9 @@ const (
 	// JSON serialization. Metrics are encoded as human-readable JSON objects.
 	SerializationFormat_JSON SerializationFormat = 0
 	// Protocol Buffers serialization. Each Kafka message value is a binary-serialized
-	// “envoy.service.metrics.v3.StreamMetricsMessage“ containing
-	// “io.prometheus.client.MetricFamily“ entries -- the same wire format used by
-	// the gRPC “envoy.stat_sinks.metrics_service“ sink.
+	// ``envoy.service.metrics.v3.StreamMetricsMessage`` containing
+	// ``io.prometheus.client.MetricFamily`` entries -- the same wire format used by
+	// the gRPC ``envoy.stat_sinks.metrics_service`` sink.
 	SerializationFormat_PROTOBUF SerializationFormat = 1
 )
 
@@ -99,12 +99,12 @@ type KafkaStatsSinkConfig struct {
 	EmitTagsAsLabels *wrapperspb.BoolValue `protobuf:"bytes,5,opt,name=emit_tags_as_labels,json=emitTagsAsLabels,proto3" json:"emit_tags_as_labels,omitempty"`
 	// Additional librdkafka producer configuration properties as key-value pairs.
 	// These are passed directly to librdkafka and can be used to configure
-	// compression (“compression.type“), authentication (“security.protocol“,
-	// “sasl.mechanism“, etc.), batching (“batch.num.messages“), and more.
+	// compression (``compression.type``), authentication (``security.protocol``,
+	// ``sasl.mechanism``, etc.), batching (``batch.num.messages``), and more.
 	// See https://github.com/confluentinc/librdkafka/blob/master/CONFIGURATION.md
 	ProducerConfig map[string]string `protobuf:"bytes,6,rep,name=producer_config,json=producerConfig,proto3" json:"producer_config,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// Maximum time in milliseconds to buffer messages before forcing a produce.
-	// Maps to librdkafka's “linger.ms“. If not set, defaults to 500ms.
+	// Maps to librdkafka's ``linger.ms``. If not set, defaults to 500ms.
 	BufferFlushTimeoutMs *wrapperspb.UInt32Value `protobuf:"bytes,7,opt,name=buffer_flush_timeout_ms,json=bufferFlushTimeoutMs,proto3" json:"buffer_flush_timeout_ms,omitempty"`
 	// Serialization format for metric messages produced to Kafka.
 	// Defaults to JSON.

@@ -31,10 +31,10 @@ type ResourceMonitor struct {
 	// The name of the resource monitor to instantiate. Must match a registered
 	// resource monitor type. The built-in resource monitors are:
 	//
-	//   - :ref:`envoy.resource_monitors.fixed_heap
-	//     <envoy_api_msg_config.resource_monitor.fixed_heap.v2alpha.FixedHeapConfig>`
-	//   - :ref:`envoy.resource_monitors.injected_resource
-	//     <envoy_api_msg_config.resource_monitor.injected_resource.v2alpha.InjectedResourceConfig>`
+	// * :ref:`envoy.resource_monitors.fixed_heap
+	//   <envoy_api_msg_config.resource_monitor.fixed_heap.v2alpha.FixedHeapConfig>`
+	// * :ref:`envoy.resource_monitors.injected_resource
+	//   <envoy_api_msg_config.resource_monitor.injected_resource.v2alpha.InjectedResourceConfig>`
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Configuration for the resource monitor being instantiated.
 	//

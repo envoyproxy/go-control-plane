@@ -32,7 +32,7 @@ type MetadataExchange struct {
 	// If true, will attempt to use WDS in case the prefix peer metadata is not available.
 	EnableDiscovery bool `protobuf:"varint,2,opt,name=enable_discovery,json=enableDiscovery,proto3" json:"enable_discovery,omitempty"`
 	// Additional labels to be added to the peer metadata to help your understand the traffic.
-	// e.g. “role“, “location“ etc.
+	// e.g. ``role``, ``location`` etc.
 	AdditionalLabels []string `protobuf:"bytes,3,rep,name=additional_labels,json=additionalLabels,proto3" json:"additional_labels,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache

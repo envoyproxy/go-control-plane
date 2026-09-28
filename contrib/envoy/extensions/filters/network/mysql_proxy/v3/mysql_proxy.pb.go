@@ -32,7 +32,7 @@ const (
 	MySQLProxy_DISABLE MySQLProxy_SSLMode = 0
 	// The MySQL proxy filter will terminate SSL session initiated by a client
 	// and close downstream connections that do not initiate SSL.
-	// The filter will mediate “caching_sha2_password“ RSA authentication when
+	// The filter will mediate ``caching_sha2_password`` RSA authentication when
 	// the upstream MySQL server requires full authentication over the plaintext connection.
 	// The filter chain must use :ref:`starttls transport socket
 	// <envoy_v3_api_msg_extensions.transport_sockets.starttls.v3.StartTlsConfig>`.
@@ -40,7 +40,7 @@ const (
 	// The MySQL proxy filter will accept downstream client's encryption settings.
 	// If the client wants to use clear-text, Envoy will not enforce SSL encryption.
 	// If the client wants to use encryption, Envoy will terminate SSL and mediate
-	// “caching_sha2_password“ RSA authentication when needed.
+	// ``caching_sha2_password`` RSA authentication when needed.
 	// The filter chain must use :ref:`starttls transport socket
 	// <envoy_v3_api_msg_extensions.transport_sockets.starttls.v3.StartTlsConfig>`.
 	MySQLProxy_ALLOW MySQLProxy_SSLMode = 2
@@ -98,7 +98,7 @@ type MySQLProxy struct {
 	// Controls whether to terminate SSL sessions initiated by downstream clients.
 	// If enabled, the filter chain must use
 	// :ref:`starttls transport socket <envoy_v3_api_msg_extensions.transport_sockets.starttls.v3.StartTlsConfig>`.
-	// Defaults to “DISABLE“.
+	// Defaults to ``DISABLE``.
 	DownstreamSsl MySQLProxy_SSLMode `protobuf:"varint,3,opt,name=downstream_ssl,json=downstreamSsl,proto3,enum=envoy.extensions.filters.network.mysql_proxy.v3.MySQLProxy_SSLMode" json:"downstream_ssl,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

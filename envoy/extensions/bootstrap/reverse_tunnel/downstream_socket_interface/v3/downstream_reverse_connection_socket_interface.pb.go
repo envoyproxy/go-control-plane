@@ -36,16 +36,16 @@ type DownstreamReverseConnectionSocketInterface struct {
 	StatPrefix string `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// Enable detailed per-host and per-cluster statistics.
 	// When enabled, emits hidden statistics for individual hosts and clusters.
-	// Defaults to “false“.
+	// Defaults to ``false``.
 	EnableDetailedStats bool `protobuf:"varint,2,opt,name=enable_detailed_stats,json=enableDetailedStats,proto3" json:"enable_detailed_stats,omitempty"`
 	// Optional HTTP handshake configuration. When unset, the initiator envoy uses the defaults
-	// provided by “HttpHandshakeConfig“.
+	// provided by ``HttpHandshakeConfig``.
 	HttpHandshake *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig `protobuf:"bytes,3,opt,name=http_handshake,json=httpHandshake,proto3" json:"http_handshake,omitempty"`
 	// Access log configuration for reverse tunnel initiator lifecycle events.
 	// Logs are emitted on handshake success, handshake failure, connection draining, and
-	// connection close. Reverse tunnel metadata (“node_id“, “cluster_id“, “tenant_id“,
-	// upstream cluster, “connection_key“, “connection_id“, etc.) is available via
-	// “%DYNAMIC_METADATA(envoy.reverse_tunnel.initiator:*)%“ substitutions.
+	// connection close. Reverse tunnel metadata (``node_id``, ``cluster_id``, ``tenant_id``,
+	// upstream cluster, ``connection_key``, ``connection_id``, etc.) is available via
+	// ``%DYNAMIC_METADATA(envoy.reverse_tunnel.initiator:*)%`` substitutions.
 	AccessLog []*v3.AccessLog `protobuf:"bytes,4,rep,name=access_log,json=accessLog,proto3" json:"access_log,omitempty"`
 	// Upper bound on the per-host reconnect backoff. The initiator retries a failed handshake on a
 	// deterministic exponential schedule (1s, 2s, 4s, ...) with small upward jitter; this value caps
@@ -139,13 +139,13 @@ type DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig struct {
 	RequestPath string `protobuf:"bytes,1,opt,name=request_path,json=requestPath,proto3" json:"request_path,omitempty"`
 	// Additional headers to include in the HTTP handshake request.
 	AdditionalHeaders []*v31.HeaderValueOption `protobuf:"bytes,2,rep,name=additional_headers,json=additionalHeaders,proto3" json:"additional_headers,omitempty"`
-	// Perform the handshake as an HTTP/1.1 “Upgrade“ exchange (“Upgrade: reverse-tunnel“,
-	// success on “101“) so HTTP proxies can route the handshake and splice the tunnel
+	// Perform the handshake as an HTTP/1.1 ``Upgrade`` exchange (``Upgrade: reverse-tunnel``,
+	// success on ``101``) so HTTP proxies can route the handshake and splice the tunnel
 	// afterward. The responder must set this flag to the same value.
-	// Defaults to “false“.
+	// Defaults to ``false``.
 	UseHttpUpgrade bool `protobuf:"varint,3,opt,name=use_http_upgrade,json=useHttpUpgrade,proto3" json:"use_http_upgrade,omitempty"`
-	// Formatter extensions usable in “additional_headers“ substitution. See the formatter
-	// extensions documentation for details. When set, “additional_headers“ values are evaluated
+	// Formatter extensions usable in ``additional_headers`` substitution. See the formatter
+	// extensions documentation for details. When set, ``additional_headers`` values are evaluated
 	// as substitution format strings; when empty, the values are sent literally.
 	// [#extension-category: envoy.formatter]
 	Formatters    []*v31.TypedExtensionConfig `protobuf:"bytes,4,rep,name=formatters,proto3" json:"formatters,omitempty"`

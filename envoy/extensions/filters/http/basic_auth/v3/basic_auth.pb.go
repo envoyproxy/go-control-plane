@@ -51,24 +51,24 @@ type BasicAuth struct {
 	//
 	// If it is not specified, the filter loads the credential from  the "Authorization" header.
 	AuthenticationHeader string `protobuf:"bytes,3,opt,name=authentication_header,json=authenticationHeader,proto3" json:"authentication_header,omitempty"`
-	// If set to true, requests without Basic credentials (missing “Authorization“ header, or
-	// “Authorization“ header with a non-“Basic“ scheme such as “Bearer“) are allowed to pass through
-	// without authentication. Requests that present “Basic“ credentials are still fully validated.
+	// If set to true, requests without Basic credentials (missing ``Authorization`` header, or
+	// ``Authorization`` header with a non-``Basic`` scheme such as ``Bearer``) are allowed to pass through
+	// without authentication. Requests that present ``Basic`` credentials are still fully validated.
 	//
 	// This is useful when combining BasicAuth with other authentication methods (e.g. JWT) to
 	// achieve OR semantics: a request is accepted if any one configured auth method succeeds.
-	// When “allow_missing“ is “true“ on all auth filters, pair it with an RBAC filter that checks
-	// the dynamic metadata emitted by this filter (see “emit_dynamic_metadata“) to ensure at
-	// least one method authenticated the request. Requires “emit_dynamic_metadata“ to be set to
-	// “true“.
+	// When ``allow_missing`` is ``true`` on all auth filters, pair it with an RBAC filter that checks
+	// the dynamic metadata emitted by this filter (see ``emit_dynamic_metadata``) to ensure at
+	// least one method authenticated the request. Requires ``emit_dynamic_metadata`` to be set to
+	// ``true``.
 	AllowMissing bool `protobuf:"varint,4,opt,name=allow_missing,json=allowMissing,proto3" json:"allow_missing,omitempty"`
-	// If set to “true“, the filter emits dynamic metadata on successful authentication with key
-	// “username“ set to the authenticated username. The metadata is emitted under the namespace
-	// corresponding to the name of this basic_auth filter as configured in the “http_filters“
-	// chain (e.g. if the filter is configured with name “envoy.filters.http.basic_auth“, that is
+	// If set to ``true``, the filter emits dynamic metadata on successful authentication with key
+	// ``username`` set to the authenticated username. The metadata is emitted under the namespace
+	// corresponding to the name of this basic_auth filter as configured in the ``http_filters``
+	// chain (e.g. if the filter is configured with name ``envoy.filters.http.basic_auth``, that is
 	// the namespace that will be used).
 	//
-	// This is typically enabled together with “allow_missing“ when combining BasicAuth with
+	// This is typically enabled together with ``allow_missing`` when combining BasicAuth with
 	// other authentication methods (e.g. JWT) and using a downstream RBAC filter to enforce
 	// OR semantics.
 	EmitDynamicMetadata bool `protobuf:"varint,5,opt,name=emit_dynamic_metadata,json=emitDynamicMetadata,proto3" json:"emit_dynamic_metadata,omitempty"`

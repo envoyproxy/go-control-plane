@@ -37,7 +37,7 @@ const (
 	// counts may be stale (an earlier cumulative snapshot) or incomplete.
 	TokenUsage_PARTIAL TokenUsage_ExtractionStatus = 2
 	// Usage-bearing input was observed but no usable canonical count could
-	// be extracted; only “llm_protocol“ and “model“ may be populated.
+	// be extracted; only ``llm_protocol`` and ``model`` may be populated.
 	TokenUsage_FAILED TokenUsage_ExtractionStatus = 3
 )
 
@@ -114,9 +114,9 @@ type TokenUsage struct {
 	InputTokens *wrapperspb.UInt64Value `protobuf:"bytes,3,opt,name=input_tokens,json=inputTokens,proto3" json:"input_tokens,omitempty"`
 	// Canonical inclusive output token count.
 	OutputTokens *wrapperspb.UInt64Value `protobuf:"bytes,4,opt,name=output_tokens,json=outputTokens,proto3" json:"output_tokens,omitempty"`
-	// Canonical total: “input_tokens + output_tokens“. Present only when
+	// Canonical total: ``input_tokens + output_tokens``. Present only when
 	// both canonical components are known, so the triple is always internally
-	// consistent. Compare against “provider_total_tokens“ to detect a
+	// consistent. Compare against ``provider_total_tokens`` to detect a
 	// provider that reports inconsistently or in buckets unknown to the
 	// extractor.
 	TotalTokens *wrapperspb.UInt64Value `protobuf:"bytes,5,opt,name=total_tokens,json=totalTokens,proto3" json:"total_tokens,omitempty"`
@@ -126,7 +126,7 @@ type TokenUsage struct {
 	OutputTokenDetails *OutputTokenDetails `protobuf:"bytes,7,opt,name=output_token_details,json=outputTokenDetails,proto3" json:"output_token_details,omitempty"`
 	// The total token count reported directly by the provider, when it
 	// reported one — preserved regardless of whether it agrees with
-	// “total_tokens“.
+	// ``total_tokens``.
 	ProviderTotalTokens *wrapperspb.UInt64Value `protobuf:"bytes,8,opt,name=provider_total_tokens,json=providerTotalTokens,proto3" json:"provider_total_tokens,omitempty"`
 	// Quality of the extraction result.
 	ExtractionStatus TokenUsage_ExtractionStatus `protobuf:"varint,9,opt,name=extraction_status,json=extractionStatus,proto3,enum=envoy.data.ai.v3.TokenUsage_ExtractionStatus" json:"extraction_status,omitempty"`

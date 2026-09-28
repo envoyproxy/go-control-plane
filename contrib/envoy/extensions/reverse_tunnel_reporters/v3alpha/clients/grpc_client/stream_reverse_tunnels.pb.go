@@ -204,7 +204,7 @@ type ReverseTunnel struct {
 	// This is also used for the reporting the disconnection with the associated tunnel initiator.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Identity information of the tunnel initiator (downstream Envoy).
-	// Contains “node_id“, “cluster_id“, and “tenant_id“ for proper identification.
+	// Contains ``node_id``, ``cluster_id``, and ``tenant_id`` for proper identification.
 	Identity *TunnelInitiatorIdentity `protobuf:"bytes,2,opt,name=identity,proto3" json:"identity,omitempty"`
 	// Timestamp when this tunnel connection was created.
 	// Used for ordering events and debugging connection timing issues.

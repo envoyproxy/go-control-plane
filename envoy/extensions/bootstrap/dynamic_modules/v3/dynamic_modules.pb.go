@@ -43,38 +43,39 @@ type DynamicModuleBootstrapExtension struct {
 	//
 	// This can be used to distinguish between different extension implementations inside a dynamic
 	// module. For example, a module can have completely different extension implementations. When Envoy
-	// receives this configuration, it passes the “extension_name“ to the dynamic module's bootstrap
-	// extension config init function together with the “extension_config“. That way a module can
+	// receives this configuration, it passes the ``extension_name`` to the dynamic module's bootstrap
+	// extension config init function together with the ``extension_config``. That way a module can
 	// decide which in-module extension implementation to use based on the name at load time.
 	//
 	// If not specified, defaults to an empty string.
 	ExtensionName string `protobuf:"bytes,2,opt,name=extension_name,json=extensionName,proto3" json:"extension_name,omitempty"`
-	// The configuration for the extension chosen by “extension_name“.
+	// The configuration for the extension chosen by ``extension_name``.
 	//
 	// This is passed to the module's bootstrap extension initialization function. Together with the
-	// “extension_name“, the module can decide which in-module extension implementation to use and
+	// ``extension_name``, the module can decide which in-module extension implementation to use and
 	// fine-tune the behavior of the extension.
 	//
 	// For example, if a module has two extension implementations, one for configuration loading and
-	// one for metric initialization, “extension_name“ is used to choose the implementation. The
-	// “extension_config“ can be used to configure the specific behavior of each implementation.
+	// one for metric initialization, ``extension_name`` is used to choose the implementation. The
+	// ``extension_config`` can be used to configure the specific behavior of each implementation.
 	//
-	// “google.protobuf.Struct“ and the “value“ field of “xds.type.v3.TypedStruct“ are
+	// ``google.protobuf.Struct`` and the ``value`` field of ``xds.type.v3.TypedStruct`` are
 	// serialized as JSON before passing them to the module.
-	// “google.protobuf.BytesValue“ and “google.protobuf.StringValue“ are passed directly
+	// ``google.protobuf.BytesValue`` and ``google.protobuf.StringValue`` are passed directly
 	// without the wrapper.
 	//
 	// .. code-block:: yaml
 	//
-	//	# Passing a string value
-	//	extension_config:
-	//	  "@type": "type.googleapis.com/google.protobuf.StringValue"
-	//	  value: hello
+	//  # Passing a string value
+	//  extension_config:
+	//    "@type": "type.googleapis.com/google.protobuf.StringValue"
+	//    value: hello
 	//
-	//	# Passing raw bytes
-	//	extension_config:
-	//	  "@type": "type.googleapis.com/google.protobuf.BytesValue"
-	//	  value: aGVsbG8=  # echo -n "hello" | base64
+	//  # Passing raw bytes
+	//  extension_config:
+	//    "@type": "type.googleapis.com/google.protobuf.BytesValue"
+	//    value: aGVsbG8=  # echo -n "hello" | base64
+	//
 	ExtensionConfig *anypb.Any `protobuf:"bytes,3,opt,name=extension_config,json=extensionConfig,proto3" json:"extension_config,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache

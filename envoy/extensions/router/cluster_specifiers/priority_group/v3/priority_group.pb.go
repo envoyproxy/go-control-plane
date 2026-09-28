@@ -197,7 +197,7 @@ type PriorityGroupClusterSpecifier struct {
 	// <envoy_v3_api_msg_extensions.router.cluster_specifiers.priority_group.v3.PriorityGroupsOverride>`
 	// message. If the namespace is not present there, then it is read from the :ref:`untyped
 	// dynamic metadata <envoy_v3_api_field_config.core.v3.Metadata.filter_metadata>`, where it must
-	// be a struct with the same shape as the “PriorityGroupsOverride“ message.
+	// be a struct with the same shape as the ``PriorityGroupsOverride`` message.
 	//
 	// The group of the current attempt is read from the overriding list in the same way as from the
 	// configured list: the initial attempt uses the first group, the first retry uses the second
@@ -207,7 +207,7 @@ type PriorityGroupClusterSpecifier struct {
 	// <envoy_v3_api_field_extensions.router.cluster_specifiers.priority_group.v3.PriorityGroup.clusters>`
 	// are set replaces the clusters and the weights of the group for the request. Note these
 	// clusters are not validated when the configuration is loaded and the request fails with a
-	// “no cluster“ response if the selected cluster does not exist. An overriding group whose
+	// ``no cluster`` response if the selected cluster does not exist. An overriding group whose
 	// clusters are omitted or empty instead selects the configured priority group with the same
 	// :ref:`name
 	// <envoy_v3_api_field_extensions.router.cluster_specifiers.priority_group.v3.PriorityGroup.name>`
@@ -218,31 +218,30 @@ type PriorityGroupClusterSpecifier struct {
 	// filter <config_http_filters_ext_proc>`.
 	//
 	// .. note::
-	//
-	//	The route, and with it the cluster of the initial attempt, is resolved before the HTTP
-	//	filter chain runs, so the filter that sets the metadata must also clear the route cache.
+	//   The route, and with it the cluster of the initial attempt, is resolved before the HTTP
+	//   filter chain runs, so the filter that sets the metadata must also clear the route cache.
 	//
 	// Example of a matching untyped dynamic metadata value:
 	//
 	// .. code-block:: yaml
 	//
-	//	envoy.my_filter:
-	//	  priority_groups:
-	//	  - name: remote
-	//	    clusters:
-	//	    - cluster_name: remote_primary
-	//	      weight: 20
-	//	    - cluster_name: remote_secondary
-	//	      weight: 80
-	//	  - name: local
+	//   envoy.my_filter:
+	//     priority_groups:
+	//     - name: remote
+	//       clusters:
+	//       - cluster_name: remote_primary
+	//         weight: 20
+	//       - cluster_name: remote_secondary
+	//         weight: 80
+	//     - name: local
 	//
-	// With the metadata value above, the initial attempt uses the group “remote“ with the clusters
-	// and the weights of the metadata, and the first retry uses the configured group “local“ with
+	// With the metadata value above, the initial attempt uses the group ``remote`` with the clusters
+	// and the weights of the metadata, and the first retry uses the configured group ``local`` with
 	// its configured clusters and weights.
 	//
-	// If the metadata namespace is missing, cannot be parsed as a “PriorityGroupsOverride“
+	// If the metadata namespace is missing, cannot be parsed as a ``PriorityGroupsOverride``
 	// message, holds no group at all, or the group of the current attempt is not a valid override,
-	// then the configured “priority_groups“ are used instead.
+	// then the configured ``priority_groups`` are used instead.
 	OverrideMetadataNamespace string `protobuf:"bytes,2,opt,name=override_metadata_namespace,json=overrideMetadataNamespace,proto3" json:"override_metadata_namespace,omitempty"`
 	// The source of the random value that is used to select the target cluster of the selected
 	// priority group based on the cluster weights. If this is not configured, the internally

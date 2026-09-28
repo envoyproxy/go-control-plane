@@ -43,35 +43,36 @@ type DynamicModuleTracer struct {
 	// This can be used to distinguish between different tracer implementations inside a dynamic
 	// module. For example, a module can have completely different tracer implementations (e.g.,
 	// Zipkin-compatible, OpenTelemetry-compatible). When Envoy receives this configuration, it
-	// passes the “tracer_name“ to the dynamic module's tracer config init function together with
-	// the “tracer_config“. That way a module can decide which in-module tracer implementation to
+	// passes the ``tracer_name`` to the dynamic module's tracer config init function together with
+	// the ``tracer_config``. That way a module can decide which in-module tracer implementation to
 	// use based on the name at load time.
 	TracerName string `protobuf:"bytes,2,opt,name=tracer_name,json=tracerName,proto3" json:"tracer_name,omitempty"`
-	// The configuration for the tracer chosen by “tracer_name“. If not specified, an empty
+	// The configuration for the tracer chosen by ``tracer_name``. If not specified, an empty
 	// configuration is passed to the module.
 	//
 	// This is passed to the module's tracer initialization function. Together with the
-	// “tracer_name“, the module can decide which in-module tracer implementation to use and
+	// ``tracer_name``, the module can decide which in-module tracer implementation to use and
 	// fine-tune the behavior of the tracer.
 	//
-	// “google.protobuf.Struct“ and the “value“ field of “xds.type.v3.TypedStruct“ are
+	// ``google.protobuf.Struct`` and the ``value`` field of ``xds.type.v3.TypedStruct`` are
 	// serialized as JSON before passing them to the module.
-	// “google.protobuf.BytesValue“ and “google.protobuf.StringValue“ are passed directly
+	// ``google.protobuf.BytesValue`` and ``google.protobuf.StringValue`` are passed directly
 	// without the wrapper.
 	//
 	// .. code-block:: yaml
 	//
-	//	# Passing a JSON struct configuration
-	//	tracer_config:
-	//	  "@type": "type.googleapis.com/google.protobuf.Struct"
-	//	  value:
-	//	    endpoint: "http://tracing-backend:9411/api/v2/spans"
-	//	    sample_rate: 0.1
+	//  # Passing a JSON struct configuration
+	//  tracer_config:
+	//    "@type": "type.googleapis.com/google.protobuf.Struct"
+	//    value:
+	//      endpoint: "http://tracing-backend:9411/api/v2/spans"
+	//      sample_rate: 0.1
 	//
-	//	# Passing a simple string configuration
-	//	tracer_config:
-	//	  "@type": "type.googleapis.com/google.protobuf.StringValue"
-	//	  value: "http://tracing-backend:9411"
+	//  # Passing a simple string configuration
+	//  tracer_config:
+	//    "@type": "type.googleapis.com/google.protobuf.StringValue"
+	//    value: "http://tracing-backend:9411"
+	//
 	TracerConfig  *anypb.Any `protobuf:"bytes,3,opt,name=tracer_config,json=tracerConfig,proto3" json:"tracer_config,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

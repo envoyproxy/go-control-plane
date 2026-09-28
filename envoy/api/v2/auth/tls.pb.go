@@ -31,9 +31,9 @@ type UpstreamTlsContext struct {
 	//
 	// .. attention::
 	//
-	//	Server certificate verification is not enabled by default. Configure
-	//	:ref:`trusted_ca<envoy_api_field_auth.CertificateValidationContext.trusted_ca>` to enable
-	//	verification.
+	//   Server certificate verification is not enabled by default. Configure
+	//   :ref:`trusted_ca<envoy_api_field_auth.CertificateValidationContext.trusted_ca>` to enable
+	//   verification.
 	CommonTlsContext *CommonTlsContext `protobuf:"bytes,1,opt,name=common_tls_context,json=commonTlsContext,proto3" json:"common_tls_context,omitempty"`
 	// SNI string to use when creating TLS backend connections.
 	Sni string `protobuf:"bytes,2,opt,name=sni,proto3" json:"sni,omitempty"`
@@ -41,7 +41,7 @@ type UpstreamTlsContext struct {
 	//
 	// .. attention::
 	//
-	//	TLS renegotiation is considered insecure and shouldn't be used unless absolutely necessary.
+	//   TLS renegotiation is considered insecure and shouldn't be used unless absolutely necessary.
 	AllowRenegotiation bool `protobuf:"varint,3,opt,name=allow_renegotiation,json=allowRenegotiation,proto3" json:"allow_renegotiation,omitempty"`
 	// Maximum number of session keys (Pre-Shared Keys for TLSv1.3+, Session IDs and Session Tickets
 	// for TLSv1.2 and older) to store for the purpose of session resumption.
@@ -127,7 +127,7 @@ type DownstreamTlsContext struct {
 	//	*DownstreamTlsContext_SessionTicketKeysSdsSecretConfig
 	//	*DownstreamTlsContext_DisableStatelessSessionResumption
 	SessionTicketKeysType isDownstreamTlsContext_SessionTicketKeysType `protobuf_oneof:"session_ticket_keys_type"`
-	// If specified, “session_timeout“ will change the maximum lifetime (in seconds) of the TLS session.
+	// If specified, ``session_timeout`` will change the maximum lifetime (in seconds) of the TLS session.
 	// Currently this value is used as a hint for the `TLS session ticket lifetime (for TLSv1.2) <https://tools.ietf.org/html/rfc5077#section-5.6>`_.
 	// Only seconds can be specified (fractional seconds are ignored).
 	SessionTimeout *durationpb.Duration `protobuf:"bytes,6,opt,name=session_timeout,json=sessionTimeout,proto3" json:"session_timeout,omitempty"`

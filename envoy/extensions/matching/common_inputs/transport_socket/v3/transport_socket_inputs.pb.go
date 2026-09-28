@@ -45,7 +45,7 @@ const (
 type EndpointMetadataInput struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The filter name to retrieve the Struct from the endpoint metadata.
-	// If not specified, defaults to “envoy.lb“ which is commonly used for load balancing metadata.
+	// If not specified, defaults to ``envoy.lb`` which is commonly used for load balancing metadata.
 	Filter string `protobuf:"bytes,1,opt,name=filter,proto3" json:"filter,omitempty"`
 	// The path to retrieve the Value from the Struct.
 	Path          []*EndpointMetadataInput_PathSegment `protobuf:"bytes,2,rep,name=path,proto3" json:"path,omitempty"`
@@ -119,7 +119,7 @@ func (x *EndpointMetadataInput) GetPath() []*EndpointMetadataInput_PathSegment {
 type LocalityMetadataInput struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The filter name to retrieve the Struct from the locality metadata.
-	// If not specified, defaults to “envoy.lb“ which is commonly used for load balancing metadata.
+	// If not specified, defaults to ``envoy.lb`` which is commonly used for load balancing metadata.
 	Filter string `protobuf:"bytes,1,opt,name=filter,proto3" json:"filter,omitempty"`
 	// The path to retrieve the Value from the Struct.
 	Path          []*LocalityMetadataInput_PathSegment `protobuf:"bytes,2,rep,name=path,proto3" json:"path,omitempty"`

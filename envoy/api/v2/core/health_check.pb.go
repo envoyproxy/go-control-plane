@@ -516,8 +516,8 @@ type HealthCheck_HttpHealthCheck struct {
 	//
 	// .. attention::
 	//
-	//	This field has been deprecated in favor of `service_name_matcher` for better flexibility
-	//	over matching with service-cluster name.
+	//   This field has been deprecated in favor of `service_name_matcher` for better flexibility
+	//   over matching with service-cluster name.
 	//
 	// Deprecated: Marked as deprecated in envoy/api/v2/core/health_check.proto.
 	ServiceName string `protobuf:"bytes,5,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty"`
@@ -718,7 +718,7 @@ func (x *HealthCheck_TcpHealthCheck) GetReceive() []*HealthCheck_Payload {
 
 type HealthCheck_RedisHealthCheck struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// If set, optionally perform “EXISTS <key>“ instead of “PING“. A return value
+	// If set, optionally perform ``EXISTS <key>`` instead of ``PING``. A return value
 	// from Redis of 0 (does not exist) is considered a passing healthcheck. A return value other
 	// than 0 is considered a failure. This allows the user to mark a Redis instance for maintenance
 	// by setting the specified key to any value and waiting for traffic to drain.

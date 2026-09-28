@@ -216,7 +216,7 @@ type ProcessingRequest struct {
 	// The metadata is not automatically propagated from request to response.
 	// The external processor must include any needed metadata in its response.
 	Metadata *v3.Metadata `protobuf:"bytes,3,opt,name=metadata,proto3" json:"metadata,omitempty"`
-	// The values of properties selected by the “connection_attributes“
+	// The values of properties selected by the ``connection_attributes``
 	// list in the configuration. Each entry in the list is populated
 	// from the standard :ref:`attributes <arch_overview_attributes>` supported in the data plane.
 	Attributes    map[string]*structpb.Struct `protobuf:"bytes,4,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
@@ -317,13 +317,12 @@ type ProcessingResponse struct {
 	// as if it were configured in SKIP mode.
 	//
 	// .. note::
-	//
-	//	This should only be used when there is a strong protocol guarantee
-	//	that no additional data chunks are in-flight on the wire. Because Envoy
-	//	immediately drains its local buffer when forwarding bytes to the external
-	//	processor, if Envoy has already dispatched subsequent data chunks before this
-	//	stream is closed, those in-flight bytes will be permanently lost and not
-	//	injected back into the filter chain.
+	//   This should only be used when there is a strong protocol guarantee
+	//   that no additional data chunks are in-flight on the wire. Because Envoy
+	//   immediately drains its local buffer when forwarding bytes to the external
+	//   processor, if Envoy has already dispatched subsequent data chunks before this
+	//   stream is closed, those in-flight bytes will be permanently lost and not
+	//   injected back into the filter chain.
 	//
 	// This feature is primarily designed for tightly-coupled synchronous protocols,
 	// such as reading the ClientHello during a TLS handshake, where the sender

@@ -31,7 +31,7 @@ const (
 // [#next-free-field: 8]
 type CacheV2Config struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Config specific to the cache storage implementation. Required unless “disabled“
+	// Config specific to the cache storage implementation. Required unless ``disabled``
 	// is true.
 	// [#extension-category: envoy.http.cache_v2]
 	TypedConfig *anypb.Any `protobuf:"bytes,1,opt,name=typed_config,json=typedConfig,proto3" json:"typed_config,omitempty"`
@@ -42,17 +42,17 @@ type CacheV2Config struct {
 	// [#comment: once route-specific overrides are implemented, they are the more likely use-case.]
 	Disabled *wrapperspb.BoolValue `protobuf:"bytes,5,opt,name=disabled,proto3" json:"disabled,omitempty"`
 	// [#not-implemented-hide:]
-	// List of matching rules that defines allowed “Vary“ headers.
+	// List of matching rules that defines allowed ``Vary`` headers.
 	//
-	// The “vary“ response header holds a list of header names that affect the
+	// The ``vary`` response header holds a list of header names that affect the
 	// contents of a response, as described by
 	// https://httpwg.org/specs/rfc7234.html#caching.negotiated.responses.
 	//
-	// During insertion, “allowed_vary_headers“ acts as a allowlist: if a
-	// response's “vary“ header mentions any header names that aren't matched by any rules in
-	// “allowed_vary_headers“, that response will not be cached.
+	// During insertion, ``allowed_vary_headers`` acts as a allowlist: if a
+	// response's ``vary`` header mentions any header names that aren't matched by any rules in
+	// ``allowed_vary_headers``, that response will not be cached.
 	//
-	// During lookup, “allowed_vary_headers“ controls what request headers will be
+	// During lookup, ``allowed_vary_headers`` controls what request headers will be
 	// sent to the cache storage implementation.
 	AllowedVaryHeaders []*v3.StringMatcher `protobuf:"bytes,2,rep,name=allowed_vary_headers,json=allowedVaryHeaders,proto3" json:"allowed_vary_headers,omitempty"`
 	// [#not-implemented-hide:]
@@ -66,7 +66,7 @@ type CacheV2Config struct {
 	// Max body size the cache filter will insert into a cache. 0 means unlimited (though the cache
 	// storage implementation may have its own limit beyond which it will reject insertions).
 	MaxBodyBytes uint32 `protobuf:"varint,4,opt,name=max_body_bytes,json=maxBodyBytes,proto3" json:"max_body_bytes,omitempty"`
-	// By default, a “cache-control: no-cache“ or “pragma: no-cache“ header in the request
+	// By default, a ``cache-control: no-cache`` or ``pragma: no-cache`` header in the request
 	// causes the cache to validate with its upstream even if the lookup is a hit. Setting this
 	// to true will ignore these headers.
 	IgnoreRequestCacheControlHeader bool `protobuf:"varint,6,opt,name=ignore_request_cache_control_header,json=ignoreRequestCacheControlHeader,proto3" json:"ignore_request_cache_control_header,omitempty"`
@@ -74,10 +74,10 @@ type CacheV2Config struct {
 	// specified cluster rather than the cluster selected by the vhost and route.
 	//
 	// If you have actions to be taken by the router filter - either
-	// “upstream_http_filters“ or one of the “RouteConfiguration“ actions such as
-	// “response_headers_to_add“ - then the cache's side-channel going directly to the
-	// routed cluster will bypass these actions. You can set “override_upstream_cluster“
-	// to an internal listener which duplicates the relevant “RouteConfiguration“, to
+	// ``upstream_http_filters`` or one of the ``RouteConfiguration`` actions such as
+	// ``response_headers_to_add`` - then the cache's side-channel going directly to the
+	// routed cluster will bypass these actions. You can set ``override_upstream_cluster``
+	// to an internal listener which duplicates the relevant ``RouteConfiguration``, to
 	// replicate the desired behavior on the side-channel upstream request issued by the
 	// cache.
 	//
@@ -177,13 +177,13 @@ type CacheV2Config_KeyCreatorParams struct {
 	// If true, exclude the host from the cache key. Set to true if your origins' responses don't
 	// ever depend on host.
 	ExcludeHost bool `protobuf:"varint,2,opt,name=exclude_host,json=excludeHost,proto3" json:"exclude_host,omitempty"`
-	// If “query_parameters_included“ is nonempty, only query parameters matched
+	// If ``query_parameters_included`` is nonempty, only query parameters matched
 	// by one or more of its matchers are included in the cache key. Any other
 	// query params will not affect cache lookup.
 	QueryParametersIncluded []*v31.QueryParameterMatcher `protobuf:"bytes,3,rep,name=query_parameters_included,json=queryParametersIncluded,proto3" json:"query_parameters_included,omitempty"`
-	// If “query_parameters_excluded“ is nonempty, query parameters matched by one
+	// If ``query_parameters_excluded`` is nonempty, query parameters matched by one
 	// or more of its matchers are excluded from the cache key (even if also
-	// matched by “query_parameters_included“), and will not affect cache lookup.
+	// matched by ``query_parameters_included``), and will not affect cache lookup.
 	QueryParametersExcluded []*v31.QueryParameterMatcher `protobuf:"bytes,4,rep,name=query_parameters_excluded,json=queryParametersExcluded,proto3" json:"query_parameters_excluded,omitempty"`
 	unknownFields           protoimpl.UnknownFields
 	sizeCache               protoimpl.SizeCache

@@ -40,7 +40,7 @@ type Config struct {
 	// True to enable sharing with the upstream.
 	SharedWithUpstream bool `protobuf:"varint,5,opt,name=shared_with_upstream,json=sharedWithUpstream,proto3" json:"shared_with_upstream,omitempty"`
 	// Additional labels to be added to the peer metadata to help your understand the traffic.
-	// e.g. “role“, “location“ etc.
+	// e.g. ``role``, ``location`` etc.
 	AdditionalLabels []string `protobuf:"bytes,6,rep,name=additional_labels,json=additionalLabels,proto3" json:"additional_labels,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
@@ -201,8 +201,8 @@ func (*Config_WorkloadDiscovery) Descriptor() ([]byte, []int) {
 // This method uses Istio HTTP metadata exchange headers, e.g. “x-envoy-peer-metadata“. Removes these headers if found.
 type Config_IstioHeaders struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Strip “x-envoy-peer-metadata“ and “x-envoy-peer-metadata-id“ headers on HTTP requests to services outside the mesh.
-	// Detects upstream clusters with “istio“ and “external“ filter metadata fields
+	// Strip ``x-envoy-peer-metadata`` and ``x-envoy-peer-metadata-id`` headers on HTTP requests to services outside the mesh.
+	// Detects upstream clusters with ``istio`` and ``external`` filter metadata fields
 	SkipExternalClusters bool `protobuf:"varint,1,opt,name=skip_external_clusters,json=skipExternalClusters,proto3" json:"skip_external_clusters,omitempty"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache

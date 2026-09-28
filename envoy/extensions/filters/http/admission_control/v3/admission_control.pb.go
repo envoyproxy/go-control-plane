@@ -43,7 +43,7 @@ type AdmissionControl struct {
 	SamplingWindow *durationpb.Duration `protobuf:"bytes,3,opt,name=sampling_window,json=samplingWindow,proto3" json:"sampling_window,omitempty"`
 	// Rejection probability is defined by the formula::
 	//
-	//	max(0, (rq_count -  rq_success_count / sr_threshold) / (rq_count + 1)) ^ (1 / aggression)
+	//     max(0, (rq_count -  rq_success_count / sr_threshold) / (rq_count + 1)) ^ (1 / aggression)
 	//
 	// The aggression dictates how heavily the admission controller will throttle requests upon SR
 	// dropping at or below the threshold. A value of 1 will result in a linear increase in
@@ -175,10 +175,10 @@ type AdmissionControl_SuccessCriteria struct {
 	//
 	// .. note::
 	//
-	//	The default HTTP codes considered successful by the admission controller are done so due
-	//	to the unlikelihood that sending fewer requests would change their behavior (for example:
-	//	redirects, unauthorized access, or bad requests won't be alleviated by sending less
-	//	traffic).
+	//    The default HTTP codes considered successful by the admission controller are done so due
+	//    to the unlikelihood that sending fewer requests would change their behavior (for example:
+	//    redirects, unauthorized access, or bad requests won't be alleviated by sending less
+	//    traffic).
 	HttpCriteria *AdmissionControl_SuccessCriteria_HttpCriteria `protobuf:"bytes,1,opt,name=http_criteria,json=httpCriteria,proto3" json:"http_criteria,omitempty"`
 	// GRPC status codes to consider as request successes. If unspecified, defaults to: Ok,
 	// Cancelled, Unknown, InvalidArgument, NotFound, AlreadyExists, Unauthenticated,
@@ -186,8 +186,8 @@ type AdmissionControl_SuccessCriteria struct {
 	//
 	// .. note::
 	//
-	//	The default gRPC codes that are considered successful by the admission controller are
-	//	chosen because of the unlikelihood that sending fewer requests will change the behavior.
+	//    The default gRPC codes that are considered successful by the admission controller are
+	//    chosen because of the unlikelihood that sending fewer requests will change the behavior.
 	GrpcCriteria  *AdmissionControl_SuccessCriteria_GrpcCriteria `protobuf:"bytes,2,opt,name=grpc_criteria,json=grpcCriteria,proto3" json:"grpc_criteria,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

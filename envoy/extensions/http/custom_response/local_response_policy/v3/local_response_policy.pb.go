@@ -32,12 +32,12 @@ const (
 type LocalResponsePolicy struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Optional new local reply body text. It will be used
-	// in the “%LOCAL_REPLY_BODY%“ command operator in the “body_format“. If unset when
-	// “body_format“ is configured for an existing local reply, the existing body will be used as
+	// in the ``%LOCAL_REPLY_BODY%`` command operator in the ``body_format``. If unset when
+	// ``body_format`` is configured for an existing local reply, the existing body will be used as
 	// the formatter input instead.
 	Body *v3.DataSource `protobuf:"bytes,1,opt,name=body,proto3" json:"body,omitempty"`
-	// Optional body format to be used for this response. If “body_format“ is  not
-	// provided, and “body“ is, the contents of “body“ will be used to populate
+	// Optional body format to be used for this response. If ``body_format`` is  not
+	// provided, and ``body`` is, the contents of ``body`` will be used to populate
 	// the body of the local reply without formatting.
 	BodyFormat *v3.SubstitutionFormatString `protobuf:"bytes,2,opt,name=body_format,json=bodyFormat,proto3" json:"body_format,omitempty"`
 	// The new response status code if specified.
@@ -47,12 +47,12 @@ type LocalResponsePolicy struct {
 	// the original response for local body, or the custom response from the
 	// remote body, before it is sent to a downstream client.
 	ResponseHeadersToAdd []*v3.HeaderValueOption `protobuf:"bytes,4,rep,name=response_headers_to_add,json=responseHeadersToAdd,proto3" json:"response_headers_to_add,omitempty"`
-	// Controls what is written to “stream_info.response_code_details“ when this
+	// Controls what is written to ``stream_info.response_code_details`` when this
 	// policy sends its local reply.
 	//
 	// If unset, details are cleared (empty string), matching legacy behavior.
-	// Use “preserve_response_code_details“ to keep the existing value (e.g.
-	// “csrf_origin_mismatch“), or “response_code_details“ to set an explicit
+	// Use ``preserve_response_code_details`` to keep the existing value (e.g.
+	// ``csrf_origin_mismatch``), or ``response_code_details`` to set an explicit
 	// replacement.
 	//
 	// Types that are valid to be assigned to ResponseCodeDetailsAction:
@@ -152,12 +152,12 @@ type isLocalResponsePolicy_ResponseCodeDetailsAction interface {
 }
 
 type LocalResponsePolicy_PreserveResponseCodeDetails struct {
-	// If set, keep the existing “response_code_details“ already present on StreamInfo.
+	// If set, keep the existing ``response_code_details`` already present on StreamInfo.
 	PreserveResponseCodeDetails bool `protobuf:"varint,5,opt,name=preserve_response_code_details,json=preserveResponseCodeDetails,proto3,oneof"`
 }
 
 type LocalResponsePolicy_ResponseCodeDetails struct {
-	// Replace “response_code_details“ with this value.
+	// Replace ``response_code_details`` with this value.
 	ResponseCodeDetails string `protobuf:"bytes,6,opt,name=response_code_details,json=responseCodeDetails,proto3,oneof"`
 }
 

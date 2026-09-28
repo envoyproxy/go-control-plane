@@ -46,7 +46,7 @@ type DynamicModuleTransportSocket struct {
 	// <envoy_v3_api_msg_extensions.dynamic_modules.v3.DynamicModuleConfig>` for details.
 	DynamicModuleConfig *v3.DynamicModuleConfig `protobuf:"bytes,1,opt,name=dynamic_module_config,json=dynamicModuleConfig,proto3" json:"dynamic_module_config,omitempty"`
 	// The name of the transport socket implementation in the dynamic module. This is passed to the
-	// module's “envoy_dynamic_module_on_transport_socket_factory_config_new“ function.
+	// module's ``envoy_dynamic_module_on_transport_socket_factory_config_new`` function.
 	TransportSocketName string `protobuf:"bytes,2,opt,name=transport_socket_name,json=transportSocketName,proto3" json:"transport_socket_name,omitempty"`
 	// Optional configuration for the transport socket. This is passed as bytes to the dynamic module.
 	// If not specified, no configuration bytes are passed to the module.

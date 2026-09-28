@@ -32,10 +32,11 @@ type RemoteJwks struct {
 	//
 	// .. code-block:: yaml
 	//
-	//	http_uri:
-	//	  uri: https://www.googleapis.com/oauth2/v1/certs
-	//	  cluster: jwt.www.googleapis.com|443
-	//	  timeout: 1s
+	//    http_uri:
+	//      uri: https://www.googleapis.com/oauth2/v1/certs
+	//      cluster: jwt.www.googleapis.com|443
+	//      timeout: 1s
+	//
 	HttpUri *v3.HttpUri `protobuf:"bytes,1,opt,name=http_uri,json=httpUri,proto3" json:"http_uri,omitempty"`
 	// Duration after which the cached JWKS should be expired. If not specified, default cache
 	// duration is 10 minutes.
@@ -45,15 +46,16 @@ type RemoteJwks struct {
 	//
 	// If this feature is not enabled:
 	//
-	//   - The Jwks is fetched on-demand when the requests come. During the fetching, first
-	//     few requests are paused until the Jwks is fetched.
-	//   - Each worker thread fetches its own Jwks since Jwks cache is per worker thread.
+	// * The Jwks is fetched on-demand when the requests come. During the fetching, first
+	//   few requests are paused until the Jwks is fetched.
+	// * Each worker thread fetches its own Jwks since Jwks cache is per worker thread.
 	//
 	// If this feature is enabled:
 	//
-	//   - Fetched Jwks is done in the main thread before the listener is activated. Its fetched
-	//     Jwks can be used by all worker threads. Each worker thread doesn't need to fetch its own.
-	//   - Jwks is ready when the requests come, not need to wait for the Jwks fetching.
+	// * Fetched Jwks is done in the main thread before the listener is activated. Its fetched
+	//   Jwks can be used by all worker threads. Each worker thread doesn't need to fetch its own.
+	// * Jwks is ready when the requests come, not need to wait for the Jwks fetching.
+	//
 	AsyncFetch *JwksAsyncFetch `protobuf:"bytes,3,opt,name=async_fetch,json=asyncFetch,proto3" json:"async_fetch,omitempty"`
 	// Retry policy for fetching Jwks. optional. turned off by default.
 	//
@@ -61,26 +63,29 @@ type RemoteJwks struct {
 	//
 	// .. code-block:: yaml
 	//
-	//	retry_policy:
-	//	  retry_back_off:
-	//	    base_interval: 0.01s
-	//	    max_interval: 20s
-	//	  num_retries: 10
+	//   retry_policy:
+	//     retry_back_off:
+	//       base_interval: 0.01s
+	//       max_interval: 20s
+	//     num_retries: 10
 	//
 	// will yield a randomized truncated exponential backoff policy with an initial delay of 10ms
 	// 10 maximum attempts spaced at most 20s seconds.
 	//
 	// .. code-block:: yaml
 	//
-	//	retry_policy:
-	//	  num_retries:1
+	//   retry_policy:
+	//     num_retries:1
 	//
 	// uses the default :ref:`retry backoff strategy <envoy_v3_api_msg_config.core.v3.BackoffStrategy>`.
 	// with the default base interval is 1000 milliseconds. and the default maximum interval of 10 times the base interval.
 	//
 	// if num_retries is omitted, the default is to allow only one retry.
 	//
+	//
 	// If enabled, the retry policy will apply to all Jwks fetching approaches, e.g. on demand or asynchronously in background.
+	//
+	//
 	RetryPolicy   *v3.RetryPolicy `protobuf:"bytes,4,opt,name=retry_policy,json=retryPolicy,proto3" json:"retry_policy,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

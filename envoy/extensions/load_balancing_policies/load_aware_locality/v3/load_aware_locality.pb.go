@@ -38,8 +38,8 @@ type LoadAwareLocality struct {
 	WeightUpdatePeriod *durationpb.Duration `protobuf:"bytes,2,opt,name=weight_update_period,json=weightUpdatePeriod,proto3" json:"weight_update_period,omitempty"`
 	// Specifies the metrics used to compute endpoint utilization. For map
 	// fields in the ORCA proto, the string will be of the form
-	// “<map_field_name>.<map_key>“. For example, the string
-	// “named_metrics.foo“ will mean to look for the key “foo“ in the ORCA
+	// ``<map_field_name>.<map_key>``. For example, the string
+	// ``named_metrics.foo`` will mean to look for the key ``foo`` in the ORCA
 	// :ref:`named_metrics <envoy_v3_api_field_.xds.data.orca.v3.OrcaLoadReport.named_metrics>`
 	// field. Utilization is the max of the values of the metrics specified
 	// here, when that max is greater than 0. Otherwise
@@ -47,8 +47,8 @@ type LoadAwareLocality struct {
 	// is used if greater than 0, with
 	// :ref:`cpu_utilization <envoy_v3_api_field_.xds.data.orca.v3.OrcaLoadReport.cpu_utilization>`
 	// as the final fallback. Disabling the runtime flag
-	// “envoy.reloadable_features.orca_weight_manager_use_named_metrics_first“
-	// restores the legacy order, preferring “application_utilization“ over
+	// ``envoy.reloadable_features.orca_weight_manager_use_named_metrics_first``
+	// restores the legacy order, preferring ``application_utilization`` over
 	// these metrics.
 	MetricNamesForComputingUtilization []string `protobuf:"bytes,3,rep,name=metric_names_for_computing_utilization,json=metricNamesForComputingUtilization,proto3" json:"metric_names_for_computing_utilization,omitempty"`
 	// When the local locality's utilization is at most this threshold above the
@@ -58,8 +58,8 @@ type LoadAwareLocality struct {
 	// always applies. Must be in [0, 1]. Defaults to 0.1.
 	UtilizationVarianceThreshold *wrapperspb.DoubleValue `protobuf:"bytes,4,opt,name=utilization_variance_threshold,json=utilizationVarianceThreshold,proto3" json:"utilization_variance_threshold,omitempty"`
 	// EWMA time constant for per-locality utilization smoothing. The per-tick
-	// smoothing factor alpha is derived as “1 - exp(-weight_update_period /
-	// smoothing_time_constant)“, so settling time is consistent regardless of
+	// smoothing factor alpha is derived as ``1 - exp(-weight_update_period /
+	// smoothing_time_constant)``, so settling time is consistent regardless of
 	// the configured tick rate. Larger values produce more stable weights;
 	// smaller values react faster. Must be greater than 0s. Defaults to 5s
 	// (~95% settling within ~15s).
@@ -73,7 +73,7 @@ type LoadAwareLocality struct {
 	//
 	// Probe fraction is a global value split across all remote localities.
 	// At very high remote-locality counts combined with low aggregate request
-	// rates, per-host sample intervals can exceed “weight_expiration_period“.
+	// rates, per-host sample intervals can exceed ``weight_expiration_period``.
 	// See the architecture overview for the scaling matrix.
 	RemoteProbeFraction *wrapperspb.DoubleValue `protobuf:"bytes,6,opt,name=remote_probe_fraction,json=remoteProbeFraction,proto3" json:"remote_probe_fraction,omitempty"`
 	// Per-host ORCA sample validity window. Hosts that have not reported load

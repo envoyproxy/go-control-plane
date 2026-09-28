@@ -28,7 +28,7 @@ const (
 type AsyncFileManagerConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// An optional identifier for the manager. An empty string is a valid identifier
-	// for a common, default “AsyncFileManager“.
+	// for a common, default ``AsyncFileManager``.
 	//
 	// Reusing the same id with different configurations in the same envoy instance
 	// is an error.

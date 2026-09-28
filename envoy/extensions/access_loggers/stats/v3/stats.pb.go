@@ -90,8 +90,8 @@ func (Config_Histogram_Unit) EnumDescriptor() ([]byte, []int) {
 type Config struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The stat prefix for the generated stats.
-	// Deprecated: please use “stats_scope.prefix“ instead.
-	// It will override “stats_scope.prefix“ if non-empty.
+	// Deprecated: please use ``stats_scope.prefix`` instead.
+	// It will override ``stats_scope.prefix`` if non-empty.
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/access_loggers/stats/v3/stats.proto.
 	StatPrefix string `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
@@ -368,10 +368,10 @@ type Config_Counter struct {
 	// The name and tags of this counter.
 	Stat *Config_Stat `protobuf:"bytes,1,opt,name=stat,proto3" json:"stat,omitempty"`
 	// The format string for the value to add to this counter, using :ref:`command operators <config_access_log_command_operators>`.
-	// One of “value_format“ or “value_fixed“ must be configured.
+	// One of ``value_format`` or ``value_fixed`` must be configured.
 	ValueFormat string `protobuf:"bytes,2,opt,name=value_format,json=valueFormat,proto3" json:"value_format,omitempty"`
 	// A fixed value to add to this counter.
-	// One of “value_format“ or “value_fixed“ must be configured.
+	// One of ``value_format`` or ``value_fixed`` must be configured.
 	ValueFixed    *wrapperspb.UInt64Value `protobuf:"bytes,3,opt,name=value_fixed,json=valueFixed,proto3" json:"value_fixed,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -441,7 +441,7 @@ type Config_Gauge struct {
 	// positive number.
 	ValueFormat string `protobuf:"bytes,2,opt,name=value_format,json=valueFormat,proto3" json:"value_format,omitempty"`
 	// A fixed value to add/subtract/set to this gauge.
-	// One of “value_format“ or “value_fixed“ must be configured.
+	// One of ``value_format`` or ``value_fixed`` must be configured.
 	ValueFixed *wrapperspb.UInt64Value `protobuf:"bytes,3,opt,name=value_fixed,json=valueFixed,proto3" json:"value_fixed,omitempty"`
 	// The PairedAddSubtract operation.
 	// Only one of PairedAddSubtract and Set can be defined.

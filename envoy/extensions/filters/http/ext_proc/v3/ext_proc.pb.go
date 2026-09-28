@@ -41,11 +41,11 @@ const (
 	// :ref:`clear_route_cache <envoy_v3_api_field_service.ext_proc.v3.CommonResponse.clear_route_cache>`
 	// field is set in an external processor response.
 	ExternalProcessor_DEFAULT ExternalProcessor_RouteCacheAction = 0
-	// Always clear the route cache irrespective of the “clear_route_cache“ bit in
+	// Always clear the route cache irrespective of the ``clear_route_cache`` bit in
 	// the external processor response.
 	ExternalProcessor_CLEAR ExternalProcessor_RouteCacheAction = 1
-	// Do not clear the route cache irrespective of the “clear_route_cache“ bit in
-	// the external processor response. Setting to “RETAIN“ is equivalent to setting the
+	// Do not clear the route cache irrespective of the ``clear_route_cache`` bit in
+	// the external processor response. Setting to ``RETAIN`` is equivalent to setting the
 	// :ref:`disable_clear_route_cache <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.disable_clear_route_cache>`
 	// to true.
 	ExternalProcessor_RETAIN ExternalProcessor_RouteCacheAction = 2
@@ -160,17 +160,17 @@ func (ExternalProcessor_RouteCacheAction) EnumDescriptor() ([]byte, []int) {
 type ExternalProcessor struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Configuration for the gRPC service that the filter will communicate with.
-	// Only one of “grpc_service“ or “http_service“ can be set.
+	// Only one of ``grpc_service`` or ``http_service`` can be set.
 	// It is required that one of them must be set.
 	GrpcService *v3.GrpcService `protobuf:"bytes,1,opt,name=grpc_service,json=grpcService,proto3" json:"grpc_service,omitempty"`
 	// Configuration for the HTTP service that the filter will communicate with.
-	// Only one of “http_service“ or
+	// Only one of ``http_service`` or
 	// :ref:`grpc_service <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.grpc_service>`
 	// can be set. It is required that one of them must be set.
 	//
-	// If “http_service“ is set, the
+	// If ``http_service`` is set, the
 	// :ref:`processing_mode <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.processing_mode>`
-	// cannot be configured to send any body or trailers. i.e., “http_service“ only supports
+	// cannot be configured to send any body or trailers. i.e., ``http_service`` only supports
 	// sending request or response headers to the side stream server.
 	//
 	// With this configuration, the data plane behavior is:
@@ -185,16 +185,17 @@ type ExternalProcessor struct {
 	//
 	// After the side-stream receives this HTTP request message, it is expected to do as follows:
 	//
-	// 1. It converts the body, which is a JSON string, into a “ProcessingRequest“
+	// 1. It converts the body, which is a JSON string, into a ``ProcessingRequest``
 	// proto message to examine and mutate the headers.
 	//
 	// 2. It then sets the mutated headers into a new proto message
 	// :ref:`ProcessingResponse <envoy_v3_api_msg_service.ext_proc.v3.ProcessingResponse>`.
 	//
-	// 3. It converts the “ProcessingResponse“ proto message into a JSON text.
+	// 3. It converts the ``ProcessingResponse`` proto message into a JSON text.
 	//
-	// 4. It then sends an HTTP response back to the data plane with status code as “"200"“,
-	// “content-type“ as “"application/json"“ and sets the JSON text as the body.
+	// 4. It then sends an HTTP response back to the data plane with status code as ``"200"``,
+	// ``content-type`` as ``"application/json"`` and sets the JSON text as the body.
+	//
 	HttpService *ExtProcHttpService `protobuf:"bytes,20,opt,name=http_service,json=httpService,proto3" json:"http_service,omitempty"`
 	// By default, if in the following cases:
 	//
@@ -211,9 +212,10 @@ type ExternalProcessor struct {
 	//
 	// However, with this parameter set to true and if the above cases happen, the processing
 	// continues without error.
+	//
 	FailureModeAllow bool `protobuf:"varint,2,opt,name=failure_mode_allow,json=failureModeAllow,proto3" json:"failure_mode_allow,omitempty"`
 	// Specifies default options for how HTTP headers, trailers, and bodies are
-	// sent. See “ProcessingMode“ for details.
+	// sent. See ``ProcessingMode`` for details.
 	ProcessingMode *ProcessingMode `protobuf:"bytes,3,opt,name=processing_mode,json=processingMode,proto3" json:"processing_mode,omitempty"`
 	// The data plane provides a number of :ref:`attributes <arch_overview_attributes>`
 	// for expressive policies. Each attribute name provided in this field will be
@@ -235,12 +237,12 @@ type ExternalProcessor struct {
 	// an error (subject to the processing mode) if the timer expires before a
 	// matching response is received. There is no timeout when the filter is
 	// running in observability mode or when the body send mode is
-	// “FULL_DUPLEX_STREAMED“ or “GRPC“. Zero is a valid config which means
+	// ``FULL_DUPLEX_STREAMED`` or ``GRPC``. Zero is a valid config which means
 	// the timer will be triggered immediately. If not configured, default is
 	// 200 milliseconds.
 	MessageTimeout *durationpb.Duration `protobuf:"bytes,7,opt,name=message_timeout,json=messageTimeout,proto3" json:"message_timeout,omitempty"`
 	// Optional additional prefix to use when emitting statistics. This allows to distinguish
-	// emitted statistics between configured “ext_proc“ filters in an HTTP filter chain.
+	// emitted statistics between configured ``ext_proc`` filters in an HTTP filter chain.
 	StatPrefix string `protobuf:"bytes,8,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// Rules that determine what modifications an external processing server may
 	// make to message headers. If not set, all headers may be modified except
@@ -256,21 +258,21 @@ type ExternalProcessor struct {
 	MutationRules *v31.HeaderMutationRules `protobuf:"bytes,9,opt,name=mutation_rules,json=mutationRules,proto3" json:"mutation_rules,omitempty"`
 	// Specify the upper bound of
 	// :ref:`override_message_timeout <envoy_v3_api_field_service.ext_proc.v3.ProcessingResponse.override_message_timeout>`
-	// If not specified, by default it is 0, which will effectively disable the “override_message_timeout“ API.
+	// If not specified, by default it is 0, which will effectively disable the ``override_message_timeout`` API.
 	MaxMessageTimeout *durationpb.Duration `protobuf:"bytes,10,opt,name=max_message_timeout,json=maxMessageTimeout,proto3" json:"max_message_timeout,omitempty"`
-	// Allow headers matching the “forward_rules“ to be forwarded to the external processing server.
+	// Allow headers matching the ``forward_rules`` to be forwarded to the external processing server.
 	// If not set, all headers are forwarded to the external processing server.
 	ForwardRules *HeaderForwardingRules `protobuf:"bytes,12,opt,name=forward_rules,json=forwardRules,proto3" json:"forward_rules,omitempty"`
 	// Additional metadata to be added to the filter state for logging purposes. The metadata
 	// will be added to StreamInfo's filter state under the namespace corresponding to the
 	// ext_proc filter name.
 	FilterMetadata *structpb.Struct `protobuf:"bytes,13,opt,name=filter_metadata,json=filterMetadata,proto3" json:"filter_metadata,omitempty"`
-	// If “allow_mode_override“ is set to true, the filter config :ref:`processing_mode
+	// If ``allow_mode_override`` is set to true, the filter config :ref:`processing_mode
 	// <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.processing_mode>`
 	// can be overridden by the response message from the external processing server
 	// :ref:`mode_override <envoy_v3_api_field_service.ext_proc.v3.ProcessingResponse.mode_override>`.
-	// If not set, “mode_override“ API in the response message will be ignored.
-	// Mode override is not supported if the body send mode is “FULL_DUPLEX_STREAMED“.
+	// If not set, ``mode_override`` API in the response message will be ignored.
+	// Mode override is not supported if the body send mode is ``FULL_DUPLEX_STREAMED``.
 	AllowModeOverride bool `protobuf:"varint,14,opt,name=allow_mode_override,json=allowModeOverride,proto3" json:"allow_mode_override,omitempty"`
 	// If set to true, ignore the
 	// :ref:`immediate_response <envoy_v3_api_field_service.ext_proc.v3.ProcessingResponse.immediate_response>`
@@ -280,11 +282,11 @@ type ExternalProcessor struct {
 	DisableImmediateResponse bool `protobuf:"varint,15,opt,name=disable_immediate_response,json=disableImmediateResponse,proto3" json:"disable_immediate_response,omitempty"`
 	// Options related to the sending and receiving of dynamic metadata.
 	MetadataOptions *MetadataOptions `protobuf:"bytes,16,opt,name=metadata_options,json=metadataOptions,proto3" json:"metadata_options,omitempty"`
-	// If true, send each part of the HTTP request or response specified by “ProcessingMode“
+	// If true, send each part of the HTTP request or response specified by ``ProcessingMode``
 	// without pausing on filter chain iteration. It is "Send and Go" mode that can be used
 	// by external processor to observe the request's data and status. In this mode:
 	//
-	// 1. Only “STREAMED“, “GRPC“, and “NONE“ body processing modes are supported; for any
+	// 1. Only ``STREAMED``, ``GRPC``, and ``NONE`` body processing modes are supported; for any
 	// other body processing mode, the body will not be sent.
 	//
 	// 2. External processor should not send back processing response, as any responses will be ignored.
@@ -293,28 +295,29 @@ type ExternalProcessor struct {
 	// restriction doesn't apply to this mode.
 	//
 	// 3. External processor may still close the stream to indicate that no more messages are needed.
+	//
 	ObservabilityMode bool `protobuf:"varint,17,opt,name=observability_mode,json=observabilityMode,proto3" json:"observability_mode,omitempty"`
 	// Prevents clearing the route-cache when the
 	// :ref:`clear_route_cache <envoy_v3_api_field_service.ext_proc.v3.CommonResponse.clear_route_cache>`
 	// field is set in an external processor response.
-	// Only one of “disable_clear_route_cache“ or “route_cache_action“ can be set.
-	// It is recommended to set “route_cache_action“ which supersedes “disable_clear_route_cache“.
+	// Only one of ``disable_clear_route_cache`` or ``route_cache_action`` can be set.
+	// It is recommended to set ``route_cache_action`` which supersedes ``disable_clear_route_cache``.
 	DisableClearRouteCache bool `protobuf:"varint,11,opt,name=disable_clear_route_cache,json=disableClearRouteCache,proto3" json:"disable_clear_route_cache,omitempty"`
 	// Specifies the action to be taken when an external processor response is
 	// received in response to request headers. It is recommended to set this field rather than set
 	// :ref:`disable_clear_route_cache <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.disable_clear_route_cache>`.
-	// Only one of “disable_clear_route_cache“ or “route_cache_action“ can be set.
+	// Only one of ``disable_clear_route_cache`` or ``route_cache_action`` can be set.
 	//
 	// .. attention::
 	//
-	//	Clearing the route cache can cause Envoy to recompute route matching after earlier HTTP
-	//	filters have already processed the request. This can be security-sensitive when filters
-	//	that make route-dependent authorization decisions, such as the RBAC filter, run before
-	//	ext_proc and ext_proc mutates route-matching inputs.
+	//   Clearing the route cache can cause Envoy to recompute route matching after earlier HTTP
+	//   filters have already processed the request. This can be security-sensitive when filters
+	//   that make route-dependent authorization decisions, such as the RBAC filter, run before
+	//   ext_proc and ext_proc mutates route-matching inputs.
 	//
-	//	Operators should only enable route cache clearing for trusted external processors, should
-	//	carefully order route-dependent authorization filters, and should use mutation_rules to
-	//	restrict sensitive mutations when appropriate.
+	//   Operators should only enable route cache clearing for trusted external processors, should
+	//   carefully order route-dependent authorization filters, and should use mutation_rules to
+	//   restrict sensitive mutations when appropriate.
 	RouteCacheAction ExternalProcessor_RouteCacheAction `protobuf:"varint,18,opt,name=route_cache_action,json=routeCacheAction,proto3,enum=envoy.extensions.filters.http.ext_proc.v3.ExternalProcessor_RouteCacheAction" json:"route_cache_action,omitempty"`
 	// Specifies the deferred closure timeout for gRPC stream that connects to external processor. Currently, the deferred stream closure
 	// is only used in :ref:`observability_mode <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.observability_mode>`.
@@ -323,7 +326,7 @@ type ExternalProcessor struct {
 	// The default value is 5000 milliseconds (5 seconds) if not specified.
 	DeferredCloseTimeout *durationpb.Duration `protobuf:"bytes,19,opt,name=deferred_close_timeout,json=deferredCloseTimeout,proto3" json:"deferred_close_timeout,omitempty"`
 	// Send body to the side stream server once it arrives without waiting for the header response from that server.
-	// It only works for “STREAMED“ body processing mode. For any other body
+	// It only works for ``STREAMED`` body processing mode. For any other body
 	// processing modes, it is ignored.
 	// The server has two options upon receiving a header request:
 	//
@@ -340,19 +343,18 @@ type ExternalProcessor struct {
 	SendBodyWithoutWaitingForHeaderResponse bool `protobuf:"varint,21,opt,name=send_body_without_waiting_for_header_response,json=sendBodyWithoutWaitingForHeaderResponse,proto3" json:"send_body_without_waiting_for_header_response,omitempty"`
 	// When :ref:`allow_mode_override
 	// <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.allow_mode_override>` is enabled and
-	// “allowed_override_modes“ is configured, the filter config :ref:`processing_mode
+	// ``allowed_override_modes`` is configured, the filter config :ref:`processing_mode
 	// <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.processing_mode>`
 	// can only be overridden by the response message from the external processing server iff the
 	// :ref:`mode_override <envoy_v3_api_field_service.ext_proc.v3.ProcessingResponse.mode_override>` is allowed by
-	// the “allowed_override_modes“ allow-list below.
-	// Since “request_header_mode“ is not applicable in any way, it's ignored in comparison.
+	// the ``allowed_override_modes`` allow-list below.
+	// Since ``request_header_mode`` is not applicable in any way, it's ignored in comparison.
 	AllowedOverrideModes []*ProcessingMode `protobuf:"bytes,22,rep,name=allowed_override_modes,json=allowedOverrideModes,proto3" json:"allowed_override_modes,omitempty"`
-	// Decorator to introduce custom logic that runs after the “ProcessingRequest“ is constructed, but
-	// before it is sent to the External Processor. The “ProcessingRequest“ may be modified.
+	// Decorator to introduce custom logic that runs after the ``ProcessingRequest`` is constructed, but
+	// before it is sent to the External Processor. The ``ProcessingRequest`` may be modified.
 	//
 	// .. note::
-	//
-	//	Processing request modifiers are currently in alpha.
+	//   Processing request modifiers are currently in alpha.
 	//
 	// [#extension-category: envoy.http.ext_proc.processing_request_modifiers]
 	ProcessingRequestModifier *v3.TypedExtensionConfig `protobuf:"bytes,25,opt,name=processing_request_modifier,json=processingRequestModifier,proto3" json:"processing_request_modifier,omitempty"`
@@ -360,17 +362,16 @@ type ExternalProcessor struct {
 	// the External Processor is processed, but before continuing filter chain iteration.
 	//
 	// .. note::
-	//
-	//	Response processors are currently in alpha.
+	//   Response processors are currently in alpha.
 	//
 	// [#extension-category: envoy.http.ext_proc.response_processors]
 	OnProcessingResponse *v3.TypedExtensionConfig `protobuf:"bytes,23,opt,name=on_processing_response,json=onProcessingResponse,proto3" json:"on_processing_response,omitempty"`
 	// Sets the HTTP status code that is returned to the client when the external processing server returns
 	// an error, fails to respond, or cannot be reached.
 	//
-	// The default status is “HTTP 500 Internal Server Error“.
+	// The default status is ``HTTP 500 Internal Server Error``.
 	StatusOnError *v32.HttpStatus `protobuf:"bytes,24,opt,name=status_on_error,json=statusOnError,proto3" json:"status_on_error,omitempty"`
-	// If true, the filter will not remove the “content-length“ header from the request/response after external processing.
+	// If true, the filter will not remove the ``content-length`` header from the request/response after external processing.
 	// It is typically used in
 	// :ref:`FULL_DUPLEX_STREAMED <envoy_v3_api_enum_value_extensions.filters.http.ext_proc.v3.ProcessingMode.BodySendMode.FULL_DUPLEX_STREAMED>`
 	// mode. If the original body has been modified, the external processing server needs to set the correct content-length header in HeaderMutation
@@ -378,15 +379,16 @@ type ExternalProcessor struct {
 	//
 	// .. warning::
 	//
-	//	This configuration should only be used if you are sure that the content length matches
-	//	the body length after external processing. Otherwise, it may cause vulnerability issues such as
-	//	request smuggling. Thus, please use your own discretion when enabling this feature.
+	//    This configuration should only be used if you are sure that the content length matches
+	//    the body length after external processing. Otherwise, it may cause vulnerability issues such as
+	//    request smuggling. Thus, please use your own discretion when enabling this feature.
+	//
 	AllowContentLengthHeader bool `protobuf:"varint,26,opt,name=allow_content_length_header,json=allowContentLengthHeader,proto3" json:"allow_content_length_header,omitempty"`
 	// Whether to emit client-side spans for external processing requests.
 	// When set to false, client-side egress spans will not be emitted/exported to trace collectors,
-	// but trace context (e.g. “traceparent“) will still be propagated to the external processor.
+	// but trace context (e.g. ``traceparent``) will still be propagated to the external processor.
 	//
-	// If unset, defaults to “true“.
+	// If unset, defaults to ``true``.
 	EmitClientSpan *wrapperspb.BoolValue `protobuf:"bytes,27,opt,name=emit_client_span,json=emitClientSpan,proto3" json:"emit_client_span,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -738,10 +740,10 @@ func (x *MetadataOptions) GetClusterMetadataForwardingNamespaces() *MetadataOpti
 type HeaderForwardingRules struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// If set, specifically allow any header in this list to be forwarded to the external
-	// processing server. This can be overridden by the below “disallowed_headers“.
+	// processing server. This can be overridden by the below ``disallowed_headers``.
 	AllowedHeaders *v33.ListStringMatcher `protobuf:"bytes,1,opt,name=allowed_headers,json=allowedHeaders,proto3" json:"allowed_headers,omitempty"`
 	// If set, specifically disallow any header in this list to be forwarded to the external
-	// processing server. This overrides the above “allowed_headers“ if a header matches both.
+	// processing server. This overrides the above ``allowed_headers`` if a header matches both.
 	DisallowedHeaders *v33.ListStringMatcher `protobuf:"bytes,2,opt,name=disallowed_headers,json=disallowedHeaders,proto3" json:"disallowed_headers,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
@@ -894,11 +896,11 @@ type ExtProcOverrides struct {
 	AsyncMode bool `protobuf:"varint,2,opt,name=async_mode,json=asyncMode,proto3" json:"async_mode,omitempty"`
 	// [#not-implemented-hide:]
 	// Set different optional attributes than the default setting of the
-	// “request_attributes“ field.
+	// ``request_attributes`` field.
 	RequestAttributes []string `protobuf:"bytes,3,rep,name=request_attributes,json=requestAttributes,proto3" json:"request_attributes,omitempty"`
 	// [#not-implemented-hide:]
 	// Set different optional properties than the default setting of the
-	// “response_attributes“ field.
+	// ``response_attributes`` field.
 	ResponseAttributes []string `protobuf:"bytes,4,rep,name=response_attributes,json=responseAttributes,proto3" json:"response_attributes,omitempty"`
 	// Set a different gRPC service for this route than the default.
 	GrpcService *v3.GrpcService `protobuf:"bytes,5,opt,name=grpc_service,json=grpcService,proto3" json:"grpc_service,omitempty"`
@@ -908,21 +910,21 @@ type ExtProcOverrides struct {
 	// config used. It is the prerogative of the control plane to ensure this
 	// most-specific config contains the correct final overrides.
 	MetadataOptions *MetadataOptions `protobuf:"bytes,6,opt,name=metadata_options,json=metadataOptions,proto3" json:"metadata_options,omitempty"`
-	// Additional metadata to include into streams initiated to the “ext_proc“ gRPC
+	// Additional metadata to include into streams initiated to the ``ext_proc`` gRPC
 	// service. This can be used for scenarios in which additional ad hoc
-	// authorization headers (e.g. “x-foo-bar: baz-key“) are to be injected or
+	// authorization headers (e.g. ``x-foo-bar: baz-key``) are to be injected or
 	// when a route needs to partially override inherited metadata.
 	GrpcInitialMetadata []*v3.HeaderValue `protobuf:"bytes,7,rep,name=grpc_initial_metadata,json=grpcInitialMetadata,proto3" json:"grpc_initial_metadata,omitempty"`
 	// If true, the filter will not fail closed if the gRPC stream is prematurely closed
 	// or could not be opened. This field is the per-route override of
 	// :ref:`failure_mode_allow <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.failure_mode_allow>`.
 	FailureModeAllow *wrapperspb.BoolValue `protobuf:"bytes,8,opt,name=failure_mode_allow,json=failureModeAllow,proto3" json:"failure_mode_allow,omitempty"`
-	// Decorator to introduce custom logic that runs after the “ProcessingRequest“ is constructed, but
-	// before it is sent to the External Processor. The “ProcessingRequest“ may be modified.
+	// Decorator to introduce custom logic that runs after the ``ProcessingRequest`` is constructed, but
+	// before it is sent to the External Processor. The ``ProcessingRequest`` may be modified.
 	// This is a per-route override of
 	// :ref:`processing_request_modifier <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.processing_request_modifier>`.
 	ProcessingRequestModifier *v3.TypedExtensionConfig `protobuf:"bytes,9,opt,name=processing_request_modifier,json=processingRequestModifier,proto3" json:"processing_request_modifier,omitempty"`
-	// Overrides the filter-level “emit_client_span“ setting for this route.
+	// Overrides the filter-level ``emit_client_span`` setting for this route.
 	EmitClientSpan *wrapperspb.BoolValue `protobuf:"bytes,10,opt,name=emit_client_span,json=emitClientSpan,proto3" json:"emit_client_span,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -1032,10 +1034,10 @@ func (x *ExtProcOverrides) GetEmitClientSpan() *wrapperspb.BoolValue {
 type MetadataOptions_MetadataNamespaces struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Specifies a list of metadata namespaces whose values, if present,
-	// will be passed to the “ext_proc“ service as an opaque “protobuf::Struct“.
+	// will be passed to the ``ext_proc`` service as an opaque ``protobuf::Struct``.
 	Untyped []string `protobuf:"bytes,1,rep,name=untyped,proto3" json:"untyped,omitempty"`
 	// Specifies a list of metadata namespaces whose values, if present,
-	// will be passed to the “ext_proc“ service as a “protobuf::Any“. This allows
+	// will be passed to the ``ext_proc`` service as a ``protobuf::Any``. This allows
 	// envoy and the external processing server to share the protobuf message
 	// definition for safe parsing.
 	Typed         []string `protobuf:"bytes,2,rep,name=typed,proto3" json:"typed,omitempty"`

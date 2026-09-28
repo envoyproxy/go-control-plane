@@ -41,11 +41,11 @@ const (
 type SaveProcessingResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The default filter state name is
-	// “envoy.http.ext_proc.response_processors.save_processing_response“.
-	// If defined, “filter_state_name_suffix“ is appended to this name.
+	// ``envoy.http.ext_proc.response_processors.save_processing_response``.
+	// If defined, ``filter_state_name_suffix`` is appended to this name.
 	//
-	// For example, setting “filter_state_name_suffix“ to “xyz“ will set the filter state name
-	// to “envoy.http.ext_proc.response_processors.save_processing_response.xyz“.
+	// For example, setting ``filter_state_name_suffix`` to ``xyz`` will set the filter state name
+	// to ``envoy.http.ext_proc.response_processors.save_processing_response.xyz``.
 	FilterStateNameSuffix string `protobuf:"bytes,1,opt,name=filter_state_name_suffix,json=filterStateNameSuffix,proto3" json:"filter_state_name_suffix,omitempty"`
 	// Save the response to filter state when
 	// :ref:`request_headers <envoy_v3_api_field_service.ext_proc.v3.ProcessingResponse.request_headers>`
@@ -146,14 +146,14 @@ func (x *SaveProcessingResponse) GetSaveImmediateResponse() *SaveProcessingRespo
 // Options for saving the processing response.
 type SaveProcessingResponse_SaveOptions struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// When set to “true“, saves the response for the corresponding response type.
+	// When set to ``true``, saves the response for the corresponding response type.
 	//
-	// Defaults to “false“.
+	// Defaults to ``false``.
 	SaveResponse bool `protobuf:"varint,1,opt,name=save_response,json=saveResponse,proto3" json:"save_response,omitempty"`
-	// When set to “true“, saves the response if there was an error when processing the response
+	// When set to ``true``, saves the response if there was an error when processing the response
 	// from the external processor.
 	//
-	// Defaults to “false“.
+	// Defaults to ``false``.
 	SaveOnError   bool `protobuf:"varint,2,opt,name=save_on_error,json=saveOnError,proto3" json:"save_on_error,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

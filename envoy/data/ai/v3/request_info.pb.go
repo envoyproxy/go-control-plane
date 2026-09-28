@@ -33,7 +33,7 @@ const (
 // [#next-free-field: 8]
 type RequestInfo struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The route's declared wire API. When unspecified, only “model“ and “stream“ are read.
+	// The route's declared wire API. When unspecified, only ``model`` and ``stream`` are read.
 	InputLlmProtocol v3.LLMProtocol `protobuf:"varint,1,opt,name=input_llm_protocol,json=inputLlmProtocol,proto3,enum=envoy.type.ai.v3.LLMProtocol" json:"input_llm_protocol,omitempty"`
 	// The requested model.
 	Model string `protobuf:"bytes,2,opt,name=model,proto3" json:"model,omitempty"`
@@ -47,7 +47,7 @@ type RequestInfo struct {
 	ToolCount *wrapperspb.UInt32Value `protobuf:"bytes,6,opt,name=tool_count,json=toolCount,proto3" json:"tool_count,omitempty"`
 	// Envoy's estimate of the input tokens, published only when :ref:`token_estimation
 	// <envoy_v3_api_field_extensions.http.ai_filters.request_info.v3.RequestInfo.token_estimation>`
-	// is configured: “ceil(tokens_per_byte * request payload bytes)“. A size heuristic, not a
+	// is configured: ``ceil(tokens_per_byte * request payload bytes)``. A size heuristic, not a
 	// tokenizer result, and independent of the wire API.
 	EstimatedInputTokens *wrapperspb.UInt64Value `protobuf:"bytes,7,opt,name=estimated_input_tokens,json=estimatedInputTokens,proto3" json:"estimated_input_tokens,omitempty"`
 	unknownFields        protoimpl.UnknownFields

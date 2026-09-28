@@ -174,14 +174,13 @@ type StringMatcher_Regex struct {
 	//
 	// Examples:
 	//
-	// * The regex “\d{3}“ matches the value *123*
-	// * The regex “\d{3}“ does not match the value *1234*
-	// * The regex “\d{3}“ does not match the value *123.456*
+	// * The regex ``\d{3}`` matches the value *123*
+	// * The regex ``\d{3}`` does not match the value *1234*
+	// * The regex ``\d{3}`` does not match the value *123.456*
 	//
 	// .. attention::
-	//
-	//	This field has been deprecated in favor of `safe_regex` as it is not safe for use with
-	//	untrusted input in all cases.
+	//   This field has been deprecated in favor of `safe_regex` as it is not safe for use with
+	//   untrusted input in all cases.
 	//
 	// Deprecated: Marked as deprecated in envoy/type/matcher/string.proto.
 	Regex string `protobuf:"bytes,4,opt,name=regex,proto3,oneof"`

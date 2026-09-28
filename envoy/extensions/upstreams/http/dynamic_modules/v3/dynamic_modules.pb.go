@@ -37,13 +37,13 @@ type Config struct {
 	// The dynamic module configuration.
 	DynamicModuleConfig *v3.DynamicModuleConfig `protobuf:"bytes,1,opt,name=dynamic_module_config,json=dynamicModuleConfig,proto3" json:"dynamic_module_config,omitempty"`
 	// The name to identify the bridge implementation within the module.
-	// This is passed to the module's “envoy_dynamic_module_on_upstream_http_tcp_bridge_config_new“
+	// This is passed to the module's ``envoy_dynamic_module_on_upstream_http_tcp_bridge_config_new``
 	// function.
 	BridgeName string `protobuf:"bytes,2,opt,name=bridge_name,json=bridgeName,proto3" json:"bridge_name,omitempty"`
 	// The configuration for the module's bridge implementation.
-	// This is passed to the module's “envoy_dynamic_module_on_upstream_http_tcp_bridge_config_new“
+	// This is passed to the module's ``envoy_dynamic_module_on_upstream_http_tcp_bridge_config_new``
 	// function. The configuration can be any protobuf message. However, it is recommended to use
-	// “google.protobuf.Struct“, “google.protobuf.StringValue“, or “google.protobuf.BytesValue“.
+	// ``google.protobuf.Struct``, ``google.protobuf.StringValue``, or ``google.protobuf.BytesValue``.
 	// These types are passed directly as bytes to the module, so the module does not need to have
 	// knowledge of protobuf encoding. Otherwise, the serialized bytes of the type are passed.
 	// If not specified, an empty configuration is passed.

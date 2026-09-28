@@ -105,7 +105,7 @@ type RouteTemplate struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The identifier the module selects this template with. Must be unique within the specifier.
 	TemplateId string `protobuf:"bytes,1,opt,name=template_id,json=templateId,proto3" json:"template_id,omitempty"`
-	// The route. “route_specifiers“ must be empty, since a template is not run through the
+	// The route. ``route_specifiers`` must be empty, since a template is not run through the
 	// specifier chains.
 	Route         *v3.Route `protobuf:"bytes,2,opt,name=route,proto3" json:"route,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -170,14 +170,14 @@ type RouteOverride struct {
 	// Retry policy replacing the retry policy of the produced route.
 	RetryPolicy *v3.RetryPolicy `protobuf:"bytes,2,opt,name=retry_policy,json=retryPolicy,proto3" json:"retry_policy,omitempty"`
 	// Metadata match criteria replacing those of the produced route, used by subset load balancing.
-	// Only the “envoy.lb“ entry of :ref:`filter_metadata
+	// Only the ``envoy.lb`` entry of :ref:`filter_metadata
 	// <envoy_v3_api_field_config.core.v3.Metadata.filter_metadata>` is used, matching the behavior of
 	// :ref:`RouteAction.metadata_match
 	// <envoy_v3_api_field_config.route.v3.RouteAction.metadata_match>`. An entry whose only property
-	// is a “metadata_match“ without an “envoy.lb“ entry replaces nothing and is rejected.
+	// is a ``metadata_match`` without an ``envoy.lb`` entry replaces nothing and is rejected.
 	MetadataMatch *v31.Metadata `protobuf:"bytes,3,opt,name=metadata_match,json=metadataMatch,proto3" json:"metadata_match,omitempty"`
 	// Request mirroring policies replacing those of the produced route. Statically named mirror
-	// clusters are checked against the cluster manager when “validate_clusters“ is enabled.
+	// clusters are checked against the cluster manager when ``validate_clusters`` is enabled.
 	RequestMirrorPolicies []*v3.RouteAction_RequestMirrorPolicy `protobuf:"bytes,4,rep,name=request_mirror_policies,json=requestMirrorPolicies,proto3" json:"request_mirror_policies,omitempty"`
 	// Hash policy replacing the hash policy of the produced route, used when the upstream cluster
 	// employs a hashing load balancer. A cluster level and a load balancer level hash policy, when
@@ -287,55 +287,53 @@ type DynamicModuleRouteSpecifier struct {
 	// Specifies the shared object level configuration. This field is required.
 	//
 	// .. note::
-	//
-	//	This extension loads the module while the route configuration is built, so it cannot wait
-	//	for an asynchronous fetch. A remote :ref:`module
-	//	<envoy_v3_api_field_extensions.dynamic_modules.v3.DynamicModuleConfig.module>` is therefore
-	//	accepted only when the module is already cached on disk, and is otherwise rejected. Setting
-	//	:ref:`nack_on_cache_miss
-	//	<envoy_v3_api_field_extensions.dynamic_modules.v3.DynamicModuleConfig.nack_on_cache_miss>` to
-	//	``true`` makes the rejection start a background fetch so that a later update succeeds. Prefer
-	//	``name`` or a local data source.
+	//   This extension loads the module while the route configuration is built, so it cannot wait
+	//   for an asynchronous fetch. A remote :ref:`module
+	//   <envoy_v3_api_field_extensions.dynamic_modules.v3.DynamicModuleConfig.module>` is therefore
+	//   accepted only when the module is already cached on disk, and is otherwise rejected. Setting
+	//   :ref:`nack_on_cache_miss
+	//   <envoy_v3_api_field_extensions.dynamic_modules.v3.DynamicModuleConfig.nack_on_cache_miss>` to
+	//   ``true`` makes the rejection start a background fetch so that a later update succeeds. Prefer
+	//   ``name`` or a local data source.
 	DynamicModuleConfig *v32.DynamicModuleConfig `protobuf:"bytes,1,opt,name=dynamic_module_config,json=dynamicModuleConfig,proto3" json:"dynamic_module_config,omitempty"`
 	// The name for this route specifier configuration, used to select an implementation within the
 	// module. If not specified, defaults to an empty string.
 	SpecifierName string `protobuf:"bytes,2,opt,name=specifier_name,json=specifierName,proto3" json:"specifier_name,omitempty"`
-	// The configuration for the route specifier chosen by “specifier_name“. If not specified,
+	// The configuration for the route specifier chosen by ``specifier_name``. If not specified,
 	// defaults to an empty configuration.
 	SpecifierConfig *anypb.Any `protobuf:"bytes,3,opt,name=specifier_config,json=specifierConfig,proto3" json:"specifier_config,omitempty"`
 	// Prefix for the statistics of this specifier, emitted as
-	// “<metrics_namespace>.route_specifier.<stat_prefix>.*“, where “metrics_namespace“ is the
+	// ``<metrics_namespace>.route_specifier.<stat_prefix>.*``, where ``metrics_namespace`` is the
 	// :ref:`metrics_namespace
 	// <envoy_v3_api_field_extensions.dynamic_modules.v3.DynamicModuleConfig.metrics_namespace>`
 	// of the module. Specifiers that share a metrics namespace and prefix share counters, so keep
 	// the prefix unique within that namespace.
 	StatPrefix string `protobuf:"bytes,4,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
-	// The route templates the module may select by “template_id“, each replacing the resolved
-	// route with a route built from configuration. The “template_id“ values must be unique.
+	// The route templates the module may select by ``template_id``, each replacing the resolved
+	// route with a route built from configuration. The ``template_id`` values must be unique.
 	RouteTemplates []*RouteTemplate `protobuf:"bytes,5,rep,name=route_templates,json=routeTemplates,proto3" json:"route_templates,omitempty"`
-	// The route overrides the module may select by “override_id“, each overlaying its properties
-	// onto the produced route. The “override_id“ values must be unique.
+	// The route overrides the module may select by ``override_id``, each overlaying its properties
+	// onto the produced route. The ``override_id`` values must be unique.
 	RouteOverrides []*RouteOverride `protobuf:"bytes,6,rep,name=route_overrides,json=routeOverrides,proto3" json:"route_overrides,omitempty"`
 	// Fraction of requests the module is invoked for. A request outside the fraction is passed
-	// through untouched and counted in “runtime_skipped“. The stable random value of the request is
+	// through untouched and counted in ``runtime_skipped``. The stable random value of the request is
 	// used, so the choice holds when the route of a request is recomputed. If not specified,
 	// defaults to every request.
 	//
 	// .. attention::
-	//
-	//	A request outside the fraction is routed by ``routes`` or ``matcher`` alone, so a fraction
-	//	below 100% is only safe, as a canary or as an emergency switch with the runtime key set to
-	//	``0``, while the route table the module replaces is still complete. Once that table has been
-	//	shrunk, lowering the fraction turns the affected requests into 404s or routes them wrongly, and
-	//	the way back is a route configuration rollback that restores the table.
+	//   A request outside the fraction is routed by ``routes`` or ``matcher`` alone, so a fraction
+	//   below 100% is only safe, as a canary or as an emergency switch with the runtime key set to
+	//   ``0``, while the route table the module replaces is still complete. Once that table has been
+	//   shrunk, lowering the fraction turns the affected requests into 404s or routes them wrongly, and
+	//   the way back is a route configuration rollback that restores the table.
 	RuntimeFraction *v31.RuntimeFractionalPercent `protobuf:"bytes,7,opt,name=runtime_fraction,json=runtimeFraction,proto3" json:"runtime_fraction,omitempty"`
 	// What Envoy does when the decision of the module cannot be honored. Must be set explicitly.
 	FailurePolicy FailurePolicy `protobuf:"varint,8,opt,name=failure_policy,json=failurePolicy,proto3,enum=envoy.extensions.router.route_specifiers.dynamic_modules.v3.FailurePolicy" json:"failure_policy,omitempty"`
 	// Whether the clusters the route templates and the route overrides name are checked
 	// against the cluster manager while the specifier is configured. If not specified, defaults to
-	// “false“, because the clusters a route names may be delivered after the route configuration
+	// ``false``, because the clusters a route names may be delivered after the route configuration
 	// that references them. An unknown cluster then fails the request with the
-	// “cluster_not_found_response_code“ of the route instead.
+	// ``cluster_not_found_response_code`` of the route instead.
 	ValidateClusters *wrapperspb.BoolValue `protobuf:"bytes,9,opt,name=validate_clusters,json=validateClusters,proto3" json:"validate_clusters,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache

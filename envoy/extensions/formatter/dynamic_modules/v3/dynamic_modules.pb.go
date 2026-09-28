@@ -40,37 +40,38 @@ type DynamicModuleFormatter struct {
 	// The name for this formatter configuration. If not specified, defaults to an empty string.
 	//
 	// This can be used to distinguish between different formatter implementations inside a dynamic
-	// module. When Envoy receives this configuration, it passes the “formatter_name“ to the dynamic
-	// module's formatter config init function together with the “formatter_config“. That way a
+	// module. When Envoy receives this configuration, it passes the ``formatter_name`` to the dynamic
+	// module's formatter config init function together with the ``formatter_config``. That way a
 	// module can decide which in-module command parser implementation to use based on the name at
 	// load time.
 	FormatterName string `protobuf:"bytes,2,opt,name=formatter_name,json=formatterName,proto3" json:"formatter_name,omitempty"`
-	// The configuration for the formatter chosen by “formatter_name“. If not specified, an empty
+	// The configuration for the formatter chosen by ``formatter_name``. If not specified, an empty
 	// configuration is passed to the module.
 	//
 	// This is passed to the module's formatter initialization function. Together with the
-	// “formatter_name“, the module can decide which in-module command parser implementation to use
+	// ``formatter_name``, the module can decide which in-module command parser implementation to use
 	// and fine-tune which commands it recognizes.
 	//
-	// “google.protobuf.Struct“ and the “value“ field of “xds.type.v3.TypedStruct“ are
+	// ``google.protobuf.Struct`` and the ``value`` field of ``xds.type.v3.TypedStruct`` are
 	// serialized as JSON before passing them to the module.
-	// “google.protobuf.BytesValue“ and “google.protobuf.StringValue“ are passed directly
+	// ``google.protobuf.BytesValue`` and ``google.protobuf.StringValue`` are passed directly
 	// without the wrapper.
 	//
 	// .. code-block:: yaml
 	//
-	//	# Passing a JSON struct configuration
-	//	formatter_config:
-	//	  "@type": "type.googleapis.com/google.protobuf.Struct"
-	//	  value:
-	//	    redact_headers:
-	//	    - authorization
-	//	    - cookie
+	//  # Passing a JSON struct configuration
+	//  formatter_config:
+	//    "@type": "type.googleapis.com/google.protobuf.Struct"
+	//    value:
+	//      redact_headers:
+	//      - authorization
+	//      - cookie
 	//
-	//	# Passing a simple string configuration
-	//	formatter_config:
-	//	  "@type": "type.googleapis.com/google.protobuf.StringValue"
-	//	  value: "x-request-id"
+	//  # Passing a simple string configuration
+	//  formatter_config:
+	//    "@type": "type.googleapis.com/google.protobuf.StringValue"
+	//    value: "x-request-id"
+	//
 	FormatterConfig *anypb.Any `protobuf:"bytes,3,opt,name=formatter_config,json=formatterConfig,proto3" json:"formatter_config,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache

@@ -200,13 +200,13 @@ type RateLimit struct {
 	//
 	// .. note::
 	//
-	//	The filter supports a range of 0 - 10 inclusively for stage numbers.
+	//  The filter supports a range of 0 - 10 inclusively for stage numbers.
 	Stage uint32 `protobuf:"varint,2,opt,name=stage,proto3" json:"stage,omitempty"`
 	// The type of requests the filter should apply to. The supported
-	// types are “internal“, “external“ or “both“. A request is considered internal if
+	// types are ``internal``, ``external`` or ``both``. A request is considered internal if
 	// :ref:`x-envoy-internal<config_http_conn_man_headers_x-envoy-internal>` is set to true. If
 	// :ref:`x-envoy-internal<config_http_conn_man_headers_x-envoy-internal>` is not set or false, a
-	// request is considered external. The filter defaults to “both“, and it will apply to all request
+	// request is considered external. The filter defaults to ``both``, and it will apply to all request
 	// types.
 	RequestType string `protobuf:"bytes,3,opt,name=request_type,json=requestType,proto3" json:"request_type,omitempty"`
 	// The timeout in milliseconds for the rate limit service RPC. If not
@@ -216,8 +216,8 @@ type RateLimit struct {
 	// not respond back. When it is set to true, Envoy will not allow traffic in case of
 	// communication failure between rate limiting service and the proxy.
 	FailureModeDeny bool `protobuf:"varint,5,opt,name=failure_mode_deny,json=failureModeDeny,proto3" json:"failure_mode_deny,omitempty"`
-	// Specifies whether a “RESOURCE_EXHAUSTED“ gRPC code must be returned instead
-	// of the default “UNAVAILABLE“ gRPC code for a rate limited gRPC call. The
+	// Specifies whether a ``RESOURCE_EXHAUSTED`` gRPC code must be returned instead
+	// of the default ``UNAVAILABLE`` gRPC code for a rate limited gRPC call. The
 	// HTTP code will be 200 for a gRPC response.
 	RateLimitedAsResourceExhausted bool `protobuf:"varint,6,opt,name=rate_limited_as_resource_exhausted,json=rateLimitedAsResourceExhausted,proto3" json:"rate_limited_as_resource_exhausted,omitempty"`
 	// Configuration for an external rate limit service provider. If not
@@ -226,19 +226,19 @@ type RateLimit struct {
 	RateLimitService *v3.RateLimitServiceConfig `protobuf:"bytes,7,opt,name=rate_limit_service,json=rateLimitService,proto3" json:"rate_limit_service,omitempty"`
 	// Defines the standard version to use for X-RateLimit headers emitted by the filter:
 	//
-	//   - “X-RateLimit-Limit“ - indicates the request-quota associated to the
-	//     client in the current time-window followed by the description of the
-	//     quota policy. The values are returned by the rate limiting service in
-	//     :ref:`current_limit<envoy_v3_api_field_service.ratelimit.v3.RateLimitResponse.DescriptorStatus.current_limit>`
-	//     field. Example: “10, 10;w=1;name="per-ip", 1000;w=3600“.
-	//   - “X-RateLimit-Remaining“ - indicates the remaining requests in the
-	//     current time-window. The values are returned by the rate limiting service
-	//     in :ref:`limit_remaining<envoy_v3_api_field_service.ratelimit.v3.RateLimitResponse.DescriptorStatus.limit_remaining>`
-	//     field.
-	//   - “X-RateLimit-Reset“ - indicates the number of seconds until reset of
-	//     the current time-window. The values are returned by the rate limiting service
-	//     in :ref:`duration_until_reset<envoy_v3_api_field_service.ratelimit.v3.RateLimitResponse.DescriptorStatus.duration_until_reset>`
-	//     field.
+	// * ``X-RateLimit-Limit`` - indicates the request-quota associated to the
+	//   client in the current time-window followed by the description of the
+	//   quota policy. The values are returned by the rate limiting service in
+	//   :ref:`current_limit<envoy_v3_api_field_service.ratelimit.v3.RateLimitResponse.DescriptorStatus.current_limit>`
+	//   field. Example: ``10, 10;w=1;name="per-ip", 1000;w=3600``.
+	// * ``X-RateLimit-Remaining`` - indicates the remaining requests in the
+	//   current time-window. The values are returned by the rate limiting service
+	//   in :ref:`limit_remaining<envoy_v3_api_field_service.ratelimit.v3.RateLimitResponse.DescriptorStatus.limit_remaining>`
+	//   field.
+	// * ``X-RateLimit-Reset`` - indicates the number of seconds until reset of
+	//   the current time-window. The values are returned by the rate limiting service
+	//   in :ref:`duration_until_reset<envoy_v3_api_field_service.ratelimit.v3.RateLimitResponse.DescriptorStatus.duration_until_reset>`
+	//   field.
 	//
 	// In case rate limiting policy specifies more than one time window, the values
 	// above represent the window that is closest to reaching its limit.
@@ -259,8 +259,7 @@ type RateLimit struct {
 	// Defaults to 429 (TooManyRequests).
 	//
 	// .. note::
-	//
-	//	If this is set to < 400, 429 will be used instead.
+	//   If this is set to < 400, 429 will be used instead.
 	RateLimitedStatus *v31.HttpStatus `protobuf:"bytes,10,opt,name=rate_limited_status,json=rateLimitedStatus,proto3" json:"rate_limited_status,omitempty"`
 	// Specifies a list of HTTP headers that should be added to each response for requests that
 	// have been rate limited.
@@ -269,12 +268,12 @@ type RateLimit struct {
 	// or cannot be reached. The default status is 500.
 	StatusOnError *v31.HttpStatus `protobuf:"bytes,12,opt,name=status_on_error,json=statusOnError,proto3" json:"status_on_error,omitempty"`
 	// Optional additional prefix to use when emitting statistics. This allows to distinguish
-	// emitted statistics between configured “ratelimit“ filters in an HTTP filter chain.
+	// emitted statistics between configured ``ratelimit`` filters in an HTTP filter chain.
 	StatPrefix string `protobuf:"bytes,13,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// If set, this will enable -- but not necessarily enforce -- the rate limit for the given
 	// fraction of requests.
 	//
-	// If not set then “ratelimit.http_filter_enabled“ runtime key will be used to determine
+	// If not set then ``ratelimit.http_filter_enabled`` runtime key will be used to determine
 	// the fraction of requests to enforce rate limits on. And the default percentage of the
 	// runtime key is 100% for backwards compatibility.
 	FilterEnabled *v32.RuntimeFractionalPercent `protobuf:"bytes,14,opt,name=filter_enabled,json=filterEnabled,proto3" json:"filter_enabled,omitempty"`
@@ -282,7 +281,7 @@ type RateLimit struct {
 	//
 	// Note: this only applies to the fraction of enabled requests.
 	//
-	// If not set then “ratelimit.http_filter_enforcing“ runtime key will be used to determine
+	// If not set then ``ratelimit.http_filter_enforcing`` runtime key will be used to determine
 	// the fraction of requests to enforce rate limits on. And the default percentage of the
 	// runtime key is 100% for backwards compatibility.
 	FilterEnforced *v32.RuntimeFractionalPercent `protobuf:"bytes,15,opt,name=filter_enforced,json=filterEnforced,proto3" json:"filter_enforced,omitempty"`
@@ -293,12 +292,12 @@ type RateLimit struct {
 	//
 	// .. code-block:: yaml
 	//
-	//	failure_mode_deny: true
-	//	failure_mode_deny_percent:
-	//	  default_value:
-	//	    numerator: 50
-	//	    denominator: HUNDRED
-	//	  runtime_key: ratelimit.failure_mode_deny_percent
+	//   failure_mode_deny: true
+	//   failure_mode_deny_percent:
+	//     default_value:
+	//       numerator: 50
+	//       denominator: HUNDRED
+	//     runtime_key: ratelimit.failure_mode_deny_percent
 	//
 	// This means that when the rate limit service is unavailable, 50% of requests will be denied
 	// (fail closed) and 50% will be allowed (fail open).
@@ -312,25 +311,24 @@ type RateLimit struct {
 	// will take precedence over this field.
 	//
 	// .. note::
+	//   Not all configuration fields of
+	//   :ref:`rate limit config <envoy_v3_api_msg_config.route.v3.RateLimit>` is supported at here.
+	//   Following fields are not supported:
 	//
-	//	Not all configuration fields of
-	//	:ref:`rate limit config <envoy_v3_api_msg_config.route.v3.RateLimit>` is supported at here.
-	//	Following fields are not supported:
-	//
-	//	1. :ref:`rate limit stage <envoy_v3_api_field_config.route.v3.RateLimit.stage>`.
-	//	2. :ref:`dynamic metadata <envoy_v3_api_field_config.route.v3.RateLimit.Action.dynamic_metadata>`.
-	//	3. :ref:`disable_key <envoy_v3_api_field_config.route.v3.RateLimit.disable_key>`.
-	//	4. :ref:`override limit <envoy_v3_api_field_config.route.v3.RateLimit.limit>`.
+	//   1. :ref:`rate limit stage <envoy_v3_api_field_config.route.v3.RateLimit.stage>`.
+	//   2. :ref:`dynamic metadata <envoy_v3_api_field_config.route.v3.RateLimit.Action.dynamic_metadata>`.
+	//   3. :ref:`disable_key <envoy_v3_api_field_config.route.v3.RateLimit.disable_key>`.
+	//   4. :ref:`override limit <envoy_v3_api_field_config.route.v3.RateLimit.limit>`.
 	RateLimits []*v33.RateLimit `protobuf:"bytes,17,rep,name=rate_limits,json=rateLimits,proto3" json:"rate_limits,omitempty"`
 	// The namespace where dynamic metadata from rate limit response is saved.
 	// If not set, the default is "envoy.filters.http.ratelimit".
 	MetadataNamespace string `protobuf:"bytes,18,opt,name=metadata_namespace,json=metadataNamespace,proto3" json:"metadata_namespace,omitempty"`
-	// Specifies whether the filter emits a “Retry-After“ header when it enforces an HTTP 429
+	// Specifies whether the filter emits a ``Retry-After`` header when it enforces an HTTP 429
 	// response. This option has no effect on responses with any other status code. The value is the
-	// largest “duration_until_reset“ among the over-limit descriptor statuses returned by the rate
+	// largest ``duration_until_reset`` among the over-limit descriptor statuses returned by the rate
 	// limit service, expressed in seconds and clamped to at least 1. The header is not emitted when no
 	// over-limit descriptor status is present.
-	// If the rate limit service returns a “Retry-After“ header, the filter does not overwrite it.
+	// If the rate limit service returns a ``Retry-After`` header, the filter does not overwrite it.
 	//
 	// Disabled by default.
 	EnableRetryAfterHeader bool `protobuf:"varint,19,opt,name=enable_retry_after_header,json=enableRetryAfterHeader,proto3" json:"enable_retry_after_header,omitempty"`
@@ -511,7 +509,7 @@ type RateLimitPerRoute struct {
 	OverrideOption RateLimitPerRoute_OverrideOptions `protobuf:"varint,2,opt,name=override_option,json=overrideOption,proto3,enum=envoy.extensions.filters.http.ratelimit.v3.RateLimitPerRoute_OverrideOptions" json:"override_option,omitempty"`
 	// Rate limit configuration that is used to generate a list of descriptor entries based on
 	// the request context. The generated entries will be used to find one or multiple matched rate
-	// limit rule from the “descriptors“.
+	// limit rule from the ``descriptors``.
 	// If this is set, then
 	// :ref:`VirtualHost.rate_limits<envoy_v3_api_field_config.route.v3.VirtualHost.rate_limits>`,
 	// :ref:`RouteAction.rate_limits<envoy_v3_api_field_config.route.v3.RouteAction.rate_limits>` and
@@ -519,15 +517,14 @@ type RateLimitPerRoute struct {
 	// will be ignored.
 	//
 	// .. note::
+	//   Not all configuration fields of
+	//   :ref:`rate limit config <envoy_v3_api_msg_config.route.v3.RateLimit>` is supported at here.
+	//   Following fields are not supported:
 	//
-	//	Not all configuration fields of
-	//	:ref:`rate limit config <envoy_v3_api_msg_config.route.v3.RateLimit>` is supported at here.
-	//	Following fields are not supported:
-	//
-	//	1. :ref:`rate limit stage <envoy_v3_api_field_config.route.v3.RateLimit.stage>`.
-	//	2. :ref:`dynamic metadata <envoy_v3_api_field_config.route.v3.RateLimit.Action.dynamic_metadata>`.
-	//	3. :ref:`disable_key <envoy_v3_api_field_config.route.v3.RateLimit.disable_key>`.
-	//	4. :ref:`override limit <envoy_v3_api_field_config.route.v3.RateLimit.limit>`.
+	//   1. :ref:`rate limit stage <envoy_v3_api_field_config.route.v3.RateLimit.stage>`.
+	//   2. :ref:`dynamic metadata <envoy_v3_api_field_config.route.v3.RateLimit.Action.dynamic_metadata>`.
+	//   3. :ref:`disable_key <envoy_v3_api_field_config.route.v3.RateLimit.disable_key>`.
+	//   4. :ref:`override limit <envoy_v3_api_field_config.route.v3.RateLimit.limit>`.
 	RateLimits []*v33.RateLimit `protobuf:"bytes,3,rep,name=rate_limits,json=rateLimits,proto3" json:"rate_limits,omitempty"`
 	// Overrides the domain. If not set, uses the filter-level domain instead.
 	Domain        string `protobuf:"bytes,4,opt,name=domain,proto3" json:"domain,omitempty"`

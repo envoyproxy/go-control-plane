@@ -350,8 +350,8 @@ type HealthCheckEjectUnhealthy struct {
 	// The type of failure that caused this ejection.
 	FailureType HealthCheckFailureType `protobuf:"varint,1,opt,name=failure_type,json=failureType,proto3,enum=envoy.data.core.v3.HealthCheckFailureType" json:"failure_type,omitempty"`
 	// HTTP status code observed on the response associated with the failure.
-	// Only set when the health checker type is HTTP and the failure type is “ACTIVE“.
-	// A value of “0“ indicates that no HTTP status code was recorded (e.g., network-level failures
+	// Only set when the health checker type is HTTP and the failure type is ``ACTIVE``.
+	// A value of ``0`` indicates that no HTTP status code was recorded (e.g., network-level failures
 	// or non-HTTP health checkers).
 	HttpStatusCode uint32 `protobuf:"varint,2,opt,name=http_status_code,json=httpStatusCode,proto3" json:"http_status_code,omitempty"`
 	unknownFields  protoimpl.UnknownFields
@@ -492,8 +492,8 @@ type HealthCheckFailure struct {
 	// Whether this event is the result of the first ever health check on a host.
 	FirstCheck bool `protobuf:"varint,2,opt,name=first_check,json=firstCheck,proto3" json:"first_check,omitempty"`
 	// HTTP status code observed on the response associated with the failure.
-	// Only set when the health checker type is HTTP and the failure type is “ACTIVE“.
-	// A value of “0“ indicates that no HTTP status code was recorded (e.g., network-level failures
+	// Only set when the health checker type is HTTP and the failure type is ``ACTIVE``.
+	// A value of ``0`` indicates that no HTTP status code was recorded (e.g., network-level failures
 	// or non-HTTP health checkers).
 	HttpStatusCode uint32 `protobuf:"varint,3,opt,name=http_status_code,json=httpStatusCode,proto3" json:"http_status_code,omitempty"`
 	unknownFields  protoimpl.UnknownFields

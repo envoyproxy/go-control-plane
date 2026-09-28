@@ -30,10 +30,10 @@ const (
 type BandwidthShare struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Configuration for request limiting. If unset, requests are not limited.
-	// If “kbps“ is zero, requests are not limited.
+	// If ``kbps`` is zero, requests are not limited.
 	RequestLimit *BandwidthShare_Limit `protobuf:"bytes,1,opt,name=request_limit,json=requestLimit,proto3" json:"request_limit,omitempty"`
 	// Configuration for response limiting. If unset, responses are not limited.
-	// If “kbps“ is zero, responses are not limited.
+	// If ``kbps`` is zero, responses are not limited.
 	ResponseLimit *BandwidthShare_Limit `protobuf:"bytes,2,opt,name=response_limit,json=responseLimit,proto3" json:"response_limit,omitempty"`
 	// Optional fill interval in milliseconds for the token refills. Defaults to 50ms.
 	// It must be at least 20ms to avoid too aggressive refills.
@@ -45,27 +45,27 @@ type BandwidthShare struct {
 	//
 	// .. note::
 	//
-	//	If set true, the following 4 trailers will be added, prefixed by ``response_trailer_prefix``:
-	//	* bandwidth-request-delay-ms: delay time in milliseconds added by the limiter.
-	//	* bandwidth-response-delay-ms: delay time in milliseconds added by the limiter.
-	//	* bandwidth-request-duration-ms: total duration of receiving and processing the request.
-	//	* bandwidth-response-duration-ms: total duration of receiving and processing the response.
+	//   If set true, the following 4 trailers will be added, prefixed by ``response_trailer_prefix``:
+	//   * bandwidth-request-delay-ms: delay time in milliseconds added by the limiter.
+	//   * bandwidth-response-delay-ms: delay time in milliseconds added by the limiter.
+	//   * bandwidth-request-duration-ms: total duration of receiving and processing the request.
+	//   * bandwidth-response-duration-ms: total duration of receiving and processing the response.
 	//
-	//	If ``response_limit`` is unset or has ``kbps`` of 0, the trailers will not be set.
+	//   If ``response_limit`` is unset or has ``kbps`` of 0, the trailers will not be set.
 	//
-	//	If both the request and response delay time is 0, the trailers will not be set.
+	//   If both the request and response delay time is 0, the trailers will not be set.
 	//
-	//	Note that the delay time may overlap with other factors such that it may not actually
-	//	increase the duration by the stated amount - for example, the source data may still be
-	//	arriving into a buffer during the artificial delay, such that it's possible to fully
-	//	"catch up" the lost time by reading from that buffer at a later, less-constrained time.
+	//   Note that the delay time may overlap with other factors such that it may not actually
+	//   increase the duration by the stated amount - for example, the source data may still be
+	//   arriving into a buffer during the artificial delay, such that it's possible to fully
+	//   "catch up" the lost time by reading from that buffer at a later, less-constrained time.
 	EnableResponseTrailers bool `protobuf:"varint,4,opt,name=enable_response_trailers,json=enableResponseTrailers,proto3" json:"enable_response_trailers,omitempty"`
 	// The prefix for the response trailers. Empty string is a valid prefix.
 	//
-	// If set, “enable_response_trailers“ must be true.
+	// If set, ``enable_response_trailers`` must be true.
 	//
-	// For example, if this value is “x-banana-“ then the trailer keys will be
-	// “x-banana-bandwidth-request-delay-ms“, “x-banana-bandwidth-response-duration-ms“,
+	// For example, if this value is ``x-banana-`` then the trailer keys will be
+	// ``x-banana-bandwidth-request-delay-ms``, ``x-banana-bandwidth-response-duration-ms``,
 	// etc.
 	ResponseTrailerPrefix string `protobuf:"bytes,5,opt,name=response_trailer_prefix,json=responseTrailerPrefix,proto3" json:"response_trailer_prefix,omitempty"`
 	// An optional matcher which returns a string to use as a tenant name.
@@ -75,14 +75,14 @@ type BandwidthShare struct {
 	//
 	// If tenant names are set when limiting is being enforced, traffic may be
 	// distributed unevenly - for example, assuming all requests want all possible
-	// bandwidth, if there are five streams with tenant “foo“ and two streams with
-	// tenant “bar“, and no custom weights, “foo“ and “bar“ will get an equal
+	// bandwidth, if there are five streams with tenant ``foo`` and two streams with
+	// tenant ``bar``, and no custom weights, ``foo`` and ``bar`` will get an equal
 	// share of the bandwidth (half), then the requests within each tenant will get
-	// an equal share of that tenant's share, i.e. the “foo“ requests will each
-	// get a fifth of the “foo“ half, a tenth of the total, and the “bar“ requests
-	// will each get half of the “bar“ half, a quarter of the total.
+	// an equal share of that tenant's share, i.e. the ``foo`` requests will each
+	// get a fifth of the ``foo`` half, a tenth of the total, and the ``bar`` requests
+	// will each get half of the ``bar`` half, a quarter of the total.
 	//
-	// An example way this might be used is to have “tenant_name_selector“ make
+	// An example way this might be used is to have ``tenant_name_selector`` make
 	// each source IP address a tenant. Then if one source IP is trying to make 100
 	// requests in parallel, and 99 other IPs are making one request each, the
 	// total bandwidth distribution (assuming the limit is being exceeded) would
@@ -98,7 +98,7 @@ type BandwidthShare struct {
 	// would be throttled equally.
 	TenantNameSelector *v3.Matcher `protobuf:"bytes,6,opt,name=tenant_name_selector,json=tenantNameSelector,proto3" json:"tenant_name_selector,omitempty"`
 	// A map from tenant names to configurations. If a tenant name is not present
-	// in the map, “default_tenant_config“ is used.
+	// in the map, ``default_tenant_config`` is used.
 	TenantConfigs map[string]*BandwidthShare_TenantConfig `protobuf:"bytes,7,rep,name=tenant_configs,json=tenantConfigs,proto3" json:"tenant_configs,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// Optional configuration override for the default tenant. If unset, the
 	// default values are used.
@@ -202,7 +202,7 @@ type BandwidthShare_TenantConfig struct {
 	//
 	// If unset or 0, the default weight of 1 will be used.
 	Weight uint32 `protobuf:"varint,1,opt,name=weight,proto3" json:"weight,omitempty"`
-	// True to record stats with “tenant“ tag set to the tenant name.
+	// True to record stats with ``tenant`` tag set to the tenant name.
 	// If false or unset, the stats tag will be empty. It is recommended not
 	// to set this to default true if tenant names are dynamically generated
 	// from untrusted sources (or otherwise with unlimited scope), to
@@ -260,22 +260,21 @@ type BandwidthShare_Limit struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The unique id of the limiter. Should be set if you want to apply distinct
 	// limits on different listeners, or distinct limits for requests and responses.
-	// With matching “bucket_id“ values, multiple listeners can share a single limit
+	// With matching ``bucket_id`` values, multiple listeners can share a single limit
 	// (e.g. for https and http listener that share a network bandwidth constraint).
 	//
-	// Also used for the “bucket_id“ stats tag.
+	// Also used for the ``bucket_id`` stats tag.
 	//
-	// The empty string is a valid “bucket_id“.
+	// The empty string is a valid ``bucket_id``.
 	BucketId string `protobuf:"bytes,1,opt,name=bucket_id,json=bucketId,proto3" json:"bucket_id,omitempty"`
 	// The limit supplied in KiB/s.
 	//
 	// .. note::
-	//
-	//	The limit is associated with the ``bucket_id``. If the same ``bucket_id``
-	//	is used in multiple listeners/routes, it is a config error for the
-	//	configurations to not be identical. If the configuration is updated
-	//	dynamically via xds, changing the runtime key, the ``bucket_id`` must
-	//	also be changed or it is a config error.
+	//   The limit is associated with the ``bucket_id``. If the same ``bucket_id``
+	//   is used in multiple listeners/routes, it is a config error for the
+	//   configurations to not be identical. If the configuration is updated
+	//   dynamically via xds, changing the runtime key, the ``bucket_id`` must
+	//   also be changed or it is a config error.
 	//
 	// The limit can be updated dynamically via runtime. Setting the limit
 	// to zero, or unset, disables the filter.

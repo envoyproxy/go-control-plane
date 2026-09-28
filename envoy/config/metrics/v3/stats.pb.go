@@ -135,50 +135,49 @@ type StatsConfig struct {
 	// performance for Envoys running especially large configs.
 	//
 	// .. warning::
-	//
-	//	Excluding stats may affect Envoy's behavior in undocumented ways. See
-	//	`issue #8771 <https://github.com/envoyproxy/envoy/issues/8771>`_ for more information.
-	//	If any unexpected behavior changes are observed, please open a new issue immediately.
+	//   Excluding stats may affect Envoy's behavior in undocumented ways. See
+	//   `issue #8771 <https://github.com/envoyproxy/envoy/issues/8771>`_ for more information.
+	//   If any unexpected behavior changes are observed, please open a new issue immediately.
 	StatsMatcher *StatsMatcher `protobuf:"bytes,3,opt,name=stats_matcher,json=statsMatcher,proto3" json:"stats_matcher,omitempty"`
 	// Defines rules for setting the histogram buckets. Rules are evaluated in order, and the first
 	// match is applied. If no match is found (or if no rules are set), the following default buckets
 	// are used:
 	//
-	//	.. code-block:: json
+	//   .. code-block:: json
 	//
-	//	  [
-	//	    0.5,
-	//	    1,
-	//	    5,
-	//	    10,
-	//	    25,
-	//	    50,
-	//	    100,
-	//	    250,
-	//	    500,
-	//	    1000,
-	//	    2500,
-	//	    5000,
-	//	    10000,
-	//	    30000,
-	//	    60000,
-	//	    300000,
-	//	    600000,
-	//	    1800000,
-	//	    3600000
-	//	  ]
+	//     [
+	//       0.5,
+	//       1,
+	//       5,
+	//       10,
+	//       25,
+	//       50,
+	//       100,
+	//       250,
+	//       500,
+	//       1000,
+	//       2500,
+	//       5000,
+	//       10000,
+	//       30000,
+	//       60000,
+	//       300000,
+	//       600000,
+	//       1800000,
+	//       3600000
+	//     ]
 	HistogramBucketSettings []*HistogramBucketSettings `protobuf:"bytes,4,rep,name=histogram_bucket_settings,json=histogramBucketSettings,proto3" json:"histogram_bucket_settings,omitempty"`
-	// When set to “true“, tag extractors specified in :ref:`stats_tags
+	// When set to ``true``, tag extractors specified in :ref:`stats_tags
 	// <envoy_v3_api_field_config.metrics.v3.StatsConfig.stats_tags>` take precedence over the built-in
-	// default tag extractors that share the same “tag_name“, instead of the default taking
+	// default tag extractors that share the same ``tag_name``, instead of the default taking
 	// precedence. This allows overriding individual default Envoy tags (for example
-	// “envoy.cluster_name“) while keeping :ref:`use_all_default_tags
+	// ``envoy.cluster_name``) while keeping :ref:`use_all_default_tags
 	// <envoy_v3_api_field_config.metrics.v3.StatsConfig.use_all_default_tags>` enabled, so it is not
 	// necessary to disable all defaults and re-declare every extractor.
 	//
-	// Has no effect when “use_all_default_tags“ is “false“ (no default extractors are added in
+	// Has no effect when ``use_all_default_tags`` is ``false`` (no default extractors are added in
 	// that case). If not provided, the value is assumed to be false, preserving existing behavior
-	// where the default extractor takes precedence over custom extractors with the same “tag_name“.
+	// where the default extractor takes precedence over custom extractors with the same ``tag_name``.
 	AllowDefaultTagOverrides *wrapperspb.BoolValue `protobuf:"bytes,5,opt,name=allow_default_tag_overrides,json=allowDefaultTagOverrides,proto3" json:"allow_default_tag_overrides,omitempty"`
 	unknownFields            protoimpl.UnknownFields
 	sizeCache                protoimpl.SizeCache
@@ -331,7 +330,7 @@ type isStatsMatcher_StatsMatcher interface {
 }
 
 type StatsMatcher_RejectAll struct {
-	// If “reject_all“ is true, then all stats are disabled. If “reject_all“ is false, then all
+	// If ``reject_all`` is true, then all stats are disabled. If ``reject_all`` is false, then all
 	// stats are enabled.
 	RejectAll bool `protobuf:"varint,1,opt,name=reject_all,json=rejectAll,proto3,oneof"`
 }
@@ -371,11 +370,11 @@ type TagSpecifier struct {
 	//
 	// .. note::
 	//
-	//	A stat name may be spelled in such a way that it matches two different
-	//	tag extractors for the same tag name. In that case, all but one of the
-	//	tag values will be dropped. It is not specified which tag value will be
-	//	retained. The extraction will only occur for one of the extractors, and
-	//	only the matched extraction will be removed from the tag name.
+	//   A stat name may be spelled in such a way that it matches two different
+	//   tag extractors for the same tag name. In that case, all but one of the
+	//   tag values will be dropped. It is not specified which tag value will be
+	//   retained. The extraction will only occur for one of the extractors, and
+	//   only the matched extraction will be removed from the tag name.
 	TagName string `protobuf:"bytes,1,opt,name=tag_name,json=tagName,proto3" json:"tag_name,omitempty"`
 	// Types that are valid to be assigned to TagValue:
 	//
@@ -463,55 +462,55 @@ type TagSpecifier_Regex struct {
 	// group is provided, the first will also be used to set the value of the tag.
 	// All other capture groups will be ignored.
 	//
-	// Example 1. a stat name “cluster.foo_cluster.upstream_rq_timeout“ and
+	// Example 1. a stat name ``cluster.foo_cluster.upstream_rq_timeout`` and
 	// one tag specifier:
 	//
 	// .. code-block:: json
 	//
-	//	{
-	//	  "tag_name": "envoy.cluster_name",
-	//	  "regex": "^cluster\\.((.+?)\\.)"
-	//	}
+	//   {
+	//     "tag_name": "envoy.cluster_name",
+	//     "regex": "^cluster\\.((.+?)\\.)"
+	//   }
 	//
-	// Note that the regex will remove “foo_cluster.“ making the tag extracted
-	// name “cluster.upstream_rq_timeout“ and the tag value for
-	// “envoy.cluster_name“ will be “foo_cluster“ (note: there will be no
-	// “.“ character because of the second capture group).
+	// Note that the regex will remove ``foo_cluster.`` making the tag extracted
+	// name ``cluster.upstream_rq_timeout`` and the tag value for
+	// ``envoy.cluster_name`` will be ``foo_cluster`` (note: there will be no
+	// ``.`` character because of the second capture group).
 	//
 	// Example 2. a stat name
-	// “http.connection_manager_1.user_agent.ios.downstream_cx_total“ and two
+	// ``http.connection_manager_1.user_agent.ios.downstream_cx_total`` and two
 	// tag specifiers:
 	//
 	// .. code-block:: json
 	//
-	//	[
-	//	  {
-	//	    "tag_name": "envoy.http_user_agent",
-	//	    "regex": "^http(?=\\.).*?\\.user_agent\\.((.+?)\\.)\\w+?$"
-	//	  },
-	//	  {
-	//	    "tag_name": "envoy.http_conn_manager_prefix",
-	//	    "regex": "^http\\.((.*?)\\.)"
-	//	  }
-	//	]
+	//   [
+	//     {
+	//       "tag_name": "envoy.http_user_agent",
+	//       "regex": "^http(?=\\.).*?\\.user_agent\\.((.+?)\\.)\\w+?$"
+	//     },
+	//     {
+	//       "tag_name": "envoy.http_conn_manager_prefix",
+	//       "regex": "^http\\.((.*?)\\.)"
+	//     }
+	//   ]
 	//
 	// The two regexes of the specifiers will be processed from the elaborated
 	// stat name.
 	//
-	// The first regex will save “ios.“ as the tag value for “envoy.http_user_agent“. It will
+	// The first regex will save ``ios.`` as the tag value for ``envoy.http_user_agent``. It will
 	// leave it in the name for potential matching with additional tag specifiers. After all tag
 	// specifiers are processed the tags will be removed from the name.
 	//
-	// The second regex will populate tag “envoy.http_conn_manager_prefix“ with value
-	// “connection_manager_1.“, based on the original stat name.
+	// The second regex will populate tag ``envoy.http_conn_manager_prefix`` with value
+	// ``connection_manager_1.``, based on the original stat name.
 	//
 	// As a final step, the matched tags are removed, leaving
-	// “http.user_agent.downstream_cx_total“ as the tag extracted name.
+	// ``http.user_agent.downstream_cx_total`` as the tag extracted name.
 	Regex string `protobuf:"bytes,2,opt,name=regex,proto3,oneof"`
 }
 
 type TagSpecifier_FixedValue struct {
-	// Specifies a fixed tag value for the “tag_name“.
+	// Specifies a fixed tag value for the ``tag_name``.
 	FixedValue string `protobuf:"bytes,3,opt,name=fixed_value,json=fixedValue,proto3,oneof"`
 }
 
@@ -523,12 +522,12 @@ func (*TagSpecifier_FixedValue) isTagSpecifier_TagValue() {}
 type HistogramBucketSettings struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The stats that this rule applies to. The match is applied to the original stat name
-	// before tag-extraction, for example “cluster.exampleclustername.upstream_cx_length_ms“.
+	// before tag-extraction, for example ``cluster.exampleclustername.upstream_cx_length_ms``.
 	Match *v3.StringMatcher `protobuf:"bytes,1,opt,name=match,proto3" json:"match,omitempty"`
 	// Each value is the upper bound of a bucket. Each bucket must be greater than 0 and unique.
 	// The order of the buckets does not matter.
 	Buckets []float64 `protobuf:"fixed64,2,rep,packed,name=buckets,proto3" json:"buckets,omitempty"`
-	// Initial number of bins for the “circllhist“ thread local histogram per time series. Default value is 100.
+	// Initial number of bins for the ``circllhist`` thread local histogram per time series. Default value is 100.
 	Bins          *wrapperspb.UInt32Value `protobuf:"bytes,3,opt,name=bins,proto3" json:"bins,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -601,16 +600,16 @@ type StatsdSink struct {
 	//
 	// .. code-block:: json
 	//
-	//	{
-	//	  "prefix" : "envoy-prod"
-	//	}
+	//   {
+	//     "prefix" : "envoy-prod"
+	//   }
 	//
 	// will change emitted stats to
 	//
 	// .. code-block:: cpp
 	//
-	//	envoy-prod.test_counter:1|c
-	//	envoy-prod.test_timer:5|ms
+	//   envoy-prod.test_counter:1|c
+	//   envoy-prod.test_timer:5|ms
 	//
 	// Note that the default prefix, "envoy", will be used if a prefix is not
 	// specified.
@@ -619,14 +618,14 @@ type StatsdSink struct {
 	//
 	// .. code-block:: cpp
 	//
-	//	envoy.test_counter:1|c
-	//	envoy.test_timer:5|ms
+	//   envoy.test_counter:1|c
+	//   envoy.test_timer:5|ms
 	Prefix string `protobuf:"bytes,3,opt,name=prefix,proto3" json:"prefix,omitempty"`
 	// If true, histogram samples are scaled to milliseconds according to the histogram's unit
 	// before being reported as timers: samples of histograms recording microseconds are divided by
 	// 1000 and reported as a fractional millisecond value, while histograms recording milliseconds
 	// or without a declared unit are reported unchanged. By default every sample is reported
-	// unchanged with an “ms“ suffix regardless of the histogram's unit, so histograms recording
+	// unchanged with an ``ms`` suffix regardless of the histogram's unit, so histograms recording
 	// microseconds are reported a factor of 1000 off.
 	ScaleHistogramUnitsToMilliseconds bool `protobuf:"varint,4,opt,name=scale_histogram_units_to_milliseconds,json=scaleHistogramUnitsToMilliseconds,proto3" json:"scale_histogram_units_to_milliseconds,omitempty"`
 	unknownFields                     protoimpl.UnknownFields
@@ -853,7 +852,7 @@ type HystrixSink struct {
 	// in the process). The sink then outputs the aggregate statistics across the
 	// current rolling window to the event stream(s).
 	//
-	// “rolling_window(ms)“ = “stats_flush_interval(ms)“ * “num_of_buckets“
+	// ``rolling_window(ms)`` = ``stats_flush_interval(ms)`` * ``num_of_buckets``
 	//
 	// More detailed explanation can be found in `Hystrix wiki
 	// <https://github.com/Netflix/Hystrix/wiki/Metrics-and-Monitoring#hystrixrollingnumber>`_.

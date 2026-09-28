@@ -339,10 +339,10 @@ type McpRouter struct {
 	// If not set, sessions are created without identity binding.
 	SessionIdentity *SessionIdentity `protobuf:"bytes,2,opt,name=session_identity,json=sessionIdentity,proto3" json:"session_identity,omitempty"`
 	// If true, backend initialization is deferred until the first request that targets each backend.
-	// The “initialize“ response is returned immediately with gateway capabilities and an empty
+	// The ``initialize`` response is returned immediately with gateway capabilities and an empty
 	// backend session map. Each backend is initialized on-demand when a request first routes to it.
-	// This avoids blocking the client “initialize“ on slow or misbehaving backends.
-	// Default is false (eager initialization of all backends during “initialize“).
+	// This avoids blocking the client ``initialize`` on slow or misbehaving backends.
+	// Default is false (eager initialization of all backends during ``initialize``).
 	LazyInitialization bool `protobuf:"varint,3,opt,name=lazy_initialization,json=lazyInitialization,proto3" json:"lazy_initialization,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache

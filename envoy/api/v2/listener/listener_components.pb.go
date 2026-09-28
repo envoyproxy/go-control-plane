@@ -236,15 +236,15 @@ type FilterChainMatch struct {
 	// a filter chain match. Those values will be compared against the server names of a new
 	// connection, when detected by one of the listener filters.
 	//
-	// The server name will be matched against all wildcard domains, i.e. “www.example.com“
-	// will be first matched against “www.example.com“, then “*.example.com“, then “*.com“.
+	// The server name will be matched against all wildcard domains, i.e. ``www.example.com``
+	// will be first matched against ``www.example.com``, then ``*.example.com``, then ``*.com``.
 	//
-	// Note that partial wildcards are not supported, and values like “*w.example.com“ are invalid.
+	// Note that partial wildcards are not supported, and values like ``*w.example.com`` are invalid.
 	//
 	// .. attention::
 	//
-	//	See the :ref:`FAQ entry <faq_how_to_setup_sni>` on how to configure SNI for more
-	//	information.
+	//   See the :ref:`FAQ entry <faq_how_to_setup_sni>` on how to configure SNI for more
+	//   information.
 	ServerNames []string `protobuf:"bytes,11,rep,name=server_names,json=serverNames,proto3" json:"server_names,omitempty"`
 	// If non-empty, a transport protocol to consider when determining a filter chain match.
 	// This value will be compared against the transport protocol of a new connection, when
@@ -252,9 +252,9 @@ type FilterChainMatch struct {
 	//
 	// Suggested values include:
 	//
-	//   - “raw_buffer“ - default, used when no transport protocol is detected,
-	//   - “tls“ - set by :ref:`envoy.filters.listener.tls_inspector <config_listener_filters_tls_inspector>`
-	//     when TLS protocol is detected.
+	// * ``raw_buffer`` - default, used when no transport protocol is detected,
+	// * ``tls`` - set by :ref:`envoy.filters.listener.tls_inspector <config_listener_filters_tls_inspector>`
+	//   when TLS protocol is detected.
 	TransportProtocol string `protobuf:"bytes,9,opt,name=transport_protocol,json=transportProtocol,proto3" json:"transport_protocol,omitempty"`
 	// If non-empty, a list of application protocols (e.g. ALPN for TLS protocol) to consider when
 	// determining a filter chain match. Those values will be compared against the application
@@ -262,19 +262,19 @@ type FilterChainMatch struct {
 	//
 	// Suggested values include:
 	//
-	//   - “http/1.1“ - set by :ref:`envoy.filters.listener.tls_inspector
-	//     <config_listener_filters_tls_inspector>`,
-	//   - “h2“ - set by :ref:`envoy.filters.listener.tls_inspector <config_listener_filters_tls_inspector>`
+	// * ``http/1.1`` - set by :ref:`envoy.filters.listener.tls_inspector
+	//   <config_listener_filters_tls_inspector>`,
+	// * ``h2`` - set by :ref:`envoy.filters.listener.tls_inspector <config_listener_filters_tls_inspector>`
 	//
 	// .. attention::
 	//
-	//	Currently, only :ref:`TLS Inspector <config_listener_filters_tls_inspector>` provides
-	//	application protocol detection based on the requested
-	//	`ALPN <https://en.wikipedia.org/wiki/Application-Layer_Protocol_Negotiation>`_ values.
+	//   Currently, only :ref:`TLS Inspector <config_listener_filters_tls_inspector>` provides
+	//   application protocol detection based on the requested
+	//   `ALPN <https://en.wikipedia.org/wiki/Application-Layer_Protocol_Negotiation>`_ values.
 	//
-	//	However, the use of ALPN is pretty much limited to the HTTP/2 traffic on the Internet,
-	//	and matching on values other than ``h2`` is going to lead to a lot of false negatives,
-	//	unless all connecting clients are known to use ALPN.
+	//   However, the use of ALPN is pretty much limited to the HTTP/2 traffic on the Internet,
+	//   and matching on values other than ``h2`` is going to lead to a lot of false negatives,
+	//   unless all connecting clients are known to use ALPN.
 	ApplicationProtocols []string `protobuf:"bytes,10,rep,name=application_protocols,json=applicationProtocols,proto3" json:"application_protocols,omitempty"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
@@ -391,8 +391,8 @@ type FilterChain struct {
 	//
 	// .. attention::
 	//
-	//	**This field is deprecated**. Use `transport_socket` with name `tls` instead. If both are
-	//	set, `transport_socket` takes priority.
+	//   **This field is deprecated**. Use `transport_socket` with name `tls` instead. If both are
+	//   set, `transport_socket` takes priority.
 	//
 	// Deprecated: Marked as deprecated in envoy/api/v2/listener/listener_components.proto.
 	TlsContext *auth.DownstreamTlsContext `protobuf:"bytes,2,opt,name=tls_context,json=tlsContext,proto3" json:"tls_context,omitempty"`

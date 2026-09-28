@@ -52,12 +52,12 @@ type MetadataKey struct {
 	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	// The path used to retrieve a specific Value from the Struct.
 	// This can be either a prefix or a full path, depending on the use case.
-	// For example, “[{key: prop}, {key: xyz}]“ would retrieve a struct or “[{key: prop}, {key: foo}]“
+	// For example, ``[{key: prop}, {key: xyz}]`` would retrieve a struct or ``[{key: prop}, {key: foo}]``
 	// would retrieve a string in the example above.
 	//
-	// Path segments support both struct field access (via “key“) and list element access (via “index“).
-	// For example, to access the first element of a list at “envoy.filters.http.grpc_field_extraction.tenant_id“,
-	// use “path: [{key: tenant_id}, {index: 0}]“.
+	// Path segments support both struct field access (via ``key``) and list element access (via ``index``).
+	// For example, to access the first element of a list at ``envoy.filters.http.grpc_field_extraction.tenant_id``,
+	// use ``path: [{key: tenant_id}, {index: 0}]``.
 	Path          []*MetadataKey_PathSegment `protobuf:"bytes,2,rep,name=path,proto3" json:"path,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

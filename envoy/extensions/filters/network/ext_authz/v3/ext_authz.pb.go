@@ -63,40 +63,42 @@ type ExtAuthz struct {
 	// When this field is true, Envoy will include the SNI name used for TLSClientHello, if available, in the
 	// :ref:`tls_session<envoy_v3_api_field_service.auth.v3.AttributeContext.tls_session>`.
 	IncludeTlsSession bool `protobuf:"varint,8,opt,name=include_tls_session,json=includeTlsSession,proto3" json:"include_tls_session,omitempty"`
-	// When set to “true“, the filter will send a TLS “access_denied(49)“ alert before closing
+	// When set to ``true``, the filter will send a TLS ``access_denied(49)`` alert before closing
 	// the connection when authorization is denied. This provides better visibility to TLS clients
 	// about the reason for connection closure. This alert is only sent for TLS connections. The
 	// non-TLS connections will be closed without sending an alert.
 	//
-	// Defaults to “false“.
+	// Defaults to ``false``.
 	SendTlsAlertOnDenial bool `protobuf:"varint,9,opt,name=send_tls_alert_on_denial,json=sendTlsAlertOnDenial,proto3" json:"send_tls_alert_on_denial,omitempty"`
 	// Specifies a list of metadata namespaces whose values, if present, will be passed to the
 	// ext_authz service. The :ref:`filter_metadata <envoy_v3_api_field_config.core.v3.Metadata.filter_metadata>`
-	// is passed as an opaque “protobuf::Struct“.
+	// is passed as an opaque ``protobuf::Struct``.
 	//
-	// For example, if the “proxy_protocol“ listener filter is used and populates TLV metadata,
+	// For example, if the ``proxy_protocol`` listener filter is used and populates TLV metadata,
 	// then the following will pass that metadata to the authorization server for making decisions
 	// based on proxy protocol information.
 	//
 	// .. code-block:: yaml
 	//
-	//	metadata_context_namespaces:
-	//	- envoy.filters.listener.proxy_protocol
+	//    metadata_context_namespaces:
+	//    - envoy.filters.listener.proxy_protocol
+	//
 	MetadataContextNamespaces []string `protobuf:"bytes,10,rep,name=metadata_context_namespaces,json=metadataContextNamespaces,proto3" json:"metadata_context_namespaces,omitempty"`
 	// Specifies a list of metadata namespaces whose values, if present, will be passed to the
 	// ext_authz service. :ref:`typed_filter_metadata <envoy_v3_api_field_config.core.v3.Metadata.typed_filter_metadata>`
-	// is passed as a “protobuf::Any“.
+	// is passed as a ``protobuf::Any``.
 	//
-	// This works similarly to “metadata_context_namespaces“ but allows Envoy and the ext_authz server to share
+	// This works similarly to ``metadata_context_namespaces`` but allows Envoy and the ext_authz server to share
 	// the protobuf message definition in order to perform safe parsing.
+	//
 	TypedMetadataContextNamespaces []string `protobuf:"bytes,11,rep,name=typed_metadata_context_namespaces,json=typedMetadataContextNamespaces,proto3" json:"typed_metadata_context_namespaces,omitempty"`
-	// When set to “true“, the filter operates in shadow mode. The filter still calls the external
+	// When set to ``true``, the filter operates in shadow mode. The filter still calls the external
 	// authorization service but never closes the connection. The authorization decision is instead
 	// recorded in the connection's :ref:`FilterState <arch_overview_data_sharing_between_filters>`
-	// under the key “envoy.filters.network.ext_authz“ so that a subsequent filter can read and
+	// under the key ``envoy.filters.network.ext_authz`` so that a subsequent filter can read and
 	// optionally enforce it.
 	//
-	// Defaults to “false“.
+	// Defaults to ``false``.
 	ShadowMode    bool `protobuf:"varint,12,opt,name=shadow_mode,json=shadowMode,proto3" json:"shadow_mode,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

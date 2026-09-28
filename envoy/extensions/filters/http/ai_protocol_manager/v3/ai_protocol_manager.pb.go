@@ -86,7 +86,7 @@ const (
 	TokenUsageExtraction_USAGE_SIGNAL_UNSPECIFIED TokenUsageExtraction_UsageSignal = 0
 	// Synthesize empty response trailers at end of stream if none exist.
 	// This wakes downstream trailer-driven consumers (such as ext_proc with
-	// “response_trailer_mode: SEND“) with metadata context without transferring
+	// ``response_trailer_mode: SEND``) with metadata context without transferring
 	// response body bytes.
 	TokenUsageExtraction_SYNTHESIZE_TRAILERS TokenUsageExtraction_UsageSignal = 1
 )
@@ -152,7 +152,7 @@ type AiProtocolManager struct {
 	// pure passthrough.
 	ResponseHandling *ResponseHandling `protobuf:"bytes,2,opt,name=response_handling,json=responseHandling,proto3" json:"response_handling,omitempty"`
 	// AI filters, in order. They run over a declared AI endpoint's parsed request payload
-	// before it continues down the HTTP filter chain, and require “request_handling“.
+	// before it continues down the HTTP filter chain, and require ``request_handling``.
 	// [#extension-category: envoy.http.ai_filters]
 	Filters       []*v3.TypedExtensionConfig `protobuf:"bytes,3,rep,name=filters,proto3" json:"filters,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -221,20 +221,20 @@ type RequestHandling struct {
 	// Attempt best-effort JSON parsing on routes without a per-route
 	// configuration.
 	//
-	// Defaults to “false“: unconfigured routes are not buffered or parsed.
-	// When “true“, such routes are parsed too, but never failed over it — a
+	// Defaults to ``false``: unconfigured routes are not buffered or parsed.
+	// When ``true``, such routes are parsed too, but never failed over it — a
 	// route that declared no AI wire contract has nothing to hold its payload
 	// to, so a body that fails to parse is forwarded unchanged.
 	//
 	// Only requests that can be held to end of stream are taken: the request must
-	// carry a JSON content type (“application/json“ or a “+json“ suffix) and
+	// carry a JSON content type (``application/json`` or a ``+json`` suffix) and
 	// must not be gRPC or Connect streaming, an upgrade, or a CONNECT. Holding a
 	// full-duplex request would stall it, since the client may not finish the
 	// request until it sees a response the held upstream cannot produce.
 	ParseUnconfiguredRoutes bool `protobuf:"varint,1,opt,name=parse_unconfigured_routes,json=parseUnconfiguredRoutes,proto3" json:"parse_unconfigured_routes,omitempty"`
 	// Request-path parsing limits. Defaults apply when unset.
 	Limits *RequestParsingLimits `protobuf:"bytes,2,opt,name=limits,proto3" json:"limits,omitempty"`
-	// Whether the parsed request is re-serialized once the AI filters finish. Defaults to “ALWAYS“.
+	// Whether the parsed request is re-serialized once the AI filters finish. Defaults to ``ALWAYS``.
 	// Requests that run no AI filters are forwarded as received either way.
 	ReserializeBody RequestHandling_BodyReserialization `protobuf:"varint,3,opt,name=reserialize_body,json=reserializeBody,proto3,enum=envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandling_BodyReserialization" json:"reserialize_body,omitempty"`
 	unknownFields   protoimpl.UnknownFields
@@ -304,9 +304,9 @@ type RequestParsingLimits struct {
 	// ordinary metadata (model names, roles, tool names) inline while
 	// conversation content goes to the buffer.
 	//
-	// Keep it above the longest “model“ name in use. Values over the threshold
+	// Keep it above the longest ``model`` name in use. Values over the threshold
 	// are offloaded, and on a declared AI endpoint the payload schema requires
-	// “model“ inline, so an offloaded one is rejected with a 400.
+	// ``model`` inline, so an offloaded one is rejected with a 400.
 	InlineStringThresholdBytes *wrapperspb.UInt32Value `protobuf:"bytes,1,opt,name=inline_string_threshold_bytes,json=inlineStringThresholdBytes,proto3" json:"inline_string_threshold_bytes,omitempty"`
 	unknownFields              protoimpl.UnknownFields
 	sizeCache                  protoimpl.SizeCache
@@ -412,7 +412,7 @@ type TokenUsageExtraction struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Also inspect responses on routes without per-route configuration.
 	//
-	// Defaults to “false“: only routes carrying an
+	// Defaults to ``false``: only routes carrying an
 	// :ref:`AiProtocolManagerPerRoute
 	// <envoy_v3_api_msg_extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute>`
 	// configuration are inspected, so enabling token usage on a mixed listener
@@ -422,7 +422,7 @@ type TokenUsageExtraction struct {
 	IncludeUnconfiguredRoutes bool `protobuf:"varint,1,opt,name=include_unconfigured_routes,json=includeUnconfiguredRoutes,proto3" json:"include_unconfigured_routes,omitempty"`
 	// Fallback wire API used when the route does not identify a response API.
 	//
-	// “LLM_PROTOCOL_UNSPECIFIED“ means auto-detect from the response shape
+	// ``LLM_PROTOCOL_UNSPECIFIED`` means auto-detect from the response shape
 	// (only strongly shaped, value-validated markers lock a stream). This is a
 	// fallback, not an override of per-route response configuration; see the
 	// :ref:`per-route configuration
@@ -430,7 +430,7 @@ type TokenUsageExtraction struct {
 	// for the full precedence.
 	DefaultLlmProtocol v31.LLMProtocol `protobuf:"varint,2,opt,name=default_llm_protocol,json=defaultLlmProtocol,proto3,enum=envoy.type.ai.v3.LLMProtocol" json:"default_llm_protocol,omitempty"`
 	// Namespace for the emitted typed dynamic metadata.
-	// Defaults to “envoy.ai.token_usage“.
+	// Defaults to ``envoy.ai.token_usage``.
 	MetadataNamespace string `protobuf:"bytes,3,opt,name=metadata_namespace,json=metadataNamespace,proto3" json:"metadata_namespace,omitempty"`
 	// Extraction resource limits. Defaults apply when unset.
 	Limits *TokenUsageExtractionLimits `protobuf:"bytes,4,opt,name=limits,proto3" json:"limits,omitempty"`
@@ -523,12 +523,12 @@ type TokenUsageExtractionLimits struct {
 	// usage from long generations.
 	MaxSseEventSize *wrapperspb.UInt32Value `protobuf:"bytes,1,opt,name=max_sse_event_size,json=maxSseEventSize,proto3" json:"max_sse_event_size,omitempty"`
 	// Maximum JSON response body inspected for token usage. A larger body —
-	// including one whose “content-length“ already exceeds the cap — is not
+	// including one whose ``content-length`` already exceeds the cap — is not
 	// inspected. Defaults to 4MiB.
 	MaxJsonBodySize *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=max_json_body_size,json=maxJsonBodySize,proto3" json:"max_json_body_size,omitempty"`
 	// Maximum number of SSE payloads parsed as JSON for one response, counting
 	// malformed payloads; events skipped by name (keepalives, content deltas)
-	// do not count. “max_sse_event_size“ bounds one event; this bounds the
+	// do not count. ``max_sse_event_size`` bounds one event; this bounds the
 	// parse work a long-lived stream can extract from the worker. On
 	// exhaustion the accumulated usage is kept and published as partial, and
 	// extraction goes inert.
@@ -611,7 +611,7 @@ type AiProtocolManagerPerRoute struct {
 	// is enabled).
 	Request *RequestPerRoute `protobuf:"bytes,1,opt,name=request,proto3" json:"request,omitempty"`
 	// Optional response-side route configuration. When absent, response
-	// processing inherits “request.llm_protocol“ when available, then the
+	// processing inherits ``request.llm_protocol`` when available, then the
 	// global fallback.
 	Response      *ResponsePerRoute `protobuf:"bytes,2,opt,name=response,proto3" json:"response,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -666,7 +666,7 @@ func (x *AiProtocolManagerPerRoute) GetResponse() *ResponsePerRoute {
 type RequestPerRoute struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The wire API a request payload on this route follows.
-	// “LLM_PROTOCOL_UNSPECIFIED“ declares the endpoint without naming its
+	// ``LLM_PROTOCOL_UNSPECIFIED`` declares the endpoint without naming its
 	// API.
 	//
 	// Payloads are validated against the declared API's schema when one is
@@ -722,8 +722,8 @@ func (x *RequestPerRoute) GetLlmProtocol() v31.LLMProtocol {
 type ResponsePerRoute struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The wire API the response on this route follows. This can differ from
-	// “request.llm_protocol“ when the gateway performs protocol translation.
-	// “LLM_PROTOCOL_UNSPECIFIED“ falls through the precedence chain above.
+	// ``request.llm_protocol`` when the gateway performs protocol translation.
+	// ``LLM_PROTOCOL_UNSPECIFIED`` falls through the precedence chain above.
 	LlmProtocol   v31.LLMProtocol `protobuf:"varint,1,opt,name=llm_protocol,json=llmProtocol,proto3,enum=envoy.type.ai.v3.LLMProtocol" json:"llm_protocol,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

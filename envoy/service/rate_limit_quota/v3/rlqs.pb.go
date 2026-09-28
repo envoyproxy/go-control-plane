@@ -206,7 +206,7 @@ func (x *BucketId) GetBucket() map[string]string {
 //	the RLQS client is subscribing for the future assignments for this ``BucketId``.
 type RateLimitQuotaUsageReports_BucketQuotaUsage struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// “BucketId“ for which request quota usage is reported.
+	// ``BucketId`` for which request quota usage is reported.
 	BucketId *BucketId `protobuf:"bytes,1,opt,name=bucket_id,json=bucketId,proto3" json:"bucket_id,omitempty"`
 	// Time elapsed since the last report.
 	TimeElapsed *durationpb.Duration `protobuf:"bytes,2,opt,name=time_elapsed,json=timeElapsed,proto3" json:"time_elapsed,omitempty"`
@@ -280,7 +280,7 @@ func (x *RateLimitQuotaUsageReports_BucketQuotaUsage) GetNumRequestsDenied() uin
 // :ref:`bucket_id <envoy_v3_api_field_service.rate_limit_quota.v3.RateLimitQuotaResponse.BucketAction.bucket_id>`.
 type RateLimitQuotaResponse_BucketAction struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// “BucketId“ for which request the action is applied.
+	// ``BucketId`` for which request the action is applied.
 	BucketId *BucketId `protobuf:"bytes,1,opt,name=bucket_id,json=bucketId,proto3" json:"bucket_id,omitempty"`
 	// Types that are valid to be assigned to BucketAction:
 	//
@@ -419,28 +419,27 @@ func (*RateLimitQuotaResponse_BucketAction_AbandonAction_) isRateLimitQuotaRespo
 //     field. The “active“ assignment is considered unchanged.
 type RateLimitQuotaResponse_BucketAction_QuotaAssignmentAction struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// A duration after which the assignment is be considered “expired“. The process of the
+	// A duration after which the assignment is be considered ``expired``. The process of the
 	// expiration is described :ref:`above
 	// <envoy_v3_api_msg_service.rate_limit_quota.v3.RateLimitQuotaResponse.BucketAction.QuotaAssignmentAction>`.
 	//
-	//   - If unset, the assignment has no expiration date.
-	//   - If set to “0“, the assignment expires immediately, forcing the client into the
-	//     :ref:`"expired assignment"
-	//     <envoy_v3_api_field_extensions.filters.http.rate_limit_quota.v3.RateLimitQuotaBucketSettings.ExpiredAssignmentBehavior.expired_assignment_behavior_timeout>`
-	//     state. This may be used by the RLQS server in cases when it needs clients to proactively
-	//     fall back to the pre-configured :ref:`ExpiredAssignmentBehavior
-	//     <envoy_v3_api_msg_extensions.filters.http.rate_limit_quota.v3.RateLimitQuotaBucketSettings.ExpiredAssignmentBehavior>`,
-	//     f.e. before the server going into restart.
+	// * If unset, the assignment has no expiration date.
+	// * If set to ``0``, the assignment expires immediately, forcing the client into the
+	//   :ref:`"expired assignment"
+	//   <envoy_v3_api_field_extensions.filters.http.rate_limit_quota.v3.RateLimitQuotaBucketSettings.ExpiredAssignmentBehavior.expired_assignment_behavior_timeout>`
+	//   state. This may be used by the RLQS server in cases when it needs clients to proactively
+	//   fall back to the pre-configured :ref:`ExpiredAssignmentBehavior
+	//   <envoy_v3_api_msg_extensions.filters.http.rate_limit_quota.v3.RateLimitQuotaBucketSettings.ExpiredAssignmentBehavior>`,
+	//   f.e. before the server going into restart.
 	//
 	// .. attention::
-	//
-	//	Note that :ref:`expiring
-	//	<envoy_v3_api_msg_service.rate_limit_quota.v3.RateLimitQuotaResponse.BucketAction.QuotaAssignmentAction>`
-	//	the assignment is not the same as :ref:`abandoning
-	//	<envoy_v3_api_msg_service.rate_limit_quota.v3.RateLimitQuotaResponse.BucketAction.AbandonAction>`
-	//	the assignment. While expiring the assignment just transitions the bucket to
-	//	the "expired assignment" state; abandoning the assignment completely erases
-	//	the bucket from the data plane memory, and stops the usage reports.
+	//   Note that :ref:`expiring
+	//   <envoy_v3_api_msg_service.rate_limit_quota.v3.RateLimitQuotaResponse.BucketAction.QuotaAssignmentAction>`
+	//   the assignment is not the same as :ref:`abandoning
+	//   <envoy_v3_api_msg_service.rate_limit_quota.v3.RateLimitQuotaResponse.BucketAction.AbandonAction>`
+	//   the assignment. While expiring the assignment just transitions the bucket to
+	//   the "expired assignment" state; abandoning the assignment completely erases
+	//   the bucket from the data plane memory, and stops the usage reports.
 	AssignmentTimeToLive *durationpb.Duration `protobuf:"bytes,2,opt,name=assignment_time_to_live,json=assignmentTimeToLive,proto3" json:"assignment_time_to_live,omitempty"`
 	// Configures the local rate limiter for the request matched to the bucket.
 	// If not set, allow all requests.

@@ -32,8 +32,8 @@ const (
 	// Unspecified. Uses default behavior (nothing is stored).
 	McpJsonRestBridge_MODE_UNSPECIFIED McpJsonRestBridge_RequestStorageMode = 0
 	// Store request attributes in dynamic metadata. The metadata namespace
-	// is the filter's config name as specified by the “name“ field in the
-	// “http_filters“ list (e.g. “envoy.filters.http.mcp_json_rest_bridge“
+	// is the filter's config name as specified by the ``name`` field in the
+	// ``http_filters`` list (e.g. ``envoy.filters.http.mcp_json_rest_bridge``
 	// if using the canonical filter name).
 	McpJsonRestBridge_DYNAMIC_METADATA McpJsonRestBridge_RequestStorageMode = 1
 )
@@ -84,10 +84,10 @@ const (
 	// Unspecified element type.
 	HttpRule_ParameterBinding_TYPE_UNSPECIFIED HttpRule_ParameterBinding_Type = 0
 	// The argument value is bound to an HTTP request header.
-	// Conceptually maps to an OpenAPI parameter with “in: header“.
+	// Conceptually maps to an OpenAPI parameter with ``in: header``.
 	HttpRule_ParameterBinding_HEADER HttpRule_ParameterBinding_Type = 1
 	// The argument value is bound to an HTTP request cookie.
-	// Conceptually maps to an OpenAPI parameter with “in: cookie“.
+	// Conceptually maps to an OpenAPI parameter with ``in: cookie``.
 	HttpRule_ParameterBinding_COOKIE HttpRule_ParameterBinding_Type = 2
 )
 
@@ -212,7 +212,7 @@ type McpJsonRestBridge struct {
 	// Configuration for the MCP tools.
 	ToolConfig *ServerToolConfig `protobuf:"bytes,2,opt,name=tool_config,json=toolConfig,proto3" json:"tool_config,omitempty"`
 	// Maximum size of the request body to buffer for transcoding and validation.
-	// If the request body exceeds this size, the request is rejected with “413 Payload Too Large“.
+	// If the request body exceeds this size, the request is rejected with ``413 Payload Too Large``.
 	// This limit applies to prevent unbounded buffering.
 	//
 	// It defaults to 64KB (65536 bytes) as the MCP calls (tools, resources, or prompts)
@@ -231,13 +231,13 @@ type McpJsonRestBridge struct {
 	MaxResponseBodySize *wrapperspb.UInt32Value `protobuf:"bytes,4,opt,name=max_response_body_size,json=maxResponseBodySize,proto3" json:"max_response_body_size,omitempty"`
 	// Where to store parsed MCP request attributes.
 	// Default is not storing anything.
-	// When set to “DYNAMIC_METADATA“, attributes are stored in dynamic metadata
-	// using the filter's config name (i.e. the “name“ field of this filter's entry
-	// in the “http_filters“ list) as the metadata namespace.
+	// When set to ``DYNAMIC_METADATA``, attributes are stored in dynamic metadata
+	// using the filter's config name (i.e. the ``name`` field of this filter's entry
+	// in the ``http_filters`` list) as the metadata namespace.
 	RequestStorageMode McpJsonRestBridge_RequestStorageMode `protobuf:"varint,5,opt,name=request_storage_mode,json=requestStorageMode,proto3,enum=envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge_RequestStorageMode" json:"request_storage_mode,omitempty"`
 	// If set, extract OpenTelemetry (OTel) trace context from MCP requests and propagate it to
-	// request headers. The keys “traceparent“, “tracestate“, and “baggage“
-	// will be extracted from “_meta“.
+	// request headers. The keys ``traceparent``, ``tracestate``, and ``baggage``
+	// will be extracted from ``_meta``.
 	// Ref: `Request Meta SEP <https://modelcontextprotocol.io/seps/414-request-meta>`_
 	TraceContextExtraction *TraceContextExtractionOptions `protobuf:"bytes,6,opt,name=trace_context_extraction,json=traceContextExtraction,proto3" json:"trace_context_extraction,omitempty"`
 	// When set to true, the filter will not clear the route cache after transcoding.
@@ -377,10 +377,10 @@ type ServerInfo struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The maximum MCP protocol version supported by this MCP endpoint.
 	//
-	// Supported values are “2025-11-25“ and “2026-07-28“. Versions prior
-	// to “2025-11-25“ are rejected because the filter unconditionally supports features
-	// up to “2025-11-25“ and does not support downgrading below that baseline.
-	// If not provided: Defaults to “2025-11-25“.
+	// Supported values are ``2025-11-25`` and ``2026-07-28``. Versions prior
+	// to ``2025-11-25`` are rejected because the filter unconditionally supports features
+	// up to ``2025-11-25`` and does not support downgrading below that baseline.
+	// If not provided: Defaults to ``2025-11-25``.
 	//
 	// Example value: "2026-07-28"
 	MaxSupportedProtocolVersion *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=max_supported_protocol_version,json=maxSupportedProtocolVersion,proto3" json:"max_supported_protocol_version,omitempty"`
@@ -388,13 +388,13 @@ type ServerInfo struct {
 	// [#comment:TODO(guoyilin42): Implement description]
 	// Optional description of the server.
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	// The fallback protocol version to use if the client does not provide the “mcp-protocol-version“ header.
+	// The fallback protocol version to use if the client does not provide the ``mcp-protocol-version`` header.
 	//
-	//   - If provided: The extension uses this version as the fallback protocol version.
-	//   - If not provided: The extension uses the fallback protocol version defined in the latest MCP
-	//     specification. For example, the current latest 2026-07-28 specification designates "2025-03-26"
-	//     as the fallback protocol version.
-	//     See https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http#protocol-version-header
+	// - If provided: The extension uses this version as the fallback protocol version.
+	// - If not provided: The extension uses the fallback protocol version defined in the latest MCP
+	//   specification. For example, the current latest 2026-07-28 specification designates "2025-03-26"
+	//   as the fallback protocol version.
+	//   See https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http#protocol-version-header
 	FallbackProtocolVersion *wrapperspb.StringValue `protobuf:"bytes,3,opt,name=fallback_protocol_version,json=fallbackProtocolVersion,proto3" json:"fallback_protocol_version,omitempty"`
 	unknownFields           protoimpl.UnknownFields
 	sizeCache               protoimpl.SizeCache
@@ -498,7 +498,7 @@ type ServerToolConfig struct {
 	// [#comment:TODO(guoyilin42): Implement list_changed]
 	// Whether this server supports notifications for changes to the tool list.
 	ListChanged bool `protobuf:"varint,2,opt,name=list_changed,json=listChanged,proto3" json:"list_changed,omitempty"`
-	// Optional configuration for tools/list requests. If not set: The “tools/list“ request is
+	// Optional configuration for tools/list requests. If not set: The ``tools/list`` request is
 	// passed through. This allows subsequent extension or the backend itself to handle the tools/list
 	// request if they support it.
 	//
@@ -596,8 +596,8 @@ type isServerToolConfig_ToolListConfig interface {
 type ServerToolConfig_ToolListHttpRule struct {
 	// Configuration to transcode the tools/list requests to a standard HTTP request. If provided:
 	// The extension transcodes the request and forwards it down the filter chain. The response
-	// (whether from an upstream backend, a configured “direct_response“, or another extension)
-	// MUST be a JSON body strictly matching the MCP “ListToolsResult“ schema. Ref:
+	// (whether from an upstream backend, a configured ``direct_response``, or another extension)
+	// MUST be a JSON body strictly matching the MCP ``ListToolsResult`` schema. Ref:
 	// https://modelcontextprotocol.io/specification/2025-11-25/schema#listtoolsresult
 	ToolListHttpRule *HttpRule `protobuf:"bytes,3,opt,name=tool_list_http_rule,json=toolListHttpRule,proto3,oneof"`
 }
@@ -743,21 +743,21 @@ type ToolConfig struct {
 	// Config for this tool's entry in a local tools/list response. Used when tool_list_local is set
 	// in the ServerToolConfig.
 	ToolListConfig *ToolsListSpecificConfig `protobuf:"bytes,3,opt,name=tool_list_config,json=toolListConfig,proto3" json:"tool_list_config,omitempty"`
-	// Enables streaming transcoding for unstructured text responses (“content“ field of a result).
+	// Enables streaming transcoding for unstructured text responses (``content`` field of a result).
 	//
 	// When enabled, the response body is streamed directly to the client without buffering. Each
 	// chunk is JSON escaped as it arrives and wrapped with a pre-built JSON-RPC prefix and suffix.
 	//
-	// For Server-Sent Events (SSE) responses (i.e. “text/event-stream“ content type), Envoy parses
+	// For Server-Sent Events (SSE) responses (i.e. ``text/event-stream`` content type), Envoy parses
 	// the stream and wraps each extracted complete event payload into a distinct text content item
-	// within the JSON-RPC “content“ array on the fly.
+	// within the JSON-RPC ``content`` array on the fly.
 	//
 	// Streaming flow:
 	//
 	// .. code-block:: text
 	//
-	//	input:  [chunk1] → [chunk2] → [chunk3]
-	//	output: [prefix+escaped_chunk1] → [escaped_chunk2] → [escaped_chunk3+suffix]
+	//   input:  [chunk1] → [chunk2] → [chunk3]
+	//   output: [prefix+escaped_chunk1] → [escaped_chunk2] → [escaped_chunk3+suffix]
 	//
 	// Disabled by default.
 	TextContentStreamingEnabled bool `protobuf:"varint,4,opt,name=text_content_streaming_enabled,json=textContentStreamingEnabled,proto3" json:"text_content_streaming_enabled,omitempty"`
@@ -851,7 +851,7 @@ type HttpRule struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Determines the HTTP method and the URL path template.
 	//
-	// Path templating uses curly braces “{}“ to mark a section of the URL path as replaceable.
+	// Path templating uses curly braces ``{}`` to mark a section of the URL path as replaceable.
 	// Each template variable MUST correspond to a field in the JSON-RPC "arguments".
 	// Use dot-notation to access fields within nested objects (e.g., "user.id" maps the value of the
 	// "id" field inside "user").
@@ -872,10 +872,10 @@ type HttpRule struct {
 	Patch string `protobuf:"bytes,5,opt,name=patch,proto3" json:"patch,omitempty"`
 	// The name of the request field whose value is mapped to the HTTP request body.
 	//
-	//   - If "*": All fields not bound by the path template are mapped to the request body.
-	//   - If specify a field: This specific field is mapped to the body. Uses dot-notation for nested
-	//     fields (e.g., "user.data" maps the value of the "data" field inside "user").
-	//   - If omitted: There is no HTTP request body; fields not in the path become query parameters.
+	// - If "*": All fields not bound by the path template are mapped to the request body.
+	// - If specify a field: This specific field is mapped to the body. Uses dot-notation for nested
+	//   fields (e.g., "user.data" maps the value of the "data" field inside "user").
+	// - If omitted: There is no HTTP request body; fields not in the path become query parameters.
 	Body string `protobuf:"bytes,6,opt,name=body,proto3" json:"body,omitempty"`
 	// Bindings to extract values from the 'arguments' object of a tools/call
 	// request and inject them as HTTP elements.
@@ -1018,14 +1018,14 @@ type HttpRule_ParameterBinding struct {
 	// The name of the HTTP header (e.g., "X-API-Key", "Authorization") or the
 	// name of the cookie (e.g.,"SESSION_ID"). Note: Envoy normalizes the header names to lowercase.
 	// The following headers are reserved for Envoy's internal use and cannot be overridden by
-	// bindings: “content-length“, “transfer-encoding“, “host“, “:authority“, “cookie“,
-	// “accept-encoding“, and any header starting with “x-envoy-“. Attempting to bind to these
+	// bindings: ``content-length``, ``transfer-encoding``, ``host``, ``:authority``, ``cookie``,
+	// ``accept-encoding``, and any header starting with ``x-envoy-``. Attempting to bind to these
 	// will be ignored.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	// Path to the field within the JSON arguments object from a tools/call
 	// request. Uses dot-notation for nested fields.
-	// E.g. if arguments object is “{"user":{"auth_token":"foo"}}“, then
-	// “argument_path“ should be "user.auth_token".
+	// E.g. if arguments object is ``{"user":{"auth_token":"foo"}}``, then
+	// ``argument_path`` should be "user.auth_token".
 	ArgumentPath  string `protobuf:"bytes,3,opt,name=argument_path,json=argumentPath,proto3" json:"argument_path,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

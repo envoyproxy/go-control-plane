@@ -44,35 +44,36 @@ type DynamicModuleHealthCheck struct {
 	// This can be used to distinguish between different health checker implementations inside a
 	// dynamic module. For example, a module can have completely different health checker
 	// implementations (e.g., a ping checker, an external-service checker). When Envoy receives this
-	// configuration, it passes the “health_checker_name“ to the dynamic module's health checker
-	// config init function together with the “health_checker_config“. That way a module can decide
+	// configuration, it passes the ``health_checker_name`` to the dynamic module's health checker
+	// config init function together with the ``health_checker_config``. That way a module can decide
 	// which in-module health checker implementation to use based on the name at load time.
 	HealthCheckerName string `protobuf:"bytes,2,opt,name=health_checker_name,json=healthCheckerName,proto3" json:"health_checker_name,omitempty"`
-	// The configuration for the health checker chosen by “health_checker_name“. If not specified,
+	// The configuration for the health checker chosen by ``health_checker_name``. If not specified,
 	// an empty configuration is passed to the module.
 	//
 	// This is passed to the module's health checker initialization function. Together with the
-	// “health_checker_name“, the module can decide which in-module health checker implementation to
+	// ``health_checker_name``, the module can decide which in-module health checker implementation to
 	// use and fine-tune the behavior of the health checker.
 	//
-	// “google.protobuf.Struct“ and the “value“ field of “xds.type.v3.TypedStruct“ are
+	// ``google.protobuf.Struct`` and the ``value`` field of ``xds.type.v3.TypedStruct`` are
 	// serialized as JSON before passing them to the module.
-	// “google.protobuf.BytesValue“ and “google.protobuf.StringValue“ are passed directly
+	// ``google.protobuf.BytesValue`` and ``google.protobuf.StringValue`` are passed directly
 	// without the wrapper.
 	//
 	// .. code-block:: yaml
 	//
-	//	# Passing a JSON struct configuration
-	//	health_checker_config:
-	//	  "@type": "type.googleapis.com/google.protobuf.Struct"
-	//	  value:
-	//	    path: "/healthz"
-	//	    degraded_on_slow_response: true
+	//  # Passing a JSON struct configuration
+	//  health_checker_config:
+	//    "@type": "type.googleapis.com/google.protobuf.Struct"
+	//    value:
+	//      path: "/healthz"
+	//      degraded_on_slow_response: true
 	//
-	//	# Passing a simple string configuration
-	//	health_checker_config:
-	//	  "@type": "type.googleapis.com/google.protobuf.StringValue"
-	//	  value: "/healthz"
+	//  # Passing a simple string configuration
+	//  health_checker_config:
+	//    "@type": "type.googleapis.com/google.protobuf.StringValue"
+	//    value: "/healthz"
+	//
 	HealthCheckerConfig *anypb.Any `protobuf:"bytes,3,opt,name=health_checker_config,json=healthCheckerConfig,proto3" json:"health_checker_config,omitempty"`
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache

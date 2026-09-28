@@ -162,7 +162,7 @@ type CustomTag_Value struct {
 	//
 	// The same :ref:`format specifier <config_access_log_format>` as used for
 	// :ref:`HTTP access logging <config_access_log>` applies here, however
-	// unknown specifier values are replaced with the empty string instead of “-“.
+	// unknown specifier values are replaced with the empty string instead of ``-``.
 	Value string `protobuf:"bytes,6,opt,name=value,proto3,oneof"`
 }
 

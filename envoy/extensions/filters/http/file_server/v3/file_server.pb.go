@@ -34,21 +34,21 @@ type FileServerConfig struct {
 	// The longest matching path_mapping takes precedence.
 	PathMappings []*FileServerConfig_PathMapping `protobuf:"bytes,2,rep,name=path_mappings,json=pathMappings,proto3" json:"path_mappings,omitempty"`
 	// A map from filename suffix (in lowercase) to content type header.
-	// e.g. “{"txt": "text/plain"}“
+	// e.g. ``{"txt": "text/plain"}``
 	//
-	// File suffixes may not contain “.“ as the filename suffix after
-	// the last “.“ is used to perform an O(1) lookup against the keys.
+	// File suffixes may not contain ``.`` as the filename suffix after
+	// the last ``.`` is used to perform an O(1) lookup against the keys.
 	//
-	// An empty string suffix will only match files ending with a “.“.
+	// An empty string suffix will only match files ending with a ``.``.
 	//
-	// Files with no suffix (e.g. “README“) can be matched as the full string
-	// in lowercase. e.g. “{"readme": "text/plain"}“
+	// Files with no suffix (e.g. ``README``) can be matched as the full string
+	// in lowercase. e.g. ``{"readme": "text/plain"}``
 	ContentTypes map[string]string `protobuf:"bytes,3,rep,name=content_types,json=contentTypes,proto3" json:"content_types,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	// If “content_types“ does not contain a match for a file suffix,
-	// “default_content_type“ is used.
+	// If ``content_types`` does not contain a match for a file suffix,
+	// ``default_content_type`` is used.
 	//
-	// If there is no match and “default_content_type“ is empty, the
-	// “content-type“ header will be omitted from the response.
+	// If there is no match and ``default_content_type`` is empty, the
+	// ``content-type`` header will be omitted from the response.
 	DefaultContentType string `protobuf:"bytes,4,opt,name=default_content_type,json=defaultContentType,proto3" json:"default_content_type,omitempty"`
 	// If the requested path refers to a directory, the given behaviors are
 	// tried in order until one succeeds. If the end of the list is reached
@@ -125,15 +125,15 @@ func (x *FileServerConfig) GetDirectoryBehaviors() []*FileServerConfig_Directory
 
 type FileServerConfig_PathMapping struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// If no “request_path_prefix“ is matched, the filter does not intercept a request.
+	// If no ``request_path_prefix`` is matched, the filter does not intercept a request.
 	//
-	// If a “request_path_prefix“ is matched, that prefix is removed from the request
-	// and replaced with “file_path_prefix“ to form a filesystem path for
+	// If a ``request_path_prefix`` is matched, that prefix is removed from the request
+	// and replaced with ``file_path_prefix`` to form a filesystem path for
 	// the request.
 	//
-	// Prefix “/“ will match all GET requests.
+	// Prefix ``/`` will match all GET requests.
 	RequestPathPrefix string `protobuf:"bytes,1,opt,name=request_path_prefix,json=requestPathPrefix,proto3" json:"request_path_prefix,omitempty"`
-	// Replaces a matched “request_path_prefix“ to form a filesystem path for a
+	// Replaces a matched ``request_path_prefix`` to form a filesystem path for a
 	// request. May be relative to the working directory of the envoy execution,
 	// or an absolute path.
 	FilePathPrefix string `protobuf:"bytes,2,opt,name=file_path_prefix,json=filePathPrefix,proto3" json:"file_path_prefix,omitempty"`
@@ -187,11 +187,11 @@ func (x *FileServerConfig_PathMapping) GetFilePathPrefix() string {
 
 type FileServerConfig_DirectoryBehavior struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Attempts to serve the given file within the directory, e.g. “index.html“.
-	// Precisely one of “default_file“ and “list“ must be set per “DirectoryBehavior“.
+	// Attempts to serve the given file within the directory, e.g. ``index.html``.
+	// Precisely one of ``default_file`` and ``list`` must be set per ``DirectoryBehavior``.
 	DefaultFile string `protobuf:"bytes,1,opt,name=default_file,json=defaultFile,proto3" json:"default_file,omitempty"`
 	// Responds with an html formatted list of the files and subdirectories in the directory.
-	// Precisely one of “default_file“ and “list“ must be set per “DirectoryBehavior“.
+	// Precisely one of ``default_file`` and ``list`` must be set per ``DirectoryBehavior``.
 	// [#not-implemented-hide:] Directory operations currently have no async implementation.
 	List          *FileServerConfig_DirectoryBehavior_List `protobuf:"bytes,2,opt,name=list,proto3" json:"list,omitempty"`
 	unknownFields protoimpl.UnknownFields

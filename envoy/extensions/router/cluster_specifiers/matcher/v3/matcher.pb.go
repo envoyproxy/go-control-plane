@@ -81,45 +81,45 @@ type MatcherClusterSpecifier struct {
 	// Example:
 	//
 	// .. validated-code-block:: yaml
+	//   :type-name: xds.type.matcher.v3.Matcher
 	//
-	//	:type-name: xds.type.matcher.v3.Matcher
+	//   matcher_list:
+	//     matchers:
+	//     - predicate:
+	//         single_predicate:
+	//           input:
+	//             typed_config:
+	//               '@type': type.googleapis.com/envoy.type.matcher.v3.HttpRequestHeaderMatchInput
+	//               header_name: env
+	//           value_match:
+	//             exact: staging
+	//       on_match:
+	//         action:
+	//           typed_config:
+	//             '@type': type.googleapis.com/envoy.extensions.router.cluster_specifiers.matcher.v3.ClusterAction
+	//             cluster: "staging-cluster"
 	//
-	//	matcher_list:
-	//	  matchers:
-	//	  - predicate:
-	//	      single_predicate:
-	//	        input:
-	//	          typed_config:
-	//	            '@type': type.googleapis.com/envoy.type.matcher.v3.HttpRequestHeaderMatchInput
-	//	            header_name: env
-	//	        value_match:
-	//	          exact: staging
-	//	    on_match:
-	//	      action:
-	//	        typed_config:
-	//	          '@type': type.googleapis.com/envoy.extensions.router.cluster_specifiers.matcher.v3.ClusterAction
-	//	          cluster: "staging-cluster"
+	//     - predicate:
+	//         single_predicate:
+	//           input:
+	//             typed_config:
+	//               '@type': type.googleapis.com/envoy.type.matcher.v3.HttpRequestHeaderMatchInput
+	//               header_name: env
+	//           value_match:
+	//             exact: prod
+	//       on_match:
+	//         action:
+	//           typed_config:
+	//             '@type': type.googleapis.com/envoy.extensions.router.cluster_specifiers.matcher.v3.ClusterAction
+	//             cluster: "prod-cluster"
 	//
-	//	  - predicate:
-	//	      single_predicate:
-	//	        input:
-	//	          typed_config:
-	//	            '@type': type.googleapis.com/envoy.type.matcher.v3.HttpRequestHeaderMatchInput
-	//	            header_name: env
-	//	        value_match:
-	//	          exact: prod
-	//	    on_match:
-	//	      action:
-	//	        typed_config:
-	//	          '@type': type.googleapis.com/envoy.extensions.router.cluster_specifiers.matcher.v3.ClusterAction
-	//	          cluster: "prod-cluster"
+	//   # Catch-all with a default cluster.
+	//   on_no_match:
+	//     action:
+	//       typed_config:
+	//         '@type': type.googleapis.com/envoy.extensions.router.cluster_specifiers.matcher.v3.ClusterAction
+	//         cluster: "default-cluster"
 	//
-	//	# Catch-all with a default cluster.
-	//	on_no_match:
-	//	  action:
-	//	    typed_config:
-	//	      '@type': type.googleapis.com/envoy.extensions.router.cluster_specifiers.matcher.v3.ClusterAction
-	//	      cluster: "default-cluster"
 	ClusterMatcher *v3.Matcher `protobuf:"bytes,1,opt,name=cluster_matcher,json=clusterMatcher,proto3" json:"cluster_matcher,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache

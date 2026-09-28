@@ -30,12 +30,12 @@ type FixedHeapConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Static value for max heap size in bytes set at startup.
 	// Exactly one of max_heap_size_bytes or max_heap_size_bytes_runtime must be set.
-	// If set, the expected value must be greater than “0“, otherwise validation will fail.
+	// If set, the expected value must be greater than ``0``, otherwise validation will fail.
 	MaxHeapSizeBytes uint64 `protobuf:"varint,1,opt,name=max_heap_size_bytes,json=maxHeapSizeBytes,proto3" json:"max_heap_size_bytes,omitempty"`
 	// Runtime overlay for max heap size in bytes. When set, the value can be overridden
 	// at runtime during startup or later without restart.
 	// Exactly one of max_heap_size_bytes or max_heap_size_bytes_runtime must be set.
-	// If set, the expected value must be greater than “0“, otherwise validation will fail.
+	// If set, the expected value must be greater than ``0``, otherwise validation will fail.
 	MaxHeapSizeBytesRuntime *v3.RuntimeUInt64 `protobuf:"bytes,2,opt,name=max_heap_size_bytes_runtime,json=maxHeapSizeBytesRuntime,proto3" json:"max_heap_size_bytes_runtime,omitempty"`
 	unknownFields           protoimpl.UnknownFields
 	sizeCache               protoimpl.SizeCache

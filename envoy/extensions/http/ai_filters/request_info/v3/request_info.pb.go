@@ -29,7 +29,7 @@ const (
 // request headers continue, so later HTTP filters see it from their first callback.
 type RequestInfo struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Metadata namespace. Defaults to “envoy.ai.request_info“.
+	// Metadata namespace. Defaults to ``envoy.ai.request_info``.
 	MetadataNamespace string `protobuf:"bytes,1,opt,name=metadata_namespace,json=metadataNamespace,proto3" json:"metadata_namespace,omitempty"`
 	// When unset, no estimate is published.
 	TokenEstimation *RequestInfo_TokenEstimation `protobuf:"bytes,2,opt,name=token_estimation,json=tokenEstimation,proto3" json:"token_estimation,omitempty"`
@@ -85,8 +85,8 @@ func (x *RequestInfo) GetTokenEstimation() *RequestInfo_TokenEstimation {
 // budget before the provider reports what it actually charged.
 type RequestInfo_TokenEstimation struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Estimated input tokens, as “ceil(tokens_per_byte * request payload bytes)“. No token
-	// spans fewer than one byte, so the ratio cannot exceed 1.0; “0.5“ is a rough fit for
+	// Estimated input tokens, as ``ceil(tokens_per_byte * request payload bytes)``. No token
+	// spans fewer than one byte, so the ratio cannot exceed 1.0; ``0.5`` is a rough fit for
 	// JSON chat payloads.
 	TokensPerByte float64 `protobuf:"fixed64,1,opt,name=tokens_per_byte,json=tokensPerByte,proto3" json:"tokens_per_byte,omitempty"`
 	unknownFields protoimpl.UnknownFields
