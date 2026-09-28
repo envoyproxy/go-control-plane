@@ -451,6 +451,17 @@ func (m *Cluster) validate(all bool) error {
 		}
 	}
 
+	if len(m.GetHealthChecks()) > 8 {
+		err := ClusterValidationError{
+			field:  "HealthChecks",
+			reason: "value must contain no more than 8 item(s)",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	for idx, item := range m.GetHealthChecks() {
 		_, _ = idx, item
 

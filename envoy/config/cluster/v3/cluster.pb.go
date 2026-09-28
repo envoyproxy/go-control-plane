@@ -3459,7 +3459,7 @@ const file_envoy_config_cluster_v3_cluster_proto_rawDesc = "" +
 	"\n" +
 	"%envoy/config/cluster/v3/cluster.proto\x12\x17envoy.config.cluster.v3\x1a-envoy/config/cluster/v3/circuit_breaker.proto\x1a$envoy/config/cluster/v3/filter.proto\x1a/envoy/config/cluster/v3/outlier_detection.proto\x1a\"envoy/config/core/v3/address.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a$envoy/config/core/v3/extension.proto\x1a'envoy/config/core/v3/health_check.proto\x1a#envoy/config/core/v3/protocol.proto\x1a#envoy/config/core/v3/resolver.proto\x1a'envoy/config/endpoint/v3/endpoint.proto\x1a#envoy/config/metrics/v3/stats.proto\x1a$envoy/type/matcher/v3/metadata.proto\x1a%envoy/type/metadata/v3/metadata.proto\x1a\x1benvoy/type/v3/percent.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\"xds/core/v3/collection_entry.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1eudpa/annotations/migrate.proto\x1a\x1fudpa/annotations/security.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"K\n" +
 	"\x11ClusterCollection\x126\n" +
-	"\aentries\x18\x01 \x01(\v2\x1c.xds.core.v3.CollectionEntryR\aentries\"\xa3Y\n" +
+	"\aentries\x18\x01 \x01(\v2\x1c.xds.core.v3.CollectionEntryR\aentries\"\xadY\n" +
 	"\aCluster\x12o\n" +
 	"\x18transport_socket_matches\x18+ \x03(\v25.envoy.config.cluster.v3.Cluster.TransportSocketMatchR\x16transportSocketMatches\x12V\n" +
 	"\x18transport_socket_matcher\x18; \x01(\v2\x1c.xds.type.matcher.v3.MatcherR\x16transportSocketMatcher\x12\x1b\n" +
@@ -3474,8 +3474,8 @@ const file_envoy_config_cluster_v3_cluster_proto_rawDesc = "" +
 	"!per_connection_buffer_limit_bytes\x18\x05 \x01(\v2\x1c.google.protobuf.UInt32ValueB\a\x8a\x93\xb7*\x02\x10\x01R\x1dperConnectionBufferLimitBytes\x12\x82\x01\n" +
 	",per_connection_buffer_high_watermark_timeout\x18< \x01(\v2\x19.google.protobuf.DurationB\b\xfaB\x05\xaa\x01\x022\x00R'perConnectionBufferHighWatermarkTimeout\x12P\n" +
 	"\tlb_policy\x18\x06 \x01(\x0e2).envoy.config.cluster.v3.Cluster.LbPolicyB\b\xfaB\x05\x82\x01\x02\x10\x01R\blbPolicy\x12X\n" +
-	"\x0fload_assignment\x18! \x01(\v2/.envoy.config.endpoint.v3.ClusterLoadAssignmentR\x0eloadAssignment\x12F\n" +
-	"\rhealth_checks\x18\b \x03(\v2!.envoy.config.core.v3.HealthCheckR\fhealthChecks\x12h\n" +
+	"\x0fload_assignment\x18! \x01(\v2/.envoy.config.endpoint.v3.ClusterLoadAssignmentR\x0eloadAssignment\x12P\n" +
+	"\rhealth_checks\x18\b \x03(\v2!.envoy.config.core.v3.HealthCheckB\b\xfaB\x05\x92\x01\x02\x10\bR\fhealthChecks\x12h\n" +
 	"\x1bmax_requests_per_connection\x18\t \x01(\v2\x1c.google.protobuf.UInt32ValueB\v\x92ǆ\xd8\x04\x033.0\x18\x01R\x18maxRequestsPerConnection\x12S\n" +
 	"\x10circuit_breakers\x18\n" +
 	" \x01(\v2(.envoy.config.cluster.v3.CircuitBreakersR\x0fcircuitBreakers\x12\x83\x01\n" +

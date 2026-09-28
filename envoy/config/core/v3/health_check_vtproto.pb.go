@@ -639,6 +639,15 @@ func (m *HealthCheck) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xda
+	}
 	if m.AlwaysLogHealthCheckSuccess {
 		i--
 		if m.AlwaysLogHealthCheckSuccess {
@@ -1322,6 +1331,10 @@ func (m *HealthCheck) SizeVT() (n int) {
 	}
 	if m.AlwaysLogHealthCheckSuccess {
 		n += 3
+	}
+	l = len(m.Name)
+	if l > 0 {
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n

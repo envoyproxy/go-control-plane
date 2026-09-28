@@ -178,6 +178,8 @@ func (m *HealthCheck) validate(all bool) error {
 
 	var errors []error
 
+	// no validation rules for Name
+
 	if m.GetTimeout() == nil {
 		err := HealthCheckValidationError{
 			field:  "Timeout",

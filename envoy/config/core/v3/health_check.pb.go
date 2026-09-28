@@ -145,9 +145,14 @@ func (x *HealthStatusSet) GetStatuses() []HealthStatus {
 	return nil
 }
 
-// [#next-free-field: 27]
+// [#next-free-field: 28]
 type HealthCheck struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
+	// Optional name for this health checker. When set, per-checker stats are emitted under
+	// ``health_check.name.<name>.<stat>`` instead of ``health_check.<stat>``.
+	//
+	// This is required if multiple health checks are configured on a cluster.
+	Name string `protobuf:"bytes,27,opt,name=name,proto3" json:"name,omitempty"`
 	// The time to wait for a health check response. If the timeout is reached the
 	// health check attempt will be considered a failure.
 	Timeout *durationpb.Duration `protobuf:"bytes,1,opt,name=timeout,proto3" json:"timeout,omitempty"`
@@ -320,6 +325,13 @@ func (x *HealthCheck) ProtoReflect() protoreflect.Message {
 // Deprecated: Use HealthCheck.ProtoReflect.Descriptor instead.
 func (*HealthCheck) Descriptor() ([]byte, []int) {
 	return file_envoy_config_core_v3_health_check_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *HealthCheck) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
 }
 
 func (x *HealthCheck) GetTimeout() *durationpb.Duration {
@@ -1145,8 +1157,9 @@ const file_envoy_config_core_v3_health_check_proto_rawDesc = "" +
 	"'envoy/config/core/v3/health_check.proto\x12\x14envoy.config.core.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a/envoy/config/core/v3/event_service_config.proto\x1a$envoy/config/core/v3/extension.proto\x1a)envoy/config/core/v3/proxy_protocol.proto\x1a\"envoy/type/matcher/v3/string.proto\x1a\x18envoy/type/v3/http.proto\x1a\x19envoy/type/v3/range.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"`\n" +
 	"\x0fHealthStatusSet\x12M\n" +
 	"\bstatuses\x18\x01 \x03(\x0e2\".envoy.config.core.v3.HealthStatusB\r\xfaB\n" +
-	"\x92\x01\a\"\x05\x82\x01\x02\x10\x01R\bstatuses\"\x8c \n" +
-	"\vHealthCheck\x12?\n" +
+	"\x92\x01\a\"\x05\x82\x01\x02\x10\x01R\bstatuses\"\xa0 \n" +
+	"\vHealthCheck\x12\x12\n" +
+	"\x04name\x18\x1b \x01(\tR\x04name\x12?\n" +
 	"\atimeout\x18\x01 \x01(\v2\x19.google.protobuf.DurationB\n" +
 	"\xfaB\a\xaa\x01\x04\b\x01*\x00R\atimeout\x12A\n" +
 	"\binterval\x18\x02 \x01(\v2\x19.google.protobuf.DurationB\n" +
