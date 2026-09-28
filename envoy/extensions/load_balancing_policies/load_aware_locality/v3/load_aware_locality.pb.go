@@ -9,6 +9,7 @@ package load_aware_localityv3
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
+	v31 "github.com/envoyproxy/go-control-plane/envoy/extensions/load_balancing_policies/common/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -28,7 +29,7 @@ const (
 
 // Configuration for the load_aware_locality LB policy which uses ORCA utilization data
 // to route traffic between localities based on available headroom.
-// [#next-free-field: 10]
+// [#next-free-field: 11]
 type LoadAwareLocality struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The child LB policy to create for endpoint-picking within each locality.
@@ -91,6 +92,10 @@ type LoadAwareLocality struct {
 	// server may not provide reports as frequently as the client requests.
 	// Used only when enable_oob_load_report is true. Default is 10 seconds.
 	OobReportingPeriod *durationpb.Duration `protobuf:"bytes,9,opt,name=oob_reporting_period,json=oobReportingPeriod,proto3" json:"oob_reporting_period,omitempty"`
+	// Optional overrides for the OOB reporting connection (alternative port,
+	// ``:authority``, transport socket selection). Honored only when
+	// ``enable_oob_load_report`` is true.
+	OobReportingConfig *v31.OrcaOobReportingConfig `protobuf:"bytes,10,opt,name=oob_reporting_config,json=oobReportingConfig,proto3" json:"oob_reporting_config,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -188,11 +193,18 @@ func (x *LoadAwareLocality) GetOobReportingPeriod() *durationpb.Duration {
 	return nil
 }
 
+func (x *LoadAwareLocality) GetOobReportingConfig() *v31.OrcaOobReportingConfig {
+	if x != nil {
+		return x.OobReportingConfig
+	}
+	return nil
+}
+
 var File_envoy_extensions_load_balancing_policies_load_aware_locality_v3_load_aware_locality_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_load_balancing_policies_load_aware_locality_v3_load_aware_locality_proto_rawDesc = "" +
 	"\n" +
-	"Yenvoy/extensions/load_balancing_policies/load_aware_locality/v3/load_aware_locality.proto\x12?envoy.extensions.load_balancing_policies.load_aware_locality.v3\x1a%envoy/config/cluster/v3/cluster.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xf5\x06\n" +
+	"Yenvoy/extensions/load_balancing_policies/load_aware_locality/v3/load_aware_locality.proto\x12?envoy.extensions.load_balancing_policies.load_aware_locality.v3\x1a%envoy/config/cluster/v3/cluster.proto\x1a?envoy/extensions/load_balancing_policies/common/v3/common.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xf3\a\n" +
 	"\x11LoadAwareLocality\x12n\n" +
 	"\x17endpoint_picking_policy\x18\x01 \x01(\v2,.envoy.config.cluster.v3.LoadBalancingPolicyB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x15endpointPickingPolicy\x12Z\n" +
 	"\x14weight_update_period\x18\x02 \x01(\v2\x19.google.protobuf.DurationB\r\xfaB\n" +
@@ -203,7 +215,9 @@ const file_envoy_extensions_load_balancing_policies_load_aware_locality_v3_load_
 	"\x15remote_probe_fraction\x18\x06 \x01(\v2\x1c.google.protobuf.DoubleValueB\x17\xfaB\x14\x12\x12\x11\x00\x00\x00\x00\x00\x00\xf0?)\x00\x00\x00\x00\x00\x00\x00\x00R\x13remoteProbeFraction\x12]\n" +
 	"\x18weight_expiration_period\x18\a \x01(\v2\x19.google.protobuf.DurationB\b\xfaB\x05\xaa\x01\x022\x00R\x16weightExpirationPeriod\x12O\n" +
 	"\x16enable_oob_load_report\x18\b \x01(\v2\x1a.google.protobuf.BoolValueR\x13enableOobLoadReport\x12K\n" +
-	"\x14oob_reporting_period\x18\t \x01(\v2\x19.google.protobuf.DurationR\x12oobReportingPeriodB\xef\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x14oob_reporting_period\x18\t \x01(\v2\x19.google.protobuf.DurationR\x12oobReportingPeriod\x12|\n" +
+	"\x14oob_reporting_config\x18\n" +
+	" \x01(\v2J.envoy.extensions.load_balancing_policies.common.v3.OrcaOobReportingConfigR\x12oobReportingConfigB\xef\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"Mio.envoyproxy.envoy.extensions.load_balancing_policies.load_aware_locality.v3B\x16LoadAwareLocalityProtoP\x01Z|github.com/envoyproxy/go-control-plane/envoy/extensions/load_balancing_policies/load_aware_locality/v3;load_aware_localityv3b\x06proto3"
 
 var (
@@ -220,11 +234,12 @@ func file_envoy_extensions_load_balancing_policies_load_aware_locality_v3_load_a
 
 var file_envoy_extensions_load_balancing_policies_load_aware_locality_v3_load_aware_locality_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_envoy_extensions_load_balancing_policies_load_aware_locality_v3_load_aware_locality_proto_goTypes = []any{
-	(*LoadAwareLocality)(nil),      // 0: envoy.extensions.load_balancing_policies.load_aware_locality.v3.LoadAwareLocality
-	(*v3.LoadBalancingPolicy)(nil), // 1: envoy.config.cluster.v3.LoadBalancingPolicy
-	(*durationpb.Duration)(nil),    // 2: google.protobuf.Duration
-	(*wrapperspb.DoubleValue)(nil), // 3: google.protobuf.DoubleValue
-	(*wrapperspb.BoolValue)(nil),   // 4: google.protobuf.BoolValue
+	(*LoadAwareLocality)(nil),          // 0: envoy.extensions.load_balancing_policies.load_aware_locality.v3.LoadAwareLocality
+	(*v3.LoadBalancingPolicy)(nil),     // 1: envoy.config.cluster.v3.LoadBalancingPolicy
+	(*durationpb.Duration)(nil),        // 2: google.protobuf.Duration
+	(*wrapperspb.DoubleValue)(nil),     // 3: google.protobuf.DoubleValue
+	(*wrapperspb.BoolValue)(nil),       // 4: google.protobuf.BoolValue
+	(*v31.OrcaOobReportingConfig)(nil), // 5: envoy.extensions.load_balancing_policies.common.v3.OrcaOobReportingConfig
 }
 var file_envoy_extensions_load_balancing_policies_load_aware_locality_v3_load_aware_locality_proto_depIdxs = []int32{
 	1, // 0: envoy.extensions.load_balancing_policies.load_aware_locality.v3.LoadAwareLocality.endpoint_picking_policy:type_name -> envoy.config.cluster.v3.LoadBalancingPolicy
@@ -235,11 +250,12 @@ var file_envoy_extensions_load_balancing_policies_load_aware_locality_v3_load_aw
 	2, // 5: envoy.extensions.load_balancing_policies.load_aware_locality.v3.LoadAwareLocality.weight_expiration_period:type_name -> google.protobuf.Duration
 	4, // 6: envoy.extensions.load_balancing_policies.load_aware_locality.v3.LoadAwareLocality.enable_oob_load_report:type_name -> google.protobuf.BoolValue
 	2, // 7: envoy.extensions.load_balancing_policies.load_aware_locality.v3.LoadAwareLocality.oob_reporting_period:type_name -> google.protobuf.Duration
-	8, // [8:8] is the sub-list for method output_type
-	8, // [8:8] is the sub-list for method input_type
-	8, // [8:8] is the sub-list for extension type_name
-	8, // [8:8] is the sub-list for extension extendee
-	0, // [0:8] is the sub-list for field type_name
+	5, // 8: envoy.extensions.load_balancing_policies.load_aware_locality.v3.LoadAwareLocality.oob_reporting_config:type_name -> envoy.extensions.load_balancing_policies.common.v3.OrcaOobReportingConfig
+	9, // [9:9] is the sub-list for method output_type
+	9, // [9:9] is the sub-list for method input_type
+	9, // [9:9] is the sub-list for extension type_name
+	9, // [9:9] is the sub-list for extension extendee
+	0, // [0:9] is the sub-list for field type_name
 }
 
 func init() {

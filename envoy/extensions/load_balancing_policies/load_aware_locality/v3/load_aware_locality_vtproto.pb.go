@@ -52,6 +52,28 @@ func (m *LoadAwareLocality) MarshalToSizedBufferVTStrict(dAtA []byte) (int, erro
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.OobReportingConfig != nil {
+		if vtmsg, ok := interface{}(m.OobReportingConfig).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.OobReportingConfig)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+		}
+		i--
+		dAtA[i] = 0x52
+	}
 	if m.OobReportingPeriod != nil {
 		size, err := (*durationpb.Duration)(m.OobReportingPeriod).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -204,6 +226,16 @@ func (m *LoadAwareLocality) SizeVT() (n int) {
 	}
 	if m.OobReportingPeriod != nil {
 		l = (*durationpb.Duration)(m.OobReportingPeriod).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.OobReportingConfig != nil {
+		if size, ok := interface{}(m.OobReportingConfig).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.OobReportingConfig)
+		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
