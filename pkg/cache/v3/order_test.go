@@ -31,6 +31,10 @@ func TestOrderKeys(t *testing.T) {
 			ID:      5,
 			TypeURL: resource.ScopedRouteType,
 		},
+		{
+			ID:      6,
+			TypeURL: resource.ExtensionConfigType,
+		},
 	}
 	expected := keys{
 		{
@@ -44,6 +48,12 @@ func TestOrderKeys(t *testing.T) {
 		{
 			ID:      4,
 			TypeURL: resource.ListenerType,
+		},
+		// An extension config is subscribed to by the filters of a listener, and is named
+		// from the per-filter configuration of a route, so it sits between the two.
+		{
+			ID:      6,
+			TypeURL: resource.ExtensionConfigType,
 		},
 		{
 			ID:      3,
@@ -67,6 +77,7 @@ func TestOrderKeys(t *testing.T) {
 	// order_test.go:43: {ID:2 TypeURL:type.googleapis.com/envoy.config.cluster.v3.Cluster}
 	// order_test.go:43: {ID:1 TypeURL:type.googleapis.com/envoy.config.endpoint.v3.ClusterLoadAssignment}
 	// order_test.go:43: {ID:4 TypeURL:type.googleapis.com/envoy.config.listener.v3.Listener}
+	// order_test.go:43: {ID:6 TypeURL:type.googleapis.com/envoy.config.core.v3.TypedExtensionConfig}
 	// order_test.go:43: {ID:3 TypeURL:type.googleapis.com/envoy.config.route.v3.RouteConfiguration}
 	// order_test.go:43: {ID:5 TypeURL:type.googleapis.com/envoy.config.route.v3.ScopedRouteConfiguration}
 }
