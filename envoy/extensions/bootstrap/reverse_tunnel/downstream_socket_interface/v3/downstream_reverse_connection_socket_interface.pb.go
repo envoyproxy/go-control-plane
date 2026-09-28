@@ -42,9 +42,10 @@ type DownstreamReverseConnectionSocketInterface struct {
 	// provided by “HttpHandshakeConfig“.
 	HttpHandshake *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig `protobuf:"bytes,3,opt,name=http_handshake,json=httpHandshake,proto3" json:"http_handshake,omitempty"`
 	// Access log configuration for reverse tunnel initiator lifecycle events.
-	// Logs are emitted on handshake success, handshake failure, and connection close.
-	// Reverse tunnel metadata (“node_id“, “cluster_id“, “tenant_id“, upstream cluster, etc.)
-	// is available via “%DYNAMIC_METADATA(envoy.reverse_tunnel.initiator:*)%“ substitutions.
+	// Logs are emitted on handshake success, handshake failure, connection draining, and
+	// connection close. Reverse tunnel metadata (“node_id“, “cluster_id“, “tenant_id“,
+	// upstream cluster, “connection_key“, “connection_id“, etc.) is available via
+	// “%DYNAMIC_METADATA(envoy.reverse_tunnel.initiator:*)%“ substitutions.
 	AccessLog []*v3.AccessLog `protobuf:"bytes,4,rep,name=access_log,json=accessLog,proto3" json:"access_log,omitempty"`
 	// Upper bound on the per-host reconnect backoff. The initiator retries a failed handshake on a
 	// deterministic exponential schedule (1s, 2s, 4s, ...) with small upward jitter; this value caps
