@@ -47,6 +47,11 @@ const (
 	// this once the module owns the routing of the virtual host, so that a failure never falls back
 	// to the routes that are left.
 	FailurePolicy_NO_ROUTE FailurePolicy = 2
+	// Skip the route the specifier was given and let route matching carry on with the next route,
+	// keeping the route table the module replaces in effect for the request. Prefer this for the
+	// catch all route that owns routing during a migration, so a module failure falls back to the
+	// route table rather than to the catch all route's own action.
+	FailurePolicy_CONTINUE_MATCHING FailurePolicy = 3
 )
 
 // Enum value maps for FailurePolicy.
@@ -55,11 +60,13 @@ var (
 		0: "FAILURE_POLICY_UNSPECIFIED",
 		1: "PASS_THROUGH",
 		2: "NO_ROUTE",
+		3: "CONTINUE_MATCHING",
 	}
 	FailurePolicy_value = map[string]int32{
 		"FAILURE_POLICY_UNSPECIFIED": 0,
 		"PASS_THROUGH":               1,
 		"NO_ROUTE":                   2,
+		"CONTINUE_MATCHING":          3,
 	}
 )
 
@@ -477,11 +484,12 @@ const file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_m
 	"\x10runtime_fraction\x18\a \x01(\v2..envoy.config.core.v3.RuntimeFractionalPercentR\x0fruntimeFraction\x12{\n" +
 	"\x0efailure_policy\x18\b \x01(\x0e2J.envoy.extensions.router.route_specifiers.dynamic_modules.v3.FailurePolicyB\b\xfaB\x05\x82\x01\x02\x10\x01R\rfailurePolicy\x12G\n" +
 	"\x11validate_clusters\x18\t \x01(\v2\x1a.google.protobuf.BoolValueR\x10validateClusters\x12<\n" +
-	"\x15specifier_instance_id\x18\v \x01(\tB\b\xfaB\x05r\x03\x18\x80\x02R\x13specifierInstanceId*O\n" +
+	"\x15specifier_instance_id\x18\v \x01(\tB\b\xfaB\x05r\x03\x18\x80\x02R\x13specifierInstanceId*f\n" +
 	"\rFailurePolicy\x12\x1e\n" +
 	"\x1aFAILURE_POLICY_UNSPECIFIED\x10\x00\x12\x10\n" +
 	"\fPASS_THROUGH\x10\x01\x12\f\n" +
-	"\bNO_ROUTE\x10\x02B\xe0\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\bNO_ROUTE\x10\x02\x12\x15\n" +
+	"\x11CONTINUE_MATCHING\x10\x03B\xe0\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"Iio.envoyproxy.envoy.extensions.router.route_specifiers.dynamic_modules.v3B\x13DynamicModulesProtoP\x01Ztgithub.com/envoyproxy/go-control-plane/envoy/extensions/router/route_specifiers/dynamic_modules/v3;dynamic_modulesv3b\x06proto3"
 
 var (
