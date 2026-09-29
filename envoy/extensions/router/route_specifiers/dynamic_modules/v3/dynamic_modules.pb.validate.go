@@ -757,6 +757,17 @@ func (m *DynamicModuleRouteSpecifier) validate(all bool) error {
 		}
 	}
 
+	if utf8.RuneCountInString(m.GetSpecifierInstanceId()) > 256 {
+		err := DynamicModuleRouteSpecifierValidationError{
+			field:  "SpecifierInstanceId",
+			reason: "value length must be at most 256 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if len(errors) > 0 {
 		return DynamicModuleRouteSpecifierMultiError(errors)
 	}

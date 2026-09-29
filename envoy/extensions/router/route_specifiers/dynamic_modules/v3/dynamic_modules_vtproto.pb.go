@@ -314,6 +314,13 @@ func (m *DynamicModuleRouteSpecifier) MarshalToSizedBufferVTStrict(dAtA []byte) 
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.SpecifierInstanceId) > 0 {
+		i -= len(m.SpecifierInstanceId)
+		copy(dAtA[i:], m.SpecifierInstanceId)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.SpecifierInstanceId)))
+		i--
+		dAtA[i] = 0x5a
+	}
 	if m.ValidateClusters != nil {
 		size, err := (*wrapperspb.BoolValue)(m.ValidateClusters).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -593,6 +600,10 @@ func (m *DynamicModuleRouteSpecifier) SizeVT() (n int) {
 	}
 	if m.ValidateClusters != nil {
 		l = (*wrapperspb.BoolValue)(m.ValidateClusters).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.SpecifierInstanceId)
+	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)

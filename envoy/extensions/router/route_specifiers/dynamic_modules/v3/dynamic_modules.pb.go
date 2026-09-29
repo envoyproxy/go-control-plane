@@ -281,7 +281,7 @@ func (x *RouteOverride) GetCors() *v3.CorsPolicy {
 }
 
 // Configuration for the dynamic modules route specifier.
-// [#next-free-field: 10]
+// [#next-free-field: 12]
 type DynamicModuleRouteSpecifier struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Specifies the shared object level configuration. This field is required.
@@ -335,8 +335,14 @@ type DynamicModuleRouteSpecifier struct {
 	// that references them. An unknown cluster then fails the request with the
 	// ``cluster_not_found_response_code`` of the route instead.
 	ValidateClusters *wrapperspb.BoolValue `protobuf:"bytes,9,opt,name=validate_clusters,json=validateClusters,proto3" json:"validate_clusters,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// An opaque identifier the module reads with ``get_config_specifier_instance_id``, so that two
+	// specifier instances sharing one module can tell the routes they build apart, for example by
+	// writing it into the route metadata they mark their routes with. It is documentation and
+	// convenience for the module and Envoy enforces nothing about it. If not specified, defaults to
+	// an empty string.
+	SpecifierInstanceId string `protobuf:"bytes,11,opt,name=specifier_instance_id,json=specifierInstanceId,proto3" json:"specifier_instance_id,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *DynamicModuleRouteSpecifier) Reset() {
@@ -432,6 +438,13 @@ func (x *DynamicModuleRouteSpecifier) GetValidateClusters() *wrapperspb.BoolValu
 	return nil
 }
 
+func (x *DynamicModuleRouteSpecifier) GetSpecifierInstanceId() string {
+	if x != nil {
+		return x.SpecifierInstanceId
+	}
+	return ""
+}
+
 var File_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_modules_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_modules_proto_rawDesc = "" +
@@ -452,7 +465,7 @@ const file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_m
 	"\fhedge_policy\x18\x06 \x01(\v2\".envoy.config.route.v3.HedgePolicyR\vhedgePolicy\x12A\n" +
 	"\vrate_limits\x18\a \x03(\v2 .envoy.config.route.v3.RateLimitR\n" +
 	"rateLimits\x125\n" +
-	"\x04cors\x18\b \x01(\v2!.envoy.config.route.v3.CorsPolicyR\x04cors\"\xb2\x06\n" +
+	"\x04cors\x18\b \x01(\v2!.envoy.config.route.v3.CorsPolicyR\x04cors\"\xf0\x06\n" +
 	"\x1bDynamicModuleRouteSpecifier\x12v\n" +
 	"\x15dynamic_module_config\x18\x01 \x01(\v28.envoy.extensions.dynamic_modules.v3.DynamicModuleConfigB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x13dynamicModuleConfig\x12%\n" +
 	"\x0especifier_name\x18\x02 \x01(\tR\rspecifierName\x12?\n" +
@@ -463,7 +476,8 @@ const file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_m
 	"\x0froute_overrides\x18\x06 \x03(\v2J.envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverrideR\x0erouteOverrides\x12Y\n" +
 	"\x10runtime_fraction\x18\a \x01(\v2..envoy.config.core.v3.RuntimeFractionalPercentR\x0fruntimeFraction\x12{\n" +
 	"\x0efailure_policy\x18\b \x01(\x0e2J.envoy.extensions.router.route_specifiers.dynamic_modules.v3.FailurePolicyB\b\xfaB\x05\x82\x01\x02\x10\x01R\rfailurePolicy\x12G\n" +
-	"\x11validate_clusters\x18\t \x01(\v2\x1a.google.protobuf.BoolValueR\x10validateClusters*O\n" +
+	"\x11validate_clusters\x18\t \x01(\v2\x1a.google.protobuf.BoolValueR\x10validateClusters\x12<\n" +
+	"\x15specifier_instance_id\x18\v \x01(\tB\b\xfaB\x05r\x03\x18\x80\x02R\x13specifierInstanceId*O\n" +
 	"\rFailurePolicy\x12\x1e\n" +
 	"\x1aFAILURE_POLICY_UNSPECIFIED\x10\x00\x12\x10\n" +
 	"\fPASS_THROUGH\x10\x01\x12\f\n" +
