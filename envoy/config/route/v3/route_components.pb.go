@@ -142,8 +142,6 @@ func (RouteAction_ClusterNotFoundResponseCode) EnumDescriptor() ([]byte, []int) 
 
 // Configures :ref:`internal redirect <arch_overview_internal_redirects>` behavior.
 // [#next-major-version: remove this definition - it's defined in the InternalRedirectPolicy message.]
-//
-// Deprecated: Marked as deprecated in envoy/config/route/v3/route_components.proto.
 type RouteAction_InternalRedirectAction int32
 
 const (
@@ -7851,7 +7849,7 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\x1callow_private_network_access\x18\f \x01(\v2\x1a.google.protobuf.BoolValueR\x19allowPrivateNetworkAccess\x12a\n" +
 	"\x1fforward_not_matching_preflights\x18\r \x01(\v2\x1a.google.protobuf.BoolValueR\x1cforwardNotMatchingPreflights:$\x9aň\x1e\x1f\n" +
 	"\x1denvoy.api.v2.route.CorsPolicyB\x13\n" +
-	"\x11enabled_specifierJ\x04\b\x01\x10\x02J\x04\b\b\x10\tJ\x04\b\a\x10\bR\fallow_originR\x12allow_origin_regexR\aenabled\"\xeb/\n" +
+	"\x11enabled_specifierJ\x04\b\x01\x10\x02J\x04\b\b\x10\tJ\x04\b\a\x10\bR\fallow_originR\x12allow_origin_regexR\aenabled\"\xe7/\n" +
 	"\vRouteAction\x12#\n" +
 	"\acluster\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01H\x00R\acluster\x126\n" +
 	"\x0ecluster_header\x18\x02 \x01(\tB\r\xfaB\n" +
@@ -7956,10 +7954,10 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\x1bClusterNotFoundResponseCode\x12\x17\n" +
 	"\x13SERVICE_UNAVAILABLE\x10\x00\x12\r\n" +
 	"\tNOT_FOUND\x10\x01\x12\x19\n" +
-	"\x15INTERNAL_SERVER_ERROR\x10\x02\"^\n" +
+	"\x15INTERNAL_SERVER_ERROR\x10\x02\"Z\n" +
 	"\x16InternalRedirectAction\x12\"\n" +
 	"\x1ePASS_THROUGH_INTERNAL_REDIRECT\x10\x00\x12\x1c\n" +
-	"\x18HANDLE_INTERNAL_REDIRECT\x10\x01\x1a\x02\x18\x01:%\x9aň\x1e \n" +
+	"\x18HANDLE_INTERNAL_REDIRECT\x10\x01:%\x9aň\x1e \n" +
 	"\x1eenvoy.api.v2.route.RouteActionB\x18\n" +
 	"\x11cluster_specifier\x12\x03\xf8B\x01B\x18\n" +
 	"\x16host_rewrite_specifierJ\x04\b\f\x10\rJ\x04\b\x12\x10\x13J\x04\b\x13\x10\x14J\x04\b\x10\x10\x11J\x04\b\x16\x10\x17J\x04\b\x15\x10\x16J\x04\b\n" +
