@@ -1,4 +1,4 @@
-FROM golang:1.26@sha256:c83e68f3ebb6943a2904fa66348867d108119890a2c6a2e6f07b38d0eb6c25c5
+FROM golang:1.27@sha256:0ecdc2a9f6156af6451080bfe3d8382a662fcc4e209608c6f919e643453514c1
 
 WORKDIR /go/src/dyplomat
 COPY . /go/src/dyplomat
