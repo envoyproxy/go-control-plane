@@ -785,6 +785,18 @@ func (m *HttpConnectionManager) MarshalToSizedBufferVTStrict(dAtA []byte) (int, 
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.RecordRouteResolutionStats {
+		i--
+		if m.RecordRouteResolutionStats {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x3
+		i--
+		dAtA[i] = 0xf8
+	}
 	if m.DrainTimeoutJitter != nil {
 		if vtmsg, ok := interface{}(m.DrainTimeoutJitter).(interface {
 			MarshalToSizedBufferVTStrict([]byte) (int, error)
@@ -3301,6 +3313,9 @@ func (m *HttpConnectionManager) SizeVT() (n int) {
 			l = proto.Size(m.DrainTimeoutJitter)
 		}
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.RecordRouteResolutionStats {
+		n += 3
 	}
 	n += len(m.unknownFields)
 	return n
