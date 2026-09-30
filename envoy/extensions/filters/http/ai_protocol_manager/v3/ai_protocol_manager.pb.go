@@ -305,8 +305,9 @@ type RequestParsingLimits struct {
 	// conversation content goes to the buffer.
 	//
 	// Keep it above the longest ``model`` name in use. Values over the threshold
-	// are offloaded, and on a declared AI endpoint the payload schema requires
-	// ``model`` inline, so an offloaded one is rejected with a 400.
+	// are offloaded, and the :ref:`schema validation AI filter
+	// <envoy_v3_api_msg_extensions.http.ai_filters.schema_validation.v3.SchemaValidation>`
+	// requires ``model`` inline, so it rejects an offloaded one with a 400.
 	InlineStringThresholdBytes *wrapperspb.UInt32Value `protobuf:"bytes,1,opt,name=inline_string_threshold_bytes,json=inlineStringThresholdBytes,proto3" json:"inline_string_threshold_bytes,omitempty"`
 	unknownFields              protoimpl.UnknownFields
 	sizeCache                  protoimpl.SizeCache
@@ -667,11 +668,12 @@ type RequestPerRoute struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The wire API a request payload on this route follows.
 	// ``LLM_PROTOCOL_UNSPECIFIED`` declares the endpoint without naming its
-	// API.
+	// API. The ``envoy.ai.llm_protocol.request`` filter state object, when it
+	// names one, takes precedence.
 	//
-	// Payloads are validated against the declared API's schema when one is
-	// defined (currently OpenAI Chat Completions); a schema-invalid payload is
-	// rejected with a 400.
+	// The :ref:`schema validation AI filter
+	// <envoy_v3_api_msg_extensions.http.ai_filters.schema_validation.v3.SchemaValidation>`
+	// holds a payload to its API's schema.
 	//
 	// [#comment: Normalization is not implemented yet; a normalization knob
 	// will be added here once the transformation and its output contract
