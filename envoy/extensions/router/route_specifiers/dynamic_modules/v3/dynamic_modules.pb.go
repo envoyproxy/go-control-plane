@@ -170,7 +170,7 @@ func (x *RouteTemplate) GetRoute() *v3.Route {
 // configuration load rather than constructed on the request path. An entry that replaces no
 // property is rejected. A property an entry leaves unset keeps the value of the route the decision
 // produced, so an entry can never remove a property that route configures.
-// [#next-free-field: 10]
+// [#next-free-field: 12]
 type RouteOverride struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The identifier the module selects this override with. Must be unique within the specifier.
@@ -203,7 +203,15 @@ type RouteOverride struct {
 	// query string, which is preserved, and the result is capped at
 	// :ref:`max_rewritten_path_bytes
 	// <envoy_v3_api_field_extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.max_rewritten_path_bytes>`.
-	RegexRewrite  *v32.RegexMatchAndSubstitute `protobuf:"bytes,9,opt,name=regex_rewrite,json=regexRewrite,proto3" json:"regex_rewrite,omitempty"`
+	RegexRewrite *v32.RegexMatchAndSubstitute `protobuf:"bytes,9,opt,name=regex_rewrite,json=regexRewrite,proto3" json:"regex_rewrite,omitempty"`
+	// Tracing configuration replacing the tracing settings of the produced route, overriding the
+	// connection manager defaults for the request. This is a route level property, so it applies to
+	// a direct response or a redirect route as well as a route entry.
+	Tracing *v3.Tracing `protobuf:"bytes,10,opt,name=tracing,proto3" json:"tracing,omitempty"`
+	// Metadata layered onto the metadata of the produced route, per namespace, so consumers such as
+	// the rate limit ROUTE_ENTRY action, ext_authz and the METADATA(ROUTE) formatter observe it. It
+	// is a route level property. An empty message layers nothing.
+	Metadata      *v31.Metadata `protobuf:"bytes,11,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -297,6 +305,20 @@ func (x *RouteOverride) GetCors() *v3.CorsPolicy {
 func (x *RouteOverride) GetRegexRewrite() *v32.RegexMatchAndSubstitute {
 	if x != nil {
 		return x.RegexRewrite
+	}
+	return nil
+}
+
+func (x *RouteOverride) GetTracing() *v3.Tracing {
+	if x != nil {
+		return x.Tracing
+	}
+	return nil
+}
+
+func (x *RouteOverride) GetMetadata() *v31.Metadata {
+	if x != nil {
+		return x.Metadata
 	}
 	return nil
 }
@@ -485,7 +507,7 @@ const file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_m
 	"\rRouteTemplate\x12(\n" +
 	"\vtemplate_id\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\n" +
 	"templateId\x12<\n" +
-	"\x05route\x18\x02 \x01(\v2\x1c.envoy.config.route.v3.RouteB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x05route\"\x9d\x05\n" +
+	"\x05route\x18\x02 \x01(\v2\x1c.envoy.config.route.v3.RouteB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x05route\"\x93\x06\n" +
 	"\rRouteOverride\x12(\n" +
 	"\voverride_id\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\n" +
 	"overrideId\x12E\n" +
@@ -498,7 +520,10 @@ const file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_m
 	"\vrate_limits\x18\a \x03(\v2 .envoy.config.route.v3.RateLimitR\n" +
 	"rateLimits\x125\n" +
 	"\x04cors\x18\b \x01(\v2!.envoy.config.route.v3.CorsPolicyR\x04cors\x12S\n" +
-	"\rregex_rewrite\x18\t \x01(\v2..envoy.type.matcher.v3.RegexMatchAndSubstituteR\fregexRewrite\"\xd0\a\n" +
+	"\rregex_rewrite\x18\t \x01(\v2..envoy.type.matcher.v3.RegexMatchAndSubstituteR\fregexRewrite\x128\n" +
+	"\atracing\x18\n" +
+	" \x01(\v2\x1e.envoy.config.route.v3.TracingR\atracing\x12:\n" +
+	"\bmetadata\x18\v \x01(\v2\x1e.envoy.config.core.v3.MetadataR\bmetadata\"\xd0\a\n" +
 	"\x1bDynamicModuleRouteSpecifier\x12v\n" +
 	"\x15dynamic_module_config\x18\x01 \x01(\v28.envoy.extensions.dynamic_modules.v3.DynamicModuleConfigB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x13dynamicModuleConfig\x12%\n" +
 	"\x0especifier_name\x18\x02 \x01(\tR\rspecifierName\x12?\n" +
@@ -548,11 +573,12 @@ var file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_mod
 	(*v3.RateLimit)(nil),                       // 10: envoy.config.route.v3.RateLimit
 	(*v3.CorsPolicy)(nil),                      // 11: envoy.config.route.v3.CorsPolicy
 	(*v32.RegexMatchAndSubstitute)(nil),        // 12: envoy.type.matcher.v3.RegexMatchAndSubstitute
-	(*v33.DynamicModuleConfig)(nil),            // 13: envoy.extensions.dynamic_modules.v3.DynamicModuleConfig
-	(*anypb.Any)(nil),                          // 14: google.protobuf.Any
-	(*v31.RuntimeFractionalPercent)(nil),       // 15: envoy.config.core.v3.RuntimeFractionalPercent
-	(*wrapperspb.BoolValue)(nil),               // 16: google.protobuf.BoolValue
-	(*wrapperspb.UInt32Value)(nil),             // 17: google.protobuf.UInt32Value
+	(*v3.Tracing)(nil),                         // 13: envoy.config.route.v3.Tracing
+	(*v33.DynamicModuleConfig)(nil),            // 14: envoy.extensions.dynamic_modules.v3.DynamicModuleConfig
+	(*anypb.Any)(nil),                          // 15: google.protobuf.Any
+	(*v31.RuntimeFractionalPercent)(nil),       // 16: envoy.config.core.v3.RuntimeFractionalPercent
+	(*wrapperspb.BoolValue)(nil),               // 17: google.protobuf.BoolValue
+	(*wrapperspb.UInt32Value)(nil),             // 18: google.protobuf.UInt32Value
 }
 var file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_modules_proto_depIdxs = []int32{
 	4,  // 0: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteTemplate.route:type_name -> envoy.config.route.v3.Route
@@ -564,19 +590,21 @@ var file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_mod
 	10, // 6: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride.rate_limits:type_name -> envoy.config.route.v3.RateLimit
 	11, // 7: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride.cors:type_name -> envoy.config.route.v3.CorsPolicy
 	12, // 8: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride.regex_rewrite:type_name -> envoy.type.matcher.v3.RegexMatchAndSubstitute
-	13, // 9: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.dynamic_module_config:type_name -> envoy.extensions.dynamic_modules.v3.DynamicModuleConfig
-	14, // 10: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.specifier_config:type_name -> google.protobuf.Any
-	1,  // 11: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.route_templates:type_name -> envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteTemplate
-	2,  // 12: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.route_overrides:type_name -> envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride
-	15, // 13: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.runtime_fraction:type_name -> envoy.config.core.v3.RuntimeFractionalPercent
-	0,  // 14: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.failure_policy:type_name -> envoy.extensions.router.route_specifiers.dynamic_modules.v3.FailurePolicy
-	16, // 15: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.validate_clusters:type_name -> google.protobuf.BoolValue
-	17, // 16: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.max_rewritten_path_bytes:type_name -> google.protobuf.UInt32Value
-	17, // [17:17] is the sub-list for method output_type
-	17, // [17:17] is the sub-list for method input_type
-	17, // [17:17] is the sub-list for extension type_name
-	17, // [17:17] is the sub-list for extension extendee
-	0,  // [0:17] is the sub-list for field type_name
+	13, // 9: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride.tracing:type_name -> envoy.config.route.v3.Tracing
+	6,  // 10: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride.metadata:type_name -> envoy.config.core.v3.Metadata
+	14, // 11: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.dynamic_module_config:type_name -> envoy.extensions.dynamic_modules.v3.DynamicModuleConfig
+	15, // 12: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.specifier_config:type_name -> google.protobuf.Any
+	1,  // 13: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.route_templates:type_name -> envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteTemplate
+	2,  // 14: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.route_overrides:type_name -> envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride
+	16, // 15: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.runtime_fraction:type_name -> envoy.config.core.v3.RuntimeFractionalPercent
+	0,  // 16: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.failure_policy:type_name -> envoy.extensions.router.route_specifiers.dynamic_modules.v3.FailurePolicy
+	17, // 17: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.validate_clusters:type_name -> google.protobuf.BoolValue
+	18, // 18: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.max_rewritten_path_bytes:type_name -> google.protobuf.UInt32Value
+	19, // [19:19] is the sub-list for method output_type
+	19, // [19:19] is the sub-list for method input_type
+	19, // [19:19] is the sub-list for extension type_name
+	19, // [19:19] is the sub-list for extension extendee
+	0,  // [0:19] is the sub-list for field type_name
 }
 
 func init() {
