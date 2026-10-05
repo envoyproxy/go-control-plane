@@ -35,7 +35,7 @@ const (
 //	    user1:{SHA}hashed_user1_password
 //	    user2:{SHA}hashed_user2_password
 //
-// [#next-free-field: 6]
+// [#next-free-field: 7]
 type BasicAuth struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Username-password pairs used to verify user credentials in the "Authorization" header.
@@ -72,8 +72,17 @@ type BasicAuth struct {
 	// other authentication methods (e.g. JWT) and using a downstream RBAC filter to enforce
 	// OR semantics.
 	EmitDynamicMetadata bool `protobuf:"varint,5,opt,name=emit_dynamic_metadata,json=emitDynamicMetadata,proto3" json:"emit_dynamic_metadata,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	// The realm to use in the ``WWW-Authenticate`` response header when authentication fails.
+	// The value is placed verbatim into ``WWW-Authenticate: Basic realm="<value>"``.
+	//
+	// If not specified, Envoy falls back to using the full request URI
+	// (scheme + authority + path, truncated to 256 characters), which differs per path and
+	// prevents browsers from reusing cached credentials across paths on the same origin.
+	// Set a fixed realm to enable correct credential caching. The realm pattern dose not
+	// allow DEL, 32 C0 control chars including CRLF injection chars.
+	Realm         string `protobuf:"bytes,6,opt,name=realm,proto3" json:"realm,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *BasicAuth) Reset() {
@@ -141,12 +150,25 @@ func (x *BasicAuth) GetEmitDynamicMetadata() bool {
 	return false
 }
 
+func (x *BasicAuth) GetRealm() string {
+	if x != nil {
+		return x.Realm
+	}
+	return ""
+}
+
 // Extra settings that may be added to per-route configuration for
 // a virtual host or a cluster.
 type BasicAuthPerRoute struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Username-password pairs for this route.
-	Users         *v3.DataSource `protobuf:"bytes,1,opt,name=users,proto3" json:"users,omitempty"`
+	Users *v3.DataSource `protobuf:"bytes,1,opt,name=users,proto3" json:"users,omitempty"`
+	// Per-route realm override for the ``WWW-Authenticate`` response header. If set, takes
+	// precedence over the filter-level ``BasicAuth.realm``. Same escaping semantics apply.
+	// If neither this nor the filter-level realm is set, the full request URI is used.
+	// Set a fixed realm to enable correct credential caching. The realm pattern dose not
+	// allow DEL, 32 C0 control chars including CRLF injection chars.
+	Realm         string `protobuf:"bytes,2,opt,name=realm,proto3" json:"realm,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -188,19 +210,28 @@ func (x *BasicAuthPerRoute) GetUsers() *v3.DataSource {
 	return nil
 }
 
+func (x *BasicAuthPerRoute) GetRealm() string {
+	if x != nil {
+		return x.Realm
+	}
+	return ""
+}
+
 var File_envoy_extensions_filters_http_basic_auth_v3_basic_auth_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_filters_http_basic_auth_v3_basic_auth_proto_rawDesc = "" +
 	"\n" +
-	"<envoy/extensions/filters/http/basic_auth/v3/basic_auth.proto\x12+envoy.extensions.filters.http.basic_auth.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a udpa/annotations/sensitive.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xab\x02\n" +
+	"<envoy/extensions/filters/http/basic_auth/v3/basic_auth.proto\x12+envoy.extensions.filters.http.basic_auth.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a udpa/annotations/sensitive.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xdd\x02\n" +
 	"\tBasicAuth\x12>\n" +
 	"\x05users\x18\x01 \x01(\v2 .envoy.config.core.v3.DataSourceB\x06\xb8\xb7\x8b\xa4\x02\x01R\x05users\x12C\n" +
 	"\x17forward_username_header\x18\x02 \x01(\tB\v\xfaB\br\x06\xc8\x01\x00\xc0\x01\x01R\x15forwardUsernameHeader\x12@\n" +
 	"\x15authentication_header\x18\x03 \x01(\tB\v\xfaB\br\x06\xc8\x01\x00\xc0\x01\x01R\x14authenticationHeader\x12#\n" +
 	"\rallow_missing\x18\x04 \x01(\bR\fallowMissing\x122\n" +
-	"\x15emit_dynamic_metadata\x18\x05 \x01(\bR\x13emitDynamicMetadata\"[\n" +
+	"\x15emit_dynamic_metadata\x18\x05 \x01(\bR\x13emitDynamicMetadata\x120\n" +
+	"\x05realm\x18\x06 \x01(\tB\x1a\xfaB\x17r\x152\x13^[^\\x00-\\x1f\\x7f]*$R\x05realm\"\x8d\x01\n" +
 	"\x11BasicAuthPerRoute\x12F\n" +
-	"\x05users\x18\x01 \x01(\v2 .envoy.config.core.v3.DataSourceB\x0e\xfaB\x05\x8a\x01\x02\x10\x01\xb8\xb7\x8b\xa4\x02\x01R\x05usersB\xb6\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x05users\x18\x01 \x01(\v2 .envoy.config.core.v3.DataSourceB\x0e\xfaB\x05\x8a\x01\x02\x10\x01\xb8\xb7\x8b\xa4\x02\x01R\x05users\x120\n" +
+	"\x05realm\x18\x02 \x01(\tB\x1a\xfaB\x17r\x152\x13^[^\\x00-\\x1f\\x7f]*$R\x05realmB\xb6\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"9io.envoyproxy.envoy.extensions.filters.http.basic_auth.v3B\x0eBasicAuthProtoP\x01Z_github.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/basic_auth/v3;basic_authv3b\x06proto3"
 
 var (
