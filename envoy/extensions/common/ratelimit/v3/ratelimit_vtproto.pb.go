@@ -98,6 +98,16 @@ func (m *RateLimitDescriptor_RateLimitOverride) MarshalToSizedBufferVTStrict(dAt
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.UnitMultiplier != nil {
+		size, err := (*wrapperspb.UInt32Value)(m.UnitMultiplier).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1a
+	}
 	if m.Unit != 0 {
 		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.Unit))
 		i--
@@ -325,6 +335,10 @@ func (m *RateLimitDescriptor_RateLimitOverride) SizeVT() (n int) {
 	}
 	if m.Unit != 0 {
 		n += 1 + protohelpers.SizeOfVarint(uint64(m.Unit))
+	}
+	if m.UnitMultiplier != nil {
+		l = (*wrapperspb.UInt32Value)(m.UnitMultiplier).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n

@@ -16,6 +16,7 @@ import (
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	structpb "google.golang.org/protobuf/types/known/structpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -360,9 +361,12 @@ type RateLimitResponse_RateLimit struct {
 	// The number of requests per unit of time.
 	RequestsPerUnit uint32 `protobuf:"varint,1,opt,name=requests_per_unit,json=requestsPerUnit,proto3" json:"requests_per_unit,omitempty"`
 	// The unit of time.
-	Unit          RateLimitResponse_RateLimit_Unit `protobuf:"varint,2,opt,name=unit,proto3,enum=envoy.service.ratelimit.v3.RateLimitResponse_RateLimit_Unit" json:"unit,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Unit RateLimitResponse_RateLimit_Unit `protobuf:"varint,2,opt,name=unit,proto3,enum=envoy.service.ratelimit.v3.RateLimitResponse_RateLimit_Unit" json:"unit,omitempty"`
+	// The number of units in the rate limit period. For example, a value of ``10`` with a unit
+	// of ``MINUTE`` specifies a 10-minute rate limit period. If not specified, defaults to ``1``.
+	UnitMultiplier *wrapperspb.UInt32Value `protobuf:"bytes,4,opt,name=unit_multiplier,json=unitMultiplier,proto3" json:"unit_multiplier,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *RateLimitResponse_RateLimit) Reset() {
@@ -414,6 +418,13 @@ func (x *RateLimitResponse_RateLimit) GetUnit() RateLimitResponse_RateLimit_Unit
 		return x.Unit
 	}
 	return RateLimitResponse_RateLimit_UNKNOWN
+}
+
+func (x *RateLimitResponse_RateLimit) GetUnitMultiplier() *wrapperspb.UInt32Value {
+	if x != nil {
+		return x.UnitMultiplier
+	}
+	return nil
 }
 
 // Cacheable quota for responses.
@@ -626,13 +637,13 @@ var File_envoy_service_ratelimit_v3_rls_proto protoreflect.FileDescriptor
 
 const file_envoy_service_ratelimit_v3_rls_proto_rawDesc = "" +
 	"\n" +
-	"$envoy/service/ratelimit/v3/rls.proto\x12\x1aenvoy.service.ratelimit.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a4envoy/extensions/common/ratelimit/v3/ratelimit.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xdc\x01\n" +
+	"$envoy/service/ratelimit/v3/rls.proto\x12\x1aenvoy.service.ratelimit.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a4envoy/extensions/common/ratelimit/v3/ratelimit.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xdc\x01\n" +
 	"\x10RateLimitRequest\x12\x16\n" +
 	"\x06domain\x18\x01 \x01(\tR\x06domain\x12[\n" +
 	"\vdescriptors\x18\x02 \x03(\v29.envoy.extensions.common.ratelimit.v3.RateLimitDescriptorR\vdescriptors\x12\x1f\n" +
 	"\vhits_addend\x18\x03 \x01(\rR\n" +
 	"hitsAddend:2\x9aň\x1e-\n" +
-	"+envoy.service.ratelimit.v2.RateLimitRequest\"\x9a\f\n" +
+	"+envoy.service.ratelimit.v2.RateLimitRequest\"\xea\f\n" +
 	"\x11RateLimitResponse\x12U\n" +
 	"\foverall_code\x18\x01 \x01(\x0e22.envoy.service.ratelimit.v3.RateLimitResponse.CodeR\voverallCode\x12Z\n" +
 	"\bstatuses\x18\x02 \x03(\v2>.envoy.service.ratelimit.v3.RateLimitResponse.DescriptorStatusR\bstatuses\x12X\n" +
@@ -640,11 +651,12 @@ const file_envoy_service_ratelimit_v3_rls_proto_rawDesc = "" +
 	"\x16request_headers_to_add\x18\x04 \x03(\v2!.envoy.config.core.v3.HeaderValueR\x13requestHeadersToAdd\x12\x19\n" +
 	"\braw_body\x18\x05 \x01(\fR\arawBody\x12B\n" +
 	"\x10dynamic_metadata\x18\x06 \x01(\v2\x17.google.protobuf.StructR\x0fdynamicMetadata\x12I\n" +
-	"\x05quota\x18\a \x01(\v23.envoy.service.ratelimit.v3.RateLimitResponse.QuotaR\x05quota\x1a\xbb\x02\n" +
+	"\x05quota\x18\a \x01(\v23.envoy.service.ratelimit.v3.RateLimitResponse.QuotaR\x05quota\x1a\x8b\x03\n" +
 	"\tRateLimit\x12\x12\n" +
 	"\x04name\x18\x03 \x01(\tR\x04name\x12*\n" +
 	"\x11requests_per_unit\x18\x01 \x01(\rR\x0frequestsPerUnit\x12P\n" +
-	"\x04unit\x18\x02 \x01(\x0e2<.envoy.service.ratelimit.v3.RateLimitResponse.RateLimit.UnitR\x04unit\"]\n" +
+	"\x04unit\x18\x02 \x01(\x0e2<.envoy.service.ratelimit.v3.RateLimitResponse.RateLimit.UnitR\x04unit\x12N\n" +
+	"\x0funit_multiplier\x18\x04 \x01(\v2\x1c.google.protobuf.UInt32ValueB\a\xfaB\x04*\x02 \x00R\x0eunitMultiplier\"]\n" +
 	"\x04Unit\x12\v\n" +
 	"\aUNKNOWN\x10\x00\x12\n" +
 	"\n" +
@@ -705,8 +717,9 @@ var file_envoy_service_ratelimit_v3_rls_proto_goTypes = []any{
 	(*v3.RateLimitDescriptor)(nil),             // 7: envoy.extensions.common.ratelimit.v3.RateLimitDescriptor
 	(*v31.HeaderValue)(nil),                    // 8: envoy.config.core.v3.HeaderValue
 	(*structpb.Struct)(nil),                    // 9: google.protobuf.Struct
-	(*timestamppb.Timestamp)(nil),              // 10: google.protobuf.Timestamp
-	(*durationpb.Duration)(nil),                // 11: google.protobuf.Duration
+	(*wrapperspb.UInt32Value)(nil),             // 10: google.protobuf.UInt32Value
+	(*timestamppb.Timestamp)(nil),              // 11: google.protobuf.Timestamp
+	(*durationpb.Duration)(nil),                // 12: google.protobuf.Duration
 }
 var file_envoy_service_ratelimit_v3_rls_proto_depIdxs = []int32{
 	7,  // 0: envoy.service.ratelimit.v3.RateLimitRequest.descriptors:type_name -> envoy.extensions.common.ratelimit.v3.RateLimitDescriptor
@@ -717,18 +730,19 @@ var file_envoy_service_ratelimit_v3_rls_proto_depIdxs = []int32{
 	9,  // 5: envoy.service.ratelimit.v3.RateLimitResponse.dynamic_metadata:type_name -> google.protobuf.Struct
 	5,  // 6: envoy.service.ratelimit.v3.RateLimitResponse.quota:type_name -> envoy.service.ratelimit.v3.RateLimitResponse.Quota
 	1,  // 7: envoy.service.ratelimit.v3.RateLimitResponse.RateLimit.unit:type_name -> envoy.service.ratelimit.v3.RateLimitResponse.RateLimit.Unit
-	10, // 8: envoy.service.ratelimit.v3.RateLimitResponse.Quota.valid_until:type_name -> google.protobuf.Timestamp
-	0,  // 9: envoy.service.ratelimit.v3.RateLimitResponse.DescriptorStatus.code:type_name -> envoy.service.ratelimit.v3.RateLimitResponse.Code
-	4,  // 10: envoy.service.ratelimit.v3.RateLimitResponse.DescriptorStatus.current_limit:type_name -> envoy.service.ratelimit.v3.RateLimitResponse.RateLimit
-	11, // 11: envoy.service.ratelimit.v3.RateLimitResponse.DescriptorStatus.duration_until_reset:type_name -> google.protobuf.Duration
-	5,  // 12: envoy.service.ratelimit.v3.RateLimitResponse.DescriptorStatus.quota:type_name -> envoy.service.ratelimit.v3.RateLimitResponse.Quota
-	2,  // 13: envoy.service.ratelimit.v3.RateLimitService.ShouldRateLimit:input_type -> envoy.service.ratelimit.v3.RateLimitRequest
-	3,  // 14: envoy.service.ratelimit.v3.RateLimitService.ShouldRateLimit:output_type -> envoy.service.ratelimit.v3.RateLimitResponse
-	14, // [14:15] is the sub-list for method output_type
-	13, // [13:14] is the sub-list for method input_type
-	13, // [13:13] is the sub-list for extension type_name
-	13, // [13:13] is the sub-list for extension extendee
-	0,  // [0:13] is the sub-list for field type_name
+	10, // 8: envoy.service.ratelimit.v3.RateLimitResponse.RateLimit.unit_multiplier:type_name -> google.protobuf.UInt32Value
+	11, // 9: envoy.service.ratelimit.v3.RateLimitResponse.Quota.valid_until:type_name -> google.protobuf.Timestamp
+	0,  // 10: envoy.service.ratelimit.v3.RateLimitResponse.DescriptorStatus.code:type_name -> envoy.service.ratelimit.v3.RateLimitResponse.Code
+	4,  // 11: envoy.service.ratelimit.v3.RateLimitResponse.DescriptorStatus.current_limit:type_name -> envoy.service.ratelimit.v3.RateLimitResponse.RateLimit
+	12, // 12: envoy.service.ratelimit.v3.RateLimitResponse.DescriptorStatus.duration_until_reset:type_name -> google.protobuf.Duration
+	5,  // 13: envoy.service.ratelimit.v3.RateLimitResponse.DescriptorStatus.quota:type_name -> envoy.service.ratelimit.v3.RateLimitResponse.Quota
+	2,  // 14: envoy.service.ratelimit.v3.RateLimitService.ShouldRateLimit:input_type -> envoy.service.ratelimit.v3.RateLimitRequest
+	3,  // 15: envoy.service.ratelimit.v3.RateLimitService.ShouldRateLimit:output_type -> envoy.service.ratelimit.v3.RateLimitResponse
+	15, // [15:16] is the sub-list for method output_type
+	14, // [14:15] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_envoy_service_ratelimit_v3_rls_proto_init() }
