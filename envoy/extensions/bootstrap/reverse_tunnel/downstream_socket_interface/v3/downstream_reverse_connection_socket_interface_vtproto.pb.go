@@ -51,6 +51,16 @@ func (m *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) Marshal
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.HandshakeTimeout != nil {
+		size, err := (*durationpb.Duration)(m.HandshakeTimeout).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x2a
+	}
 	if len(m.Formatters) > 0 {
 		for iNdEx := len(m.Formatters) - 1; iNdEx >= 0; iNdEx-- {
 			if vtmsg, ok := interface{}(m.Formatters[iNdEx]).(interface {
@@ -259,6 +269,10 @@ func (m *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) SizeVT(
 			}
 			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 		}
+	}
+	if m.HandshakeTimeout != nil {
+		l = (*durationpb.Duration)(m.HandshakeTimeout).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n

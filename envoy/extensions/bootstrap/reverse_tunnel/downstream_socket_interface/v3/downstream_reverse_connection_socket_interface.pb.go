@@ -132,6 +132,7 @@ func (x *DownstreamReverseConnectionSocketInterface) GetMaintainInterval() *dura
 }
 
 // HTTP handshake settings for initiator envoy initiated reverse tunnels.
+// [#next-free-field: 6]
 type DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Request path used when issuing the HTTP reverse-connection handshake. Defaults to
@@ -148,9 +149,13 @@ type DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig struct {
 	// extensions documentation for details. When set, ``additional_headers`` values are evaluated
 	// as substitution format strings; when empty, the values are sent literally.
 	// [#extension-category: envoy.formatter]
-	Formatters    []*v31.TypedExtensionConfig `protobuf:"bytes,4,rep,name=formatters,proto3" json:"formatters,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Formatters []*v31.TypedExtensionConfig `protobuf:"bytes,4,rep,name=formatters,proto3" json:"formatters,omitempty"`
+	// Maximum time to receive the handshake response after the connection opens. If not specified,
+	// defaults to ``15s``. On expiry the attempt is closed, recorded with failure reason
+	// ``timeout``, and normal backoff applies.
+	HandshakeTimeout *durationpb.Duration `protobuf:"bytes,5,opt,name=handshake_timeout,json=handshakeTimeout,proto3" json:"handshake_timeout,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) Reset() {
@@ -211,11 +216,18 @@ func (x *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) GetForm
 	return nil
 }
 
+func (x *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) GetHandshakeTimeout() *durationpb.Duration {
+	if x != nil {
+		return x.HandshakeTimeout
+	}
+	return nil
+}
+
 var File_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v3_downstream_reverse_connection_socket_interface_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v3_downstream_reverse_connection_socket_interface_proto_rawDesc = "" +
 	"\n" +
-	"}envoy/extensions/bootstrap/reverse_tunnel/downstream_socket_interface/v3/downstream_reverse_connection_socket_interface.proto\x12Henvoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a$envoy/config/core/v3/extension.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xb4\x06\n" +
+	"}envoy/extensions/bootstrap/reverse_tunnel/downstream_socket_interface/v3/downstream_reverse_connection_socket_interface.proto\x12Henvoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a$envoy/config/core/v3/extension.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x8b\a\n" +
 	"*DownstreamReverseConnectionSocketInterface\x12\x1f\n" +
 	"\vstat_prefix\x18\x01 \x01(\tR\n" +
 	"statPrefix\x122\n" +
@@ -226,14 +238,16 @@ const file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface
 	"\x15max_reconnect_backoff\x18\x05 \x01(\v2\x19.google.protobuf.DurationB\n" +
 	"\xfaB\a\xaa\x01\x042\x02\b\x01R\x13maxReconnectBackoff\x12U\n" +
 	"\x11maintain_interval\x18\x06 \x01(\v2\x19.google.protobuf.DurationB\r\xfaB\n" +
-	"\xaa\x01\a2\x05\x10\x80\xc2\xd7/R\x10maintainInterval\x1a\x86\x02\n" +
+	"\xaa\x01\a2\x05\x10\x80\xc2\xd7/R\x10maintainInterval\x1a\xdd\x02\n" +
 	"\x13HttpHandshakeConfig\x12!\n" +
 	"\frequest_path\x18\x01 \x01(\tR\vrequestPath\x12V\n" +
 	"\x12additional_headers\x18\x02 \x03(\v2'.envoy.config.core.v3.HeaderValueOptionR\x11additionalHeaders\x12(\n" +
 	"\x10use_http_upgrade\x18\x03 \x01(\bR\x0euseHttpUpgrade\x12J\n" +
 	"\n" +
 	"formatters\x18\x04 \x03(\v2*.envoy.config.core.v3.TypedExtensionConfigR\n" +
-	"formattersB\xa3\x02\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"formatters\x12U\n" +
+	"\x11handshake_timeout\x18\x05 \x01(\v2\x19.google.protobuf.DurationB\r\xfaB\n" +
+	"\xaa\x01\a\"\x03\b\xac\x02*\x00R\x10handshakeTimeoutB\xa3\x02\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"Vio.envoyproxy.envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3B/DownstreamReverseConnectionSocketInterfaceProtoP\x01Z\x8d\x01github.com/envoyproxy/go-control-plane/envoy/extensions/bootstrap/reverse_tunnel/downstream_socket_interface/v3;downstream_socket_interfacev3b\x06proto3"
 
 var (
@@ -264,11 +278,12 @@ var file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v
 	3, // 3: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.maintain_interval:type_name -> google.protobuf.Duration
 	4, // 4: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfig.additional_headers:type_name -> envoy.config.core.v3.HeaderValueOption
 	5, // 5: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfig.formatters:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	6, // [6:6] is the sub-list for method output_type
-	6, // [6:6] is the sub-list for method input_type
-	6, // [6:6] is the sub-list for extension type_name
-	6, // [6:6] is the sub-list for extension extendee
-	0, // [0:6] is the sub-list for field type_name
+	3, // 6: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfig.handshake_timeout:type_name -> google.protobuf.Duration
+	7, // [7:7] is the sub-list for method output_type
+	7, // [7:7] is the sub-list for method input_type
+	7, // [7:7] is the sub-list for extension type_name
+	7, // [7:7] is the sub-list for extension extendee
+	0, // [0:7] is the sub-list for field type_name
 }
 
 func init() {

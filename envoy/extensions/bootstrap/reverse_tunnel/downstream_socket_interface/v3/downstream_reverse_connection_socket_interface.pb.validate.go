@@ -366,6 +366,37 @@ func (m *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) validat
 
 	}
 
+	if d := m.GetHandshakeTimeout(); d != nil {
+		dur, err := d.AsDuration(), d.CheckValid()
+		if err != nil {
+			err = DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigValidationError{
+				field:  "HandshakeTimeout",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		} else {
+
+			lte := time.Duration(300*time.Second + 0*time.Nanosecond)
+			gt := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+			if dur <= gt || dur > lte {
+				err := DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigValidationError{
+					field:  "HandshakeTimeout",
+					reason: "value must be inside range (0s, 5m0s]",
+				}
+				if !all {
+					return err
+				}
+				errors = append(errors, err)
+			}
+
+		}
+	}
+
 	if len(errors) > 0 {
 		return DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigMultiError(errors)
 	}
