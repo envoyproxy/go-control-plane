@@ -958,6 +958,35 @@ func (m *McpRouter_McpBackend) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetHeaderForwarding()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, McpRouter_McpBackendValidationError{
+					field:  "HeaderForwarding",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, McpRouter_McpBackendValidationError{
+					field:  "HeaderForwarding",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetHeaderForwarding()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return McpRouter_McpBackendValidationError{
+				field:  "HeaderForwarding",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return McpRouter_McpBackendMultiError(errors)
 	}
@@ -1183,3 +1212,165 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = McpRouter_McpClusterValidationError{}
+
+// Validate checks the field values on McpRouter_HeaderForwarding with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *McpRouter_HeaderForwarding) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on McpRouter_HeaderForwarding with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// McpRouter_HeaderForwardingMultiError, or nil if none found.
+func (m *McpRouter_HeaderForwarding) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *McpRouter_HeaderForwarding) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for ForwardAll
+
+	if all {
+		switch v := interface{}(m.GetAllowedHeaders()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, McpRouter_HeaderForwardingValidationError{
+					field:  "AllowedHeaders",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, McpRouter_HeaderForwardingValidationError{
+					field:  "AllowedHeaders",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAllowedHeaders()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return McpRouter_HeaderForwardingValidationError{
+				field:  "AllowedHeaders",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetDisallowedHeaders()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, McpRouter_HeaderForwardingValidationError{
+					field:  "DisallowedHeaders",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, McpRouter_HeaderForwardingValidationError{
+					field:  "DisallowedHeaders",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDisallowedHeaders()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return McpRouter_HeaderForwardingValidationError{
+				field:  "DisallowedHeaders",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return McpRouter_HeaderForwardingMultiError(errors)
+	}
+
+	return nil
+}
+
+// McpRouter_HeaderForwardingMultiError is an error wrapping multiple
+// validation errors returned by McpRouter_HeaderForwarding.ValidateAll() if
+// the designated constraints aren't met.
+type McpRouter_HeaderForwardingMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m McpRouter_HeaderForwardingMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m McpRouter_HeaderForwardingMultiError) AllErrors() []error { return m }
+
+// McpRouter_HeaderForwardingValidationError is the validation error returned
+// by McpRouter_HeaderForwarding.Validate if the designated constraints aren't met.
+type McpRouter_HeaderForwardingValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e McpRouter_HeaderForwardingValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e McpRouter_HeaderForwardingValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e McpRouter_HeaderForwardingValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e McpRouter_HeaderForwardingValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e McpRouter_HeaderForwardingValidationError) ErrorName() string {
+	return "McpRouter_HeaderForwardingValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e McpRouter_HeaderForwardingValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMcpRouter_HeaderForwarding.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = McpRouter_HeaderForwardingValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = McpRouter_HeaderForwardingValidationError{}

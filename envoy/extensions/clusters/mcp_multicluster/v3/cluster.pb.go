@@ -9,6 +9,7 @@ package mcp_multiclusterv3
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	_ "github.com/cncf/xds/go/xds/annotations/v3"
+	v3 "github.com/envoyproxy/go-control-plane/envoy/type/matcher/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -180,6 +181,92 @@ func (x *ClusterConfig_McpCluster) GetHostRewriteLiteral() string {
 	return ""
 }
 
+// Specifies which downstream request headers are allowed to be forwarded to an MCP
+// backend. Modeled after
+// :ref:`ext_proc's HeaderForwardingRules <envoy_v3_api_msg_extensions.filters.http.ext_proc.v3.ExternalProcessor>`,
+// but MCP-local and secure-by-default: unlike ext_proc, an unset/empty policy
+// forwards nothing rather than everything, because MCP requires audience-bound
+// tokens and prohibits implicit token passthrough between a client and a backend it
+// did not authenticate to.
+//
+// Evaluation order per header:
+//
+//  1. If the header matches “disallowed_headers“, it is never forwarded — this
+//     takes precedence over everything below, including “forward_all“.
+//  2. Otherwise, if “forward_all“ is true, the header is forwarded.
+//  3. Otherwise, if the header matches “allowed_headers“, it is forwarded.
+//  4. Otherwise, the header is not forwarded.
+//
+// This does not cover header *mutation* or credential injection, which remain a
+// separate concern from this policy.
+type ClusterConfig_HeaderForwarding struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// If true, forward all downstream request headers to this backend (subject to
+	// ``disallowed_headers`` above), matching the legacy forward-everything behavior.
+	// Defaults to false. Users relying on the legacy behavior must set this explicitly.
+	ForwardAll bool `protobuf:"varint,1,opt,name=forward_all,json=forwardAll,proto3" json:"forward_all,omitempty"`
+	// If set, specifically allow any header in this list to be forwarded. Ignored for a
+	// header that also matches ``disallowed_headers``, and redundant (but harmless) for
+	// any header covered by ``forward_all``.
+	AllowedHeaders *v3.ListStringMatcher `protobuf:"bytes,2,opt,name=allowed_headers,json=allowedHeaders,proto3" json:"allowed_headers,omitempty"`
+	// If set, specifically disallow any header in this list from being forwarded. This
+	// takes precedence over both ``forward_all`` and ``allowed_headers``.
+	DisallowedHeaders *v3.ListStringMatcher `protobuf:"bytes,3,opt,name=disallowed_headers,json=disallowedHeaders,proto3" json:"disallowed_headers,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *ClusterConfig_HeaderForwarding) Reset() {
+	*x = ClusterConfig_HeaderForwarding{}
+	mi := &file_envoy_extensions_clusters_mcp_multicluster_v3_cluster_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ClusterConfig_HeaderForwarding) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ClusterConfig_HeaderForwarding) ProtoMessage() {}
+
+func (x *ClusterConfig_HeaderForwarding) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_clusters_mcp_multicluster_v3_cluster_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ClusterConfig_HeaderForwarding.ProtoReflect.Descriptor instead.
+func (*ClusterConfig_HeaderForwarding) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_clusters_mcp_multicluster_v3_cluster_proto_rawDescGZIP(), []int{0, 1}
+}
+
+func (x *ClusterConfig_HeaderForwarding) GetForwardAll() bool {
+	if x != nil {
+		return x.ForwardAll
+	}
+	return false
+}
+
+func (x *ClusterConfig_HeaderForwarding) GetAllowedHeaders() *v3.ListStringMatcher {
+	if x != nil {
+		return x.AllowedHeaders
+	}
+	return nil
+}
+
+func (x *ClusterConfig_HeaderForwarding) GetDisallowedHeaders() *v3.ListStringMatcher {
+	if x != nil {
+		return x.DisallowedHeaders
+	}
+	return nil
+}
+
 // Specification of the MCP server.
 type ClusterConfig_McpBackend struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -190,14 +277,22 @@ type ClusterConfig_McpBackend struct {
 	// Default will be the cluster name if not specified.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Backend target specification.
-	McpCluster    *ClusterConfig_McpCluster `protobuf:"bytes,2,opt,name=mcp_cluster,json=mcpCluster,proto3" json:"mcp_cluster,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	McpCluster *ClusterConfig_McpCluster `protobuf:"bytes,2,opt,name=mcp_cluster,json=mcpCluster,proto3" json:"mcp_cluster,omitempty"`
+	// Controls which downstream request headers are forwarded to this backend.
+	// If not set, no downstream-controlled headers are forwarded beyond those the
+	// router itself must synthesize (e.g. ``content-type``, ``accept``, the session
+	// header) — in particular, a client's ``authorization`` header is NOT forwarded
+	// by default. Router-owned, framing, session, and hop-by-hop headers are never
+	// affected by this policy; they are handled separately and can never be forwarded
+	// via this mechanism.
+	HeaderForwarding *ClusterConfig_HeaderForwarding `protobuf:"bytes,3,opt,name=header_forwarding,json=headerForwarding,proto3" json:"header_forwarding,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *ClusterConfig_McpBackend) Reset() {
 	*x = ClusterConfig_McpBackend{}
-	mi := &file_envoy_extensions_clusters_mcp_multicluster_v3_cluster_proto_msgTypes[2]
+	mi := &file_envoy_extensions_clusters_mcp_multicluster_v3_cluster_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -209,7 +304,7 @@ func (x *ClusterConfig_McpBackend) String() string {
 func (*ClusterConfig_McpBackend) ProtoMessage() {}
 
 func (x *ClusterConfig_McpBackend) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_clusters_mcp_multicluster_v3_cluster_proto_msgTypes[2]
+	mi := &file_envoy_extensions_clusters_mcp_multicluster_v3_cluster_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -222,7 +317,7 @@ func (x *ClusterConfig_McpBackend) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClusterConfig_McpBackend.ProtoReflect.Descriptor instead.
 func (*ClusterConfig_McpBackend) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_clusters_mcp_multicluster_v3_cluster_proto_rawDescGZIP(), []int{0, 1}
+	return file_envoy_extensions_clusters_mcp_multicluster_v3_cluster_proto_rawDescGZIP(), []int{0, 2}
 }
 
 func (x *ClusterConfig_McpBackend) GetName() string {
@@ -239,11 +334,18 @@ func (x *ClusterConfig_McpBackend) GetMcpCluster() *ClusterConfig_McpCluster {
 	return nil
 }
 
+func (x *ClusterConfig_McpBackend) GetHeaderForwarding() *ClusterConfig_HeaderForwarding {
+	if x != nil {
+		return x.HeaderForwarding
+	}
+	return nil
+}
+
 var File_envoy_extensions_clusters_mcp_multicluster_v3_cluster_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_clusters_mcp_multicluster_v3_cluster_proto_rawDesc = "" +
 	"\n" +
-	";envoy/extensions/clusters/mcp_multicluster/v3/cluster.proto\x12-envoy.extensions.clusters.mcp_multicluster.v3\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xb6\x03\n" +
+	";envoy/extensions/clusters/mcp_multicluster/v3/cluster.proto\x12-envoy.extensions.clusters.mcp_multicluster.v3\x1a\"envoy/type/matcher/v3/string.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x94\x06\n" +
 	"\rClusterConfig\x12k\n" +
 	"\aservers\x18\x01 \x03(\v2G.envoy.extensions.clusters.mcp_multicluster.v3.ClusterConfig.McpBackendB\b\xfaB\x05\x92\x01\x02\b\x01R\aservers\x1a\xaa\x01\n" +
 	"\n" +
@@ -251,12 +353,18 @@ const file_envoy_extensions_clusters_mcp_multicluster_v3_cluster_proto_rawDesc =
 	"\acluster\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\acluster\x12\x12\n" +
 	"\x04path\x18\x02 \x01(\tR\x04path\x123\n" +
 	"\atimeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\atimeout\x120\n" +
-	"\x14host_rewrite_literal\x18\x04 \x01(\tR\x12hostRewriteLiteral\x1a\x8a\x01\n" +
+	"\x14host_rewrite_literal\x18\x04 \x01(\tR\x12hostRewriteLiteral\x1a\xdf\x01\n" +
+	"\x10HeaderForwarding\x12\x1f\n" +
+	"\vforward_all\x18\x01 \x01(\bR\n" +
+	"forwardAll\x12Q\n" +
+	"\x0fallowed_headers\x18\x02 \x01(\v2(.envoy.type.matcher.v3.ListStringMatcherR\x0eallowedHeaders\x12W\n" +
+	"\x12disallowed_headers\x18\x03 \x01(\v2(.envoy.type.matcher.v3.ListStringMatcherR\x11disallowedHeaders\x1a\x86\x02\n" +
 	"\n" +
 	"McpBackend\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12h\n" +
 	"\vmcp_cluster\x18\x02 \x01(\v2G.envoy.extensions.clusters.mcp_multicluster.v3.ClusterConfig.McpClusterR\n" +
-	"mcpClusterB\xc6\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
+	"mcpCluster\x12z\n" +
+	"\x11header_forwarding\x18\x03 \x01(\v2M.envoy.extensions.clusters.mcp_multicluster.v3.ClusterConfig.HeaderForwardingR\x10headerForwardingB\xc6\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
 	";io.envoyproxy.envoy.extensions.clusters.mcp_multicluster.v3B\fClusterProtoP\x01Zggithub.com/envoyproxy/go-control-plane/envoy/extensions/clusters/mcp_multicluster/v3;mcp_multiclusterv3b\x06proto3"
 
 var (
@@ -271,22 +379,27 @@ func file_envoy_extensions_clusters_mcp_multicluster_v3_cluster_proto_rawDescGZI
 	return file_envoy_extensions_clusters_mcp_multicluster_v3_cluster_proto_rawDescData
 }
 
-var file_envoy_extensions_clusters_mcp_multicluster_v3_cluster_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_envoy_extensions_clusters_mcp_multicluster_v3_cluster_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_envoy_extensions_clusters_mcp_multicluster_v3_cluster_proto_goTypes = []any{
-	(*ClusterConfig)(nil),            // 0: envoy.extensions.clusters.mcp_multicluster.v3.ClusterConfig
-	(*ClusterConfig_McpCluster)(nil), // 1: envoy.extensions.clusters.mcp_multicluster.v3.ClusterConfig.McpCluster
-	(*ClusterConfig_McpBackend)(nil), // 2: envoy.extensions.clusters.mcp_multicluster.v3.ClusterConfig.McpBackend
-	(*durationpb.Duration)(nil),      // 3: google.protobuf.Duration
+	(*ClusterConfig)(nil),                  // 0: envoy.extensions.clusters.mcp_multicluster.v3.ClusterConfig
+	(*ClusterConfig_McpCluster)(nil),       // 1: envoy.extensions.clusters.mcp_multicluster.v3.ClusterConfig.McpCluster
+	(*ClusterConfig_HeaderForwarding)(nil), // 2: envoy.extensions.clusters.mcp_multicluster.v3.ClusterConfig.HeaderForwarding
+	(*ClusterConfig_McpBackend)(nil),       // 3: envoy.extensions.clusters.mcp_multicluster.v3.ClusterConfig.McpBackend
+	(*durationpb.Duration)(nil),            // 4: google.protobuf.Duration
+	(*v3.ListStringMatcher)(nil),           // 5: envoy.type.matcher.v3.ListStringMatcher
 }
 var file_envoy_extensions_clusters_mcp_multicluster_v3_cluster_proto_depIdxs = []int32{
-	2, // 0: envoy.extensions.clusters.mcp_multicluster.v3.ClusterConfig.servers:type_name -> envoy.extensions.clusters.mcp_multicluster.v3.ClusterConfig.McpBackend
-	3, // 1: envoy.extensions.clusters.mcp_multicluster.v3.ClusterConfig.McpCluster.timeout:type_name -> google.protobuf.Duration
-	1, // 2: envoy.extensions.clusters.mcp_multicluster.v3.ClusterConfig.McpBackend.mcp_cluster:type_name -> envoy.extensions.clusters.mcp_multicluster.v3.ClusterConfig.McpCluster
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	3, // 0: envoy.extensions.clusters.mcp_multicluster.v3.ClusterConfig.servers:type_name -> envoy.extensions.clusters.mcp_multicluster.v3.ClusterConfig.McpBackend
+	4, // 1: envoy.extensions.clusters.mcp_multicluster.v3.ClusterConfig.McpCluster.timeout:type_name -> google.protobuf.Duration
+	5, // 2: envoy.extensions.clusters.mcp_multicluster.v3.ClusterConfig.HeaderForwarding.allowed_headers:type_name -> envoy.type.matcher.v3.ListStringMatcher
+	5, // 3: envoy.extensions.clusters.mcp_multicluster.v3.ClusterConfig.HeaderForwarding.disallowed_headers:type_name -> envoy.type.matcher.v3.ListStringMatcher
+	1, // 4: envoy.extensions.clusters.mcp_multicluster.v3.ClusterConfig.McpBackend.mcp_cluster:type_name -> envoy.extensions.clusters.mcp_multicluster.v3.ClusterConfig.McpCluster
+	2, // 5: envoy.extensions.clusters.mcp_multicluster.v3.ClusterConfig.McpBackend.header_forwarding:type_name -> envoy.extensions.clusters.mcp_multicluster.v3.ClusterConfig.HeaderForwarding
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_clusters_mcp_multicluster_v3_cluster_proto_init() }
@@ -300,7 +413,7 @@ func file_envoy_extensions_clusters_mcp_multicluster_v3_cluster_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_clusters_mcp_multicluster_v3_cluster_proto_rawDesc), len(file_envoy_extensions_clusters_mcp_multicluster_v3_cluster_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

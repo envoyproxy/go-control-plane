@@ -327,6 +327,169 @@ var _ interface {
 	ErrorName() string
 } = ClusterConfig_McpClusterValidationError{}
 
+// Validate checks the field values on ClusterConfig_HeaderForwarding with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ClusterConfig_HeaderForwarding) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ClusterConfig_HeaderForwarding with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// ClusterConfig_HeaderForwardingMultiError, or nil if none found.
+func (m *ClusterConfig_HeaderForwarding) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ClusterConfig_HeaderForwarding) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for ForwardAll
+
+	if all {
+		switch v := interface{}(m.GetAllowedHeaders()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ClusterConfig_HeaderForwardingValidationError{
+					field:  "AllowedHeaders",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ClusterConfig_HeaderForwardingValidationError{
+					field:  "AllowedHeaders",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAllowedHeaders()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClusterConfig_HeaderForwardingValidationError{
+				field:  "AllowedHeaders",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetDisallowedHeaders()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ClusterConfig_HeaderForwardingValidationError{
+					field:  "DisallowedHeaders",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ClusterConfig_HeaderForwardingValidationError{
+					field:  "DisallowedHeaders",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDisallowedHeaders()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClusterConfig_HeaderForwardingValidationError{
+				field:  "DisallowedHeaders",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return ClusterConfig_HeaderForwardingMultiError(errors)
+	}
+
+	return nil
+}
+
+// ClusterConfig_HeaderForwardingMultiError is an error wrapping multiple
+// validation errors returned by ClusterConfig_HeaderForwarding.ValidateAll()
+// if the designated constraints aren't met.
+type ClusterConfig_HeaderForwardingMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ClusterConfig_HeaderForwardingMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ClusterConfig_HeaderForwardingMultiError) AllErrors() []error { return m }
+
+// ClusterConfig_HeaderForwardingValidationError is the validation error
+// returned by ClusterConfig_HeaderForwarding.Validate if the designated
+// constraints aren't met.
+type ClusterConfig_HeaderForwardingValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ClusterConfig_HeaderForwardingValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ClusterConfig_HeaderForwardingValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ClusterConfig_HeaderForwardingValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ClusterConfig_HeaderForwardingValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ClusterConfig_HeaderForwardingValidationError) ErrorName() string {
+	return "ClusterConfig_HeaderForwardingValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ClusterConfig_HeaderForwardingValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sClusterConfig_HeaderForwarding.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ClusterConfig_HeaderForwardingValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ClusterConfig_HeaderForwardingValidationError{}
+
 // Validate checks the field values on ClusterConfig_McpBackend with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -374,6 +537,35 @@ func (m *ClusterConfig_McpBackend) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return ClusterConfig_McpBackendValidationError{
 				field:  "McpCluster",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetHeaderForwarding()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ClusterConfig_McpBackendValidationError{
+					field:  "HeaderForwarding",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ClusterConfig_McpBackendValidationError{
+					field:  "HeaderForwarding",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetHeaderForwarding()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClusterConfig_McpBackendValidationError{
+				field:  "HeaderForwarding",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
