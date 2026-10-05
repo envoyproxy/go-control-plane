@@ -345,6 +345,37 @@ func (m *ReverseTunnel) validate(all bool) error {
 
 	// no validation rules for EnableConnectionLimit
 
+	if d := m.GetHandshakeTimeout(); d != nil {
+		dur, err := d.AsDuration(), d.CheckValid()
+		if err != nil {
+			err = ReverseTunnelValidationError{
+				field:  "HandshakeTimeout",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		} else {
+
+			lte := time.Duration(300*time.Second + 0*time.Nanosecond)
+			gt := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+			if dur <= gt || dur > lte {
+				err := ReverseTunnelValidationError{
+					field:  "HandshakeTimeout",
+					reason: "value must be inside range (0s, 5m0s]",
+				}
+				if !all {
+					return err
+				}
+				errors = append(errors, err)
+			}
+
+		}
+	}
+
 	if len(errors) > 0 {
 		return ReverseTunnelMultiError(errors)
 	}

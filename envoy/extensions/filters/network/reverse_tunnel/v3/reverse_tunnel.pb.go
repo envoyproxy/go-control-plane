@@ -8,6 +8,7 @@ package reverse_tunnelv3
 
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
+	_ "github.com/envoyproxy/go-control-plane/envoy/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	v31 "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/common/jwks/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
@@ -167,18 +168,16 @@ func (x *Validation) GetDynamicMetadataNamespace() string {
 // Configuration for the reverse tunnel network filter.
 // This filter handles reverse tunnel connection acceptance and rejection by processing
 // HTTP requests where required identification values are provided via HTTP headers.
-// [#next-free-field: 11]
+// [#next-free-field: 12]
 type ReverseTunnel struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Ping interval for health checks on established reverse tunnel connections.
 	// If not specified, defaults to ``2 seconds``.
 	PingInterval *durationpb.Duration `protobuf:"bytes,1,opt,name=ping_interval,json=pingInterval,proto3" json:"ping_interval,omitempty"`
-	// Whether to automatically close connections after processing reverse tunnel requests.
+	// Deprecated. The handshake connection is always detached once the acceptance response is
+	// flushed so tunnel bytes have a single reader. Ignored.
 	//
-	// * When set to ``true``, connections are closed after acceptance or rejection.
-	// * When set to ``false``, connections remain open for potential reuse.
-	//
-	// Defaults to ``false``.
+	// Deprecated: Marked as deprecated in envoy/extensions/filters/network/reverse_tunnel/v3/reverse_tunnel.proto.
 	AutoCloseConnections bool `protobuf:"varint,2,opt,name=auto_close_connections,json=autoCloseConnections,proto3" json:"auto_close_connections,omitempty"`
 	// HTTP path to match for reverse tunnel requests.
 	// If not specified, defaults to ``/reverse_connections/request``.
@@ -238,8 +237,11 @@ type ReverseTunnel struct {
 	// worker it is finally rebalanced to, so it is best-effort unless ``skip_rebalancing`` is ``true``.
 	// Default: false.
 	EnableConnectionLimit bool `protobuf:"varint,9,opt,name=enable_connection_limit,json=enableConnectionLimit,proto3" json:"enable_connection_limit,omitempty"`
-	unknownFields         protoimpl.UnknownFields
-	sizeCache             protoimpl.SizeCache
+	// Maximum time to receive a complete handshake request. If not specified, defaults to ``10s``.
+	// On expiry the connection is closed and ``handshake.timeout`` is incremented.
+	HandshakeTimeout *durationpb.Duration `protobuf:"bytes,11,opt,name=handshake_timeout,json=handshakeTimeout,proto3" json:"handshake_timeout,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *ReverseTunnel) Reset() {
@@ -279,6 +281,7 @@ func (x *ReverseTunnel) GetPingInterval() *durationpb.Duration {
 	return nil
 }
 
+// Deprecated: Marked as deprecated in envoy/extensions/filters/network/reverse_tunnel/v3/reverse_tunnel.proto.
 func (x *ReverseTunnel) GetAutoCloseConnections() bool {
 	if x != nil {
 		return x.AutoCloseConnections
@@ -342,21 +345,28 @@ func (x *ReverseTunnel) GetEnableConnectionLimit() bool {
 	return false
 }
 
+func (x *ReverseTunnel) GetHandshakeTimeout() *durationpb.Duration {
+	if x != nil {
+		return x.HandshakeTimeout
+	}
+	return nil
+}
+
 var File_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto_rawDesc = "" +
 	"\n" +
-	"Genvoy/extensions/filters/network/reverse_tunnel/v3/reverse_tunnel.proto\x122envoy.extensions.filters.network.reverse_tunnel.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a;envoy/extensions/filters/common/jwks/v3/jwt_handshake.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xa2\x02\n" +
+	"Genvoy/extensions/filters/network/reverse_tunnel/v3/reverse_tunnel.proto\x122envoy.extensions.filters.network.reverse_tunnel.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a;envoy/extensions/filters/common/jwks/v3/jwt_handshake.proto\x1a\x1egoogle/protobuf/duration.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xa2\x02\n" +
 	"\n" +
 	"Validation\x12.\n" +
 	"\x0enode_id_format\x18\x01 \x01(\tB\b\xfaB\x05r\x03\x18\x80\bR\fnodeIdFormat\x124\n" +
 	"\x11cluster_id_format\x18\x02 \x01(\tB\b\xfaB\x05r\x03\x18\x80\bR\x0fclusterIdFormat\x122\n" +
 	"\x10tenant_id_format\x18\x05 \x01(\tB\b\xfaB\x05r\x03\x18\x80\bR\x0etenantIdFormat\x122\n" +
 	"\x15emit_dynamic_metadata\x18\x03 \x01(\bR\x13emitDynamicMetadata\x12F\n" +
-	"\x1adynamic_metadata_namespace\x18\x04 \x01(\tB\b\xfaB\x05r\x03\x18\xff\x01R\x18dynamicMetadataNamespace\"\xb3\x05\n" +
+	"\x1adynamic_metadata_namespace\x18\x04 \x01(\tB\b\xfaB\x05r\x03\x18\xff\x01R\x18dynamicMetadataNamespace\"\x97\x06\n" +
 	"\rReverseTunnel\x12Q\n" +
-	"\rping_interval\x18\x01 \x01(\v2\x19.google.protobuf.DurationB\x11\xfaB\x0e\xaa\x01\v\"\x03\b\xac\x022\x04\x10\xc0\x84=R\fpingInterval\x124\n" +
-	"\x16auto_close_connections\x18\x02 \x01(\bR\x14autoCloseConnections\x120\n" +
+	"\rping_interval\x18\x01 \x01(\v2\x19.google.protobuf.DurationB\x11\xfaB\x0e\xaa\x01\v\"\x03\b\xac\x022\x04\x10\xc0\x84=R\fpingInterval\x12A\n" +
+	"\x16auto_close_connections\x18\x02 \x01(\bB\v\x92ǆ\xd8\x04\x033.0\x18\x01R\x14autoCloseConnections\x120\n" +
 	"\frequest_path\x18\x03 \x01(\tB\r\xfaB\n" +
 	"r\b\x10\x01\x18\xff\x01\xd0\x01\x01R\vrequestPath\x12T\n" +
 	"\x0erequest_method\x18\x04 \x01(\x0e2#.envoy.config.core.v3.RequestMethodB\b\xfaB\x05\x82\x01\x02\x10\x01R\rrequestMethod\x12^\n" +
@@ -368,7 +378,9 @@ const file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_pro
 	"\x10skip_rebalancing\x18\b \x01(\bR\x0fskipRebalancing\x12c\n" +
 	"\rjwt_validator\x18\n" +
 	" \x01(\v2>.envoy.extensions.filters.common.jwks.v3.JwtHandshakeValidatorR\fjwtValidator\x126\n" +
-	"\x17enable_connection_limit\x18\t \x01(\bR\x15enableConnectionLimitB\xcc\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x17enable_connection_limit\x18\t \x01(\bR\x15enableConnectionLimit\x12U\n" +
+	"\x11handshake_timeout\x18\v \x01(\v2\x19.google.protobuf.DurationB\r\xfaB\n" +
+	"\xaa\x01\a\"\x03\b\xac\x02*\x00R\x10handshakeTimeoutB\xcc\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"@io.envoyproxy.envoy.extensions.filters.network.reverse_tunnel.v3B\x12ReverseTunnelProtoP\x01Zjgithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/reverse_tunnel/v3;reverse_tunnelv3b\x06proto3"
 
 var (
@@ -396,11 +408,12 @@ var file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto
 	3, // 1: envoy.extensions.filters.network.reverse_tunnel.v3.ReverseTunnel.request_method:type_name -> envoy.config.core.v3.RequestMethod
 	0, // 2: envoy.extensions.filters.network.reverse_tunnel.v3.ReverseTunnel.validation:type_name -> envoy.extensions.filters.network.reverse_tunnel.v3.Validation
 	4, // 3: envoy.extensions.filters.network.reverse_tunnel.v3.ReverseTunnel.jwt_validator:type_name -> envoy.extensions.filters.common.jwks.v3.JwtHandshakeValidator
-	4, // [4:4] is the sub-list for method output_type
-	4, // [4:4] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	2, // 4: envoy.extensions.filters.network.reverse_tunnel.v3.ReverseTunnel.handshake_timeout:type_name -> google.protobuf.Duration
+	5, // [5:5] is the sub-list for method output_type
+	5, // [5:5] is the sub-list for method input_type
+	5, // [5:5] is the sub-list for extension type_name
+	5, // [5:5] is the sub-list for extension extendee
+	0, // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto_init() }

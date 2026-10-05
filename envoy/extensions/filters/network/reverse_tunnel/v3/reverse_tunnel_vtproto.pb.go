@@ -122,6 +122,16 @@ func (m *ReverseTunnel) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.HandshakeTimeout != nil {
+		size, err := (*durationpb.Duration)(m.HandshakeTimeout).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x5a
+	}
 	if m.JwtValidator != nil {
 		if vtmsg, ok := interface{}(m.JwtValidator).(interface {
 			MarshalToSizedBufferVTStrict([]byte) (int, error)
@@ -300,6 +310,10 @@ func (m *ReverseTunnel) SizeVT() (n int) {
 		} else {
 			l = proto.Size(m.JwtValidator)
 		}
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.HandshakeTimeout != nil {
+		l = (*durationpb.Duration)(m.HandshakeTimeout).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
