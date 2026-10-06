@@ -830,6 +830,33 @@ func (m *Audience_AccessToken) validate(all bool) error {
 
 	var errors []error
 
+	for idx, item := range m.GetScopes() {
+		_, _ = idx, item
+
+		if utf8.RuneCountInString(item) < 1 {
+			err := Audience_AccessTokenValidationError{
+				field:  fmt.Sprintf("Scopes[%v]", idx),
+				reason: "value length must be at least 1 runes",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if !_Audience_AccessToken_Scopes_Pattern.MatchString(item) {
+			err := Audience_AccessTokenValidationError{
+				field:  fmt.Sprintf("Scopes[%v]", idx),
+				reason: "value does not match regex pattern \"^[^\\\\s,]+$\"",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return Audience_AccessTokenMultiError(errors)
 	}
@@ -909,6 +936,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = Audience_AccessTokenValidationError{}
+
+var _Audience_AccessToken_Scopes_Pattern = regexp.MustCompile("^[^\\s,]+$")
 
 // Validate checks the field values on Audience_BoundJwt with the rules defined
 // in the proto definition for this message. If any rules are violated, the
@@ -1045,6 +1074,33 @@ func (m *Audience_BoundAccessToken) validate(all bool) error {
 
 	var errors []error
 
+	for idx, item := range m.GetScopes() {
+		_, _ = idx, item
+
+		if utf8.RuneCountInString(item) < 1 {
+			err := Audience_BoundAccessTokenValidationError{
+				field:  fmt.Sprintf("Scopes[%v]", idx),
+				reason: "value length must be at least 1 runes",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if !_Audience_BoundAccessToken_Scopes_Pattern.MatchString(item) {
+			err := Audience_BoundAccessTokenValidationError{
+				field:  fmt.Sprintf("Scopes[%v]", idx),
+				reason: "value does not match regex pattern \"^[^\\\\s,]+$\"",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return Audience_BoundAccessTokenMultiError(errors)
 	}
@@ -1124,6 +1180,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = Audience_BoundAccessTokenValidationError{}
+
+var _Audience_BoundAccessToken_Scopes_Pattern = regexp.MustCompile("^[^\\s,]+$")
 
 // Validate checks the field values on Audience_IAMAccessToken with the rules
 // defined in the proto definition for this message. If any rules are

@@ -361,7 +361,18 @@ func (x *TokenHeader) GetPreserveExisting() *TokenHeader_PreserveExisting {
 }
 
 type Audience_AccessToken struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Optional custom OAuth scopes for the access token request.
+	// If empty, the filter will not request scopes explicitly, so the metadata server's default
+	// scopes will be used.
+	// When populated, the filter appends "?scopes=<comma-separated-scopes>" to the
+	// metadata server token request. Note that the metadata server replaces default
+	// scopes with the provided list rather than appending; to preserve general GCP API
+	// access, callers should explicitly include "https://www.googleapis.com/auth/cloud-platform".
+	// Validation rules require each scope to be non-empty and disallow whitespace or commas,
+	// as commas are used as the delimiter for the metadata server and OAuth 2.0 scopes
+	// cannot contain whitespace (RFC 6749 Section 3.3).
+	Scopes        []string `protobuf:"bytes,1,rep,name=scopes,proto3" json:"scopes,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -394,6 +405,13 @@ func (x *Audience_AccessToken) ProtoReflect() protoreflect.Message {
 // Deprecated: Use Audience_AccessToken.ProtoReflect.Descriptor instead.
 func (*Audience_AccessToken) Descriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_rawDescGZIP(), []int{1, 0}
+}
+
+func (x *Audience_AccessToken) GetScopes() []string {
+	if x != nil {
+		return x.Scopes
+	}
+	return nil
 }
 
 type Audience_BoundJwt struct {
@@ -442,7 +460,18 @@ func (x *Audience_BoundJwt) GetUrl() string {
 }
 
 type Audience_BoundAccessToken struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Optional custom OAuth scopes for the bound access token request.
+	// If empty, the filter will not request scopes explicitly, so the metadata server's default
+	// scopes will be used.
+	// When populated, the filter appends "&scopes=<comma-separated-scopes>" to the
+	// metadata server token request. Note that the metadata server replaces default
+	// scopes with the provided list rather than appending; to preserve general GCP API
+	// access, callers should explicitly include "https://www.googleapis.com/auth/cloud-platform".
+	// Validation rules require each scope to be non-empty and disallow whitespace or commas,
+	// as commas are used as the delimiter for the metadata server and OAuth 2.0 scopes
+	// cannot contain whitespace (RFC 6749 Section 3.3).
+	Scopes        []string `protobuf:"bytes,1,rep,name=scopes,proto3" json:"scopes,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -475,6 +504,13 @@ func (x *Audience_BoundAccessToken) ProtoReflect() protoreflect.Message {
 // Deprecated: Use Audience_BoundAccessToken.ProtoReflect.Descriptor instead.
 func (*Audience_BoundAccessToken) Descriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_rawDescGZIP(), []int{1, 2}
+}
+
+func (x *Audience_BoundAccessToken) GetScopes() []string {
+	if x != nil {
+		return x.Scopes
+	}
+	return nil
 }
 
 // Default lifetime is 1h.
@@ -595,17 +631,19 @@ const file_envoy_extensions_filters_http_gcp_authn_v3_gcp_authn_proto_rawDesc = 
 	"\acluster\x18\x05 \x01(\tR\acluster\x12E\n" +
 	"\atimeout\x18\x06 \x01(\v2\x19.google.protobuf.DurationB\x10\xfaB\r\xaa\x01\n" +
 	"\x1a\x06\b\x80\x80\x80\x80\x102\x00R\atimeout\x12P\n" +
-	"\baudience\x18\b \x01(\v24.envoy.extensions.filters.http.gcp_authn.v3.AudienceR\baudience\"\x87\x05\n" +
+	"\baudience\x18\b \x01(\v24.envoy.extensions.filters.http.gcp_authn.v3.AudienceR\baudience\"\xe9\x05\n" +
 	"\bAudience\x12\x10\n" +
 	"\x03url\x18\x01 \x01(\tR\x03url\x12c\n" +
 	"\faccess_token\x18\x02 \x01(\v2@.envoy.extensions.filters.http.gcp_authn.v3.Audience.AccessTokenR\vaccessToken\x12Z\n" +
 	"\tbound_jwt\x18\x03 \x01(\v2=.envoy.extensions.filters.http.gcp_authn.v3.Audience.BoundJwtR\bboundJwt\x12s\n" +
 	"\x12bound_access_token\x18\x04 \x01(\v2E.envoy.extensions.filters.http.gcp_authn.v3.Audience.BoundAccessTokenR\x10boundAccessToken\x12m\n" +
-	"\x10iam_access_token\x18\x05 \x01(\v2C.envoy.extensions.filters.http.gcp_authn.v3.Audience.IAMAccessTokenR\x0eiamAccessToken\x1a\r\n" +
-	"\vAccessToken\x1a%\n" +
+	"\x10iam_access_token\x18\x05 \x01(\v2C.envoy.extensions.filters.http.gcp_authn.v3.Audience.IAMAccessTokenR\x0eiamAccessToken\x1a>\n" +
+	"\vAccessToken\x12/\n" +
+	"\x06scopes\x18\x01 \x03(\tB\x17\xfaB\x14\x92\x01\x11\"\x0fr\r\x10\x012\t^[^\\s,]+$R\x06scopes\x1a%\n" +
 	"\bBoundJwt\x12\x19\n" +
-	"\x03url\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x03url\x1a\x12\n" +
-	"\x10BoundAccessToken\x1az\n" +
+	"\x03url\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x03url\x1aC\n" +
+	"\x10BoundAccessToken\x12/\n" +
+	"\x06scopes\x18\x01 \x03(\tB\x17\xfaB\x14\x92\x01\x11\"\x0fr\r\x10\x012\t^[^\\s,]+$R\x06scopes\x1az\n" +
 	"\x0eIAMAccessToken\x12!\n" +
 	"\aaccount\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\aaccount\x12-\n" +
 	"\rauthorization\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\rauthorization\x12\x16\n" +
