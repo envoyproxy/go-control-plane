@@ -555,6 +555,7 @@ type CommonTlsContext struct {
 	AlpnProtocols []string `protobuf:"bytes,4,rep,name=alpn_protocols,json=alpnProtocols,proto3" json:"alpn_protocols,omitempty"`
 	// Custom TLS handshaker. If empty, defaults to native TLS handshaking
 	// behavior.
+	// [#extension-category: envoy.tls_handshakers]
 	CustomHandshaker *v3.TypedExtensionConfig `protobuf:"bytes,13,opt,name=custom_handshaker,json=customHandshaker,proto3" json:"custom_handshaker,omitempty"`
 	// TLS key log configuration
 	KeyLog        *TlsKeyLog `protobuf:"bytes,15,opt,name=key_log,json=keyLog,proto3" json:"key_log,omitempty"`
