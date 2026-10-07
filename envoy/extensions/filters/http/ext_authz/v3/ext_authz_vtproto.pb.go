@@ -52,6 +52,17 @@ func (m *ExtAuthz) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.ClearRouteCacheHeaders) > 0 {
+		for iNdEx := len(m.ClearRouteCacheHeaders) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.ClearRouteCacheHeaders[iNdEx])
+			copy(dAtA[i:], m.ClearRouteCacheHeaders[iNdEx])
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.ClearRouteCacheHeaders[iNdEx])))
+			i--
+			dAtA[i] = 0x2
+			i--
+			dAtA[i] = 0x92
+		}
+	}
 	if m.EmitClientSpan != nil {
 		size, err := (*wrapperspb.BoolValue)(m.EmitClientSpan).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -1392,6 +1403,12 @@ func (m *ExtAuthz) SizeVT() (n int) {
 	if m.EmitClientSpan != nil {
 		l = (*wrapperspb.BoolValue)(m.EmitClientSpan).SizeVT()
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if len(m.ClearRouteCacheHeaders) > 0 {
+		for _, s := range m.ClearRouteCacheHeaders {
+			l = len(s)
+			n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+		}
 	}
 	n += len(m.unknownFields)
 	return n

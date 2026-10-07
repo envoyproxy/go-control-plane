@@ -83,7 +83,7 @@ func (ShadowDecision_CheckResult) EnumDescriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_http_ext_authz_v3_ext_authz_proto_rawDescGZIP(), []int{1, 0}
 }
 
-// [#next-free-field: 34]
+// [#next-free-field: 35]
 type ExtAuthz struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// External authorization service configuration.
@@ -140,6 +140,21 @@ type ExtAuthz struct {
 	//   clear the route cache should run before route-dependent authorization filters. Operators can
 	//   also use decoder_header_mutation_rules to restrict sensitive request header mutations.
 	ClearRouteCache bool `protobuf:"varint,6,opt,name=clear_route_cache,json=clearRouteCache,proto3" json:"clear_route_cache,omitempty"`
+	// A list of the request header names the routes match on. When this list is not empty and
+	// ``clear_route_cache`` is ``true``, an ``OK`` response clears the route cache only when it sets,
+	// appends, or removes one of these headers, or mutates a query parameter, rather than on any request
+	// mutation. This avoids re-resolving the route when the response only touches headers that no route
+	// matches on.
+	//
+	// If not specified, the route cache is cleared whenever an ``OK`` response sets, appends, or removes
+	// any request header, or mutates a query parameter.
+	//
+	// .. attention::
+	//
+	//   List every request header the routes match on. A route that matches on a header omitted here is
+	//   not re-resolved when the authorization service mutates that header, which can route the request
+	//   as if the mutation had not happened.
+	ClearRouteCacheHeaders []string `protobuf:"bytes,34,rep,name=clear_route_cache_headers,json=clearRouteCacheHeaders,proto3" json:"clear_route_cache_headers,omitempty"`
 	// Sets the HTTP status that is returned to the client when the authorization server returns an error
 	// or cannot be reached.
 	//
@@ -511,6 +526,13 @@ func (x *ExtAuthz) GetClearRouteCache() bool {
 		return x.ClearRouteCache
 	}
 	return false
+}
+
+func (x *ExtAuthz) GetClearRouteCacheHeaders() []string {
+	if x != nil {
+		return x.ClearRouteCacheHeaders
+	}
+	return nil
 }
 
 func (x *ExtAuthz) GetStatusOnError() *v31.HttpStatus {
@@ -1419,7 +1441,7 @@ var File_envoy_extensions_filters_http_ext_authz_v3_ext_authz_proto protoreflect
 
 const file_envoy_extensions_filters_http_ext_authz_v3_ext_authz_proto_rawDesc = "" +
 	"\n" +
-	":envoy/extensions/filters/http/ext_authz/v3/ext_authz.proto\x12*envoy.extensions.filters.http.ext_authz.v3\x1a:envoy/config/common/mutation_rules/v3/mutation_rules.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a'envoy/config/core/v3/grpc_service.proto\x1a#envoy/config/core/v3/http_uri.proto\x1a$envoy/type/matcher/v3/metadata.proto\x1a\"envoy/type/matcher/v3/string.proto\x1a\x1fenvoy/type/v3/http_status.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a udpa/annotations/sensitive.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xe5\x12\n" +
+	":envoy/extensions/filters/http/ext_authz/v3/ext_authz.proto\x12*envoy.extensions.filters.http.ext_authz.v3\x1a:envoy/config/common/mutation_rules/v3/mutation_rules.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a'envoy/config/core/v3/grpc_service.proto\x1a#envoy/config/core/v3/http_uri.proto\x1a$envoy/type/matcher/v3/metadata.proto\x1a\"envoy/type/matcher/v3/string.proto\x1a\x1fenvoy/type/v3/http_status.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a udpa/annotations/sensitive.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xb4\x13\n" +
 	"\bExtAuthz\x12F\n" +
 	"\fgrpc_service\x18\x01 \x01(\v2!.envoy.config.core.v3.GrpcServiceH\x00R\vgrpcService\x12\\\n" +
 	"\fhttp_service\x18\x03 \x01(\v27.envoy.extensions.filters.http.ext_authz.v3.HttpServiceH\x00R\vhttpService\x12^\n" +
@@ -1427,7 +1449,9 @@ const file_envoy_extensions_filters_http_ext_authz_v3_ext_authz_proto_rawDesc = 
 	"\x12failure_mode_allow\x18\x02 \x01(\bR\x10failureModeAllow\x12@\n" +
 	"\x1dfailure_mode_allow_header_add\x18\x13 \x01(\bR\x19failureModeAllowHeaderAdd\x12f\n" +
 	"\x11with_request_body\x18\x05 \x01(\v2:.envoy.extensions.filters.http.ext_authz.v3.BufferSettingsR\x0fwithRequestBody\x12*\n" +
-	"\x11clear_route_cache\x18\x06 \x01(\bR\x0fclearRouteCache\x12A\n" +
+	"\x11clear_route_cache\x18\x06 \x01(\bR\x0fclearRouteCache\x12M\n" +
+	"\x19clear_route_cache_headers\x18\" \x03(\tB\x12\xfaB\x0f\x92\x01\f\"\n" +
+	"r\b\x10\x01\xc8\x01\x00\xc0\x01\x01R\x16clearRouteCacheHeaders\x12A\n" +
 	"\x0fstatus_on_error\x18\a \x01(\v2\x19.envoy.type.v3.HttpStatusR\rstatusOnError\x12-\n" +
 	"\x12validate_mutations\x18\x18 \x01(\bR\x11validateMutations\x12>\n" +
 	"\x1bmetadata_context_namespaces\x18\b \x03(\tR\x19metadataContextNamespaces\x12I\n" +

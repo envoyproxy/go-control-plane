@@ -108,6 +108,33 @@ func (m *ExtAuthz) validate(all bool) error {
 
 	// no validation rules for ClearRouteCache
 
+	for idx, item := range m.GetClearRouteCacheHeaders() {
+		_, _ = idx, item
+
+		if utf8.RuneCountInString(item) < 1 {
+			err := ExtAuthzValidationError{
+				field:  fmt.Sprintf("ClearRouteCacheHeaders[%v]", idx),
+				reason: "value length must be at least 1 runes",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if !_ExtAuthz_ClearRouteCacheHeaders_Pattern.MatchString(item) {
+			err := ExtAuthzValidationError{
+				field:  fmt.Sprintf("ClearRouteCacheHeaders[%v]", idx),
+				reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
 	if all {
 		switch v := interface{}(m.GetStatusOnError()).(type) {
 		case interface{ ValidateAll() error }:
@@ -610,6 +637,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ExtAuthzValidationError{}
+
+var _ExtAuthz_ClearRouteCacheHeaders_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 // Validate checks the field values on ShadowDecision with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
