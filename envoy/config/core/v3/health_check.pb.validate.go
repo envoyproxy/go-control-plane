@@ -1426,6 +1426,8 @@ func (m *HealthCheck_HttpHealthCheck) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
+	// no validation rules for UseAlpnProtocol
+
 	if all {
 		switch v := interface{}(m.GetServiceNameMatcher()).(type) {
 		case interface{ ValidateAll() error }:

@@ -642,7 +642,7 @@ func (*HealthCheck_Payload_Text) isHealthCheck_Payload_Payload() {}
 
 func (*HealthCheck_Payload_Binary) isHealthCheck_Payload_Payload() {}
 
-// [#next-free-field: 15]
+// [#next-free-field: 16]
 type HealthCheck_HttpHealthCheck struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The value of the host header in the HTTP health check request. If
@@ -693,8 +693,22 @@ type HealthCheck_HttpHealthCheck struct {
 	// the host being considered immediately unhealthy i.e. if status code 200 is expected and there are no configured retriable statuses, any
 	// non-200 response will result in the host being marked unhealthy.
 	RetriableStatuses []*v3.Int64Range `protobuf:"bytes,12,rep,name=retriable_statuses,json=retriableStatuses,proto3" json:"retriable_statuses,omitempty"`
-	// Use specified application protocol for health checks.
+	// Use specified application protocol for health checks. With :ref:`use_alpn_protocol
+	// <envoy_v3_api_field_config.core.v3.HealthCheck.HttpHealthCheck.use_alpn_protocol>` this is
+	// the codec used when ALPN settles on neither ``h2`` nor ``http/1.1``.
 	CodecClientType v3.CodecClientType `protobuf:"varint,10,opt,name=codec_client_type,json=codecClientType,proto3,enum=envoy.type.v3.CodecClientType" json:"codec_client_type,omitempty"`
+	// Select the codec from the protocol negotiated by ALPN on the health check connection: HTTP/2
+	// when ``h2`` is negotiated, HTTP/1.1 when ``http/1.1`` is negotiated, and otherwise
+	// ``codec_client_type``, including when nothing is negotiated. With ``codec_client_type`` at
+	// its default this is the same mapping as the cluster's :ref:`auto_config
+	// <envoy_v3_api_field_extensions.upstreams.http.v3.HttpProtocolOptions.auto_config>`. Like
+	// ``auto_config``, it requires a transport socket that supports ALPN such as TLS and is
+	// rejected on a cluster whose transport sockets do not, unless the
+	// ``config.do_not_validate_alpn_support`` runtime key is set, as for ``auto_config``. It
+	// cannot be combined with ``codec_client_type`` ``HTTP3``. See :ref:`tls_options
+	// <envoy_v3_api_field_config.core.v3.HealthCheck.tls_options>` for what the connection
+	// advertises.
+	UseAlpnProtocol bool `protobuf:"varint,15,opt,name=use_alpn_protocol,json=useAlpnProtocol,proto3" json:"use_alpn_protocol,omitempty"`
 	// An optional service name parameter which is used to validate the identity of
 	// the health checked cluster using a :ref:`StringMatcher
 	// <envoy_v3_api_msg_type.matcher.v3.StringMatcher>`. See the :ref:`architecture overview
@@ -808,6 +822,13 @@ func (x *HealthCheck_HttpHealthCheck) GetCodecClientType() v3.CodecClientType {
 		return x.CodecClientType
 	}
 	return v3.CodecClientType(0)
+}
+
+func (x *HealthCheck_HttpHealthCheck) GetUseAlpnProtocol() bool {
+	if x != nil {
+		return x.UseAlpnProtocol
+	}
+	return false
 }
 
 func (x *HealthCheck_HttpHealthCheck) GetServiceNameMatcher() *v31.StringMatcher {
@@ -1107,7 +1128,10 @@ type HealthCheck_TlsOptions struct {
 	// Specifies the ALPN protocols for health check connections. This is useful if the
 	// corresponding upstream is using ALPN-based :ref:`FilterChainMatch
 	// <envoy_v3_api_msg_config.listener.v3.FilterChainMatch>` along with different protocols for health checks
-	// versus data connections. If empty, no ALPN protocols will be set on health check connections.
+	// versus data connections. If empty, health check connections advertise the ALPN protocols of
+	// the cluster's TLS context, if any. With :ref:`use_alpn_protocol
+	// <envoy_v3_api_field_config.core.v3.HealthCheck.HttpHealthCheck.use_alpn_protocol>`,
+	// the negotiated protocol selects the health check codec.
 	AlpnProtocols []string `protobuf:"bytes,1,rep,name=alpn_protocols,json=alpnProtocols,proto3" json:"alpn_protocols,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1157,7 +1181,7 @@ const file_envoy_config_core_v3_health_check_proto_rawDesc = "" +
 	"'envoy/config/core/v3/health_check.proto\x12\x14envoy.config.core.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a/envoy/config/core/v3/event_service_config.proto\x1a$envoy/config/core/v3/extension.proto\x1a)envoy/config/core/v3/proxy_protocol.proto\x1a\"envoy/type/matcher/v3/string.proto\x1a\x18envoy/type/v3/http.proto\x1a\x19envoy/type/v3/range.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"`\n" +
 	"\x0fHealthStatusSet\x12M\n" +
 	"\bstatuses\x18\x01 \x03(\x0e2\".envoy.config.core.v3.HealthStatusB\r\xfaB\n" +
-	"\x92\x01\a\"\x05\x82\x01\x02\x10\x01R\bstatuses\"\xa0 \n" +
+	"\x92\x01\a\"\x05\x82\x01\x02\x10\x01R\bstatuses\"\xcc \n" +
 	"\vHealthCheck\x12\x12\n" +
 	"\x04name\x18\x1b \x01(\tR\x04name\x12?\n" +
 	"\atimeout\x18\x01 \x01(\v2\x19.google.protobuf.DurationB\n" +
@@ -1192,7 +1216,7 @@ const file_envoy_config_core_v3_health_check_proto_rawDesc = "" +
 	"\x04text\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01H\x00R\x04text\x12\x18\n" +
 	"\x06binary\x18\x02 \x01(\fH\x00R\x06binary:,\x9aň\x1e'\n" +
 	"%envoy.api.v2.core.HealthCheck.PayloadB\x0e\n" +
-	"\apayload\x12\x03\xf8B\x01\x1a\xc6\a\n" +
+	"\apayload\x12\x03\xf8B\x01\x1a\xf2\a\n" +
 	"\x0fHttpHealthCheck\x12\x1c\n" +
 	"\x04host\x18\x01 \x01(\tB\b\xfaB\x05r\x03\xc0\x01\x02R\x04host\x12\x1e\n" +
 	"\x04path\x18\x02 \x01(\tB\n" +
@@ -1206,7 +1230,8 @@ const file_envoy_config_core_v3_health_check_proto_rawDesc = "" +
 	"\x11expected_statuses\x18\t \x03(\v2\x19.envoy.type.v3.Int64RangeR\x10expectedStatuses\x12H\n" +
 	"\x12retriable_statuses\x18\f \x03(\v2\x19.envoy.type.v3.Int64RangeR\x11retriableStatuses\x12T\n" +
 	"\x11codec_client_type\x18\n" +
-	" \x01(\x0e2\x1e.envoy.type.v3.CodecClientTypeB\b\xfaB\x05\x82\x01\x02\x10\x01R\x0fcodecClientType\x12V\n" +
+	" \x01(\x0e2\x1e.envoy.type.v3.CodecClientTypeB\b\xfaB\x05\x82\x01\x02\x10\x01R\x0fcodecClientType\x12*\n" +
+	"\x11use_alpn_protocol\x18\x0f \x01(\bR\x0fuseAlpnProtocol\x12V\n" +
 	"\x14service_name_matcher\x18\v \x01(\v2$.envoy.type.matcher.v3.StringMatcherR\x12serviceNameMatcher\x12G\n" +
 	"\x06method\x18\r \x01(\x0e2#.envoy.config.core.v3.RequestMethodB\n" +
 	"\xfaB\a\x82\x01\x04\x10\x01 \x06R\x06method:4\x9aň\x1e/\n" +

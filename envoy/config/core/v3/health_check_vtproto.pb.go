@@ -183,6 +183,16 @@ func (m *HealthCheck_HttpHealthCheck) MarshalToSizedBufferVTStrict(dAtA []byte) 
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.UseAlpnProtocol {
+		i--
+		if m.UseAlpnProtocol {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x78
+	}
 	if m.ResponseBufferSize != nil {
 		size, err := (*wrapperspb.UInt64Value)(m.ResponseBufferSize).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -1126,6 +1136,9 @@ func (m *HealthCheck_HttpHealthCheck) SizeVT() (n int) {
 	if m.ResponseBufferSize != nil {
 		l = (*wrapperspb.UInt64Value)(m.ResponseBufferSize).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.UseAlpnProtocol {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n
