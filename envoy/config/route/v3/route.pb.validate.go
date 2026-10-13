@@ -391,7 +391,16 @@ func (m *RouteConfiguration) validate(all bool) error {
 
 	// no validation rules for IgnorePortInHostMatching
 
-	// no validation rules for VhostHeader
+	if !_RouteConfiguration_VhostHeader_Pattern.MatchString(m.GetVhostHeader()) {
+		err := RouteConfigurationValidationError{
+			field:  "VhostHeader",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
 
 	// no validation rules for IgnorePathParametersInPathMatching
 
@@ -589,6 +598,8 @@ var _RouteConfiguration_InternalOnlyHeaders_Pattern = regexp.MustCompile("^[^\x0
 var _RouteConfiguration_ResponseHeadersToRemove_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 var _RouteConfiguration_RequestHeadersToRemove_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+var _RouteConfiguration_VhostHeader_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 // Validate checks the field values on Vhds with the rules defined in the proto
 // definition for this message. If any rules are violated, the first error

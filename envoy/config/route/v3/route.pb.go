@@ -382,7 +382,7 @@ var File_envoy_config_route_v3_route_proto protoreflect.FileDescriptor
 
 const file_envoy_config_route_v3_route_proto_rawDesc = "" +
 	"\n" +
-	"!envoy/config/route/v3/route.proto\x12\x15envoy.config.route.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a$envoy/config/core/v3/extension.proto\x1a,envoy/config/route/v3/route_components.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\x83\r\n" +
+	"!envoy/config/route/v3/route.proto\x12\x15envoy.config.route.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a$envoy/config/core/v3/extension.proto\x1a,envoy/config/route/v3/route_components.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\x90\r\n" +
 	"\x12RouteConfiguration\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12G\n" +
 	"\rvirtual_hosts\x18\x02 \x03(\v2\".envoy.config.route.v3.VirtualHostR\fvirtualHosts\x12/\n" +
@@ -401,8 +401,8 @@ const file_envoy_config_route_v3_route_proto_rawDesc = "" +
 	"#max_direct_response_body_size_bytes\x18\v \x01(\v2\x1c.google.protobuf.UInt32ValueR\x1emaxDirectResponseBodySizeBytes\x12i\n" +
 	"\x19cluster_specifier_plugins\x18\f \x03(\v2-.envoy.config.route.v3.ClusterSpecifierPluginR\x17clusterSpecifierPlugins\x12n\n" +
 	"\x17request_mirror_policies\x18\r \x03(\v26.envoy.config.route.v3.RouteAction.RequestMirrorPolicyR\x15requestMirrorPolicies\x12>\n" +
-	"\x1cignore_port_in_host_matching\x18\x0e \x01(\bR\x18ignorePortInHostMatching\x12!\n" +
-	"\fvhost_header\x18\x12 \x01(\tR\vvhostHeader\x12S\n" +
+	"\x1cignore_port_in_host_matching\x18\x0e \x01(\bR\x18ignorePortInHostMatching\x12.\n" +
+	"\fvhost_header\x18\x12 \x01(\tB\v\xfaB\br\x06\xc8\x01\x00\xc0\x01\x01R\vvhostHeader\x12S\n" +
 	"'ignore_path_parameters_in_path_matching\x18\x0f \x01(\bR\"ignorePathParametersInPathMatching\x12z\n" +
 	"\x17typed_per_filter_config\x18\x10 \x03(\v2C.envoy.config.route.v3.RouteConfiguration.TypedPerFilterConfigEntryR\x14typedPerFilterConfig\x12:\n" +
 	"\bmetadata\x18\x11 \x01(\v2\x1e.envoy.config.core.v3.MetadataR\bmetadata\x12U\n" +
