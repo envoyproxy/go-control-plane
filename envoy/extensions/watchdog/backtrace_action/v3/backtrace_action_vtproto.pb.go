@@ -50,6 +50,11 @@ func (m *BacktraceActionConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, 
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.LogLevel != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.LogLevel))
+		i--
+		dAtA[i] = 0x10
+	}
 	if m.CooldownDuration != nil {
 		size, err := (*durationpb.Duration)(m.CooldownDuration).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -72,6 +77,9 @@ func (m *BacktraceActionConfig) SizeVT() (n int) {
 	if m.CooldownDuration != nil {
 		l = (*durationpb.Duration)(m.CooldownDuration).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.LogLevel != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.LogLevel))
 	}
 	n += len(m.unknownFields)
 	return n

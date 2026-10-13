@@ -87,6 +87,8 @@ func (m *BacktraceActionConfig) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for LogLevel
+
 	if len(errors) > 0 {
 		return BacktraceActionConfigMultiError(errors)
 	}

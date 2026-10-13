@@ -23,6 +23,65 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Log levels at which the backtrace can be logged.
+type BacktraceActionConfig_LogLevel int32
+
+const (
+	BacktraceActionConfig_CRITICAL BacktraceActionConfig_LogLevel = 0
+	BacktraceActionConfig_TRACE    BacktraceActionConfig_LogLevel = 1
+	BacktraceActionConfig_DEBUG    BacktraceActionConfig_LogLevel = 2
+	BacktraceActionConfig_INFO     BacktraceActionConfig_LogLevel = 3
+	BacktraceActionConfig_WARN     BacktraceActionConfig_LogLevel = 4
+	BacktraceActionConfig_ERROR    BacktraceActionConfig_LogLevel = 5
+)
+
+// Enum value maps for BacktraceActionConfig_LogLevel.
+var (
+	BacktraceActionConfig_LogLevel_name = map[int32]string{
+		0: "CRITICAL",
+		1: "TRACE",
+		2: "DEBUG",
+		3: "INFO",
+		4: "WARN",
+		5: "ERROR",
+	}
+	BacktraceActionConfig_LogLevel_value = map[string]int32{
+		"CRITICAL": 0,
+		"TRACE":    1,
+		"DEBUG":    2,
+		"INFO":     3,
+		"WARN":     4,
+		"ERROR":    5,
+	}
+)
+
+func (x BacktraceActionConfig_LogLevel) Enum() *BacktraceActionConfig_LogLevel {
+	p := new(BacktraceActionConfig_LogLevel)
+	*p = x
+	return p
+}
+
+func (x BacktraceActionConfig_LogLevel) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (BacktraceActionConfig_LogLevel) Descriptor() protoreflect.EnumDescriptor {
+	return file_envoy_extensions_watchdog_backtrace_action_v3_backtrace_action_proto_enumTypes[0].Descriptor()
+}
+
+func (BacktraceActionConfig_LogLevel) Type() protoreflect.EnumType {
+	return &file_envoy_extensions_watchdog_backtrace_action_v3_backtrace_action_proto_enumTypes[0]
+}
+
+func (x BacktraceActionConfig_LogLevel) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use BacktraceActionConfig_LogLevel.Descriptor instead.
+func (BacktraceActionConfig_LogLevel) EnumDescriptor() ([]byte, []int) {
+	return file_envoy_extensions_watchdog_backtrace_action_v3_backtrace_action_proto_rawDescGZIP(), []int{0, 0}
+}
+
 // Configuration for the backtrace watchdog action.
 //
 // This action is currently only supported on Linux.
@@ -31,8 +90,10 @@ type BacktraceActionConfig struct {
 	// Minimum time between backtrace logs per thread. Defaults to 10 seconds if not set.
 	// Set to 0 to disable the cooldown and log a backtrace on every watchdog event.
 	CooldownDuration *durationpb.Duration `protobuf:"bytes,1,opt,name=cooldown_duration,json=cooldownDuration,proto3" json:"cooldown_duration,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// Log level used for the emitted backtrace. Defaults to critical.
+	LogLevel      BacktraceActionConfig_LogLevel `protobuf:"varint,2,opt,name=log_level,json=logLevel,proto3,enum=envoy.extensions.watchdog.backtrace_action.v3.BacktraceActionConfig_LogLevel" json:"log_level,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *BacktraceActionConfig) Reset() {
@@ -72,13 +133,28 @@ func (x *BacktraceActionConfig) GetCooldownDuration() *durationpb.Duration {
 	return nil
 }
 
+func (x *BacktraceActionConfig) GetLogLevel() BacktraceActionConfig_LogLevel {
+	if x != nil {
+		return x.LogLevel
+	}
+	return BacktraceActionConfig_CRITICAL
+}
+
 var File_envoy_extensions_watchdog_backtrace_action_v3_backtrace_action_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_watchdog_backtrace_action_v3_backtrace_action_proto_rawDesc = "" +
 	"\n" +
-	"Denvoy/extensions/watchdog/backtrace_action/v3/backtrace_action.proto\x12-envoy.extensions.watchdog.backtrace_action.v3\x1a\x1egoogle/protobuf/duration.proto\x1a\x1dudpa/annotations/status.proto\"_\n" +
+	"Denvoy/extensions/watchdog/backtrace_action/v3/backtrace_action.proto\x12-envoy.extensions.watchdog.backtrace_action.v3\x1a\x1egoogle/protobuf/duration.proto\x1a\x1dudpa/annotations/status.proto\"\x9a\x02\n" +
 	"\x15BacktraceActionConfig\x12F\n" +
-	"\x11cooldown_duration\x18\x01 \x01(\v2\x19.google.protobuf.DurationR\x10cooldownDurationB\xc6\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x11cooldown_duration\x18\x01 \x01(\v2\x19.google.protobuf.DurationR\x10cooldownDuration\x12j\n" +
+	"\tlog_level\x18\x02 \x01(\x0e2M.envoy.extensions.watchdog.backtrace_action.v3.BacktraceActionConfig.LogLevelR\blogLevel\"M\n" +
+	"\bLogLevel\x12\f\n" +
+	"\bCRITICAL\x10\x00\x12\t\n" +
+	"\x05TRACE\x10\x01\x12\t\n" +
+	"\x05DEBUG\x10\x02\x12\b\n" +
+	"\x04INFO\x10\x03\x12\b\n" +
+	"\x04WARN\x10\x04\x12\t\n" +
+	"\x05ERROR\x10\x05B\xc6\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	";io.envoyproxy.envoy.extensions.watchdog.backtrace_action.v3B\x14BacktraceActionProtoP\x01Zggithub.com/envoyproxy/go-control-plane/envoy/extensions/watchdog/backtrace_action/v3;backtrace_actionv3b\x06proto3"
 
 var (
@@ -93,18 +169,21 @@ func file_envoy_extensions_watchdog_backtrace_action_v3_backtrace_action_proto_r
 	return file_envoy_extensions_watchdog_backtrace_action_v3_backtrace_action_proto_rawDescData
 }
 
+var file_envoy_extensions_watchdog_backtrace_action_v3_backtrace_action_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_envoy_extensions_watchdog_backtrace_action_v3_backtrace_action_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_envoy_extensions_watchdog_backtrace_action_v3_backtrace_action_proto_goTypes = []any{
-	(*BacktraceActionConfig)(nil), // 0: envoy.extensions.watchdog.backtrace_action.v3.BacktraceActionConfig
-	(*durationpb.Duration)(nil),   // 1: google.protobuf.Duration
+	(BacktraceActionConfig_LogLevel)(0), // 0: envoy.extensions.watchdog.backtrace_action.v3.BacktraceActionConfig.LogLevel
+	(*BacktraceActionConfig)(nil),       // 1: envoy.extensions.watchdog.backtrace_action.v3.BacktraceActionConfig
+	(*durationpb.Duration)(nil),         // 2: google.protobuf.Duration
 }
 var file_envoy_extensions_watchdog_backtrace_action_v3_backtrace_action_proto_depIdxs = []int32{
-	1, // 0: envoy.extensions.watchdog.backtrace_action.v3.BacktraceActionConfig.cooldown_duration:type_name -> google.protobuf.Duration
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	2, // 0: envoy.extensions.watchdog.backtrace_action.v3.BacktraceActionConfig.cooldown_duration:type_name -> google.protobuf.Duration
+	0, // 1: envoy.extensions.watchdog.backtrace_action.v3.BacktraceActionConfig.log_level:type_name -> envoy.extensions.watchdog.backtrace_action.v3.BacktraceActionConfig.LogLevel
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_watchdog_backtrace_action_v3_backtrace_action_proto_init() }
@@ -117,13 +196,14 @@ func file_envoy_extensions_watchdog_backtrace_action_v3_backtrace_action_proto_i
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_watchdog_backtrace_action_v3_backtrace_action_proto_rawDesc), len(file_envoy_extensions_watchdog_backtrace_action_v3_backtrace_action_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_envoy_extensions_watchdog_backtrace_action_v3_backtrace_action_proto_goTypes,
 		DependencyIndexes: file_envoy_extensions_watchdog_backtrace_action_v3_backtrace_action_proto_depIdxs,
+		EnumInfos:         file_envoy_extensions_watchdog_backtrace_action_v3_backtrace_action_proto_enumTypes,
 		MessageInfos:      file_envoy_extensions_watchdog_backtrace_action_v3_backtrace_action_proto_msgTypes,
 	}.Build()
 	File_envoy_extensions_watchdog_backtrace_action_v3_backtrace_action_proto = out.File
