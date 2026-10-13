@@ -556,6 +556,59 @@ func (m *PostLogoutRedirectUri_Uri) MarshalToSizedBufferVTStrict(dAtA []byte) (i
 	dAtA[i] = 0x12
 	return len(dAtA) - i, nil
 }
+func (m *TokenCookieChunking) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *TokenCookieChunking) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *TokenCookieChunking) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.MaxChunks != nil {
+		size, err := (*wrapperspb.UInt32Value)(m.MaxChunks).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.MaxCookieSize != nil {
+		size, err := (*wrapperspb.UInt32Value)(m.MaxCookieSize).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *OAuth2Config) MarshalVTStrict() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
@@ -585,6 +638,18 @@ func (m *OAuth2Config) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.TokenCookieChunking != nil {
+		size, err := m.TokenCookieChunking.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x2
+		i--
+		dAtA[i] = 0x92
 	}
 	if m.PostLogoutRedirectUri != nil {
 		size, err := m.PostLogoutRedirectUri.MarshalToSizedBufferVTStrict(dAtA[:i])
@@ -1326,6 +1391,24 @@ func (m *PostLogoutRedirectUri_Uri) SizeVT() (n int) {
 	n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	return n
 }
+func (m *TokenCookieChunking) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.MaxCookieSize != nil {
+		l = (*wrapperspb.UInt32Value)(m.MaxCookieSize).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.MaxChunks != nil {
+		l = (*wrapperspb.UInt32Value)(m.MaxChunks).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
 func (m *OAuth2Config) SizeVT() (n int) {
 	if m == nil {
 		return 0
@@ -1508,6 +1591,10 @@ func (m *OAuth2Config) SizeVT() (n int) {
 	}
 	if m.PostLogoutRedirectUri != nil {
 		l = m.PostLogoutRedirectUri.SizeVT()
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.TokenCookieChunking != nil {
+		l = m.TokenCookieChunking.SizeVT()
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
