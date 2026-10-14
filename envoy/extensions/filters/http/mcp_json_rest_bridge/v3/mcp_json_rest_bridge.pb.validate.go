@@ -1411,6 +1411,40 @@ func (m *ToolConfig) validate(all bool) error {
 
 	}
 
+	for idx, item := range m.GetMcpParamHeaders() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ToolConfigValidationError{
+						field:  fmt.Sprintf("McpParamHeaders[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ToolConfigValidationError{
+						field:  fmt.Sprintf("McpParamHeaders[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ToolConfigValidationError{
+					field:  fmt.Sprintf("McpParamHeaders[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return ToolConfigMultiError(errors)
 	}
@@ -1487,6 +1521,167 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ToolConfigValidationError{}
+
+// Validate checks the field values on McpParamHeader with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *McpParamHeader) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on McpParamHeader with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in McpParamHeaderMultiError,
+// or nil if none found.
+func (m *McpParamHeader) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *McpParamHeader) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if utf8.RuneCountInString(m.GetName()) < 1 {
+		err := McpParamHeaderValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if !_McpParamHeader_Name_Pattern.MatchString(m.GetName()) {
+		err := McpParamHeaderValidationError{
+			field:  "Name",
+			reason: "value does not match regex pattern \"^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$\"",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(m.GetPropertyPath()) < 1 {
+		err := McpParamHeaderValidationError{
+			field:  "PropertyPath",
+			reason: "value must contain at least 1 item(s)",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if _, ok := _McpParamHeader_Type_NotInLookup[m.GetType()]; ok {
+		err := McpParamHeaderValidationError{
+			field:  "Type",
+			reason: "value must not be in list [TYPE_UNSPECIFIED]",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if _, ok := McpParamHeader_Type_name[int32(m.GetType())]; !ok {
+		err := McpParamHeaderValidationError{
+			field:  "Type",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return McpParamHeaderMultiError(errors)
+	}
+
+	return nil
+}
+
+// McpParamHeaderMultiError is an error wrapping multiple validation errors
+// returned by McpParamHeader.ValidateAll() if the designated constraints
+// aren't met.
+type McpParamHeaderMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m McpParamHeaderMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m McpParamHeaderMultiError) AllErrors() []error { return m }
+
+// McpParamHeaderValidationError is the validation error returned by
+// McpParamHeader.Validate if the designated constraints aren't met.
+type McpParamHeaderValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e McpParamHeaderValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e McpParamHeaderValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e McpParamHeaderValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e McpParamHeaderValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e McpParamHeaderValidationError) ErrorName() string { return "McpParamHeaderValidationError" }
+
+// Error satisfies the builtin error interface
+func (e McpParamHeaderValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMcpParamHeader.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = McpParamHeaderValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = McpParamHeaderValidationError{}
+
+var _McpParamHeader_Name_Pattern = regexp.MustCompile("^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$")
+
+var _McpParamHeader_Type_NotInLookup = map[McpParamHeader_Type]struct{}{
+	0: {},
+}
 
 // Validate checks the field values on HttpRule with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
