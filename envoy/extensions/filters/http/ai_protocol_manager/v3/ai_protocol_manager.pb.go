@@ -154,9 +154,14 @@ type AiProtocolManager struct {
 	// AI filters, in order. They run over a declared AI endpoint's parsed request payload
 	// before it continues down the HTTP filter chain, and require ``request_handling``.
 	// [#extension-category: envoy.http.ai_filters]
-	Filters       []*v3.TypedExtensionConfig `protobuf:"bytes,3,rep,name=filters,proto3" json:"filters,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Filters []*v3.TypedExtensionConfig `protobuf:"bytes,3,rep,name=filters,proto3" json:"filters,omitempty"`
+	// External buffer implementation configuration. When unset, the
+	// :ref:`in-memory buffer <envoy_v3_api_msg_extensions.ai_protocol_manager.external_buffer.in_memory.v3.InMemory>`
+	// is used, which does not bound the size of the payload it holds.
+	// [#extension-category: envoy.ai_protocol_manager.external_buffer]
+	ExternalBufferConfig *v3.TypedExtensionConfig `protobuf:"bytes,4,opt,name=external_buffer_config,json=externalBufferConfig,proto3" json:"external_buffer_config,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *AiProtocolManager) Reset() {
@@ -206,6 +211,13 @@ func (x *AiProtocolManager) GetResponseHandling() *ResponseHandling {
 func (x *AiProtocolManager) GetFilters() []*v3.TypedExtensionConfig {
 	if x != nil {
 		return x.Filters
+	}
+	return nil
+}
+
+func (x *AiProtocolManager) GetExternalBufferConfig() *v3.TypedExtensionConfig {
+	if x != nil {
+		return x.ExternalBufferConfig
 	}
 	return nil
 }
@@ -772,11 +784,12 @@ var File_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manage
 
 const file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDesc = "" +
 	"\n" +
-	"Nenvoy/extensions/filters/http/ai_protocol_manager/v3/ai_protocol_manager.proto\x124envoy.extensions.filters.http.ai_protocol_manager.v3\x1a$envoy/config/core/v3/extension.proto\x1a#envoy/type/ai/v3/llm_protocol.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xc0\x02\n" +
+	"Nenvoy/extensions/filters/http/ai_protocol_manager/v3/ai_protocol_manager.proto\x124envoy.extensions.filters.http.ai_protocol_manager.v3\x1a$envoy/config/core/v3/extension.proto\x1a#envoy/type/ai/v3/llm_protocol.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xa2\x03\n" +
 	"\x11AiProtocolManager\x12p\n" +
 	"\x10request_handling\x18\x01 \x01(\v2E.envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandlingR\x0frequestHandling\x12s\n" +
 	"\x11response_handling\x18\x02 \x01(\v2F.envoy.extensions.filters.http.ai_protocol_manager.v3.ResponseHandlingR\x10responseHandling\x12D\n" +
-	"\afilters\x18\x03 \x03(\v2*.envoy.config.core.v3.TypedExtensionConfigR\afilters\"\xf2\x02\n" +
+	"\afilters\x18\x03 \x03(\v2*.envoy.config.core.v3.TypedExtensionConfigR\afilters\x12`\n" +
+	"\x16external_buffer_config\x18\x04 \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigR\x14externalBufferConfig\"\xf2\x02\n" +
 	"\x0fRequestHandling\x12:\n" +
 	"\x19parse_unconfigured_routes\x18\x01 \x01(\bR\x17parseUnconfiguredRoutes\x12b\n" +
 	"\x06limits\x18\x02 \x01(\v2J.envoy.extensions.filters.http.ai_protocol_manager.v3.RequestParsingLimitsR\x06limits\x12\x8e\x01\n" +
@@ -846,25 +859,26 @@ var file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manage
 	3,  // 0: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManager.request_handling:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandling
 	5,  // 1: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManager.response_handling:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.ResponseHandling
 	11, // 2: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManager.filters:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	4,  // 3: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandling.limits:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.RequestParsingLimits
-	0,  // 4: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandling.reserialize_body:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandling.BodyReserialization
-	12, // 5: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestParsingLimits.inline_string_threshold_bytes:type_name -> google.protobuf.UInt32Value
-	6,  // 6: envoy.extensions.filters.http.ai_protocol_manager.v3.ResponseHandling.token_usage:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction
-	13, // 7: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.default_llm_protocol:type_name -> envoy.type.ai.v3.LLMProtocol
-	7,  // 8: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.limits:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits
-	1,  // 9: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.usage_signal:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.UsageSignal
-	12, // 10: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits.max_sse_event_size:type_name -> google.protobuf.UInt32Value
-	12, // 11: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits.max_json_body_size:type_name -> google.protobuf.UInt32Value
-	12, // 12: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits.max_parsed_sse_events:type_name -> google.protobuf.UInt32Value
-	9,  // 13: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute.request:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.RequestPerRoute
-	10, // 14: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute.response:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.ResponsePerRoute
-	13, // 15: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestPerRoute.llm_protocol:type_name -> envoy.type.ai.v3.LLMProtocol
-	13, // 16: envoy.extensions.filters.http.ai_protocol_manager.v3.ResponsePerRoute.llm_protocol:type_name -> envoy.type.ai.v3.LLMProtocol
-	17, // [17:17] is the sub-list for method output_type
-	17, // [17:17] is the sub-list for method input_type
-	17, // [17:17] is the sub-list for extension type_name
-	17, // [17:17] is the sub-list for extension extendee
-	0,  // [0:17] is the sub-list for field type_name
+	11, // 3: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManager.external_buffer_config:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	4,  // 4: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandling.limits:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.RequestParsingLimits
+	0,  // 5: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandling.reserialize_body:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandling.BodyReserialization
+	12, // 6: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestParsingLimits.inline_string_threshold_bytes:type_name -> google.protobuf.UInt32Value
+	6,  // 7: envoy.extensions.filters.http.ai_protocol_manager.v3.ResponseHandling.token_usage:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction
+	13, // 8: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.default_llm_protocol:type_name -> envoy.type.ai.v3.LLMProtocol
+	7,  // 9: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.limits:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits
+	1,  // 10: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.usage_signal:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtraction.UsageSignal
+	12, // 11: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits.max_sse_event_size:type_name -> google.protobuf.UInt32Value
+	12, // 12: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits.max_json_body_size:type_name -> google.protobuf.UInt32Value
+	12, // 13: envoy.extensions.filters.http.ai_protocol_manager.v3.TokenUsageExtractionLimits.max_parsed_sse_events:type_name -> google.protobuf.UInt32Value
+	9,  // 14: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute.request:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.RequestPerRoute
+	10, // 15: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute.response:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.ResponsePerRoute
+	13, // 16: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestPerRoute.llm_protocol:type_name -> envoy.type.ai.v3.LLMProtocol
+	13, // 17: envoy.extensions.filters.http.ai_protocol_manager.v3.ResponsePerRoute.llm_protocol:type_name -> envoy.type.ai.v3.LLMProtocol
+	18, // [18:18] is the sub-list for method output_type
+	18, // [18:18] is the sub-list for method input_type
+	18, // [18:18] is the sub-list for extension type_name
+	18, // [18:18] is the sub-list for extension extendee
+	0,  // [0:18] is the sub-list for field type_name
 }
 
 func init() {

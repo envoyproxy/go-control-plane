@@ -51,6 +51,28 @@ func (m *AiProtocolManager) MarshalToSizedBufferVTStrict(dAtA []byte) (int, erro
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.ExternalBufferConfig != nil {
+		if vtmsg, ok := interface{}(m.ExternalBufferConfig).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.ExternalBufferConfig)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+		}
+		i--
+		dAtA[i] = 0x22
+	}
 	if len(m.Filters) > 0 {
 		for iNdEx := len(m.Filters) - 1; iNdEx >= 0; iNdEx-- {
 			if vtmsg, ok := interface{}(m.Filters[iNdEx]).(interface {
@@ -529,6 +551,16 @@ func (m *AiProtocolManager) SizeVT() (n int) {
 			}
 			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 		}
+	}
+	if m.ExternalBufferConfig != nil {
+		if size, ok := interface{}(m.ExternalBufferConfig).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.ExternalBufferConfig)
+		}
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
