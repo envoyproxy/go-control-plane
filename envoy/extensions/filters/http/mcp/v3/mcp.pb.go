@@ -215,7 +215,7 @@ type Mcp struct {
 	// - In ``PASS_THROUGH`` mode: the request is allowed through with an ``is_exceeding_limit`` marker in the dynamic metadata, indicating that the MCP payload was only partially parsed.
 	// - In ``REJECT_NO_MCP`` mode: the request is rejected with ``400 Bad Request`` because the complete root JSON object must fit within the size limit.
 	//
-	// It defaults to 8KB (8192 bytes) and the maximum allowed value is 10MB (10485760 bytes).
+	// It defaults to 8KB (8192 bytes).
 	//
 	// Setting it to 0 would disable the limit. It is not recommended to do so in production.
 	MaxRequestBodySize *wrapperspb.UInt32Value `protobuf:"bytes,3,opt,name=max_request_body_size,json=maxRequestBodySize,proto3" json:"max_request_body_size,omitempty"`
@@ -456,7 +456,7 @@ type McpOverride struct {
 	TrafficMode Mcp_TrafficMode `protobuf:"varint,1,opt,name=traffic_mode,json=trafficMode,proto3,enum=envoy.extensions.filters.http.mcp.v3.Mcp_TrafficMode" json:"traffic_mode,omitempty"`
 	// Optional per-route max request body size override.
 	// When set, this overrides the global max_request_body_size for this route.
-	// It defaults to 8KB (8192 bytes) and the maximum allowed value is 10MB (10485760 bytes).
+	// It defaults to 8KB (8192 bytes).
 	MaxRequestBodySize *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=max_request_body_size,json=maxRequestBodySize,proto3" json:"max_request_body_size,omitempty"`
 	// Overrides the global clear_route_cache setting for this route.
 	ClearRouteCache bool `protobuf:"varint,3,opt,name=clear_route_cache,json=clearRouteCache,proto3" json:"clear_route_cache,omitempty"`
@@ -734,13 +734,12 @@ var File_envoy_extensions_filters_http_mcp_v3_mcp_proto protoreflect.FileDescrip
 
 const file_envoy_extensions_filters_http_mcp_v3_mcp_proto_rawDesc = "" +
 	"\n" +
-	".envoy/extensions/filters/http/mcp/v3/mcp.proto\x12$envoy.extensions.filters.http.mcp.v3\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xdd\n" +
+	".envoy/extensions/filters/http/mcp/v3/mcp.proto\x12$envoy.extensions.filters.http.mcp.v3\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xd1\n" +
 	"\n" +
 	"\x03Mcp\x12b\n" +
 	"\ftraffic_mode\x18\x01 \x01(\x0e25.envoy.extensions.filters.http.mcp.v3.Mcp.TrafficModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\vtrafficMode\x12*\n" +
-	"\x11clear_route_cache\x18\x02 \x01(\bR\x0fclearRouteCache\x12[\n" +
-	"\x15max_request_body_size\x18\x03 \x01(\v2\x1c.google.protobuf.UInt32ValueB\n" +
-	"\xfaB\a*\x05\x18\x80\x80\x80\x05R\x12maxRequestBodySize\x12W\n" +
+	"\x11clear_route_cache\x18\x02 \x01(\bR\x0fclearRouteCache\x12O\n" +
+	"\x15max_request_body_size\x18\x03 \x01(\v2\x1c.google.protobuf.UInt32ValueR\x12maxRequestBodySize\x12W\n" +
 	"\rparser_config\x18\x04 \x01(\v22.envoy.extensions.filters.http.mcp.v3.ParserConfigR\fparserConfig\x12x\n" +
 	"\x14request_storage_mode\x18\x05 \x01(\x0e2<.envoy.extensions.filters.http.mcp.v3.Mcp.RequestStorageModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\x12requestStorageMode\x12\x7f\n" +
 	"\x17propagate_trace_context\x18\x06 \x01(\v2G.envoy.extensions.filters.http.mcp.v3.Mcp.TraceContextPropagationConfigR\x15propagateTraceContext\x12o\n" +
@@ -774,11 +773,10 @@ const file_envoy_extensions_filters_http_mcp_v3_mcp_proto_rawDesc = "" +
 	"\fMethodConfig\x12\x1f\n" +
 	"\x06method\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x06method\x12\x14\n" +
 	"\x05group\x18\x02 \x01(\tR\x05group\x12u\n" +
-	"\x10extraction_rules\x18\x03 \x03(\v2J.envoy.extensions.filters.http.mcp.v3.ParserConfig.AttributeExtractionRuleR\x0fextractionRules\"\x81\x04\n" +
+	"\x10extraction_rules\x18\x03 \x03(\v2J.envoy.extensions.filters.http.mcp.v3.ParserConfig.AttributeExtractionRuleR\x0fextractionRules\"\xf5\x03\n" +
 	"\vMcpOverride\x12b\n" +
-	"\ftraffic_mode\x18\x01 \x01(\x0e25.envoy.extensions.filters.http.mcp.v3.Mcp.TrafficModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\vtrafficMode\x12[\n" +
-	"\x15max_request_body_size\x18\x02 \x01(\v2\x1c.google.protobuf.UInt32ValueB\n" +
-	"\xfaB\a*\x05\x18\x80\x80\x80\x05R\x12maxRequestBodySize\x12*\n" +
+	"\ftraffic_mode\x18\x01 \x01(\x0e25.envoy.extensions.filters.http.mcp.v3.Mcp.TrafficModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\vtrafficMode\x12O\n" +
+	"\x15max_request_body_size\x18\x02 \x01(\v2\x1c.google.protobuf.UInt32ValueR\x12maxRequestBodySize\x12*\n" +
 	"\x11clear_route_cache\x18\x03 \x01(\bR\x0fclearRouteCache\x12W\n" +
 	"\rparser_config\x18\x04 \x01(\v22.envoy.extensions.filters.http.mcp.v3.ParserConfigR\fparserConfig\x12x\n" +
 	"\x14request_storage_mode\x18\x05 \x01(\x0e2<.envoy.extensions.filters.http.mcp.v3.Mcp.RequestStorageModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\x12requestStorageMode\x122\n" +

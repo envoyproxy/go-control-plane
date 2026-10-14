@@ -70,19 +70,33 @@ func (m *Mcp) validate(all bool) error {
 
 	// no validation rules for ClearRouteCache
 
-	if wrapper := m.GetMaxRequestBodySize(); wrapper != nil {
-
-		if wrapper.GetValue() > 10485760 {
-			err := McpValidationError{
-				field:  "MaxRequestBodySize",
-				reason: "value must be less than or equal to 10485760",
+	if all {
+		switch v := interface{}(m.GetMaxRequestBodySize()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, McpValidationError{
+					field:  "MaxRequestBodySize",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
 			}
-			if !all {
-				return err
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, McpValidationError{
+					field:  "MaxRequestBodySize",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
 			}
-			errors = append(errors, err)
 		}
-
+	} else if v, ok := interface{}(m.GetMaxRequestBodySize()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return McpValidationError{
+				field:  "MaxRequestBodySize",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
 	}
 
 	if all {
@@ -499,19 +513,33 @@ func (m *McpOverride) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if wrapper := m.GetMaxRequestBodySize(); wrapper != nil {
-
-		if wrapper.GetValue() > 10485760 {
-			err := McpOverrideValidationError{
-				field:  "MaxRequestBodySize",
-				reason: "value must be less than or equal to 10485760",
+	if all {
+		switch v := interface{}(m.GetMaxRequestBodySize()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, McpOverrideValidationError{
+					field:  "MaxRequestBodySize",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
 			}
-			if !all {
-				return err
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, McpOverrideValidationError{
+					field:  "MaxRequestBodySize",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
 			}
-			errors = append(errors, err)
 		}
-
+	} else if v, ok := interface{}(m.GetMaxRequestBodySize()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return McpOverrideValidationError{
+				field:  "MaxRequestBodySize",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
 	}
 
 	// no validation rules for ClearRouteCache
