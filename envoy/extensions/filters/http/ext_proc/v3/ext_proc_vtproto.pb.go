@@ -53,6 +53,18 @@ func (m *ExternalProcessor) MarshalToSizedBufferVTStrict(dAtA []byte) (int, erro
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.MaxStreamedBodyChunkSize != nil {
+		size, err := (*wrapperspb.UInt32Value)(m.MaxStreamedBodyChunkSize).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xe2
+	}
 	if m.EmitClientSpan != nil {
 		size, err := (*wrapperspb.BoolValue)(m.EmitClientSpan).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -755,6 +767,16 @@ func (m *ExtProcOverrides) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.MaxStreamedBodyChunkSize != nil {
+		size, err := (*wrapperspb.UInt32Value)(m.MaxStreamedBodyChunkSize).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x5a
+	}
 	if m.EmitClientSpan != nil {
 		size, err := (*wrapperspb.BoolValue)(m.EmitClientSpan).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -1032,6 +1054,10 @@ func (m *ExternalProcessor) SizeVT() (n int) {
 		l = (*wrapperspb.BoolValue)(m.EmitClientSpan).SizeVT()
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
+	if m.MaxStreamedBodyChunkSize != nil {
+		l = (*wrapperspb.UInt32Value)(m.MaxStreamedBodyChunkSize).SizeVT()
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
 	n += len(m.unknownFields)
 	return n
 }
@@ -1233,6 +1259,10 @@ func (m *ExtProcOverrides) SizeVT() (n int) {
 	}
 	if m.EmitClientSpan != nil {
 		l = (*wrapperspb.BoolValue)(m.EmitClientSpan).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.MaxStreamedBodyChunkSize != nil {
+		l = (*wrapperspb.UInt32Value)(m.MaxStreamedBodyChunkSize).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
