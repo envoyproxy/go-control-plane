@@ -31,19 +31,26 @@ const (
 // Provider identity, when needed, must come from configuration or routing
 // metadata.
 //
+// Nor does it name how a provider carries the API on HTTP: Claude on the
+// Anthropic API and on Vertex AI both speak “ANTHROPIC_MESSAGES“, although
+// Vertex AI names the model in the path. An :ref:`LLMBinding
+// <envoy_v3_api_msg_type.ai.v3.LLMBinding>` describes such a difference, so a
+// value is added here only for an API with schemas of its own.
+//
 // Response framing is separate: JSON, SSE, and streamed JSON-array variants
 // of the same API share one “LLMProtocol“ value.
 type LLMProtocol int32
 
 const (
 	LLMProtocol_LLM_PROTOCOL_UNSPECIFIED LLMProtocol = 0
-	// OpenAI-compatible ``/v1/chat/completions`` API.
+	// OpenAI Chat Completions API, e.g. ``/v1/chat/completions`` on the OpenAI API.
 	LLMProtocol_OPENAI_CHAT_COMPLETIONS LLMProtocol = 1
-	// OpenAI-compatible ``/v1/responses`` API.
+	// OpenAI Responses API, e.g. ``/v1/responses`` on the OpenAI API.
 	LLMProtocol_OPENAI_RESPONSES LLMProtocol = 2
-	// Anthropic-compatible ``/v1/messages`` API.
+	// Anthropic Messages API, e.g. ``/v1/messages`` on the Anthropic API.
 	LLMProtocol_ANTHROPIC_MESSAGES LLMProtocol = 3
-	// Gemini ``generateContent`` / ``streamGenerateContent`` APIs.
+	// Gemini ``generateContent`` / ``streamGenerateContent`` APIs, e.g.
+	// ``/v1beta/models/{model}:generateContent`` on the Gemini API.
 	LLMProtocol_GEMINI_GENERATE_CONTENT LLMProtocol = 4
 )
 

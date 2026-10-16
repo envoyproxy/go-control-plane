@@ -690,7 +690,17 @@ type RequestPerRoute struct {
 	// [#comment: Normalization is not implemented yet; a normalization knob
 	// will be added here once the transformation and its output contract
 	// exist.]
-	LlmProtocol   v31.LLMProtocol `protobuf:"varint,1,opt,name=llm_protocol,json=llmProtocol,proto3,enum=envoy.type.ai.v3.LLMProtocol" json:"llm_protocol,omitempty"`
+	LlmProtocol v31.LLMProtocol `protobuf:"varint,1,opt,name=llm_protocol,json=llmProtocol,proto3,enum=envoy.type.ai.v3.LLMProtocol" json:"llm_protocol,omitempty"`
+	// How clients on this route carry ``llm_protocol`` on HTTP: the
+	// :ref:`binding <config_http_filters_ai_protocol_manager_transcoder_instructions>`
+	// the transcoder reads the client's path and body under. When unset, the
+	// client's path is read under the API's own binding and the bindings Envoy
+	// defines for it, so one route takes clients of the Anthropic API and of
+	// Claude on Vertex AI alike. It needs ``llm_protocol``, and lapses for a
+	// request that the ``envoy.ai.llm_protocol.request`` filter state object
+	// names another API for. The ``envoy.ai.binding.request`` filter state
+	// object replaces it for one request.
+	Binding       *v31.LLMBinding `protobuf:"bytes,2,opt,name=binding,proto3" json:"binding,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -732,13 +742,30 @@ func (x *RequestPerRoute) GetLlmProtocol() v31.LLMProtocol {
 	return v31.LLMProtocol(0)
 }
 
+func (x *RequestPerRoute) GetBinding() *v31.LLMBinding {
+	if x != nil {
+		return x.Binding
+	}
+	return nil
+}
+
 // Per-route response-side behavior.
 type ResponsePerRoute struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The wire API the response on this route follows. This can differ from
 	// ``request.llm_protocol`` when the gateway performs protocol translation.
 	// ``LLM_PROTOCOL_UNSPECIFIED`` falls through the precedence chain above.
-	LlmProtocol   v31.LLMProtocol `protobuf:"varint,1,opt,name=llm_protocol,json=llmProtocol,proto3,enum=envoy.type.ai.v3.LLMProtocol" json:"llm_protocol,omitempty"`
+	LlmProtocol v31.LLMProtocol `protobuf:"varint,1,opt,name=llm_protocol,json=llmProtocol,proto3,enum=envoy.type.ai.v3.LLMProtocol" json:"llm_protocol,omitempty"`
+	// How the backend carries its API on HTTP: the
+	// :ref:`binding <config_http_filters_ai_protocol_manager_transcoder_instructions>`
+	// the transcoder renders the request's path from and applies to its body.
+	// When unset, a request whose backend speaks the client's API leaves in the
+	// binding it arrived in, and any other request in the backend API's own.
+	// It needs ``llm_protocol``, and lapses for a request that the
+	// ``envoy.ai.llm_protocol.response`` filter state object names another API
+	// for. The ``envoy.ai.binding.response`` filter state object replaces it for
+	// one request.
+	Binding       *v31.LLMBinding `protobuf:"bytes,2,opt,name=binding,proto3" json:"binding,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -780,11 +807,18 @@ func (x *ResponsePerRoute) GetLlmProtocol() v31.LLMProtocol {
 	return v31.LLMProtocol(0)
 }
 
+func (x *ResponsePerRoute) GetBinding() *v31.LLMBinding {
+	if x != nil {
+		return x.Binding
+	}
+	return nil
+}
+
 var File_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_rawDesc = "" +
 	"\n" +
-	"Nenvoy/extensions/filters/http/ai_protocol_manager/v3/ai_protocol_manager.proto\x124envoy.extensions.filters.http.ai_protocol_manager.v3\x1a$envoy/config/core/v3/extension.proto\x1a#envoy/type/ai/v3/llm_protocol.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xa2\x03\n" +
+	"Nenvoy/extensions/filters/http/ai_protocol_manager/v3/ai_protocol_manager.proto\x124envoy.extensions.filters.http.ai_protocol_manager.v3\x1a$envoy/config/core/v3/extension.proto\x1a\"envoy/type/ai/v3/llm_binding.proto\x1a#envoy/type/ai/v3/llm_protocol.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xa2\x03\n" +
 	"\x11AiProtocolManager\x12p\n" +
 	"\x10request_handling\x18\x01 \x01(\v2E.envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandlingR\x0frequestHandling\x12s\n" +
 	"\x11response_handling\x18\x02 \x01(\v2F.envoy.extensions.filters.http.ai_protocol_manager.v3.ResponseHandlingR\x10responseHandling\x12D\n" +
@@ -818,11 +852,13 @@ const file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_mana
 	"\x15max_parsed_sse_events\x18\x03 \x01(\v2\x1c.google.protobuf.UInt32ValueB\a\xfaB\x04*\x02(\x01R\x12maxParsedSseEvents\"\xe0\x01\n" +
 	"\x19AiProtocolManagerPerRoute\x12_\n" +
 	"\arequest\x18\x01 \x01(\v2E.envoy.extensions.filters.http.ai_protocol_manager.v3.RequestPerRouteR\arequest\x12b\n" +
-	"\bresponse\x18\x02 \x01(\v2F.envoy.extensions.filters.http.ai_protocol_manager.v3.ResponsePerRouteR\bresponse\"]\n" +
+	"\bresponse\x18\x02 \x01(\v2F.envoy.extensions.filters.http.ai_protocol_manager.v3.ResponsePerRouteR\bresponse\"\x95\x01\n" +
 	"\x0fRequestPerRoute\x12J\n" +
-	"\fllm_protocol\x18\x01 \x01(\x0e2\x1d.envoy.type.ai.v3.LLMProtocolB\b\xfaB\x05\x82\x01\x02\x10\x01R\vllmProtocol\"^\n" +
+	"\fllm_protocol\x18\x01 \x01(\x0e2\x1d.envoy.type.ai.v3.LLMProtocolB\b\xfaB\x05\x82\x01\x02\x10\x01R\vllmProtocol\x126\n" +
+	"\abinding\x18\x02 \x01(\v2\x1c.envoy.type.ai.v3.LLMBindingR\abinding\"\x96\x01\n" +
 	"\x10ResponsePerRoute\x12J\n" +
-	"\fllm_protocol\x18\x01 \x01(\x0e2\x1d.envoy.type.ai.v3.LLMProtocolB\b\xfaB\x05\x82\x01\x02\x10\x01R\vllmProtocolB\xe1\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
+	"\fllm_protocol\x18\x01 \x01(\x0e2\x1d.envoy.type.ai.v3.LLMProtocolB\b\xfaB\x05\x82\x01\x02\x10\x01R\vllmProtocol\x126\n" +
+	"\abinding\x18\x02 \x01(\v2\x1c.envoy.type.ai.v3.LLMBindingR\abindingB\xe1\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
 	"Bio.envoyproxy.envoy.extensions.filters.http.ai_protocol_manager.v3B\x16AiProtocolManagerProtoP\x01Zqgithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/ai_protocol_manager/v3;ai_protocol_managerv3b\x06proto3"
 
 var (
@@ -854,6 +890,7 @@ var file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manage
 	(*v3.TypedExtensionConfig)(nil),          // 11: envoy.config.core.v3.TypedExtensionConfig
 	(*wrapperspb.UInt32Value)(nil),           // 12: google.protobuf.UInt32Value
 	(v31.LLMProtocol)(0),                     // 13: envoy.type.ai.v3.LLMProtocol
+	(*v31.LLMBinding)(nil),                   // 14: envoy.type.ai.v3.LLMBinding
 }
 var file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manager_proto_depIdxs = []int32{
 	3,  // 0: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManager.request_handling:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.RequestHandling
@@ -873,12 +910,14 @@ var file_envoy_extensions_filters_http_ai_protocol_manager_v3_ai_protocol_manage
 	9,  // 14: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute.request:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.RequestPerRoute
 	10, // 15: envoy.extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute.response:type_name -> envoy.extensions.filters.http.ai_protocol_manager.v3.ResponsePerRoute
 	13, // 16: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestPerRoute.llm_protocol:type_name -> envoy.type.ai.v3.LLMProtocol
-	13, // 17: envoy.extensions.filters.http.ai_protocol_manager.v3.ResponsePerRoute.llm_protocol:type_name -> envoy.type.ai.v3.LLMProtocol
-	18, // [18:18] is the sub-list for method output_type
-	18, // [18:18] is the sub-list for method input_type
-	18, // [18:18] is the sub-list for extension type_name
-	18, // [18:18] is the sub-list for extension extendee
-	0,  // [0:18] is the sub-list for field type_name
+	14, // 17: envoy.extensions.filters.http.ai_protocol_manager.v3.RequestPerRoute.binding:type_name -> envoy.type.ai.v3.LLMBinding
+	13, // 18: envoy.extensions.filters.http.ai_protocol_manager.v3.ResponsePerRoute.llm_protocol:type_name -> envoy.type.ai.v3.LLMProtocol
+	14, // 19: envoy.extensions.filters.http.ai_protocol_manager.v3.ResponsePerRoute.binding:type_name -> envoy.type.ai.v3.LLMBinding
+	20, // [20:20] is the sub-list for method output_type
+	20, // [20:20] is the sub-list for method input_type
+	20, // [20:20] is the sub-list for extension type_name
+	20, // [20:20] is the sub-list for extension extendee
+	0,  // [0:20] is the sub-list for field type_name
 }
 
 func init() {

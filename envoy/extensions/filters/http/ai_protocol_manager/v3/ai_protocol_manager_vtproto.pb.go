@@ -480,6 +480,28 @@ func (m *RequestPerRoute) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error)
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.Binding != nil {
+		if vtmsg, ok := interface{}(m.Binding).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.Binding)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
 	if m.LlmProtocol != 0 {
 		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.LlmProtocol))
 		i--
@@ -517,6 +539,28 @@ func (m *ResponsePerRoute) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.Binding != nil {
+		if vtmsg, ok := interface{}(m.Binding).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.Binding)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+		}
+		i--
+		dAtA[i] = 0x12
 	}
 	if m.LlmProtocol != 0 {
 		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.LlmProtocol))
@@ -690,6 +734,16 @@ func (m *RequestPerRoute) SizeVT() (n int) {
 	if m.LlmProtocol != 0 {
 		n += 1 + protohelpers.SizeOfVarint(uint64(m.LlmProtocol))
 	}
+	if m.Binding != nil {
+		if size, ok := interface{}(m.Binding).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.Binding)
+		}
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
 	n += len(m.unknownFields)
 	return n
 }
@@ -702,6 +756,16 @@ func (m *ResponsePerRoute) SizeVT() (n int) {
 	_ = l
 	if m.LlmProtocol != 0 {
 		n += 1 + protohelpers.SizeOfVarint(uint64(m.LlmProtocol))
+	}
+	if m.Binding != nil {
+		if size, ok := interface{}(m.Binding).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.Binding)
+		}
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
