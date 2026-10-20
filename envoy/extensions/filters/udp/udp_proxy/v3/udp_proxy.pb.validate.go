@@ -336,6 +336,35 @@ func (m *UdpProxyConfig) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetUpstreamPacketWriterConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UdpProxyConfigValidationError{
+					field:  "UpstreamPacketWriterConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UdpProxyConfigValidationError{
+					field:  "UpstreamPacketWriterConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetUpstreamPacketWriterConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UdpProxyConfigValidationError{
+				field:  "UpstreamPacketWriterConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	oneofRouteSpecifierPresent := false
 	switch v := m.RouteSpecifier.(type) {
 	case *UdpProxyConfig_Cluster:

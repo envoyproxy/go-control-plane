@@ -32,7 +32,7 @@ const (
 )
 
 // Configuration for the UDP proxy filter.
-// [#next-free-field: 14]
+// [#next-free-field: 15]
 type UdpProxyConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The stat prefix used when emitting UDP proxy filter stats.
@@ -86,8 +86,15 @@ type UdpProxyConfig struct {
 	TunnelingConfig *UdpProxyConfig_UdpTunnelingConfig `protobuf:"bytes,12,opt,name=tunneling_config,json=tunnelingConfig,proto3" json:"tunneling_config,omitempty"`
 	// Additional access log options for UDP Proxy.
 	AccessLogOptions *UdpProxyConfig_UdpAccessLogOptions `protobuf:"bytes,13,opt,name=access_log_options,json=accessLogOptions,proto3" json:"access_log_options,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// Configuration for the upstream UDP packet writer. If unset, datagrams are sent individually.
+	// Independent of the downstream :ref:`udp_packet_packet_writer_config
+	// <envoy_v3_api_field_config.listener.v3.UdpListenerConfig.udp_packet_packet_writer_config>`
+	// and incompatible with
+	// :ref:`tunneling_config <envoy_v3_api_field_extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.tunneling_config>`.
+	// [#extension-category: envoy.udp_packet_writer]
+	UpstreamPacketWriterConfig *v3.TypedExtensionConfig `protobuf:"bytes,14,opt,name=upstream_packet_writer_config,json=upstreamPacketWriterConfig,proto3" json:"upstream_packet_writer_config,omitempty"`
+	unknownFields              protoimpl.UnknownFields
+	sizeCache                  protoimpl.SizeCache
 }
 
 func (x *UdpProxyConfig) Reset() {
@@ -219,6 +226,13 @@ func (x *UdpProxyConfig) GetTunnelingConfig() *UdpProxyConfig_UdpTunnelingConfig
 func (x *UdpProxyConfig) GetAccessLogOptions() *UdpProxyConfig_UdpAccessLogOptions {
 	if x != nil {
 		return x.AccessLogOptions
+	}
+	return nil
+}
+
+func (x *UdpProxyConfig) GetUpstreamPacketWriterConfig() *v3.TypedExtensionConfig {
+	if x != nil {
+		return x.UpstreamPacketWriterConfig
 	}
 	return nil
 }
@@ -808,7 +822,7 @@ var File_envoy_extensions_filters_udp_udp_proxy_v3_udp_proxy_proto protoreflect.
 
 const file_envoy_extensions_filters_udp_udp_proxy_v3_udp_proxy_proto_rawDesc = "" +
 	"\n" +
-	"9envoy/extensions/filters/udp/udp_proxy/v3/udp_proxy.proto\x12)envoy.extensions.filters.udp.udp_proxy.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a\"envoy/config/core/v3/backoff.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a$envoy/config/core/v3/extension.proto\x1a,envoy/config/core/v3/udp_socket_config.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xb5\x16\n" +
+	"9envoy/extensions/filters/udp/udp_proxy/v3/udp_proxy.proto\x12)envoy.extensions.filters.udp.udp_proxy.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a\"envoy/config/core/v3/backoff.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a$envoy/config/core/v3/extension.proto\x1a,envoy/config/core/v3/udp_socket_config.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xa4\x17\n" +
 	"\x0eUdpProxyConfig\x12(\n" +
 	"\vstat_prefix\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\n" +
 	"statPrefix\x12.\n" +
@@ -825,7 +839,8 @@ const file_envoy_extensions_filters_udp_udp_proxy_v3_udp_proxy_proto_rawDesc = "
 	" \x03(\v2$.envoy.config.accesslog.v3.AccessLogR\x0eproxyAccessLog\x12p\n" +
 	"\x0fsession_filters\x18\v \x03(\v2G.envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.SessionFilterR\x0esessionFilters\x12w\n" +
 	"\x10tunneling_config\x18\f \x01(\v2L.envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpTunnelingConfigR\x0ftunnelingConfig\x12{\n" +
-	"\x12access_log_options\x18\r \x01(\v2M.envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpAccessLogOptionsR\x10accessLogOptions\x1aj\n" +
+	"\x12access_log_options\x18\r \x01(\v2M.envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpAccessLogOptionsR\x10accessLogOptions\x12m\n" +
+	"\x1dupstream_packet_writer_config\x18\x0e \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigR\x1aupstreamPacketWriterConfig\x1aj\n" +
 	"\n" +
 	"HashPolicy\x12&\n" +
 	"\tsource_ip\x18\x01 \x01(\bB\a\xfaB\x04j\x02\b\x01H\x00R\bsourceIp\x12\x1b\n" +
@@ -893,11 +908,11 @@ var file_envoy_extensions_filters_udp_udp_proxy_v3_udp_proxy_proto_goTypes = []a
 	(*durationpb.Duration)(nil),                             // 8: google.protobuf.Duration
 	(*v3.UdpSocketConfig)(nil),                              // 9: envoy.config.core.v3.UdpSocketConfig
 	(*v31.AccessLog)(nil),                                   // 10: envoy.config.accesslog.v3.AccessLog
-	(*anypb.Any)(nil),                                       // 11: google.protobuf.Any
-	(*v3.ExtensionConfigSource)(nil),                        // 12: envoy.config.core.v3.ExtensionConfigSource
-	(*wrapperspb.UInt32Value)(nil),                          // 13: google.protobuf.UInt32Value
-	(*v3.HeaderValueOption)(nil),                            // 14: envoy.config.core.v3.HeaderValueOption
-	(*v3.TypedExtensionConfig)(nil),                         // 15: envoy.config.core.v3.TypedExtensionConfig
+	(*v3.TypedExtensionConfig)(nil),                         // 11: envoy.config.core.v3.TypedExtensionConfig
+	(*anypb.Any)(nil),                                       // 12: google.protobuf.Any
+	(*v3.ExtensionConfigSource)(nil),                        // 13: envoy.config.core.v3.ExtensionConfigSource
+	(*wrapperspb.UInt32Value)(nil),                          // 14: google.protobuf.UInt32Value
+	(*v3.HeaderValueOption)(nil),                            // 15: envoy.config.core.v3.HeaderValueOption
 	(*wrapperspb.UInt64Value)(nil),                          // 16: google.protobuf.UInt64Value
 	(*v3.BackoffStrategy)(nil),                              // 17: envoy.config.core.v3.BackoffStrategy
 }
@@ -911,23 +926,24 @@ var file_envoy_extensions_filters_udp_udp_proxy_v3_udp_proxy_proto_depIdxs = []i
 	2,  // 6: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.session_filters:type_name -> envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.SessionFilter
 	3,  // 7: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.tunneling_config:type_name -> envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpTunnelingConfig
 	4,  // 8: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.access_log_options:type_name -> envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpAccessLogOptions
-	11, // 9: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.SessionFilter.typed_config:type_name -> google.protobuf.Any
-	12, // 10: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.SessionFilter.config_discovery:type_name -> envoy.config.core.v3.ExtensionConfigSource
-	13, // 11: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpTunnelingConfig.proxy_port:type_name -> google.protobuf.UInt32Value
-	6,  // 12: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpTunnelingConfig.retry_options:type_name -> envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpTunnelingConfig.RetryOptions
-	14, // 13: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpTunnelingConfig.headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
-	5,  // 14: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpTunnelingConfig.buffer_options:type_name -> envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpTunnelingConfig.BufferOptions
-	15, // 15: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpTunnelingConfig.formatters:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	8,  // 16: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpAccessLogOptions.access_log_flush_interval:type_name -> google.protobuf.Duration
-	13, // 17: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpTunnelingConfig.BufferOptions.max_buffered_datagrams:type_name -> google.protobuf.UInt32Value
-	16, // 18: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpTunnelingConfig.BufferOptions.max_buffered_bytes:type_name -> google.protobuf.UInt64Value
-	13, // 19: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpTunnelingConfig.RetryOptions.max_connect_attempts:type_name -> google.protobuf.UInt32Value
-	17, // 20: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpTunnelingConfig.RetryOptions.backoff_options:type_name -> envoy.config.core.v3.BackoffStrategy
-	21, // [21:21] is the sub-list for method output_type
-	21, // [21:21] is the sub-list for method input_type
-	21, // [21:21] is the sub-list for extension type_name
-	21, // [21:21] is the sub-list for extension extendee
-	0,  // [0:21] is the sub-list for field type_name
+	11, // 9: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.upstream_packet_writer_config:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	12, // 10: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.SessionFilter.typed_config:type_name -> google.protobuf.Any
+	13, // 11: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.SessionFilter.config_discovery:type_name -> envoy.config.core.v3.ExtensionConfigSource
+	14, // 12: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpTunnelingConfig.proxy_port:type_name -> google.protobuf.UInt32Value
+	6,  // 13: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpTunnelingConfig.retry_options:type_name -> envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpTunnelingConfig.RetryOptions
+	15, // 14: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpTunnelingConfig.headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
+	5,  // 15: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpTunnelingConfig.buffer_options:type_name -> envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpTunnelingConfig.BufferOptions
+	11, // 16: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpTunnelingConfig.formatters:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	8,  // 17: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpAccessLogOptions.access_log_flush_interval:type_name -> google.protobuf.Duration
+	14, // 18: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpTunnelingConfig.BufferOptions.max_buffered_datagrams:type_name -> google.protobuf.UInt32Value
+	16, // 19: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpTunnelingConfig.BufferOptions.max_buffered_bytes:type_name -> google.protobuf.UInt64Value
+	14, // 20: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpTunnelingConfig.RetryOptions.max_connect_attempts:type_name -> google.protobuf.UInt32Value
+	17, // 21: envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig.UdpTunnelingConfig.RetryOptions.backoff_options:type_name -> envoy.config.core.v3.BackoffStrategy
+	22, // [22:22] is the sub-list for method output_type
+	22, // [22:22] is the sub-list for method input_type
+	22, // [22:22] is the sub-list for extension type_name
+	22, // [22:22] is the sub-list for extension extendee
+	0,  // [0:22] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_udp_udp_proxy_v3_udp_proxy_proto_init() }

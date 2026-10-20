@@ -581,6 +581,28 @@ func (m *UdpProxyConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) 
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.UpstreamPacketWriterConfig != nil {
+		if vtmsg, ok := interface{}(m.UpstreamPacketWriterConfig).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.UpstreamPacketWriterConfig)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+		}
+		i--
+		dAtA[i] = 0x72
+	}
 	if m.AccessLogOptions != nil {
 		size, err := m.AccessLogOptions.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -1085,6 +1107,16 @@ func (m *UdpProxyConfig) SizeVT() (n int) {
 	}
 	if m.AccessLogOptions != nil {
 		l = m.AccessLogOptions.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.UpstreamPacketWriterConfig != nil {
+		if size, ok := interface{}(m.UpstreamPacketWriterConfig).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.UpstreamPacketWriterConfig)
+		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
