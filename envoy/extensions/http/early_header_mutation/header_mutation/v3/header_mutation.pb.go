@@ -9,6 +9,7 @@ package header_mutationv3
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/common/mutation_rules/v3"
+	v31 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -26,8 +27,13 @@ const (
 
 // This extension allows for early header mutation by the substitution formatter.
 type HeaderMutation struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Mutations     []*v3.HeaderMutation   `protobuf:"bytes,1,rep,name=mutations,proto3" json:"mutations,omitempty"`
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	Mutations []*v3.HeaderMutation   `protobuf:"bytes,1,rep,name=mutations,proto3" json:"mutations,omitempty"`
+	// Formatter command parsers used for header values. Built-in command parsers are available
+	// without this field; use it to add extension parsers or override a built-in parser's
+	// configuration.
+	// [#extension-category: envoy.formatter]
+	Formatters    []*v31.TypedExtensionConfig `protobuf:"bytes,2,rep,name=formatters,proto3" json:"formatters,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -69,13 +75,23 @@ func (x *HeaderMutation) GetMutations() []*v3.HeaderMutation {
 	return nil
 }
 
+func (x *HeaderMutation) GetFormatters() []*v31.TypedExtensionConfig {
+	if x != nil {
+		return x.Formatters
+	}
+	return nil
+}
+
 var File_envoy_extensions_http_early_header_mutation_header_mutation_v3_header_mutation_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_http_early_header_mutation_header_mutation_v3_header_mutation_proto_rawDesc = "" +
 	"\n" +
-	"Tenvoy/extensions/http/early_header_mutation/header_mutation/v3/header_mutation.proto\x12>envoy.extensions.http.early_header_mutation.header_mutation.v3\x1a:envoy/config/common/mutation_rules/v3/mutation_rules.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"o\n" +
+	"Tenvoy/extensions/http/early_header_mutation/header_mutation/v3/header_mutation.proto\x12>envoy.extensions.http.early_header_mutation.header_mutation.v3\x1a:envoy/config/common/mutation_rules/v3/mutation_rules.proto\x1a$envoy/config/core/v3/extension.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xbb\x01\n" +
 	"\x0eHeaderMutation\x12]\n" +
-	"\tmutations\x18\x01 \x03(\v25.envoy.config.common.mutation_rules.v3.HeaderMutationB\b\xfaB\x05\x92\x01\x02\b\x01R\tmutationsB\xe6\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\tmutations\x18\x01 \x03(\v25.envoy.config.common.mutation_rules.v3.HeaderMutationB\b\xfaB\x05\x92\x01\x02\b\x01R\tmutations\x12J\n" +
+	"\n" +
+	"formatters\x18\x02 \x03(\v2*.envoy.config.core.v3.TypedExtensionConfigR\n" +
+	"formattersB\xe6\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"Lio.envoyproxy.envoy.extensions.http.early_header_mutation.header_mutation.v3B\x13HeaderMutationProtoP\x01Zwgithub.com/envoyproxy/go-control-plane/envoy/extensions/http/early_header_mutation/header_mutation/v3;header_mutationv3b\x06proto3"
 
 var (
@@ -92,16 +108,18 @@ func file_envoy_extensions_http_early_header_mutation_header_mutation_v3_header_
 
 var file_envoy_extensions_http_early_header_mutation_header_mutation_v3_header_mutation_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_envoy_extensions_http_early_header_mutation_header_mutation_v3_header_mutation_proto_goTypes = []any{
-	(*HeaderMutation)(nil),    // 0: envoy.extensions.http.early_header_mutation.header_mutation.v3.HeaderMutation
-	(*v3.HeaderMutation)(nil), // 1: envoy.config.common.mutation_rules.v3.HeaderMutation
+	(*HeaderMutation)(nil),           // 0: envoy.extensions.http.early_header_mutation.header_mutation.v3.HeaderMutation
+	(*v3.HeaderMutation)(nil),        // 1: envoy.config.common.mutation_rules.v3.HeaderMutation
+	(*v31.TypedExtensionConfig)(nil), // 2: envoy.config.core.v3.TypedExtensionConfig
 }
 var file_envoy_extensions_http_early_header_mutation_header_mutation_v3_header_mutation_proto_depIdxs = []int32{
 	1, // 0: envoy.extensions.http.early_header_mutation.header_mutation.v3.HeaderMutation.mutations:type_name -> envoy.config.common.mutation_rules.v3.HeaderMutation
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	2, // 1: envoy.extensions.http.early_header_mutation.header_mutation.v3.HeaderMutation.formatters:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() {
