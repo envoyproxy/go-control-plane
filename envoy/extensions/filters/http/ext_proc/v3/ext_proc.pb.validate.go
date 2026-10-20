@@ -520,21 +520,6 @@ func (m *ExternalProcessor) validate(all bool) error {
 		}
 	}
 
-	if wrapper := m.GetMaxStreamedBodyChunkSize(); wrapper != nil {
-
-		if wrapper.GetValue() < 1024 {
-			err := ExternalProcessorValidationError{
-				field:  "MaxStreamedBodyChunkSize",
-				reason: "value must be greater than or equal to 1024",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-	}
-
 	if len(errors) > 0 {
 		return ExternalProcessorMultiError(errors)
 	}
@@ -1505,21 +1490,6 @@ func (m *ExtProcOverrides) validate(all bool) error {
 				cause:  err,
 			}
 		}
-	}
-
-	if wrapper := m.GetMaxStreamedBodyChunkSize(); wrapper != nil {
-
-		if wrapper.GetValue() < 1024 {
-			err := ExtProcOverridesValidationError{
-				field:  "MaxStreamedBodyChunkSize",
-				reason: "value must be greater than or equal to 1024",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
 	}
 
 	if len(errors) > 0 {

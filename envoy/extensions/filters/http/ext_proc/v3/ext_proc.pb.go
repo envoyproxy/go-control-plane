@@ -156,7 +156,7 @@ func (ExternalProcessor_RouteCacheAction) EnumDescriptor() ([]byte, []int) {
 // <arch_overview_advanced_filter_state_sharing>` object in a namespace matching the filter
 // name.
 //
-// [#next-free-field: 29]
+// [#next-free-field: 28]
 type ExternalProcessor struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Configuration for the gRPC service that the filter will communicate with.
@@ -390,12 +390,8 @@ type ExternalProcessor struct {
 	//
 	// If unset, defaults to ``true``.
 	EmitClientSpan *wrapperspb.BoolValue `protobuf:"bytes,27,opt,name=emit_client_span,json=emitClientSpan,proto3" json:"emit_client_span,omitempty"`
-	// Maximum size of a body chunk sent to the external processor in ``STREAMED`` or
-	// ``FULL_DUPLEX_STREAMED`` mode. Must be at least 1024 bytes.
-	// If not specified, all body data passed in a given encodeData() or decodeData() call will be sent in a single chunk.
-	MaxStreamedBodyChunkSize *wrapperspb.UInt32Value `protobuf:"bytes,28,opt,name=max_streamed_body_chunk_size,json=maxStreamedBodyChunkSize,proto3" json:"max_streamed_body_chunk_size,omitempty"`
-	unknownFields            protoimpl.UnknownFields
-	sizeCache                protoimpl.SizeCache
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *ExternalProcessor) Reset() {
@@ -606,13 +602,6 @@ func (x *ExternalProcessor) GetAllowContentLengthHeader() bool {
 func (x *ExternalProcessor) GetEmitClientSpan() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.EmitClientSpan
-	}
-	return nil
-}
-
-func (x *ExternalProcessor) GetMaxStreamedBodyChunkSize() *wrapperspb.UInt32Value {
-	if x != nil {
-		return x.MaxStreamedBodyChunkSize
 	}
 	return nil
 }
@@ -894,7 +883,7 @@ func (*ExtProcPerRoute_Disabled) isExtProcPerRoute_Override() {}
 func (*ExtProcPerRoute_Overrides) isExtProcPerRoute_Override() {}
 
 // Overrides that may be set on a per-route basis
-// [#next-free-field: 12]
+// [#next-free-field: 11]
 type ExtProcOverrides struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Set a different processing mode for this route than the default.
@@ -937,14 +926,8 @@ type ExtProcOverrides struct {
 	ProcessingRequestModifier *v3.TypedExtensionConfig `protobuf:"bytes,9,opt,name=processing_request_modifier,json=processingRequestModifier,proto3" json:"processing_request_modifier,omitempty"`
 	// Overrides the filter-level ``emit_client_span`` setting for this route.
 	EmitClientSpan *wrapperspb.BoolValue `protobuf:"bytes,10,opt,name=emit_client_span,json=emitClientSpan,proto3" json:"emit_client_span,omitempty"`
-	// Maximum size of a body chunk sent to the external processor in ``STREAMED`` or
-	// ``FULL_DUPLEX_STREAMED`` mode. Must be at least 1024 bytes.
-	// If not specified, all body data passed in a given encodeData() or decodeData() call will be sent in a single chunk.
-	// This is a per-route override of
-	// :ref:`max_streamed_body_chunk_size <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.max_streamed_body_chunk_size>`.
-	MaxStreamedBodyChunkSize *wrapperspb.UInt32Value `protobuf:"bytes,11,opt,name=max_streamed_body_chunk_size,json=maxStreamedBodyChunkSize,proto3" json:"max_streamed_body_chunk_size,omitempty"`
-	unknownFields            protoimpl.UnknownFields
-	sizeCache                protoimpl.SizeCache
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *ExtProcOverrides) Reset() {
@@ -1048,13 +1031,6 @@ func (x *ExtProcOverrides) GetEmitClientSpan() *wrapperspb.BoolValue {
 	return nil
 }
 
-func (x *ExtProcOverrides) GetMaxStreamedBodyChunkSize() *wrapperspb.UInt32Value {
-	if x != nil {
-		return x.MaxStreamedBodyChunkSize
-	}
-	return nil
-}
-
 type MetadataOptions_MetadataNamespaces struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Specifies a list of metadata namespaces whose values, if present,
@@ -1117,7 +1093,7 @@ var File_envoy_extensions_filters_http_ext_proc_v3_ext_proc_proto protoreflect.F
 
 const file_envoy_extensions_filters_http_ext_proc_v3_ext_proc_proto_rawDesc = "" +
 	"\n" +
-	"8envoy/extensions/filters/http/ext_proc/v3/ext_proc.proto\x12)envoy.extensions.filters.http.ext_proc.v3\x1a:envoy/config/common/mutation_rules/v3/mutation_rules.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a$envoy/config/core/v3/extension.proto\x1a'envoy/config/core/v3/grpc_service.proto\x1a'envoy/config/core/v3/http_service.proto\x1a?envoy/extensions/filters/http/ext_proc/v3/processing_mode.proto\x1a\"envoy/type/matcher/v3/string.proto\x1a\x1fenvoy/type/v3/http_status.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1eudpa/annotations/migrate.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xc9\x12\n" +
+	"8envoy/extensions/filters/http/ext_proc/v3/ext_proc.proto\x12)envoy.extensions.filters.http.ext_proc.v3\x1a:envoy/config/common/mutation_rules/v3/mutation_rules.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a$envoy/config/core/v3/extension.proto\x1a'envoy/config/core/v3/grpc_service.proto\x1a'envoy/config/core/v3/http_service.proto\x1a?envoy/extensions/filters/http/ext_proc/v3/processing_mode.proto\x1a\"envoy/type/matcher/v3/string.proto\x1a\x1fenvoy/type/v3/http_status.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1eudpa/annotations/migrate.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xe1\x11\n" +
 	"\x11ExternalProcessor\x12c\n" +
 	"\fgrpc_service\x18\x01 \x01(\v2!.envoy.config.core.v3.GrpcServiceB\x1d\xf2\x98\xfe\x8f\x05\x17\x12\x15ext_proc_service_typeR\vgrpcService\x12\x87\x01\n" +
 	"\fhttp_service\x18\x14 \x01(\v2=.envoy.extensions.filters.http.ext_proc.v3.ExtProcHttpServiceB%\xf2\x98\xfe\x8f\x05\x17\x12\x15ext_proc_service_type\xd2Ƥ\xe1\x06\x02\b\x01R\vhttpService\x12,\n" +
@@ -1148,8 +1124,7 @@ const file_envoy_extensions_filters_http_ext_proc_v3_ext_proc_proto_rawDesc = ""
 	"\x16on_processing_response\x18\x17 \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigB\b\xd2Ƥ\xe1\x06\x02\b\x01R\x14onProcessingResponse\x12A\n" +
 	"\x0fstatus_on_error\x18\x18 \x01(\v2\x19.envoy.type.v3.HttpStatusR\rstatusOnError\x12=\n" +
 	"\x1ballow_content_length_header\x18\x1a \x01(\bR\x18allowContentLengthHeader\x12D\n" +
-	"\x10emit_client_span\x18\x1b \x01(\v2\x1a.google.protobuf.BoolValueR\x0eemitClientSpan\x12f\n" +
-	"\x1cmax_streamed_body_chunk_size\x18\x1c \x01(\v2\x1c.google.protobuf.UInt32ValueB\b\xfaB\x05*\x03(\x80\bR\x18maxStreamedBodyChunkSize\"6\n" +
+	"\x10emit_client_span\x18\x1b \x01(\v2\x1a.google.protobuf.BoolValueR\x0eemitClientSpan\"6\n" +
 	"\x10RouteCacheAction\x12\v\n" +
 	"\aDEFAULT\x10\x00\x12\t\n" +
 	"\x05CLEAR\x10\x01\x12\n" +
@@ -1171,7 +1146,7 @@ const file_envoy_extensions_filters_http_ext_proc_v3_ext_proc_proto_rawDesc = ""
 	"\x0fExtProcPerRoute\x12%\n" +
 	"\bdisabled\x18\x01 \x01(\bB\a\xfaB\x04j\x02\b\x01H\x00R\bdisabled\x12[\n" +
 	"\toverrides\x18\x02 \x01(\v2;.envoy.extensions.filters.http.ext_proc.v3.ExtProcOverridesH\x00R\toverridesB\x0f\n" +
-	"\boverride\x12\x03\xf8B\x01\"\xf4\x06\n" +
+	"\boverride\x12\x03\xf8B\x01\"\x8c\x06\n" +
 	"\x10ExtProcOverrides\x12b\n" +
 	"\x0fprocessing_mode\x18\x01 \x01(\v29.envoy.extensions.filters.http.ext_proc.v3.ProcessingModeR\x0eprocessingMode\x12*\n" +
 	"\n" +
@@ -1184,8 +1159,7 @@ const file_envoy_extensions_filters_http_ext_proc_v3_ext_proc_proto_rawDesc = ""
 	"\x12failure_mode_allow\x18\b \x01(\v2\x1a.google.protobuf.BoolValueR\x10failureModeAllow\x12t\n" +
 	"\x1bprocessing_request_modifier\x18\t \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigB\b\xd2Ƥ\xe1\x06\x02\b\x01R\x19processingRequestModifier\x12D\n" +
 	"\x10emit_client_span\x18\n" +
-	" \x01(\v2\x1a.google.protobuf.BoolValueR\x0eemitClientSpan\x12f\n" +
-	"\x1cmax_streamed_body_chunk_size\x18\v \x01(\v2\x1c.google.protobuf.UInt32ValueB\b\xfaB\x05*\x03(\x80\bR\x18maxStreamedBodyChunkSizeB\xae\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	" \x01(\v2\x1a.google.protobuf.BoolValueR\x0eemitClientSpanB\xae\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"7io.envoyproxy.envoy.extensions.filters.http.ext_proc.v3B\fExtProcProtoP\x01Z[github.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/ext_proc/v3;ext_procv3b\x06proto3"
 
 var (
@@ -1219,10 +1193,9 @@ var file_envoy_extensions_filters_http_ext_proc_v3_ext_proc_proto_goTypes = []an
 	(*v3.TypedExtensionConfig)(nil),            // 13: envoy.config.core.v3.TypedExtensionConfig
 	(*v32.HttpStatus)(nil),                     // 14: envoy.type.v3.HttpStatus
 	(*wrapperspb.BoolValue)(nil),               // 15: google.protobuf.BoolValue
-	(*wrapperspb.UInt32Value)(nil),             // 16: google.protobuf.UInt32Value
-	(*v3.HttpService)(nil),                     // 17: envoy.config.core.v3.HttpService
-	(*v33.ListStringMatcher)(nil),              // 18: envoy.type.matcher.v3.ListStringMatcher
-	(*v3.HeaderValue)(nil),                     // 19: envoy.config.core.v3.HeaderValue
+	(*v3.HttpService)(nil),                     // 16: envoy.config.core.v3.HttpService
+	(*v33.ListStringMatcher)(nil),              // 17: envoy.type.matcher.v3.ListStringMatcher
+	(*v3.HeaderValue)(nil),                     // 18: envoy.config.core.v3.HeaderValue
 }
 var file_envoy_extensions_filters_http_ext_proc_v3_ext_proc_proto_depIdxs = []int32{
 	8,  // 0: envoy.extensions.filters.http.ext_proc.v3.ExternalProcessor.grpc_service:type_name -> envoy.config.core.v3.GrpcService
@@ -1241,27 +1214,25 @@ var file_envoy_extensions_filters_http_ext_proc_v3_ext_proc_proto_depIdxs = []in
 	13, // 13: envoy.extensions.filters.http.ext_proc.v3.ExternalProcessor.on_processing_response:type_name -> envoy.config.core.v3.TypedExtensionConfig
 	14, // 14: envoy.extensions.filters.http.ext_proc.v3.ExternalProcessor.status_on_error:type_name -> envoy.type.v3.HttpStatus
 	15, // 15: envoy.extensions.filters.http.ext_proc.v3.ExternalProcessor.emit_client_span:type_name -> google.protobuf.BoolValue
-	16, // 16: envoy.extensions.filters.http.ext_proc.v3.ExternalProcessor.max_streamed_body_chunk_size:type_name -> google.protobuf.UInt32Value
-	17, // 17: envoy.extensions.filters.http.ext_proc.v3.ExtProcHttpService.http_service:type_name -> envoy.config.core.v3.HttpService
-	7,  // 18: envoy.extensions.filters.http.ext_proc.v3.MetadataOptions.forwarding_namespaces:type_name -> envoy.extensions.filters.http.ext_proc.v3.MetadataOptions.MetadataNamespaces
-	7,  // 19: envoy.extensions.filters.http.ext_proc.v3.MetadataOptions.receiving_namespaces:type_name -> envoy.extensions.filters.http.ext_proc.v3.MetadataOptions.MetadataNamespaces
-	7,  // 20: envoy.extensions.filters.http.ext_proc.v3.MetadataOptions.cluster_metadata_forwarding_namespaces:type_name -> envoy.extensions.filters.http.ext_proc.v3.MetadataOptions.MetadataNamespaces
-	18, // 21: envoy.extensions.filters.http.ext_proc.v3.HeaderForwardingRules.allowed_headers:type_name -> envoy.type.matcher.v3.ListStringMatcher
-	18, // 22: envoy.extensions.filters.http.ext_proc.v3.HeaderForwardingRules.disallowed_headers:type_name -> envoy.type.matcher.v3.ListStringMatcher
-	6,  // 23: envoy.extensions.filters.http.ext_proc.v3.ExtProcPerRoute.overrides:type_name -> envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides
-	9,  // 24: envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides.processing_mode:type_name -> envoy.extensions.filters.http.ext_proc.v3.ProcessingMode
-	8,  // 25: envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides.grpc_service:type_name -> envoy.config.core.v3.GrpcService
-	3,  // 26: envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides.metadata_options:type_name -> envoy.extensions.filters.http.ext_proc.v3.MetadataOptions
-	19, // 27: envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides.grpc_initial_metadata:type_name -> envoy.config.core.v3.HeaderValue
-	15, // 28: envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides.failure_mode_allow:type_name -> google.protobuf.BoolValue
-	13, // 29: envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides.processing_request_modifier:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	15, // 30: envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides.emit_client_span:type_name -> google.protobuf.BoolValue
-	16, // 31: envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides.max_streamed_body_chunk_size:type_name -> google.protobuf.UInt32Value
-	32, // [32:32] is the sub-list for method output_type
-	32, // [32:32] is the sub-list for method input_type
-	32, // [32:32] is the sub-list for extension type_name
-	32, // [32:32] is the sub-list for extension extendee
-	0,  // [0:32] is the sub-list for field type_name
+	16, // 16: envoy.extensions.filters.http.ext_proc.v3.ExtProcHttpService.http_service:type_name -> envoy.config.core.v3.HttpService
+	7,  // 17: envoy.extensions.filters.http.ext_proc.v3.MetadataOptions.forwarding_namespaces:type_name -> envoy.extensions.filters.http.ext_proc.v3.MetadataOptions.MetadataNamespaces
+	7,  // 18: envoy.extensions.filters.http.ext_proc.v3.MetadataOptions.receiving_namespaces:type_name -> envoy.extensions.filters.http.ext_proc.v3.MetadataOptions.MetadataNamespaces
+	7,  // 19: envoy.extensions.filters.http.ext_proc.v3.MetadataOptions.cluster_metadata_forwarding_namespaces:type_name -> envoy.extensions.filters.http.ext_proc.v3.MetadataOptions.MetadataNamespaces
+	17, // 20: envoy.extensions.filters.http.ext_proc.v3.HeaderForwardingRules.allowed_headers:type_name -> envoy.type.matcher.v3.ListStringMatcher
+	17, // 21: envoy.extensions.filters.http.ext_proc.v3.HeaderForwardingRules.disallowed_headers:type_name -> envoy.type.matcher.v3.ListStringMatcher
+	6,  // 22: envoy.extensions.filters.http.ext_proc.v3.ExtProcPerRoute.overrides:type_name -> envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides
+	9,  // 23: envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides.processing_mode:type_name -> envoy.extensions.filters.http.ext_proc.v3.ProcessingMode
+	8,  // 24: envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides.grpc_service:type_name -> envoy.config.core.v3.GrpcService
+	3,  // 25: envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides.metadata_options:type_name -> envoy.extensions.filters.http.ext_proc.v3.MetadataOptions
+	18, // 26: envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides.grpc_initial_metadata:type_name -> envoy.config.core.v3.HeaderValue
+	15, // 27: envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides.failure_mode_allow:type_name -> google.protobuf.BoolValue
+	13, // 28: envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides.processing_request_modifier:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	15, // 29: envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides.emit_client_span:type_name -> google.protobuf.BoolValue
+	30, // [30:30] is the sub-list for method output_type
+	30, // [30:30] is the sub-list for method input_type
+	30, // [30:30] is the sub-list for extension type_name
+	30, // [30:30] is the sub-list for extension extendee
+	0,  // [0:30] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_http_ext_proc_v3_ext_proc_proto_init() }
