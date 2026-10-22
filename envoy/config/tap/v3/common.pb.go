@@ -546,15 +546,29 @@ type OutputConfig struct {
 	// Output sinks for tap data. Currently a single sink is allowed in the list. Once multiple
 	// sink types are supported this constraint will be relaxed.
 	Sinks []*OutputSink `protobuf:"bytes,1,rep,name=sinks,proto3" json:"sinks,omitempty"`
-	// For buffered tapping, the maximum amount of received body that will be buffered prior to
-	// truncation. If truncation occurs, the :ref:`truncated
-	// <envoy_v3_api_field_data.tap.v3.Body.truncated>` field will be set. If not specified, the
-	// default is 1KiB.
+	// The maximum amount of received data that will be captured prior to truncation. If truncation
+	// occurs, the :ref:`truncated <envoy_v3_api_field_data.tap.v3.Body.truncated>` field will be set.
+	// If not specified, the default is 1KiB.
+	//
+	// For buffered tapping, this limit applies to the total amount of received data in the trace.
+	// For :ref:`streaming <envoy_v3_api_field_config.tap.v3.OutputConfig.streaming>` tapping, this
+	// limit applies to each individual streamed body chunk or socket event, as well as to any data
+	// buffered while a match cannot yet be determined. To avoid truncating streamed data, set this
+	// to a value at least as large as the largest expected chunk. This limit does not apply to
+	// transport socket streamed tapping when :ref:`min_streamed_sent_bytes
+	// <envoy_v3_api_field_config.tap.v3.OutputConfig.min_streamed_sent_bytes>` is set.
 	MaxBufferedRxBytes *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=max_buffered_rx_bytes,json=maxBufferedRxBytes,proto3" json:"max_buffered_rx_bytes,omitempty"`
-	// For buffered tapping, the maximum amount of transmitted body that will be buffered prior to
-	// truncation. If truncation occurs, the :ref:`truncated
-	// <envoy_v3_api_field_data.tap.v3.Body.truncated>` field will be set. If not specified, the
-	// default is 1KiB.
+	// The maximum amount of transmitted data that will be captured prior to truncation. If truncation
+	// occurs, the :ref:`truncated <envoy_v3_api_field_data.tap.v3.Body.truncated>` field will be set.
+	// If not specified, the default is 1KiB.
+	//
+	// For buffered tapping, this limit applies to the total amount of transmitted data in the trace.
+	// For :ref:`streaming <envoy_v3_api_field_config.tap.v3.OutputConfig.streaming>` tapping, this
+	// limit applies to each individual streamed body chunk or socket event, as well as to any data
+	// buffered while a match cannot yet be determined. To avoid truncating streamed data, set this
+	// to a value at least as large as the largest expected chunk. This limit does not apply to
+	// transport socket streamed tapping when :ref:`min_streamed_sent_bytes
+	// <envoy_v3_api_field_config.tap.v3.OutputConfig.min_streamed_sent_bytes>` is set.
 	MaxBufferedTxBytes *wrapperspb.UInt32Value `protobuf:"bytes,3,opt,name=max_buffered_tx_bytes,json=maxBufferedTxBytes,proto3" json:"max_buffered_tx_bytes,omitempty"`
 	// Indicates whether taps produce a single buffered message per tap, or multiple streamed
 	// messages per tap in the emitted :ref:`TraceWrapper

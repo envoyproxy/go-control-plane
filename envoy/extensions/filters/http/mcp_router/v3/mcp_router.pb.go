@@ -9,7 +9,8 @@ package mcp_routerv3
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	_ "github.com/cncf/xds/go/xds/annotations/v3"
-	v31 "github.com/envoyproxy/go-control-plane/envoy/type/matcher/v3"
+	v31 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
+	v32 "github.com/envoyproxy/go-control-plane/envoy/type/matcher/v3"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/type/metadata/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -345,8 +346,21 @@ type McpRouter struct {
 	// This avoids blocking the client ``initialize`` on slow or misbehaving backends.
 	// Default is false (eager initialization of all backends during ``initialize``).
 	LazyInitialization bool `protobuf:"varint,3,opt,name=lazy_initialization,json=lazyInitialization,proto3" json:"lazy_initialization,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	// Optional key used to integrity-protect composite session IDs with HMAC-SHA256.
+	//
+	// When set, every session ID minted by this filter carries a MAC over the session blob, and a
+	// presented session ID whose MAC does not verify is rejected with a 400 error. This binds every
+	// field of the session blob, including the subject checked by the ``ENFORCE`` validation mode,
+	// to this server-held key, so a client cannot rewrite the blob it was issued (for example to
+	// rebind another principal's session to the client's own identity).
+	//
+	// When not set, session IDs are Base64 encoded only and clients can read and modify them. In
+	// that mode the ``ENFORCE`` subject check compares two values that are both ultimately
+	// client-controlled, so it does not bind the session to the authenticated identity and should
+	// only be relied on as a consistency check.
+	SessionSigningKey *v31.DataSource `protobuf:"bytes,4,opt,name=session_signing_key,json=sessionSigningKey,proto3" json:"session_signing_key,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *McpRouter) Reset() {
@@ -398,6 +412,13 @@ func (x *McpRouter) GetLazyInitialization() bool {
 		return x.LazyInitialization
 	}
 	return false
+}
+
+func (x *McpRouter) GetSessionSigningKey() *v31.DataSource {
+	if x != nil {
+		return x.SessionSigningKey
+	}
+	return nil
 }
 
 // Specification of the MCP server.
@@ -576,10 +597,10 @@ type McpRouter_HeaderForwarding struct {
 	// If set, specifically allow any header in this list to be forwarded. Ignored for a
 	// header that also matches ``disallowed_headers``, and redundant (but harmless) for
 	// any header covered by ``forward_all``.
-	AllowedHeaders *v31.ListStringMatcher `protobuf:"bytes,2,opt,name=allowed_headers,json=allowedHeaders,proto3" json:"allowed_headers,omitempty"`
+	AllowedHeaders *v32.ListStringMatcher `protobuf:"bytes,2,opt,name=allowed_headers,json=allowedHeaders,proto3" json:"allowed_headers,omitempty"`
 	// If set, specifically disallow any header in this list from being forwarded. This
 	// takes precedence over both ``forward_all`` and ``allowed_headers``.
-	DisallowedHeaders *v31.ListStringMatcher `protobuf:"bytes,3,opt,name=disallowed_headers,json=disallowedHeaders,proto3" json:"disallowed_headers,omitempty"`
+	DisallowedHeaders *v32.ListStringMatcher `protobuf:"bytes,3,opt,name=disallowed_headers,json=disallowedHeaders,proto3" json:"disallowed_headers,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -621,14 +642,14 @@ func (x *McpRouter_HeaderForwarding) GetForwardAll() bool {
 	return false
 }
 
-func (x *McpRouter_HeaderForwarding) GetAllowedHeaders() *v31.ListStringMatcher {
+func (x *McpRouter_HeaderForwarding) GetAllowedHeaders() *v32.ListStringMatcher {
 	if x != nil {
 		return x.AllowedHeaders
 	}
 	return nil
 }
 
-func (x *McpRouter_HeaderForwarding) GetDisallowedHeaders() *v31.ListStringMatcher {
+func (x *McpRouter_HeaderForwarding) GetDisallowedHeaders() *v32.ListStringMatcher {
 	if x != nil {
 		return x.DisallowedHeaders
 	}
@@ -639,7 +660,7 @@ var File_envoy_extensions_filters_http_mcp_router_v3_mcp_router_proto protorefle
 
 const file_envoy_extensions_filters_http_mcp_router_v3_mcp_router_proto_rawDesc = "" +
 	"\n" +
-	"<envoy/extensions/filters/http/mcp_router/v3/mcp_router.proto\x12+envoy.extensions.filters.http.mcp_router.v3\x1a\"envoy/type/matcher/v3/string.proto\x1a%envoy/type/metadata/v3/metadata.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\".\n" +
+	"<envoy/extensions/filters/http/mcp_router/v3/mcp_router.proto\x12+envoy.extensions.filters.http.mcp_router.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a\"envoy/type/matcher/v3/string.proto\x1a%envoy/type/metadata/v3/metadata.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\".\n" +
 	"\fHeaderSource\x12\x1e\n" +
 	"\x04name\x18\x01 \x01(\tB\n" +
 	"\xfaB\ar\x05\x10\x01\xc0\x01\x01R\x04name\"X\n" +
@@ -658,11 +679,12 @@ const file_envoy_extensions_filters_http_mcp_router_v3_mcp_router_proto_rawDesc 
 	"\bidentity\x18\x01 \x01(\v2>.envoy.extensions.filters.http.mcp_router.v3.IdentityExtractorB\b\xfaB\x05\x8a\x01\x02\x10\x01R\bidentity\x12]\n" +
 	"\n" +
 	"validation\x18\x02 \x01(\v2=.envoy.extensions.filters.http.mcp_router.v3.ValidationPolicyR\n" +
-	"validation\"\x8e\a\n" +
+	"validation\"\xe0\a\n" +
 	"\tMcpRouter\x12[\n" +
 	"\aservers\x18\x01 \x03(\v2A.envoy.extensions.filters.http.mcp_router.v3.McpRouter.McpBackendR\aservers\x12g\n" +
 	"\x10session_identity\x18\x02 \x01(\v2<.envoy.extensions.filters.http.mcp_router.v3.SessionIdentityR\x0fsessionIdentity\x12/\n" +
-	"\x13lazy_initialization\x18\x03 \x01(\bR\x12lazyInitialization\x1a\xfa\x01\n" +
+	"\x13lazy_initialization\x18\x03 \x01(\bR\x12lazyInitialization\x12P\n" +
+	"\x13session_signing_key\x18\x04 \x01(\v2 .envoy.config.core.v3.DataSourceR\x11sessionSigningKey\x1a\xfa\x01\n" +
 	"\n" +
 	"McpBackend\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12b\n" +
@@ -708,8 +730,9 @@ var file_envoy_extensions_filters_http_mcp_router_v3_mcp_router_proto_goTypes = 
 	(*McpRouter_McpCluster)(nil),       // 8: envoy.extensions.filters.http.mcp_router.v3.McpRouter.McpCluster
 	(*McpRouter_HeaderForwarding)(nil), // 9: envoy.extensions.filters.http.mcp_router.v3.McpRouter.HeaderForwarding
 	(*v3.MetadataKey)(nil),             // 10: envoy.type.metadata.v3.MetadataKey
-	(*durationpb.Duration)(nil),        // 11: google.protobuf.Duration
-	(*v31.ListStringMatcher)(nil),      // 12: envoy.type.matcher.v3.ListStringMatcher
+	(*v31.DataSource)(nil),             // 11: envoy.config.core.v3.DataSource
+	(*durationpb.Duration)(nil),        // 12: google.protobuf.Duration
+	(*v32.ListStringMatcher)(nil),      // 13: envoy.type.matcher.v3.ListStringMatcher
 }
 var file_envoy_extensions_filters_http_mcp_router_v3_mcp_router_proto_depIdxs = []int32{
 	10, // 0: envoy.extensions.filters.http.mcp_router.v3.DynamicMetadataSource.key:type_name -> envoy.type.metadata.v3.MetadataKey
@@ -720,16 +743,17 @@ var file_envoy_extensions_filters_http_mcp_router_v3_mcp_router_proto_depIdxs = 
 	4,  // 5: envoy.extensions.filters.http.mcp_router.v3.SessionIdentity.validation:type_name -> envoy.extensions.filters.http.mcp_router.v3.ValidationPolicy
 	7,  // 6: envoy.extensions.filters.http.mcp_router.v3.McpRouter.servers:type_name -> envoy.extensions.filters.http.mcp_router.v3.McpRouter.McpBackend
 	5,  // 7: envoy.extensions.filters.http.mcp_router.v3.McpRouter.session_identity:type_name -> envoy.extensions.filters.http.mcp_router.v3.SessionIdentity
-	8,  // 8: envoy.extensions.filters.http.mcp_router.v3.McpRouter.McpBackend.mcp_cluster:type_name -> envoy.extensions.filters.http.mcp_router.v3.McpRouter.McpCluster
-	9,  // 9: envoy.extensions.filters.http.mcp_router.v3.McpRouter.McpBackend.header_forwarding:type_name -> envoy.extensions.filters.http.mcp_router.v3.McpRouter.HeaderForwarding
-	11, // 10: envoy.extensions.filters.http.mcp_router.v3.McpRouter.McpCluster.timeout:type_name -> google.protobuf.Duration
-	12, // 11: envoy.extensions.filters.http.mcp_router.v3.McpRouter.HeaderForwarding.allowed_headers:type_name -> envoy.type.matcher.v3.ListStringMatcher
-	12, // 12: envoy.extensions.filters.http.mcp_router.v3.McpRouter.HeaderForwarding.disallowed_headers:type_name -> envoy.type.matcher.v3.ListStringMatcher
-	13, // [13:13] is the sub-list for method output_type
-	13, // [13:13] is the sub-list for method input_type
-	13, // [13:13] is the sub-list for extension type_name
-	13, // [13:13] is the sub-list for extension extendee
-	0,  // [0:13] is the sub-list for field type_name
+	11, // 8: envoy.extensions.filters.http.mcp_router.v3.McpRouter.session_signing_key:type_name -> envoy.config.core.v3.DataSource
+	8,  // 9: envoy.extensions.filters.http.mcp_router.v3.McpRouter.McpBackend.mcp_cluster:type_name -> envoy.extensions.filters.http.mcp_router.v3.McpRouter.McpCluster
+	9,  // 10: envoy.extensions.filters.http.mcp_router.v3.McpRouter.McpBackend.header_forwarding:type_name -> envoy.extensions.filters.http.mcp_router.v3.McpRouter.HeaderForwarding
+	12, // 11: envoy.extensions.filters.http.mcp_router.v3.McpRouter.McpCluster.timeout:type_name -> google.protobuf.Duration
+	13, // 12: envoy.extensions.filters.http.mcp_router.v3.McpRouter.HeaderForwarding.allowed_headers:type_name -> envoy.type.matcher.v3.ListStringMatcher
+	13, // 13: envoy.extensions.filters.http.mcp_router.v3.McpRouter.HeaderForwarding.disallowed_headers:type_name -> envoy.type.matcher.v3.ListStringMatcher
+	14, // [14:14] is the sub-list for method output_type
+	14, // [14:14] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_http_mcp_router_v3_mcp_router_proto_init() }
