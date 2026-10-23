@@ -484,6 +484,13 @@ func (m *Bootstrap) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if msg, ok := m.StatsEviction.(*Bootstrap_RuntimeStatsEvictionInterval); ok {
+		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+	}
 	if m.EnableWorkerCpuAffinity {
 		i--
 		if m.EnableWorkerCpuAffinity {
@@ -1187,6 +1194,45 @@ func (m *Bootstrap_StatsEvictionInterval) MarshalToSizedBufferVTStrict(dAtA []by
 		dAtA[i] = 0x2
 		i--
 		dAtA[i] = 0xd2
+	}
+	return len(dAtA) - i, nil
+}
+func (m *Bootstrap_RuntimeStatsEvictionInterval) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *Bootstrap_RuntimeStatsEvictionInterval) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.RuntimeStatsEvictionInterval != nil {
+		if vtmsg, ok := interface{}(m.RuntimeStatsEvictionInterval).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.RuntimeStatsEvictionInterval)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+		}
+		i--
+		dAtA[i] = 0x2
+		i--
+		dAtA[i] = 0xe2
+	} else {
+		i = protohelpers.EncodeVarint(dAtA, i, 0)
+		i--
+		dAtA[i] = 0x2
+		i--
+		dAtA[i] = 0xe2
 	}
 	return len(dAtA) - i, nil
 }
@@ -2910,6 +2956,26 @@ func (m *Bootstrap_StatsEvictionInterval) SizeVT() (n int) {
 	_ = l
 	if m.StatsEvictionInterval != nil {
 		l = (*durationpb.Duration)(m.StatsEvictionInterval).SizeVT()
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	} else {
+		n += 3
+	}
+	return n
+}
+func (m *Bootstrap_RuntimeStatsEvictionInterval) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.RuntimeStatsEvictionInterval != nil {
+		if size, ok := interface{}(m.RuntimeStatsEvictionInterval).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.RuntimeStatsEvictionInterval)
+		}
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
 		n += 3

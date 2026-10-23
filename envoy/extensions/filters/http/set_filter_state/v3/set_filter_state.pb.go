@@ -9,6 +9,7 @@ package set_filter_statev3
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/common/set_filter_state/v3"
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -23,6 +24,63 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Life span of the stored filter state.
+type Config_LifeSpan int32
+
+const (
+	// ``FILTER_CHAIN`` is the default life span.
+	Config_DEFAULT Config_LifeSpan = 0
+	// Object lives as long as the filter chain.
+	Config_FILTER_CHAIN Config_LifeSpan = 1
+	// Object lives as long as the downstream request.
+	Config_REQUEST Config_LifeSpan = 2
+	// Object lives as long as the downstream connection.
+	Config_CONNECTION Config_LifeSpan = 3
+)
+
+// Enum value maps for Config_LifeSpan.
+var (
+	Config_LifeSpan_name = map[int32]string{
+		0: "DEFAULT",
+		1: "FILTER_CHAIN",
+		2: "REQUEST",
+		3: "CONNECTION",
+	}
+	Config_LifeSpan_value = map[string]int32{
+		"DEFAULT":      0,
+		"FILTER_CHAIN": 1,
+		"REQUEST":      2,
+		"CONNECTION":   3,
+	}
+)
+
+func (x Config_LifeSpan) Enum() *Config_LifeSpan {
+	p := new(Config_LifeSpan)
+	*p = x
+	return p
+}
+
+func (x Config_LifeSpan) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Config_LifeSpan) Descriptor() protoreflect.EnumDescriptor {
+	return file_envoy_extensions_filters_http_set_filter_state_v3_set_filter_state_proto_enumTypes[0].Descriptor()
+}
+
+func (Config_LifeSpan) Type() protoreflect.EnumType {
+	return &file_envoy_extensions_filters_http_set_filter_state_v3_set_filter_state_proto_enumTypes[0]
+}
+
+func (x Config_LifeSpan) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Config_LifeSpan.Descriptor instead.
+func (Config_LifeSpan) EnumDescriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_set_filter_state_v3_set_filter_state_proto_rawDescGZIP(), []int{0, 0}
+}
+
 type Config struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// A sequence of the filter state values to apply in the specified order
@@ -32,8 +90,11 @@ type Config struct {
 	// if the route configuration may depend on the filter state values set by
 	// this filter.
 	ClearRouteCache bool `protobuf:"varint,2,opt,name=clear_route_cache,json=clearRouteCache,proto3" json:"clear_route_cache,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// Configures the life span of the filter state object.
+	// If not specified, defaults to ``FILTER_CHAIN``
+	LifeSpan      Config_LifeSpan `protobuf:"varint,3,opt,name=life_span,json=lifeSpan,proto3,enum=envoy.extensions.filters.http.set_filter_state.v3.Config_LifeSpan" json:"life_span,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Config) Reset() {
@@ -80,14 +141,28 @@ func (x *Config) GetClearRouteCache() bool {
 	return false
 }
 
+func (x *Config) GetLifeSpan() Config_LifeSpan {
+	if x != nil {
+		return x.LifeSpan
+	}
+	return Config_DEFAULT
+}
+
 var File_envoy_extensions_filters_http_set_filter_state_v3_set_filter_state_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_filters_http_set_filter_state_v3_set_filter_state_proto_rawDesc = "" +
 	"\n" +
-	"Henvoy/extensions/filters/http/set_filter_state/v3/set_filter_state.proto\x121envoy.extensions.filters.http.set_filter_state.v3\x1a?envoy/extensions/filters/common/set_filter_state/v3/value.proto\x1a\x1dudpa/annotations/status.proto\"\xa9\x01\n" +
+	"Henvoy/extensions/filters/http/set_filter_state/v3/set_filter_state.proto\x121envoy.extensions.filters.http.set_filter_state.v3\x1a?envoy/extensions/filters/common/set_filter_state/v3/value.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xdc\x02\n" +
 	"\x06Config\x12s\n" +
 	"\x12on_request_headers\x18\x01 \x03(\v2E.envoy.extensions.filters.common.set_filter_state.v3.FilterStateValueR\x10onRequestHeaders\x12*\n" +
-	"\x11clear_route_cache\x18\x02 \x01(\bR\x0fclearRouteCacheB\xcd\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x11clear_route_cache\x18\x02 \x01(\bR\x0fclearRouteCache\x12i\n" +
+	"\tlife_span\x18\x03 \x01(\x0e2B.envoy.extensions.filters.http.set_filter_state.v3.Config.LifeSpanB\b\xfaB\x05\x82\x01\x02\x10\x01R\blifeSpan\"F\n" +
+	"\bLifeSpan\x12\v\n" +
+	"\aDEFAULT\x10\x00\x12\x10\n" +
+	"\fFILTER_CHAIN\x10\x01\x12\v\n" +
+	"\aREQUEST\x10\x02\x12\x0e\n" +
+	"\n" +
+	"CONNECTION\x10\x03B\xcd\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"?io.envoyproxy.envoy.extensions.filters.http.set_filter_state.v3B\x13SetFilterStateProtoP\x01Zkgithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/set_filter_state/v3;set_filter_statev3b\x06proto3"
 
 var (
@@ -102,18 +177,21 @@ func file_envoy_extensions_filters_http_set_filter_state_v3_set_filter_state_pro
 	return file_envoy_extensions_filters_http_set_filter_state_v3_set_filter_state_proto_rawDescData
 }
 
+var file_envoy_extensions_filters_http_set_filter_state_v3_set_filter_state_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_envoy_extensions_filters_http_set_filter_state_v3_set_filter_state_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_envoy_extensions_filters_http_set_filter_state_v3_set_filter_state_proto_goTypes = []any{
-	(*Config)(nil),              // 0: envoy.extensions.filters.http.set_filter_state.v3.Config
-	(*v3.FilterStateValue)(nil), // 1: envoy.extensions.filters.common.set_filter_state.v3.FilterStateValue
+	(Config_LifeSpan)(0),        // 0: envoy.extensions.filters.http.set_filter_state.v3.Config.LifeSpan
+	(*Config)(nil),              // 1: envoy.extensions.filters.http.set_filter_state.v3.Config
+	(*v3.FilterStateValue)(nil), // 2: envoy.extensions.filters.common.set_filter_state.v3.FilterStateValue
 }
 var file_envoy_extensions_filters_http_set_filter_state_v3_set_filter_state_proto_depIdxs = []int32{
-	1, // 0: envoy.extensions.filters.http.set_filter_state.v3.Config.on_request_headers:type_name -> envoy.extensions.filters.common.set_filter_state.v3.FilterStateValue
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	2, // 0: envoy.extensions.filters.http.set_filter_state.v3.Config.on_request_headers:type_name -> envoy.extensions.filters.common.set_filter_state.v3.FilterStateValue
+	0, // 1: envoy.extensions.filters.http.set_filter_state.v3.Config.life_span:type_name -> envoy.extensions.filters.http.set_filter_state.v3.Config.LifeSpan
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_http_set_filter_state_v3_set_filter_state_proto_init() }
@@ -126,13 +204,14 @@ func file_envoy_extensions_filters_http_set_filter_state_v3_set_filter_state_pro
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_filters_http_set_filter_state_v3_set_filter_state_proto_rawDesc), len(file_envoy_extensions_filters_http_set_filter_state_v3_set_filter_state_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_envoy_extensions_filters_http_set_filter_state_v3_set_filter_state_proto_goTypes,
 		DependencyIndexes: file_envoy_extensions_filters_http_set_filter_state_v3_set_filter_state_proto_depIdxs,
+		EnumInfos:         file_envoy_extensions_filters_http_set_filter_state_v3_set_filter_state_proto_enumTypes,
 		MessageInfos:      file_envoy_extensions_filters_http_set_filter_state_v3_set_filter_state_proto_msgTypes,
 	}.Build()
 	File_envoy_extensions_filters_http_set_filter_state_v3_set_filter_state_proto = out.File

@@ -1085,6 +1085,47 @@ func (m *Bootstrap) validate(all bool) error {
 			}
 		}
 
+	case *Bootstrap_RuntimeStatsEvictionInterval:
+		if v == nil {
+			err := BootstrapValidationError{
+				field:  "StatsEviction",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetRuntimeStatsEvictionInterval()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, BootstrapValidationError{
+						field:  "RuntimeStatsEvictionInterval",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, BootstrapValidationError{
+						field:  "RuntimeStatsEvictionInterval",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetRuntimeStatsEvictionInterval()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return BootstrapValidationError{
+					field:  "RuntimeStatsEvictionInterval",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}

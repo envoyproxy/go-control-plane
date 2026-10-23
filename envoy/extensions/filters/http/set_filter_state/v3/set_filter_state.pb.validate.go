@@ -93,6 +93,17 @@ func (m *Config) validate(all bool) error {
 
 	// no validation rules for ClearRouteCache
 
+	if _, ok := Config_LifeSpan_name[int32(m.GetLifeSpan())]; !ok {
+		err := ConfigValidationError{
+			field:  "LifeSpan",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if len(errors) > 0 {
 		return ConfigMultiError(errors)
 	}

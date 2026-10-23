@@ -50,6 +50,11 @@ func (m *Config) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.LifeSpan != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.LifeSpan))
+		i--
+		dAtA[i] = 0x18
+	}
 	if m.ClearRouteCache {
 		i--
 		if m.ClearRouteCache {
@@ -107,6 +112,9 @@ func (m *Config) SizeVT() (n int) {
 	}
 	if m.ClearRouteCache {
 		n += 2
+	}
+	if m.LifeSpan != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.LifeSpan))
 	}
 	n += len(m.unknownFields)
 	return n
