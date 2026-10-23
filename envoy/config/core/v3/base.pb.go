@@ -15,6 +15,7 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	anypb "google.golang.org/protobuf/types/known/anypb"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	structpb "google.golang.org/protobuf/types/known/structpb"
 	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
@@ -1858,7 +1859,7 @@ func (*DataSource_InlineString) isDataSource_Specifier() {}
 func (*DataSource_EnvironmentVariable) isDataSource_Specifier() {}
 
 // The message specifies the retry policy of remote data source when fetching fails.
-// [#next-free-field: 7]
+// [#next-free-field: 8]
 type RetryPolicy struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Specifies parameters that control :ref:`retry backoff strategy <envoy_v3_api_msg_config.core.v3.BackoffStrategy>`.
@@ -1876,8 +1877,12 @@ type RetryPolicy struct {
 	RetryHostPredicate []*RetryPolicy_RetryHostPredicate `protobuf:"bytes,5,rep,name=retry_host_predicate,json=retryHostPredicate,proto3" json:"retry_host_predicate,omitempty"`
 	// For details, see :ref:`host_selection_retry_max_attempts <envoy_v3_api_field_config.route.v3.RetryPolicy.host_selection_retry_max_attempts>`.
 	HostSelectionRetryMaxAttempts int64 `protobuf:"varint,6,opt,name=host_selection_retry_max_attempts,json=hostSelectionRetryMaxAttempts,proto3" json:"host_selection_retry_max_attempts,omitempty"`
-	unknownFields                 protoimpl.UnknownFields
-	sizeCache                     protoimpl.SizeCache
+	// Specifies a non-zero upstream timeout per retry attempt (including the initial attempt).
+	// This parameter is optional. For details, see :ref:`per_try_timeout
+	// <envoy_v3_api_field_config.route.v3.RetryPolicy.per_try_timeout>`.
+	PerTryTimeout *durationpb.Duration `protobuf:"bytes,7,opt,name=per_try_timeout,json=perTryTimeout,proto3" json:"per_try_timeout,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *RetryPolicy) Reset() {
@@ -1950,6 +1955,13 @@ func (x *RetryPolicy) GetHostSelectionRetryMaxAttempts() int64 {
 		return x.HostSelectionRetryMaxAttempts
 	}
 	return 0
+}
+
+func (x *RetryPolicy) GetPerTryTimeout() *durationpb.Duration {
+	if x != nil {
+		return x.PerTryTimeout
+	}
+	return nil
 }
 
 // The message specifies how to fetch data from remote and how to verify it.
@@ -2450,7 +2462,7 @@ var File_envoy_config_core_v3_base_proto protoreflect.FileDescriptor
 
 const file_envoy_config_core_v3_base_proto_rawDesc = "" +
 	"\n" +
-	"\x1fenvoy/config/core/v3/base.proto\x12\x14envoy.config.core.v3\x1a\"envoy/config/core/v3/address.proto\x1a\"envoy/config/core/v3/backoff.proto\x1a#envoy/config/core/v3/http_uri.proto\x1a\x1benvoy/type/v3/percent.proto\x1a$envoy/type/v3/semantic_version.proto\x1a\x19google/protobuf/any.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a xds/core/v3/context_params.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1eudpa/annotations/migrate.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"t\n" +
+	"\x1fenvoy/config/core/v3/base.proto\x12\x14envoy.config.core.v3\x1a\"envoy/config/core/v3/address.proto\x1a\"envoy/config/core/v3/backoff.proto\x1a#envoy/config/core/v3/http_uri.proto\x1a\x1benvoy/type/v3/percent.proto\x1a$envoy/type/v3/semantic_version.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a xds/core/v3/context_params.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1eudpa/annotations/migrate.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"t\n" +
 	"\bLocality\x12\x16\n" +
 	"\x06region\x18\x01 \x01(\tR\x06region\x12\x12\n" +
 	"\x04zone\x18\x02 \x01(\tR\x04zone\x12\x19\n" +
@@ -2575,7 +2587,7 @@ const file_envoy_config_core_v3_base_proto_rawDesc = "" +
 	"\x14environment_variable\x18\x04 \x01(\tB\a\xfaB\x04r\x02\x10\x01H\x00R\x13environmentVariable\x12S\n" +
 	"\x11watched_directory\x18\x05 \x01(\v2&.envoy.config.core.v3.WatchedDirectoryR\x10watchedDirectory:#\x9aň\x1e\x1e\n" +
 	"\x1cenvoy.api.v2.core.DataSourceB\x10\n" +
-	"\tspecifier\x12\x03\xf8B\x01\"\xee\x05\n" +
+	"\tspecifier\x12\x03\xf8B\x01\"\xbb\x06\n" +
 	"\vRetryPolicy\x12K\n" +
 	"\x0eretry_back_off\x18\x01 \x01(\v2%.envoy.config.core.v3.BackoffStrategyR\fretryBackOff\x12R\n" +
 	"\vnum_retries\x18\x02 \x01(\v2\x1c.google.protobuf.UInt32ValueB\x13\xf2\x98\xfe\x8f\x05\r\n" +
@@ -2584,7 +2596,8 @@ const file_envoy_config_core_v3_base_proto_rawDesc = "" +
 	"\bretry_on\x18\x03 \x01(\tR\aretryOn\x12V\n" +
 	"\x0eretry_priority\x18\x04 \x01(\v2/.envoy.config.core.v3.RetryPolicy.RetryPriorityR\rretryPriority\x12f\n" +
 	"\x14retry_host_predicate\x18\x05 \x03(\v24.envoy.config.core.v3.RetryPolicy.RetryHostPredicateR\x12retryHostPredicate\x12H\n" +
-	"!host_selection_retry_max_attempts\x18\x06 \x01(\x03R\x1dhostSelectionRetryMaxAttempts\x1av\n" +
+	"!host_selection_retry_max_attempts\x18\x06 \x01(\x03R\x1dhostSelectionRetryMaxAttempts\x12K\n" +
+	"\x0fper_try_timeout\x18\a \x01(\v2\x19.google.protobuf.DurationB\b\xfaB\x05\xaa\x01\x02*\x00R\rperTryTimeout\x1av\n" +
 	"\rRetryPriority\x12\x1b\n" +
 	"\x04name\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x04name\x129\n" +
 	"\ftyped_config\x18\x02 \x01(\v2\x14.google.protobuf.AnyH\x00R\vtypedConfigB\r\n" +
@@ -2699,10 +2712,11 @@ var file_envoy_config_core_v3_base_proto_goTypes = []any{
 	(*structpb.Value)(nil),                    // 41: google.protobuf.Value
 	(*BackoffStrategy)(nil),                   // 42: envoy.config.core.v3.BackoffStrategy
 	(*wrapperspb.UInt32Value)(nil),            // 43: google.protobuf.UInt32Value
-	(*HttpUri)(nil),                           // 44: envoy.config.core.v3.HttpUri
-	(*anypb.Any)(nil),                         // 45: google.protobuf.Any
-	(*v3.FractionalPercent)(nil),              // 46: envoy.type.v3.FractionalPercent
-	(*v31.ContextParams)(nil),                 // 47: xds.core.v3.ContextParams
+	(*durationpb.Duration)(nil),               // 44: google.protobuf.Duration
+	(*HttpUri)(nil),                           // 45: envoy.config.core.v3.HttpUri
+	(*anypb.Any)(nil),                         // 46: google.protobuf.Any
+	(*v3.FractionalPercent)(nil),              // 47: envoy.type.v3.FractionalPercent
+	(*v31.ContextParams)(nil),                 // 48: xds.core.v3.ContextParams
 }
 var file_envoy_config_core_v3_base_proto_depIdxs = []int32{
 	36, // 0: envoy.config.core.v3.BuildVersion.version:type_name -> envoy.type.v3.SemanticVersion
@@ -2732,22 +2746,23 @@ var file_envoy_config_core_v3_base_proto_depIdxs = []int32{
 	43, // 24: envoy.config.core.v3.RetryPolicy.num_retries:type_name -> google.protobuf.UInt32Value
 	34, // 25: envoy.config.core.v3.RetryPolicy.retry_priority:type_name -> envoy.config.core.v3.RetryPolicy.RetryPriority
 	35, // 26: envoy.config.core.v3.RetryPolicy.retry_host_predicate:type_name -> envoy.config.core.v3.RetryPolicy.RetryHostPredicate
-	44, // 27: envoy.config.core.v3.RemoteDataSource.http_uri:type_name -> envoy.config.core.v3.HttpUri
-	25, // 28: envoy.config.core.v3.RemoteDataSource.retry_policy:type_name -> envoy.config.core.v3.RetryPolicy
-	24, // 29: envoy.config.core.v3.AsyncDataSource.local:type_name -> envoy.config.core.v3.DataSource
-	26, // 30: envoy.config.core.v3.AsyncDataSource.remote:type_name -> envoy.config.core.v3.RemoteDataSource
-	45, // 31: envoy.config.core.v3.TransportSocket.typed_config:type_name -> google.protobuf.Any
-	46, // 32: envoy.config.core.v3.RuntimeFractionalPercent.default_value:type_name -> envoy.type.v3.FractionalPercent
-	47, // 33: envoy.config.core.v3.Node.DynamicParametersEntry.value:type_name -> xds.core.v3.ContextParams
-	37, // 34: envoy.config.core.v3.Metadata.FilterMetadataEntry.value:type_name -> google.protobuf.Struct
-	45, // 35: envoy.config.core.v3.Metadata.TypedFilterMetadataEntry.value:type_name -> google.protobuf.Any
-	45, // 36: envoy.config.core.v3.RetryPolicy.RetryPriority.typed_config:type_name -> google.protobuf.Any
-	45, // 37: envoy.config.core.v3.RetryPolicy.RetryHostPredicate.typed_config:type_name -> google.protobuf.Any
-	38, // [38:38] is the sub-list for method output_type
-	38, // [38:38] is the sub-list for method input_type
-	38, // [38:38] is the sub-list for extension type_name
-	38, // [38:38] is the sub-list for extension extendee
-	0,  // [0:38] is the sub-list for field type_name
+	44, // 27: envoy.config.core.v3.RetryPolicy.per_try_timeout:type_name -> google.protobuf.Duration
+	45, // 28: envoy.config.core.v3.RemoteDataSource.http_uri:type_name -> envoy.config.core.v3.HttpUri
+	25, // 29: envoy.config.core.v3.RemoteDataSource.retry_policy:type_name -> envoy.config.core.v3.RetryPolicy
+	24, // 30: envoy.config.core.v3.AsyncDataSource.local:type_name -> envoy.config.core.v3.DataSource
+	26, // 31: envoy.config.core.v3.AsyncDataSource.remote:type_name -> envoy.config.core.v3.RemoteDataSource
+	46, // 32: envoy.config.core.v3.TransportSocket.typed_config:type_name -> google.protobuf.Any
+	47, // 33: envoy.config.core.v3.RuntimeFractionalPercent.default_value:type_name -> envoy.type.v3.FractionalPercent
+	48, // 34: envoy.config.core.v3.Node.DynamicParametersEntry.value:type_name -> xds.core.v3.ContextParams
+	37, // 35: envoy.config.core.v3.Metadata.FilterMetadataEntry.value:type_name -> google.protobuf.Struct
+	46, // 36: envoy.config.core.v3.Metadata.TypedFilterMetadataEntry.value:type_name -> google.protobuf.Any
+	46, // 37: envoy.config.core.v3.RetryPolicy.RetryPriority.typed_config:type_name -> google.protobuf.Any
+	46, // 38: envoy.config.core.v3.RetryPolicy.RetryHostPredicate.typed_config:type_name -> google.protobuf.Any
+	39, // [39:39] is the sub-list for method output_type
+	39, // [39:39] is the sub-list for method input_type
+	39, // [39:39] is the sub-list for extension type_name
+	39, // [39:39] is the sub-list for extension extendee
+	0,  // [0:39] is the sub-list for field type_name
 }
 
 func init() { file_envoy_config_core_v3_base_proto_init() }

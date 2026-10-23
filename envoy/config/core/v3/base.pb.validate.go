@@ -3196,6 +3196,36 @@ func (m *RetryPolicy) validate(all bool) error {
 
 	// no validation rules for HostSelectionRetryMaxAttempts
 
+	if d := m.GetPerTryTimeout(); d != nil {
+		dur, err := d.AsDuration(), d.CheckValid()
+		if err != nil {
+			err = RetryPolicyValidationError{
+				field:  "PerTryTimeout",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		} else {
+
+			gt := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+			if dur <= gt {
+				err := RetryPolicyValidationError{
+					field:  "PerTryTimeout",
+					reason: "value must be greater than 0s",
+				}
+				if !all {
+					return err
+				}
+				errors = append(errors, err)
+			}
+
+		}
+	}
+
 	if len(errors) > 0 {
 		return RetryPolicyMultiError(errors)
 	}

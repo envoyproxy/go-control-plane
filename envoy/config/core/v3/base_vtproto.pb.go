@@ -11,6 +11,7 @@ import (
 	binary "encoding/binary"
 	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
 	anypb "github.com/planetscale/vtprotobuf/types/known/anypb"
+	durationpb "github.com/planetscale/vtprotobuf/types/known/durationpb"
 	structpb "github.com/planetscale/vtprotobuf/types/known/structpb"
 	wrapperspb "github.com/planetscale/vtprotobuf/types/known/wrapperspb"
 	proto "google.golang.org/protobuf/proto"
@@ -1510,6 +1511,16 @@ func (m *RetryPolicy) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.PerTryTimeout != nil {
+		size, err := (*durationpb.Duration)(m.PerTryTimeout).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x3a
+	}
 	if m.HostSelectionRetryMaxAttempts != 0 {
 		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.HostSelectionRetryMaxAttempts))
 		i--
@@ -2517,6 +2528,10 @@ func (m *RetryPolicy) SizeVT() (n int) {
 	}
 	if m.HostSelectionRetryMaxAttempts != 0 {
 		n += 1 + protohelpers.SizeOfVarint(uint64(m.HostSelectionRetryMaxAttempts))
+	}
+	if m.PerTryTimeout != nil {
+		l = (*durationpb.Duration)(m.PerTryTimeout).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
