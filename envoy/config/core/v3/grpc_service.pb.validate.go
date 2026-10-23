@@ -453,6 +453,21 @@ func (m *GrpcService_EnvoyGrpc) validate(all bool) error {
 
 	// no validation rules for SkipEnvoyHeaders
 
+	if wrapper := m.GetPerStreamBufferLimitBytes(); wrapper != nil {
+
+		if wrapper.GetValue() <= 0 {
+			err := GrpcService_EnvoyGrpcValidationError{
+				field:  "PerStreamBufferLimitBytes",
+				reason: "value must be greater than 0",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return GrpcService_EnvoyGrpcMultiError(errors)
 	}

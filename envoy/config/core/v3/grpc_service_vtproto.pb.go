@@ -54,6 +54,16 @@ func (m *GrpcService_EnvoyGrpc) MarshalToSizedBufferVTStrict(dAtA []byte) (int, 
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.PerStreamBufferLimitBytes != nil {
+		size, err := (*wrapperspb.UInt32Value)(m.PerStreamBufferLimitBytes).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x32
+	}
 	if m.SkipEnvoyHeaders {
 		i--
 		if m.SkipEnvoyHeaders {
@@ -1210,6 +1220,10 @@ func (m *GrpcService_EnvoyGrpc) SizeVT() (n int) {
 	}
 	if m.SkipEnvoyHeaders {
 		n += 2
+	}
+	if m.PerStreamBufferLimitBytes != nil {
+		l = (*wrapperspb.UInt32Value)(m.PerStreamBufferLimitBytes).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n

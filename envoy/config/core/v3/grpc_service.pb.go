@@ -162,7 +162,7 @@ func (*GrpcService_EnvoyGrpc_) isGrpcService_TargetSpecifier() {}
 
 func (*GrpcService_GoogleGrpc_) isGrpcService_TargetSpecifier() {}
 
-// [#next-free-field: 6]
+// [#next-free-field: 7]
 type GrpcService_EnvoyGrpc struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The name of the upstream gRPC cluster. SSL credentials will be supplied
@@ -197,8 +197,28 @@ type GrpcService_EnvoyGrpc struct {
 	// If true, the header will be removed and can not be overridden by per stream option.
 	// Default to false.
 	SkipEnvoyHeaders bool `protobuf:"varint,5,opt,name=skip_envoy_headers,json=skipEnvoyHeaders,proto3" json:"skip_envoy_headers,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// How many bytes each stream can buffer internally. This is the buffer limit of the
+	// underlying Envoy HTTP async client stream, and it has two effects:
+	//
+	// * Retries: when
+	//   :ref:`retry_policy <envoy_v3_api_field_config.core.v3.GrpcService.retry_policy>` or a
+	//   caller-provided retry policy is set, the request is buffered so that it can be replayed on
+	//   a retry. For a streaming call this counts every message sent until the upstream sends
+	//   response headers (initial metadata). Once the buffered data exceeds this limit, the
+	//   request is no longer retried and the upstream cluster's ``retry_or_shadow_abandoned``
+	//   counter is incremented. Up to this many bytes per stream can be held in memory until the
+	//   stream completes.
+	// * Flow control: this is the high watermark for data buffered before the upstream stream is
+	//   ready to accept it. Above it, the stream reports that it is above its write buffer high
+	//   watermark, and callers that check this, such as the streaming gRPC access loggers, stop
+	//   sending on the stream. It also triggers the sidestream watermark callbacks, which
+	//   ext_proc uses to push back on the downstream.
+	//
+	// A per-stream buffer limit set by the caller takes precedence over this value. If not set,
+	// the default buffer limit of the Envoy HTTP async client, 64 KiB, is used.
+	PerStreamBufferLimitBytes *wrapperspb.UInt32Value `protobuf:"bytes,6,opt,name=per_stream_buffer_limit_bytes,json=perStreamBufferLimitBytes,proto3" json:"per_stream_buffer_limit_bytes,omitempty"`
+	unknownFields             protoimpl.UnknownFields
+	sizeCache                 protoimpl.SizeCache
 }
 
 func (x *GrpcService_EnvoyGrpc) Reset() {
@@ -264,6 +284,13 @@ func (x *GrpcService_EnvoyGrpc) GetSkipEnvoyHeaders() bool {
 		return x.SkipEnvoyHeaders
 	}
 	return false
+}
+
+func (x *GrpcService_EnvoyGrpc) GetPerStreamBufferLimitBytes() *wrapperspb.UInt32Value {
+	if x != nil {
+		return x.PerStreamBufferLimitBytes
+	}
+	return nil
 }
 
 // [#next-free-field: 11]
@@ -1256,7 +1283,7 @@ var File_envoy_config_core_v3_grpc_service_proto protoreflect.FileDescriptor
 
 const file_envoy_config_core_v3_grpc_service_proto_rawDesc = "" +
 	"\n" +
-	"'envoy/config/core/v3/grpc_service.proto\x12\x14envoy.config.core.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a udpa/annotations/sensitive.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xc3$\n" +
+	"'envoy/config/core/v3/grpc_service.proto\x12\x14envoy.config.core.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a udpa/annotations/sensitive.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xac%\n" +
 	"\vGrpcService\x12L\n" +
 	"\n" +
 	"envoy_grpc\x18\x01 \x01(\v2+.envoy.config.core.v3.GrpcService.EnvoyGrpcH\x00R\tenvoyGrpc\x12O\n" +
@@ -1264,13 +1291,14 @@ const file_envoy_config_core_v3_grpc_service_proto_rawDesc = "" +
 	"googleGrpc\x123\n" +
 	"\atimeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\atimeout\x12L\n" +
 	"\x10initial_metadata\x18\x05 \x03(\v2!.envoy.config.core.v3.HeaderValueR\x0finitialMetadata\x12D\n" +
-	"\fretry_policy\x18\x06 \x01(\v2!.envoy.config.core.v3.RetryPolicyR\vretryPolicy\x1a\xe7\x02\n" +
+	"\fretry_policy\x18\x06 \x01(\v2!.envoy.config.core.v3.RetryPolicyR\vretryPolicy\x1a\xd0\x03\n" +
 	"\tEnvoyGrpc\x12*\n" +
 	"\fcluster_name\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\vclusterName\x12/\n" +
 	"\tauthority\x18\x02 \x01(\tB\x11\xfaB\x0er\f\x10\x00(\x80\x80\x01\xc8\x01\x00\xc0\x01\x02R\tauthority\x12D\n" +
 	"\fretry_policy\x18\x03 \x01(\v2!.envoy.config.core.v3.RetryPolicyR\vretryPolicy\x12Y\n" +
 	"\x1amax_receive_message_length\x18\x04 \x01(\v2\x1c.google.protobuf.UInt32ValueR\x17maxReceiveMessageLength\x12,\n" +
-	"\x12skip_envoy_headers\x18\x05 \x01(\bR\x10skipEnvoyHeaders:.\x9aň\x1e)\n" +
+	"\x12skip_envoy_headers\x18\x05 \x01(\bR\x10skipEnvoyHeaders\x12g\n" +
+	"\x1dper_stream_buffer_limit_bytes\x18\x06 \x01(\v2\x1c.google.protobuf.UInt32ValueB\a\xfaB\x04*\x02 \x00R\x19perStreamBufferLimitBytes:.\x9aň\x1e)\n" +
 	"'envoy.api.v2.core.GrpcService.EnvoyGrpc\x1a\x9c\x1e\n" +
 	"\n" +
 	"GoogleGrpc\x12&\n" +
@@ -1400,32 +1428,33 @@ var file_envoy_config_core_v3_grpc_service_proto_depIdxs = []int32{
 	16, // 4: envoy.config.core.v3.GrpcService.retry_policy:type_name -> envoy.config.core.v3.RetryPolicy
 	16, // 5: envoy.config.core.v3.GrpcService.EnvoyGrpc.retry_policy:type_name -> envoy.config.core.v3.RetryPolicy
 	17, // 6: envoy.config.core.v3.GrpcService.EnvoyGrpc.max_receive_message_length:type_name -> google.protobuf.UInt32Value
-	5,  // 7: envoy.config.core.v3.GrpcService.GoogleGrpc.channel_credentials:type_name -> envoy.config.core.v3.GrpcService.GoogleGrpc.ChannelCredentials
-	18, // 8: envoy.config.core.v3.GrpcService.GoogleGrpc.channel_credentials_plugin:type_name -> google.protobuf.Any
-	6,  // 9: envoy.config.core.v3.GrpcService.GoogleGrpc.call_credentials:type_name -> envoy.config.core.v3.GrpcService.GoogleGrpc.CallCredentials
-	18, // 10: envoy.config.core.v3.GrpcService.GoogleGrpc.call_credentials_plugin:type_name -> google.protobuf.Any
-	19, // 11: envoy.config.core.v3.GrpcService.GoogleGrpc.config:type_name -> google.protobuf.Struct
-	17, // 12: envoy.config.core.v3.GrpcService.GoogleGrpc.per_stream_buffer_limit_bytes:type_name -> google.protobuf.UInt32Value
-	7,  // 13: envoy.config.core.v3.GrpcService.GoogleGrpc.channel_args:type_name -> envoy.config.core.v3.GrpcService.GoogleGrpc.ChannelArgs
-	20, // 14: envoy.config.core.v3.GrpcService.GoogleGrpc.SslCredentials.root_certs:type_name -> envoy.config.core.v3.DataSource
-	20, // 15: envoy.config.core.v3.GrpcService.GoogleGrpc.SslCredentials.private_key:type_name -> envoy.config.core.v3.DataSource
-	20, // 16: envoy.config.core.v3.GrpcService.GoogleGrpc.SslCredentials.cert_chain:type_name -> envoy.config.core.v3.DataSource
-	3,  // 17: envoy.config.core.v3.GrpcService.GoogleGrpc.ChannelCredentials.ssl_credentials:type_name -> envoy.config.core.v3.GrpcService.GoogleGrpc.SslCredentials
-	21, // 18: envoy.config.core.v3.GrpcService.GoogleGrpc.ChannelCredentials.google_default:type_name -> google.protobuf.Empty
-	4,  // 19: envoy.config.core.v3.GrpcService.GoogleGrpc.ChannelCredentials.local_credentials:type_name -> envoy.config.core.v3.GrpcService.GoogleGrpc.GoogleLocalCredentials
-	21, // 20: envoy.config.core.v3.GrpcService.GoogleGrpc.CallCredentials.google_compute_engine:type_name -> google.protobuf.Empty
-	8,  // 21: envoy.config.core.v3.GrpcService.GoogleGrpc.CallCredentials.service_account_jwt_access:type_name -> envoy.config.core.v3.GrpcService.GoogleGrpc.CallCredentials.ServiceAccountJWTAccessCredentials
-	9,  // 22: envoy.config.core.v3.GrpcService.GoogleGrpc.CallCredentials.google_iam:type_name -> envoy.config.core.v3.GrpcService.GoogleGrpc.CallCredentials.GoogleIAMCredentials
-	10, // 23: envoy.config.core.v3.GrpcService.GoogleGrpc.CallCredentials.from_plugin:type_name -> envoy.config.core.v3.GrpcService.GoogleGrpc.CallCredentials.MetadataCredentialsFromPlugin
-	11, // 24: envoy.config.core.v3.GrpcService.GoogleGrpc.CallCredentials.sts_service:type_name -> envoy.config.core.v3.GrpcService.GoogleGrpc.CallCredentials.StsService
-	13, // 25: envoy.config.core.v3.GrpcService.GoogleGrpc.ChannelArgs.args:type_name -> envoy.config.core.v3.GrpcService.GoogleGrpc.ChannelArgs.ArgsEntry
-	18, // 26: envoy.config.core.v3.GrpcService.GoogleGrpc.CallCredentials.MetadataCredentialsFromPlugin.typed_config:type_name -> google.protobuf.Any
-	12, // 27: envoy.config.core.v3.GrpcService.GoogleGrpc.ChannelArgs.ArgsEntry.value:type_name -> envoy.config.core.v3.GrpcService.GoogleGrpc.ChannelArgs.Value
-	28, // [28:28] is the sub-list for method output_type
-	28, // [28:28] is the sub-list for method input_type
-	28, // [28:28] is the sub-list for extension type_name
-	28, // [28:28] is the sub-list for extension extendee
-	0,  // [0:28] is the sub-list for field type_name
+	17, // 7: envoy.config.core.v3.GrpcService.EnvoyGrpc.per_stream_buffer_limit_bytes:type_name -> google.protobuf.UInt32Value
+	5,  // 8: envoy.config.core.v3.GrpcService.GoogleGrpc.channel_credentials:type_name -> envoy.config.core.v3.GrpcService.GoogleGrpc.ChannelCredentials
+	18, // 9: envoy.config.core.v3.GrpcService.GoogleGrpc.channel_credentials_plugin:type_name -> google.protobuf.Any
+	6,  // 10: envoy.config.core.v3.GrpcService.GoogleGrpc.call_credentials:type_name -> envoy.config.core.v3.GrpcService.GoogleGrpc.CallCredentials
+	18, // 11: envoy.config.core.v3.GrpcService.GoogleGrpc.call_credentials_plugin:type_name -> google.protobuf.Any
+	19, // 12: envoy.config.core.v3.GrpcService.GoogleGrpc.config:type_name -> google.protobuf.Struct
+	17, // 13: envoy.config.core.v3.GrpcService.GoogleGrpc.per_stream_buffer_limit_bytes:type_name -> google.protobuf.UInt32Value
+	7,  // 14: envoy.config.core.v3.GrpcService.GoogleGrpc.channel_args:type_name -> envoy.config.core.v3.GrpcService.GoogleGrpc.ChannelArgs
+	20, // 15: envoy.config.core.v3.GrpcService.GoogleGrpc.SslCredentials.root_certs:type_name -> envoy.config.core.v3.DataSource
+	20, // 16: envoy.config.core.v3.GrpcService.GoogleGrpc.SslCredentials.private_key:type_name -> envoy.config.core.v3.DataSource
+	20, // 17: envoy.config.core.v3.GrpcService.GoogleGrpc.SslCredentials.cert_chain:type_name -> envoy.config.core.v3.DataSource
+	3,  // 18: envoy.config.core.v3.GrpcService.GoogleGrpc.ChannelCredentials.ssl_credentials:type_name -> envoy.config.core.v3.GrpcService.GoogleGrpc.SslCredentials
+	21, // 19: envoy.config.core.v3.GrpcService.GoogleGrpc.ChannelCredentials.google_default:type_name -> google.protobuf.Empty
+	4,  // 20: envoy.config.core.v3.GrpcService.GoogleGrpc.ChannelCredentials.local_credentials:type_name -> envoy.config.core.v3.GrpcService.GoogleGrpc.GoogleLocalCredentials
+	21, // 21: envoy.config.core.v3.GrpcService.GoogleGrpc.CallCredentials.google_compute_engine:type_name -> google.protobuf.Empty
+	8,  // 22: envoy.config.core.v3.GrpcService.GoogleGrpc.CallCredentials.service_account_jwt_access:type_name -> envoy.config.core.v3.GrpcService.GoogleGrpc.CallCredentials.ServiceAccountJWTAccessCredentials
+	9,  // 23: envoy.config.core.v3.GrpcService.GoogleGrpc.CallCredentials.google_iam:type_name -> envoy.config.core.v3.GrpcService.GoogleGrpc.CallCredentials.GoogleIAMCredentials
+	10, // 24: envoy.config.core.v3.GrpcService.GoogleGrpc.CallCredentials.from_plugin:type_name -> envoy.config.core.v3.GrpcService.GoogleGrpc.CallCredentials.MetadataCredentialsFromPlugin
+	11, // 25: envoy.config.core.v3.GrpcService.GoogleGrpc.CallCredentials.sts_service:type_name -> envoy.config.core.v3.GrpcService.GoogleGrpc.CallCredentials.StsService
+	13, // 26: envoy.config.core.v3.GrpcService.GoogleGrpc.ChannelArgs.args:type_name -> envoy.config.core.v3.GrpcService.GoogleGrpc.ChannelArgs.ArgsEntry
+	18, // 27: envoy.config.core.v3.GrpcService.GoogleGrpc.CallCredentials.MetadataCredentialsFromPlugin.typed_config:type_name -> google.protobuf.Any
+	12, // 28: envoy.config.core.v3.GrpcService.GoogleGrpc.ChannelArgs.ArgsEntry.value:type_name -> envoy.config.core.v3.GrpcService.GoogleGrpc.ChannelArgs.Value
+	29, // [29:29] is the sub-list for method output_type
+	29, // [29:29] is the sub-list for method input_type
+	29, // [29:29] is the sub-list for extension type_name
+	29, // [29:29] is the sub-list for extension extendee
+	0,  // [0:29] is the sub-list for field type_name
 }
 
 func init() { file_envoy_config_core_v3_grpc_service_proto_init() }
