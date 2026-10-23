@@ -839,6 +839,8 @@ func (m *RateLimitResponse_DescriptorStatus) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for ShadowOverLimit
+
 	if len(errors) > 0 {
 		return RateLimitResponse_DescriptorStatusMultiError(errors)
 	}

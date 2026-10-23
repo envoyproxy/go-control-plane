@@ -258,6 +258,16 @@ func (m *RateLimitResponse_DescriptorStatus) MarshalToSizedBufferVTStrict(dAtA [
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.ShadowOverLimit {
+		i--
+		if m.ShadowOverLimit {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x30
+	}
 	if m.Quota != nil {
 		size, err := m.Quota.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -536,6 +546,9 @@ func (m *RateLimitResponse_DescriptorStatus) SizeVT() (n int) {
 	if m.Quota != nil {
 		l = m.Quota.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.ShadowOverLimit {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n

@@ -528,7 +528,7 @@ type RateLimitResponse_Quota_ValidUntil struct {
 
 func (*RateLimitResponse_Quota_ValidUntil) isRateLimitResponse_Quota_ExpirationSpecifier() {}
 
-// [#next-free-field: 6]
+// [#next-free-field: 7]
 type RateLimitResponse_DescriptorStatus struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The response code for an individual descriptor.
@@ -563,9 +563,14 @@ type RateLimitResponse_DescriptorStatus struct {
 	//    the descriptors, then the request admission is determined by the
 	//    :ref:`overall_code <envoy_v3_api_field_service.ratelimit.v3.RateLimitResponse.overall_code>`.
 	// [#not-implemented-hide:]
-	Quota         *RateLimitResponse_Quota `protobuf:"bytes,5,opt,name=quota,proto3" json:"quota,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Quota *RateLimitResponse_Quota `protobuf:"bytes,5,opt,name=quota,proto3" json:"quota,omitempty"`
+	// Whether the descriptor exceeded its limit but the server did not enforce it because the
+	// limit is in shadow mode. When this is set, ``code`` is ``OK``. Informational only: the
+	// client increments the ``shadow_over_limit`` stat and does not change how it handles the
+	// request.
+	ShadowOverLimit bool `protobuf:"varint,6,opt,name=shadow_over_limit,json=shadowOverLimit,proto3" json:"shadow_over_limit,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *RateLimitResponse_DescriptorStatus) Reset() {
@@ -633,6 +638,13 @@ func (x *RateLimitResponse_DescriptorStatus) GetQuota() *RateLimitResponse_Quota
 	return nil
 }
 
+func (x *RateLimitResponse_DescriptorStatus) GetShadowOverLimit() bool {
+	if x != nil {
+		return x.ShadowOverLimit
+	}
+	return false
+}
+
 var File_envoy_service_ratelimit_v3_rls_proto protoreflect.FileDescriptor
 
 const file_envoy_service_ratelimit_v3_rls_proto_rawDesc = "" +
@@ -643,7 +655,7 @@ const file_envoy_service_ratelimit_v3_rls_proto_rawDesc = "" +
 	"\vdescriptors\x18\x02 \x03(\v29.envoy.extensions.common.ratelimit.v3.RateLimitDescriptorR\vdescriptors\x12\x1f\n" +
 	"\vhits_addend\x18\x03 \x01(\rR\n" +
 	"hitsAddend:2\x9aň\x1e-\n" +
-	"+envoy.service.ratelimit.v2.RateLimitRequest\"\xea\f\n" +
+	"+envoy.service.ratelimit.v2.RateLimitRequest\"\x96\r\n" +
 	"\x11RateLimitResponse\x12U\n" +
 	"\foverall_code\x18\x01 \x01(\x0e22.envoy.service.ratelimit.v3.RateLimitResponse.CodeR\voverallCode\x12Z\n" +
 	"\bstatuses\x18\x02 \x03(\v2>.envoy.service.ratelimit.v3.RateLimitResponse.DescriptorStatusR\bstatuses\x12X\n" +
@@ -674,13 +686,14 @@ const file_envoy_service_ratelimit_v3_rls_proto_rawDesc = "" +
 	"\vvalid_until\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampH\x00R\n" +
 	"validUntil\x12\x0e\n" +
 	"\x02id\x18\x03 \x01(\tR\x02idB\x16\n" +
-	"\x14expiration_specifier\x1a\xbf\x03\n" +
+	"\x14expiration_specifier\x1a\xeb\x03\n" +
 	"\x10DescriptorStatus\x12F\n" +
 	"\x04code\x18\x01 \x01(\x0e22.envoy.service.ratelimit.v3.RateLimitResponse.CodeR\x04code\x12\\\n" +
 	"\rcurrent_limit\x18\x02 \x01(\v27.envoy.service.ratelimit.v3.RateLimitResponse.RateLimitR\fcurrentLimit\x12'\n" +
 	"\x0flimit_remaining\x18\x03 \x01(\rR\x0elimitRemaining\x12K\n" +
 	"\x14duration_until_reset\x18\x04 \x01(\v2\x19.google.protobuf.DurationR\x12durationUntilReset\x12I\n" +
-	"\x05quota\x18\x05 \x01(\v23.envoy.service.ratelimit.v3.RateLimitResponse.QuotaR\x05quota:D\x9aň\x1e?\n" +
+	"\x05quota\x18\x05 \x01(\v23.envoy.service.ratelimit.v3.RateLimitResponse.QuotaR\x05quota\x12*\n" +
+	"\x11shadow_over_limit\x18\x06 \x01(\bR\x0fshadowOverLimit:D\x9aň\x1e?\n" +
 	"=envoy.service.ratelimit.v2.RateLimitResponse.DescriptorStatus\"+\n" +
 	"\x04Code\x12\v\n" +
 	"\aUNKNOWN\x10\x00\x12\x06\n" +
