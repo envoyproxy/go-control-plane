@@ -249,33 +249,19 @@ func (m *IoUringOptions) validate(all bool) error {
 		}
 	}
 
-	if all {
-		switch v := interface{}(m.GetWriteTimeoutMs()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, IoUringOptionsValidationError{
-					field:  "WriteTimeoutMs",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, IoUringOptionsValidationError{
-					field:  "WriteTimeoutMs",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetWriteTimeoutMs()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return IoUringOptionsValidationError{
+	if wrapper := m.GetWriteTimeoutMs(); wrapper != nil {
+
+		if wrapper.GetValue() <= 0 {
+			err := IoUringOptionsValidationError{
 				field:  "WriteTimeoutMs",
-				reason: "embedded message failed validation",
-				cause:  err,
+				reason: "value must be greater than 0",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
+
 	}
 
 	if wrapper := m.GetWriteHighWatermarkBytes(); wrapper != nil {

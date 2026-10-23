@@ -109,7 +109,7 @@ type IoUringOptions struct {
 	// The timeout in milliseconds to wait for pending write operations to complete when closing
 	// a socket. ``io_uring`` writes are asynchronous. If the remote peer stops reading, a write
 	// may never complete. After this timeout, pending writes are canceled and the socket is
-	// closed. If not specified, defaults to 1000.
+	// closed. If not specified, defaults to 1000. When set, the value must be greater than zero.
 	WriteTimeoutMs *wrapperspb.UInt32Value `protobuf:"bytes,4,opt,name=write_timeout_ms,json=writeTimeoutMs,proto3" json:"write_timeout_ms,omitempty"`
 	// The high watermark in bytes for the write buffer. When the amount of pending write data
 	// exceeds this threshold, the socket stops accepting new writes from the connection so that
@@ -224,12 +224,12 @@ const file_envoy_extensions_network_socket_interface_v3_default_socket_interface
 	"\n" +
 	"Kenvoy/extensions/network/socket_interface/v3/default_socket_interface.proto\x12,envoy.extensions.network.socket_interface.v3\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x80\x01\n" +
 	"\x16DefaultSocketInterface\x12f\n" +
-	"\x10io_uring_options\x18\x01 \x01(\v2<.envoy.extensions.network.socket_interface.v3.IoUringOptionsR\x0eioUringOptions\"\xab\x04\n" +
+	"\x10io_uring_options\x18\x01 \x01(\v2<.envoy.extensions.network.socket_interface.v3.IoUringOptionsR\x0eioUringOptions\"\xb4\x04\n" +
 	"\x0eIoUringOptions\x12@\n" +
 	"\rio_uring_size\x18\x01 \x01(\v2\x1c.google.protobuf.UInt32ValueR\vioUringSize\x12E\n" +
 	"\x1fenable_submission_queue_polling\x18\x02 \x01(\bR\x1cenableSubmissionQueuePolling\x12F\n" +
-	"\x10read_buffer_size\x18\x03 \x01(\v2\x1c.google.protobuf.UInt32ValueR\x0ereadBufferSize\x12F\n" +
-	"\x10write_timeout_ms\x18\x04 \x01(\v2\x1c.google.protobuf.UInt32ValueR\x0ewriteTimeoutMs\x12c\n" +
+	"\x10read_buffer_size\x18\x03 \x01(\v2\x1c.google.protobuf.UInt32ValueR\x0ereadBufferSize\x12O\n" +
+	"\x10write_timeout_ms\x18\x04 \x01(\v2\x1c.google.protobuf.UInt32ValueB\a\xfaB\x04*\x02 \x00R\x0ewriteTimeoutMs\x12c\n" +
 	"\x1awrite_high_watermark_bytes\x18\x05 \x01(\v2\x1c.google.protobuf.UInt32ValueB\b\xfaB\x05*\x03(\x80 R\x17writeHighWatermarkBytes\x12a\n" +
 	"\x19write_low_watermark_bytes\x18\x06 \x01(\v2\x1c.google.protobuf.UInt32ValueB\b\xfaB\x05*\x03(\x80\bR\x16writeLowWatermarkBytes\x128\n" +
 	"\x18enable_multishot_receive\x18\a \x01(\bR\x16enableMultishotReceiveB\xcb\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
