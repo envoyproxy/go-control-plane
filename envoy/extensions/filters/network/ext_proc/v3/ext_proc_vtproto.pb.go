@@ -10,6 +10,7 @@ package ext_procv3
 import (
 	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
 	durationpb "github.com/planetscale/vtprotobuf/types/known/durationpb"
+	wrapperspb "github.com/planetscale/vtprotobuf/types/known/wrapperspb"
 	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
@@ -256,6 +257,16 @@ func (m *MetadataOptions) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error)
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.SendOnce != nil {
+		size, err := (*wrapperspb.BoolValue)(m.SendOnce).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1a
+	}
 	if m.ReceivingNamespaces != nil {
 		size, err := m.ReceivingNamespaces.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -374,6 +385,10 @@ func (m *MetadataOptions) SizeVT() (n int) {
 	}
 	if m.ReceivingNamespaces != nil {
 		l = m.ReceivingNamespaces.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.SendOnce != nil {
+		l = (*wrapperspb.BoolValue)(m.SendOnce).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)

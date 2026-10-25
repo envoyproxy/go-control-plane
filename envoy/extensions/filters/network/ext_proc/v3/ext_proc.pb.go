@@ -14,6 +14,7 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -273,8 +274,14 @@ type MetadataOptions struct {
 	// Receiving of typed metadata is not supported.
 	// Set to empty or leave unset to disallow writing any received dynamic metadata.
 	ReceivingNamespaces *MetadataOptions_MetadataNamespaces `protobuf:"bytes,2,opt,name=receiving_namespaces,json=receivingNamespaces,proto3" json:"receiving_namespaces,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	// When set to ``true``, dynamic metadata specified in ``forwarding_namespaces``
+	// is forwarded only on the first ``ProcessingRequest`` of the connection.
+	//
+	// If unset, defaults to ``false`` (dynamic metadata is forwarded on every
+	// ``ProcessingRequest``).
+	SendOnce      *wrapperspb.BoolValue `protobuf:"bytes,3,opt,name=send_once,json=sendOnce,proto3" json:"send_once,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *MetadataOptions) Reset() {
@@ -317,6 +324,13 @@ func (x *MetadataOptions) GetForwardingNamespaces() *MetadataOptions_MetadataNam
 func (x *MetadataOptions) GetReceivingNamespaces() *MetadataOptions_MetadataNamespaces {
 	if x != nil {
 		return x.ReceivingNamespaces
+	}
+	return nil
+}
+
+func (x *MetadataOptions) GetSendOnce() *wrapperspb.BoolValue {
+	if x != nil {
+		return x.SendOnce
 	}
 	return nil
 }
@@ -383,7 +397,7 @@ var File_envoy_extensions_filters_network_ext_proc_v3_ext_proc_proto protoreflec
 
 const file_envoy_extensions_filters_network_ext_proc_v3_ext_proc_proto_rawDesc = "" +
 	"\n" +
-	";envoy/extensions/filters/network/ext_proc/v3/ext_proc.proto\x12,envoy.extensions.filters.network.ext_proc.v3\x1a'envoy/config/core/v3/grpc_service.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x91\x04\n" +
+	";envoy/extensions/filters/network/ext_proc/v3/ext_proc.proto\x12,envoy.extensions.filters.network.ext_proc.v3\x1a'envoy/config/core/v3/grpc_service.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x91\x04\n" +
 	"\x18NetworkExternalProcessor\x12D\n" +
 	"\fgrpc_service\x18\x01 \x01(\v2!.envoy.config.core.v3.GrpcServiceR\vgrpcService\x12,\n" +
 	"\x12failure_mode_allow\x18\x02 \x01(\bR\x10failureModeAllow\x12e\n" +
@@ -399,10 +413,11 @@ const file_envoy_extensions_filters_network_ext_proc_v3_ext_proc_proto_rawDesc =
 	"\rprocess_write\x18\x02 \x01(\x0e2I.envoy.extensions.filters.network.ext_proc.v3.ProcessingMode.DataSendModeR\fprocessWrite\"&\n" +
 	"\fDataSendMode\x12\f\n" +
 	"\bSTREAMED\x10\x00\x12\b\n" +
-	"\x04SKIP\x10\x01\"\xe5\x02\n" +
+	"\x04SKIP\x10\x01\"\x9e\x03\n" +
 	"\x0fMetadataOptions\x12\x85\x01\n" +
 	"\x15forwarding_namespaces\x18\x01 \x01(\v2P.envoy.extensions.filters.network.ext_proc.v3.MetadataOptions.MetadataNamespacesR\x14forwardingNamespaces\x12\x83\x01\n" +
-	"\x14receiving_namespaces\x18\x02 \x01(\v2P.envoy.extensions.filters.network.ext_proc.v3.MetadataOptions.MetadataNamespacesR\x13receivingNamespaces\x1aD\n" +
+	"\x14receiving_namespaces\x18\x02 \x01(\v2P.envoy.extensions.filters.network.ext_proc.v3.MetadataOptions.MetadataNamespacesR\x13receivingNamespaces\x127\n" +
+	"\tsend_once\x18\x03 \x01(\v2\x1a.google.protobuf.BoolValueR\bsendOnce\x1aD\n" +
 	"\x12MetadataNamespaces\x12\x18\n" +
 	"\auntyped\x18\x01 \x03(\tR\auntyped\x12\x14\n" +
 	"\x05typed\x18\x02 \x03(\tR\x05typedB\xbc\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
@@ -430,6 +445,7 @@ var file_envoy_extensions_filters_network_ext_proc_v3_ext_proc_proto_goTypes = [
 	(*MetadataOptions_MetadataNamespaces)(nil), // 4: envoy.extensions.filters.network.ext_proc.v3.MetadataOptions.MetadataNamespaces
 	(*v3.GrpcService)(nil),                     // 5: envoy.config.core.v3.GrpcService
 	(*durationpb.Duration)(nil),                // 6: google.protobuf.Duration
+	(*wrapperspb.BoolValue)(nil),               // 7: google.protobuf.BoolValue
 }
 var file_envoy_extensions_filters_network_ext_proc_v3_ext_proc_proto_depIdxs = []int32{
 	5, // 0: envoy.extensions.filters.network.ext_proc.v3.NetworkExternalProcessor.grpc_service:type_name -> envoy.config.core.v3.GrpcService
@@ -440,11 +456,12 @@ var file_envoy_extensions_filters_network_ext_proc_v3_ext_proc_proto_depIdxs = [
 	0, // 5: envoy.extensions.filters.network.ext_proc.v3.ProcessingMode.process_write:type_name -> envoy.extensions.filters.network.ext_proc.v3.ProcessingMode.DataSendMode
 	4, // 6: envoy.extensions.filters.network.ext_proc.v3.MetadataOptions.forwarding_namespaces:type_name -> envoy.extensions.filters.network.ext_proc.v3.MetadataOptions.MetadataNamespaces
 	4, // 7: envoy.extensions.filters.network.ext_proc.v3.MetadataOptions.receiving_namespaces:type_name -> envoy.extensions.filters.network.ext_proc.v3.MetadataOptions.MetadataNamespaces
-	8, // [8:8] is the sub-list for method output_type
-	8, // [8:8] is the sub-list for method input_type
-	8, // [8:8] is the sub-list for extension type_name
-	8, // [8:8] is the sub-list for extension extendee
-	0, // [0:8] is the sub-list for field type_name
+	7, // 8: envoy.extensions.filters.network.ext_proc.v3.MetadataOptions.send_once:type_name -> google.protobuf.BoolValue
+	9, // [9:9] is the sub-list for method output_type
+	9, // [9:9] is the sub-list for method input_type
+	9, // [9:9] is the sub-list for extension type_name
+	9, // [9:9] is the sub-list for extension extendee
+	0, // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_network_ext_proc_v3_ext_proc_proto_init() }
