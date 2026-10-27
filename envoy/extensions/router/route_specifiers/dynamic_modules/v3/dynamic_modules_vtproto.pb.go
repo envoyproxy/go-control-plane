@@ -10,6 +10,7 @@ package dynamic_modulesv3
 import (
 	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
 	anypb "github.com/planetscale/vtprotobuf/types/known/anypb"
+	durationpb "github.com/planetscale/vtprotobuf/types/known/durationpb"
 	wrapperspb "github.com/planetscale/vtprotobuf/types/known/wrapperspb"
 	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -350,6 +351,64 @@ func (m *RouteOverride) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *BuiltRouteCache) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *BuiltRouteCache) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *BuiltRouteCache) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.VerifyOneIn != nil {
+		size, err := (*wrapperspb.UInt32Value)(m.VerifyOneIn).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.MaxIdleTime != nil {
+		size, err := (*durationpb.Duration)(m.MaxIdleTime).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.MaxEntriesPerWorker != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.MaxEntriesPerWorker))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *DynamicModuleRouteSpecifier) MarshalVTStrict() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
@@ -379,6 +438,16 @@ func (m *DynamicModuleRouteSpecifier) MarshalToSizedBufferVTStrict(dAtA []byte) 
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.BuiltRouteCache != nil {
+		size, err := m.BuiltRouteCache.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x62
 	}
 	if len(m.SpecifierInstanceId) > 0 {
 		i -= len(m.SpecifierInstanceId)
@@ -651,6 +720,27 @@ func (m *RouteOverride) SizeVT() (n int) {
 	return n
 }
 
+func (m *BuiltRouteCache) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.MaxEntriesPerWorker != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.MaxEntriesPerWorker))
+	}
+	if m.MaxIdleTime != nil {
+		l = (*durationpb.Duration)(m.MaxIdleTime).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.VerifyOneIn != nil {
+		l = (*wrapperspb.UInt32Value)(m.VerifyOneIn).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
 func (m *DynamicModuleRouteSpecifier) SizeVT() (n int) {
 	if m == nil {
 		return 0
@@ -714,6 +804,10 @@ func (m *DynamicModuleRouteSpecifier) SizeVT() (n int) {
 	}
 	l = len(m.SpecifierInstanceId)
 	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.BuiltRouteCache != nil {
+		l = m.BuiltRouteCache.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
