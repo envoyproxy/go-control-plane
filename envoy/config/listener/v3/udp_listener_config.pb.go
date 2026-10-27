@@ -28,7 +28,8 @@ type UdpListenerConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// UDP socket configuration for the listener. The default for
 	// :ref:`prefer_gro <envoy_v3_api_field_config.core.v3.UdpSocketConfig.prefer_gro>` is false for
-	// listener sockets. If receiving a large amount of datagrams from a small number of sources, it
+	// listener sockets. When false, GRO is disabled on the listener socket.
+	// If receiving a large amount of datagrams from a small number of sources, it
 	// may be worthwhile to enable this option after performance testing.
 	DownstreamSocketConfig *v3.UdpSocketConfig `protobuf:"bytes,5,opt,name=downstream_socket_config,json=downstreamSocketConfig,proto3" json:"downstream_socket_config,omitempty"`
 	// Configuration for QUIC protocol. If empty, QUIC will not be enabled on this listener. Set
