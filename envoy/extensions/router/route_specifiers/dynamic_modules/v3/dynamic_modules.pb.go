@@ -205,6 +205,8 @@ type RouteOverride struct {
 	// query string, which is preserved, and the result is capped at
 	// :ref:`max_rewritten_path_bytes
 	// <envoy_v3_api_field_extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.max_rewritten_path_bytes>`.
+	// When the module records a prefix rewrite rule, the rule wins, and the regex rewrite applies to
+	// a path the rule does not apply to when the request headers are finalized.
 	RegexRewrite *v32.RegexMatchAndSubstitute `protobuf:"bytes,9,opt,name=regex_rewrite,json=regexRewrite,proto3" json:"regex_rewrite,omitempty"`
 	// Tracing configuration replacing the tracing settings of the produced route, overriding the
 	// connection manager defaults for the request. This is a route level property, so it applies to
@@ -382,8 +384,8 @@ type DynamicModuleRouteSpecifier struct {
 	// ``cluster_not_found_response_code`` of the route instead.
 	ValidateClusters *wrapperspb.BoolValue `protobuf:"bytes,9,opt,name=validate_clusters,json=validateClusters,proto3" json:"validate_clusters,omitempty"`
 	// The maximum length of a request path a module rewrite may produce, covering the full ``:path``
-	// value including the query string. A rewrite whose result would exceed it is rejected. If not
-	// specified, defaults to 65536.
+	// value including the query string. A rewrite whose result would exceed it is rejected, or not
+	// applied when the request headers are finalized. If not specified, defaults to 65536.
 	MaxRewrittenPathBytes *wrapperspb.UInt32Value `protobuf:"bytes,10,opt,name=max_rewritten_path_bytes,json=maxRewrittenPathBytes,proto3" json:"max_rewritten_path_bytes,omitempty"`
 	// An opaque identifier the module reads with ``get_config_specifier_instance_id``, so that two
 	// specifier instances sharing one module can tell the routes they build apart, for example by
