@@ -304,8 +304,7 @@ type TlsParameters struct {
 	//
 	//   Using TLS protocol versions below TLSv1_2 has serious security considerations and risks.
 	TlsMinimumProtocolVersion TlsParameters_TlsProtocol `protobuf:"varint,1,opt,name=tls_minimum_protocol_version,json=tlsMinimumProtocolVersion,proto3,enum=envoy.extensions.transport_sockets.tls.v3.TlsParameters_TlsProtocol" json:"tls_minimum_protocol_version,omitempty"`
-	// Maximum TLS protocol version. By default, it's ``TLSv1_2`` for clients and ``TLSv1_3`` for
-	// servers.
+	// Maximum TLS protocol version. By default, it's ``TLSv1_3`` for both clients and servers.
 	TlsMaximumProtocolVersion TlsParameters_TlsProtocol `protobuf:"varint,2,opt,name=tls_maximum_protocol_version,json=tlsMaximumProtocolVersion,proto3,enum=envoy.extensions.transport_sockets.tls.v3.TlsParameters_TlsProtocol" json:"tls_maximum_protocol_version,omitempty"`
 	// If specified, the TLS listener will only support the specified `cipher list
 	// <https://commondatastorage.googleapis.com/chromium-boringssl-docs/ssl.h.html#Cipher-suite-configuration>`_
