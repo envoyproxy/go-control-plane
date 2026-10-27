@@ -742,6 +742,35 @@ func (m *ToolsListLocal) validate(all bool) error {
 
 	var errors []error
 
+	if all {
+		switch v := interface{}(m.GetCacheConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ToolsListLocalValidationError{
+					field:  "CacheConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ToolsListLocalValidationError{
+					field:  "CacheConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCacheConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ToolsListLocalValidationError{
+				field:  "CacheConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return ToolsListLocalMultiError(errors)
 	}

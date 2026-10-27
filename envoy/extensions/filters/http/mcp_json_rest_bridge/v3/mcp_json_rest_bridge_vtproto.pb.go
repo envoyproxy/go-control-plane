@@ -310,6 +310,16 @@ func (m *ToolsListLocal) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) 
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.CacheConfig != nil {
+		size, err := m.CacheConfig.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0xa
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -969,6 +979,10 @@ func (m *ToolsListLocal) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
+	if m.CacheConfig != nil {
+		l = m.CacheConfig.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
 	n += len(m.unknownFields)
 	return n
 }

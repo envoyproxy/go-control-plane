@@ -659,7 +659,20 @@ func (x *ServerInfo) GetServerDiscoveryCacheConfig() *CacheConfig {
 
 // Configuration for sending locally-generated responses to tools/list requests.
 type ToolsListLocal struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Cache configuration advertised in locally-generated ``tools/list`` responses.
+	//
+	// When multiple endpoint configurations match a request, the selected policy applies to the
+	// entire merged ``tools/list`` response and is resolved by endpoint precedence: exact
+	// ``(host, path)``, host-only ``(host, "")``, path-only ``("", path)``, and global ``("", "")``.
+	// The first matching ``tool_list_local`` tier that explicitly sets ``cache_config`` is used. If a
+	// higher-precedence tier sets ``tool_list_local`` without ``cache_config`` (e.g.,
+	// ``tool_list_local: {}``), it inherits ``cache_config`` from the next matching tier; an explicit
+	// empty ``cache_config: {}`` overrides fallback tiers and resets to defaults.
+	//
+	// If no matching tier sets ``cache_config``: the response advertises ``ttlMs: 0`` and
+	// ``cacheScope: public``.
+	CacheConfig   *CacheConfig `protobuf:"bytes,1,opt,name=cache_config,json=cacheConfig,proto3" json:"cache_config,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -692,6 +705,13 @@ func (x *ToolsListLocal) ProtoReflect() protoreflect.Message {
 // Deprecated: Use ToolsListLocal.ProtoReflect.Descriptor instead.
 func (*ToolsListLocal) Descriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *ToolsListLocal) GetCacheConfig() *CacheConfig {
+	if x != nil {
+		return x.CacheConfig
+	}
+	return nil
 }
 
 // Configuration for the MCP tool capability of the server.
@@ -1418,8 +1438,9 @@ const file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_b
 	"2026-07-28R\x1bmaxSupportedProtocolVersion\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12X\n" +
 	"\x19fallback_protocol_version\x18\x03 \x01(\v2\x1c.google.protobuf.StringValueR\x17fallbackProtocolVersion\x12\x85\x01\n" +
-	"\x1dserver_discovery_cache_config\x18\x04 \x01(\v2B.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.CacheConfigR\x1aserverDiscoveryCacheConfig\"\x10\n" +
-	"\x0eToolsListLocal\"\xfb\x03\n" +
+	"\x1dserver_discovery_cache_config\x18\x04 \x01(\v2B.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.CacheConfigR\x1aserverDiscoveryCacheConfig\"w\n" +
+	"\x0eToolsListLocal\x12e\n" +
+	"\fcache_config\x18\x01 \x01(\v2B.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.CacheConfigR\vcacheConfig\"\xfb\x03\n" +
 	"\x10ServerToolConfig\x12W\n" +
 	"\x05tools\x18\x01 \x03(\v2A.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfigR\x05tools\x12!\n" +
 	"\flist_changed\x18\x02 \x01(\bR\vlistChanged\x12p\n" +
@@ -1531,23 +1552,24 @@ var file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bri
 	19, // 8: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerInfo.max_supported_protocol_version:type_name -> google.protobuf.StringValue
 	19, // 9: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerInfo.fallback_protocol_version:type_name -> google.protobuf.StringValue
 	6,  // 10: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerInfo.server_discovery_cache_config:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.CacheConfig
-	12, // 11: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tools:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig
-	14, // 12: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tool_list_http_rule:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
-	8,  // 13: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tool_list_local:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListLocal
-	11, // 14: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.default_server_info:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpServerInfo
-	14, // 15: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.http_rule:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
-	10, // 16: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.tool_list_config:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListSpecificConfig
-	11, // 17: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.server_info:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpServerInfo
-	13, // 18: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.mcp_param_headers:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpParamHeader
-	2,  // 19: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpParamHeader.type:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpParamHeader.Type
-	16, // 20: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule.bindings:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule.ParameterBinding
-	9,  // 21: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridgePerRoute.tool_config:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig
-	3,  // 22: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule.ParameterBinding.type:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule.ParameterBinding.Type
-	23, // [23:23] is the sub-list for method output_type
-	23, // [23:23] is the sub-list for method input_type
-	23, // [23:23] is the sub-list for extension type_name
-	23, // [23:23] is the sub-list for extension extendee
-	0,  // [0:23] is the sub-list for field type_name
+	6,  // 11: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListLocal.cache_config:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.CacheConfig
+	12, // 12: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tools:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig
+	14, // 13: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tool_list_http_rule:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
+	8,  // 14: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tool_list_local:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListLocal
+	11, // 15: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.default_server_info:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpServerInfo
+	14, // 16: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.http_rule:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
+	10, // 17: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.tool_list_config:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolsListSpecificConfig
+	11, // 18: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.server_info:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpServerInfo
+	13, // 19: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.mcp_param_headers:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpParamHeader
+	2,  // 20: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpParamHeader.type:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpParamHeader.Type
+	16, // 21: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule.bindings:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule.ParameterBinding
+	9,  // 22: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridgePerRoute.tool_config:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig
+	3,  // 23: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule.ParameterBinding.type:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule.ParameterBinding.Type
+	24, // [24:24] is the sub-list for method output_type
+	24, // [24:24] is the sub-list for method input_type
+	24, // [24:24] is the sub-list for extension type_name
+	24, // [24:24] is the sub-list for extension extendee
+	0,  // [0:24] is the sub-list for field type_name
 }
 
 func init() {
