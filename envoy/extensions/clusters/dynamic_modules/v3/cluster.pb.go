@@ -48,8 +48,29 @@ type ClusterConfig struct {
 	// knowledge of protobuf encoding. Otherwise, the serialized bytes of the type are passed.
 	// If not specified, an empty configuration is passed.
 	ClusterConfig *anypb.Any `protobuf:"bytes,3,opt,name=cluster_config,json=clusterConfig,proto3" json:"cluster_config,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	// If true, the cluster patches its host partitions by each added, removed or health-changed host
+	// instead of rebuilding them from every host, and hands workers a snapshot, so a host update
+	// costs O(changed hosts) instead of O(N) on the main thread. Defaults to false.
+	//
+	// It helps a module whose load balancer patches its own state from the membership callbacks,
+	// including the health-changed hosts read through
+	// ``envoy_dynamic_module_callback_cluster_lb_get_member_update_health_changed_host_count`` and
+	// ``envoy_dynamic_module_callback_cluster_lb_get_member_update_health_changed_host``, which list
+	// every health change since the previous update a worker applied, merged over the
+	// cluster's ``update_merge_window``. Pair it with
+	// ``envoy_dynamic_module_callback_cluster_use_persistent_host_map``, since adds and removes
+	// otherwise still copy the whole cross-priority host map.
+	//
+	// Costs: it requires ``lb_policy: CLUSTER_PROVIDED``, since native policies read the host lists
+	// on every update. It uses about 3x the per-host memory on the main thread, and any thread that
+	// reads a host list by index builds a flat copy of that list after each update. Host lists are no
+	// longer in insertion order, so an index, such as the one
+	// ``envoy_dynamic_module_callback_cluster_lb_set_host_data`` takes, can refer to a different host
+	// after an add. Bulk adds are slower than with the default storage. An aggregate cluster that lists
+	// this cluster rebuilds all of its host lists on every worker after each update.
+	UsePersistentHostPartitions bool `protobuf:"varint,4,opt,name=use_persistent_host_partitions,json=usePersistentHostPartitions,proto3" json:"use_persistent_host_partitions,omitempty"`
+	unknownFields               protoimpl.UnknownFields
+	sizeCache                   protoimpl.SizeCache
 }
 
 func (x *ClusterConfig) Reset() {
@@ -103,15 +124,23 @@ func (x *ClusterConfig) GetClusterConfig() *anypb.Any {
 	return nil
 }
 
+func (x *ClusterConfig) GetUsePersistentHostPartitions() bool {
+	if x != nil {
+		return x.UsePersistentHostPartitions
+	}
+	return false
+}
+
 var File_envoy_extensions_clusters_dynamic_modules_v3_cluster_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_clusters_dynamic_modules_v3_cluster_proto_rawDesc = "" +
 	"\n" +
-	":envoy/extensions/clusters/dynamic_modules/v3/cluster.proto\x12,envoy.extensions.clusters.dynamic_modules.v3\x1a9envoy/extensions/dynamic_modules/v3/dynamic_modules.proto\x1a\x19google/protobuf/any.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xf0\x01\n" +
+	":envoy/extensions/clusters/dynamic_modules/v3/cluster.proto\x12,envoy.extensions.clusters.dynamic_modules.v3\x1a9envoy/extensions/dynamic_modules/v3/dynamic_modules.proto\x1a\x19google/protobuf/any.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xb5\x02\n" +
 	"\rClusterConfig\x12v\n" +
 	"\x15dynamic_module_config\x18\x01 \x01(\v28.envoy.extensions.dynamic_modules.v3.DynamicModuleConfigB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x13dynamicModuleConfig\x12*\n" +
 	"\fcluster_name\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\vclusterName\x12;\n" +
-	"\x0ecluster_config\x18\x03 \x01(\v2\x14.google.protobuf.AnyR\rclusterConfigB\xbb\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x0ecluster_config\x18\x03 \x01(\v2\x14.google.protobuf.AnyR\rclusterConfig\x12C\n" +
+	"\x1euse_persistent_host_partitions\x18\x04 \x01(\bR\x1busePersistentHostPartitionsB\xbb\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	":io.envoyproxy.envoy.extensions.clusters.dynamic_modules.v3B\fClusterProtoP\x01Zegithub.com/envoyproxy/go-control-plane/envoy/extensions/clusters/dynamic_modules/v3;dynamic_modulesv3b\x06proto3"
 
 var (

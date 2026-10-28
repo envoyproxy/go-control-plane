@@ -138,6 +138,8 @@ func (m *ClusterConfig) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for UsePersistentHostPartitions
+
 	if len(errors) > 0 {
 		return ClusterConfigMultiError(errors)
 	}

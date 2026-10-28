@@ -51,6 +51,16 @@ func (m *ClusterConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.UsePersistentHostPartitions {
+		i--
+		if m.UsePersistentHostPartitions {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x20
+	}
 	if m.ClusterConfig != nil {
 		size, err := (*anypb.Any)(m.ClusterConfig).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -116,6 +126,9 @@ func (m *ClusterConfig) SizeVT() (n int) {
 	if m.ClusterConfig != nil {
 		l = (*anypb.Any)(m.ClusterConfig).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.UsePersistentHostPartitions {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n
