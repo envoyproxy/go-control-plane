@@ -142,7 +142,9 @@ func (TokenUsageExtraction_UsageSignal) EnumDescriptor() ([]byte, []int) {
 // of “request_handling“ and “response_handling“. Which routes are AI
 // endpoints — and which :ref:`wire API <envoy_v3_api_enum_type.ai.v3.LLMProtocol>`
 // each speaks — is declared with the :ref:`per-route configuration
-// <envoy_v3_api_msg_extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute>`.
+// <envoy_v3_api_msg_extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute>`,
+// or per request by a filter ahead naming the API in the
+// “envoy.ai.llm_protocol.request“ filter state object.
 type AiProtocolManager struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Request-side AI protocol processing. When unset, the decode path is a
@@ -428,10 +430,12 @@ type TokenUsageExtraction struct {
 	// Defaults to ``false``: only routes carrying an
 	// :ref:`AiProtocolManagerPerRoute
 	// <envoy_v3_api_msg_extensions.filters.http.ai_protocol_manager.v3.AiProtocolManagerPerRoute>`
-	// configuration are inspected, so enabling token usage on a mixed listener
-	// does not silently parse unrelated JSON/SSE responses. Enable this for
-	// response-only installations whose routes cannot be declared — for
-	// example an upstream installation on a dynamic-forward-proxy cluster.
+	// configuration, and requests whose ``envoy.ai.llm_protocol.request`` filter
+	// state object names an API, are inspected, so enabling token usage on a
+	// mixed listener does not silently parse unrelated JSON/SSE responses.
+	// Enable this for response-only installations whose routes cannot be
+	// declared — for example an upstream installation on a
+	// dynamic-forward-proxy cluster.
 	IncludeUnconfiguredRoutes bool `protobuf:"varint,1,opt,name=include_unconfigured_routes,json=includeUnconfiguredRoutes,proto3" json:"include_unconfigured_routes,omitempty"`
 	// Fallback wire API used when the route does not identify a response API.
 	//
