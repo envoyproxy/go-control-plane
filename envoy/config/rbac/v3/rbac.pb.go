@@ -1435,9 +1435,10 @@ func (x *Principal_Set) GetIds() []*Principal {
 // which should be used for most use cases due to its improved security.
 type Principal_Authenticated struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The name of the principal. If set, The URI SAN or DNS SAN in that order
-	// is used from the certificate, otherwise the subject field is used. If
-	// unset, it applies to any user that is allowed by the downstream TLS configuration.
+	// The name of the principal. If set, it matches if any URI SAN, any DNS SAN, or the subject
+	// field (in RFC 2253 format) of the peer certificate matches. All three are always checked,
+	// so a certificate whose URI SANs do not match can still match on a DNS SAN or its subject.
+	// If unset, it applies to any user that is allowed by the downstream TLS configuration.
 	// If :ref:`require_client_certificate <envoy_v3_api_field_extensions.transport_sockets.tls.v3.DownstreamTlsContext.require_client_certificate>`
 	// is false or :ref:`trust_chain_verification <envoy_v3_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.trust_chain_verification>`
 	// is set to :ref:`ACCEPT_UNTRUSTED <envoy_v3_api_enum_value_extensions.transport_sockets.tls.v3.CertificateValidationContext.TrustChainVerification.ACCEPT_UNTRUSTED>`,
