@@ -60,7 +60,7 @@ func (m *LLMBinding) validate(all bool) error {
 
 	// no validation rules for UriPattern
 
-	for idx, item := range m.GetMutations() {
+	for idx, item := range m.GetHeaderMutations() {
 		_, _ = idx, item
 
 		if all {
@@ -68,7 +68,7 @@ func (m *LLMBinding) validate(all bool) error {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
 					errors = append(errors, LLMBindingValidationError{
-						field:  fmt.Sprintf("Mutations[%v]", idx),
+						field:  fmt.Sprintf("HeaderMutations[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -76,7 +76,7 @@ func (m *LLMBinding) validate(all bool) error {
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
 					errors = append(errors, LLMBindingValidationError{
-						field:  fmt.Sprintf("Mutations[%v]", idx),
+						field:  fmt.Sprintf("HeaderMutations[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -85,7 +85,41 @@ func (m *LLMBinding) validate(all bool) error {
 		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return LLMBindingValidationError{
-					field:  fmt.Sprintf("Mutations[%v]", idx),
+					field:  fmt.Sprintf("HeaderMutations[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	for idx, item := range m.GetBodyMutations() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, LLMBindingValidationError{
+						field:  fmt.Sprintf("BodyMutations[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, LLMBindingValidationError{
+						field:  fmt.Sprintf("BodyMutations[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return LLMBindingValidationError{
+					field:  fmt.Sprintf("BodyMutations[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -170,176 +204,3 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = LLMBindingValidationError{}
-
-// Validate checks the field values on LLMBinding_Mutation with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *LLMBinding_Mutation) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on LLMBinding_Mutation with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// LLMBinding_MutationMultiError, or nil if none found.
-func (m *LLMBinding_Mutation) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *LLMBinding_Mutation) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	if all {
-		switch v := interface{}(m.GetValue()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, LLMBinding_MutationValidationError{
-					field:  "Value",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, LLMBinding_MutationValidationError{
-					field:  "Value",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetValue()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LLMBinding_MutationValidationError{
-				field:  "Value",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	// no validation rules for KeepExisting
-
-	oneofTargetPresent := false
-	switch v := m.Target.(type) {
-	case *LLMBinding_Mutation_BodyField:
-		if v == nil {
-			err := LLMBinding_MutationValidationError{
-				field:  "Target",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-		oneofTargetPresent = true
-
-		if utf8.RuneCountInString(m.GetBodyField()) < 1 {
-			err := LLMBinding_MutationValidationError{
-				field:  "BodyField",
-				reason: "value length must be at least 1 runes",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-	default:
-		_ = v // ensures v is used
-	}
-	if !oneofTargetPresent {
-		err := LLMBinding_MutationValidationError{
-			field:  "Target",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if len(errors) > 0 {
-		return LLMBinding_MutationMultiError(errors)
-	}
-
-	return nil
-}
-
-// LLMBinding_MutationMultiError is an error wrapping multiple validation
-// errors returned by LLMBinding_Mutation.ValidateAll() if the designated
-// constraints aren't met.
-type LLMBinding_MutationMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m LLMBinding_MutationMultiError) Error() string {
-	msgs := make([]string, 0, len(m))
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m LLMBinding_MutationMultiError) AllErrors() []error { return m }
-
-// LLMBinding_MutationValidationError is the validation error returned by
-// LLMBinding_Mutation.Validate if the designated constraints aren't met.
-type LLMBinding_MutationValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e LLMBinding_MutationValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e LLMBinding_MutationValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e LLMBinding_MutationValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e LLMBinding_MutationValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e LLMBinding_MutationValidationError) ErrorName() string {
-	return "LLMBinding_MutationValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e LLMBinding_MutationValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sLLMBinding_Mutation.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = LLMBinding_MutationValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = LLMBinding_MutationValidationError{}

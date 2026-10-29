@@ -9,10 +9,10 @@ package aiv3
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	_ "github.com/cncf/xds/go/xds/annotations/v3"
-	_ "github.com/envoyproxy/protoc-gen-validate/validate"
+	v3 "github.com/envoyproxy/go-control-plane/envoy/config/common/mutation_rules/v3"
+	v31 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	structpb "google.golang.org/protobuf/types/known/structpb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -26,21 +26,37 @@ const (
 )
 
 // How a provider carries an :ref:`LLMProtocol <envoy_v3_api_enum_type.ai.v3.LLMProtocol>` on
-// HTTP, where that differs from the API's own: the request path, and edits to the request body.
-// The API itself -- its schemas, stream events and usage -- does not change.
+// HTTP, where that differs from the API's own: the request path, and edits to the request body
+// and headers. The API itself -- its schemas, stream events and usage -- does not change.
 //
 // Claude on Vertex AI:
 //
 // .. code-block:: yaml
 //
 //	uri_pattern: "/v1/projects/my-project/locations/us-east5/publishers/anthropic/models/{model}:{rawPredict|streamRawPredict}"
-//	mutations:
-//	- { body_field: model }
-//	- { body_field: anthropic_version, value: vertex-2023-10-16, keep_existing: true }
+//	body_mutations:
+//	- remove: model
+//	- append:
+//	    record: { key: anthropic_version, value: vertex-2023-10-16 }
+//	    action: ADD_IF_ABSENT
+//	header_mutations:
+//	- remove: anthropic-version
 //
-// On the way out, the path is rendered from the request and the mutations are applied in order.
-// On the way in, the model and streaming mode the path names are written into the body and the
-// body fields the mutations write are removed, so the API's own document is transcoded.
+// The Anthropic API itself, which Envoy defines as the binding of “ANTHROPIC_MESSAGES“:
+//
+// .. code-block:: yaml
+//
+//	uri_pattern: "/v1/messages"
+//	header_mutations:
+//	- append:
+//	    header: { key: anthropic-version, value: "2023-06-01" }
+//	    append_action: ADD_IF_ABSENT
+//
+// A binding's mutations apply on top of the API's, so the Vertex binding removes the API's
+// version header, which Vertex does not take, by naming it. On the way out, the path is rendered
+// from the request and the mutations are applied in order, headers first. On the way in, the
+// model and streaming mode the path names are written into the body and the body fields and
+// headers the mutations write are removed, so the API's own document is transcoded.
 type LLMBinding struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The request path, as a :ref:`URI pattern
@@ -52,9 +68,63 @@ type LLMBinding struct {
 	// it is rendered from them. Unnamed wildcards and the query are never read. When empty, the
 	// API's own path is used.
 	UriPattern string `protobuf:"bytes,1,opt,name=uri_pattern,json=uriPattern,proto3" json:"uri_pattern,omitempty"`
-	// Edits to the request body, applied in order. When empty, the API's own edits apply, such as
-	// removing ``model`` and ``stream`` for Gemini.
-	Mutations     []*LLMBinding_Mutation `protobuf:"bytes,2,rep,name=mutations,proto3" json:"mutations,omitempty"`
+	// Ordered edits to the request headers, applied after the API's own edits and before
+	// ``body_mutations``. One that names a header the API's edits also name replaces that edit; the
+	// API's other edits still apply. So a binding that only adds a header keeps, say, Gemini's
+	// removal of ``model`` and ``stream`` from the body, and overrides one of the API's edits by
+	// naming its target.
+	//
+	// Of a :ref:`HeaderMutation <envoy_v3_api_msg_config.common.mutation_rules.v3.HeaderMutation>`,
+	// this is what is accepted. The rest is rejected for now, so that accepting it later changes no
+	// binding's meaning.
+	//
+	// .. list-table::
+	//    :header-rows: 1
+	//
+	//    * - Field
+	//      - Effect
+	//    * - ``remove``
+	//      - Removes the header.
+	//    * - ``append`` with ``append_action: OVERWRITE_IF_EXISTS_OR_ADD``
+	//      - Sets the header to ``header.value``.
+	//    * - ``append`` with ``append_action: ADD_IF_ABSENT``
+	//      - Sets the header only where the request has none.
+	//    * - ``append`` with ``append_action`` unset (``APPEND_IF_EXISTS_OR_ADD``) or ``OVERWRITE_IF_EXISTS``
+	//      - Rejected: the action is named.
+	//    * - ``remove_on_match``, ``header.raw_value``, the deprecated ``append`` flag
+	//      - Rejected.
+	//
+	// The value is not a format string. Only ``{model}``, the body's model, and the client's path
+	// variables, such as ``{project}``, are replaced; a binding can arrive through filter state
+	// built from request data, so it is never evaluated as one. Pseudo-headers (``:path`` is
+	// ``uri_pattern``'s), ``host``, ``content-length`` and ``transfer-encoding`` are not accepted.
+	// Credentials do not belong here: a binding is configuration, not a secret.
+	HeaderMutations []*v3.HeaderMutation `protobuf:"bytes,3,rep,name=header_mutations,json=headerMutations,proto3" json:"header_mutations,omitempty"`
+	// Ordered edits to the top-level members of the request body, applied after the API's own
+	// edits and after ``header_mutations``, replacing the API's edits to the same fields as
+	// ``header_mutations`` do for headers.
+	//
+	// Of a :ref:`KeyValueMutation <envoy_v3_api_msg_config.core.v3.KeyValueMutation>`, this is what
+	// is accepted, as for a header.
+	//
+	// .. list-table::
+	//    :header-rows: 1
+	//
+	//    * - Field
+	//      - Effect
+	//    * - ``remove``
+	//      - Removes the field.
+	//    * - ``append`` with ``action: OVERWRITE_IF_EXISTS_OR_ADD``
+	//      - Sets the field to ``record.value``, any JSON value.
+	//    * - ``append`` with ``action: ADD_IF_ABSENT``
+	//      - Sets the field only where the body has none.
+	//    * - ``append`` with ``action`` unset (``APPEND_IF_EXISTS_OR_ADD``) or ``OVERWRITE_IF_EXISTS``
+	//      - Rejected: the action is named.
+	//    * - ``append`` with a null or unset ``record.value``, or with the deprecated ``entry``
+	//      - Rejected: ``remove`` removes a field.
+	//
+	// In a string value, ``{name}`` is replaced as in ``header_mutations``, and nothing else is.
+	BodyMutations []*v31.KeyValueMutation `protobuf:"bytes,4,rep,name=body_mutations,json=bodyMutations,proto3" json:"body_mutations,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -96,117 +166,31 @@ func (x *LLMBinding) GetUriPattern() string {
 	return ""
 }
 
-func (x *LLMBinding) GetMutations() []*LLMBinding_Mutation {
+func (x *LLMBinding) GetHeaderMutations() []*v3.HeaderMutation {
 	if x != nil {
-		return x.Mutations
+		return x.HeaderMutations
 	}
 	return nil
 }
 
-// One edit to the request body: a field is written, or removed when “value“ is unset or null.
-type LLMBinding_Mutation struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to Target:
-	//
-	//	*LLMBinding_Mutation_BodyField
-	Target isLLMBinding_Mutation_Target `protobuf_oneof:"target"`
-	// The value to write. In a string, ``{name}`` is replaced by a value of the request:
-	// ``{model}`` by the body's model, any other name by a path variable the client's path holds,
-	// such as ``{project}``. When unset or null, the field is removed.
-	Value *structpb.Value `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
-	// Write ``value`` only where the field is absent, rather than replace it.
-	KeepExisting  bool `protobuf:"varint,3,opt,name=keep_existing,json=keepExisting,proto3" json:"keep_existing,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *LLMBinding_Mutation) Reset() {
-	*x = LLMBinding_Mutation{}
-	mi := &file_envoy_type_ai_v3_llm_binding_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *LLMBinding_Mutation) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*LLMBinding_Mutation) ProtoMessage() {}
-
-func (x *LLMBinding_Mutation) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_type_ai_v3_llm_binding_proto_msgTypes[1]
+func (x *LLMBinding) GetBodyMutations() []*v31.KeyValueMutation {
 	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use LLMBinding_Mutation.ProtoReflect.Descriptor instead.
-func (*LLMBinding_Mutation) Descriptor() ([]byte, []int) {
-	return file_envoy_type_ai_v3_llm_binding_proto_rawDescGZIP(), []int{0, 0}
-}
-
-func (x *LLMBinding_Mutation) GetTarget() isLLMBinding_Mutation_Target {
-	if x != nil {
-		return x.Target
+		return x.BodyMutations
 	}
 	return nil
 }
-
-func (x *LLMBinding_Mutation) GetBodyField() string {
-	if x != nil {
-		if x, ok := x.Target.(*LLMBinding_Mutation_BodyField); ok {
-			return x.BodyField
-		}
-	}
-	return ""
-}
-
-func (x *LLMBinding_Mutation) GetValue() *structpb.Value {
-	if x != nil {
-		return x.Value
-	}
-	return nil
-}
-
-func (x *LLMBinding_Mutation) GetKeepExisting() bool {
-	if x != nil {
-		return x.KeepExisting
-	}
-	return false
-}
-
-type isLLMBinding_Mutation_Target interface {
-	isLLMBinding_Mutation_Target()
-}
-
-type LLMBinding_Mutation_BodyField struct {
-	// A top-level member of the request body.
-	BodyField string `protobuf:"bytes,1,opt,name=body_field,json=bodyField,proto3,oneof"`
-}
-
-func (*LLMBinding_Mutation_BodyField) isLLMBinding_Mutation_Target() {}
 
 var File_envoy_type_ai_v3_llm_binding_proto protoreflect.FileDescriptor
 
 const file_envoy_type_ai_v3_llm_binding_proto_rawDesc = "" +
 	"\n" +
-	"\"envoy/type/ai/v3/llm_binding.proto\x12\x10envoy.type.ai.v3\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x8b\x02\n" +
+	"\"envoy/type/ai/v3/llm_binding.proto\x12\x10envoy.type.ai.v3\x1a:envoy/config/common/mutation_rules/v3/mutation_rules.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\"\xe4\x01\n" +
 	"\n" +
 	"LLMBinding\x12\x1f\n" +
 	"\vuri_pattern\x18\x01 \x01(\tR\n" +
-	"uriPattern\x12C\n" +
-	"\tmutations\x18\x02 \x03(\v2%.envoy.type.ai.v3.LLMBinding.MutationR\tmutations\x1a\x96\x01\n" +
-	"\bMutation\x12(\n" +
-	"\n" +
-	"body_field\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01H\x00R\tbodyField\x12,\n" +
-	"\x05value\x18\x02 \x01(\v2\x16.google.protobuf.ValueR\x05value\x12#\n" +
-	"\rkeep_existing\x18\x03 \x01(\bR\fkeepExistingB\r\n" +
-	"\x06target\x12\x03\xf8B\x01B\x81\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
+	"uriPattern\x12`\n" +
+	"\x10header_mutations\x18\x03 \x03(\v25.envoy.config.common.mutation_rules.v3.HeaderMutationR\x0fheaderMutations\x12M\n" +
+	"\x0ebody_mutations\x18\x04 \x03(\v2&.envoy.config.core.v3.KeyValueMutationR\rbodyMutationsJ\x04\b\x02\x10\x03B\x81\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
 	"\x1eio.envoyproxy.envoy.type.ai.v3B\x0fLlmBindingProtoP\x01Z<github.com/envoyproxy/go-control-plane/envoy/type/ai/v3;aiv3b\x06proto3"
 
 var (
@@ -221,15 +205,15 @@ func file_envoy_type_ai_v3_llm_binding_proto_rawDescGZIP() []byte {
 	return file_envoy_type_ai_v3_llm_binding_proto_rawDescData
 }
 
-var file_envoy_type_ai_v3_llm_binding_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_envoy_type_ai_v3_llm_binding_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_envoy_type_ai_v3_llm_binding_proto_goTypes = []any{
-	(*LLMBinding)(nil),          // 0: envoy.type.ai.v3.LLMBinding
-	(*LLMBinding_Mutation)(nil), // 1: envoy.type.ai.v3.LLMBinding.Mutation
-	(*structpb.Value)(nil),      // 2: google.protobuf.Value
+	(*LLMBinding)(nil),           // 0: envoy.type.ai.v3.LLMBinding
+	(*v3.HeaderMutation)(nil),    // 1: envoy.config.common.mutation_rules.v3.HeaderMutation
+	(*v31.KeyValueMutation)(nil), // 2: envoy.config.core.v3.KeyValueMutation
 }
 var file_envoy_type_ai_v3_llm_binding_proto_depIdxs = []int32{
-	1, // 0: envoy.type.ai.v3.LLMBinding.mutations:type_name -> envoy.type.ai.v3.LLMBinding.Mutation
-	2, // 1: envoy.type.ai.v3.LLMBinding.Mutation.value:type_name -> google.protobuf.Value
+	1, // 0: envoy.type.ai.v3.LLMBinding.header_mutations:type_name -> envoy.config.common.mutation_rules.v3.HeaderMutation
+	2, // 1: envoy.type.ai.v3.LLMBinding.body_mutations:type_name -> envoy.config.core.v3.KeyValueMutation
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
@@ -242,16 +226,13 @@ func file_envoy_type_ai_v3_llm_binding_proto_init() {
 	if File_envoy_type_ai_v3_llm_binding_proto != nil {
 		return
 	}
-	file_envoy_type_ai_v3_llm_binding_proto_msgTypes[1].OneofWrappers = []any{
-		(*LLMBinding_Mutation_BodyField)(nil),
-	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_type_ai_v3_llm_binding_proto_rawDesc), len(file_envoy_type_ai_v3_llm_binding_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
