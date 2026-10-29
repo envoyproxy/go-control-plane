@@ -686,6 +686,8 @@ func (m *Mcp_TraceContextPropagationConfig) validate(all bool) error {
 
 	var errors []error
 
+	// no validation rules for Mode
+
 	if len(errors) > 0 {
 		return Mcp_TraceContextPropagationConfigMultiError(errors)
 	}
