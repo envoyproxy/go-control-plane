@@ -193,6 +193,11 @@ type EndpointHealth struct {
 	//   returned by the upstream endpoint during the most recent health check,
 	//   e.g. ``200``, ``503``. Only present when the health check received a
 	//   complete HTTP response; absent on connection failures or timeouts.
+	//
+	// Any other key (string)
+	//   Set by a :ref:`dynamic module health checker
+	//   <envoy_v3_api_msg_extensions.health_checkers.dynamic_modules.v3.DynamicModuleHealthCheck>`.
+	//   Contains the string key/value pairs the module attached to its most recent health check.
 	HealthMetadata *structpb.Struct `protobuf:"bytes,3,opt,name=health_metadata,json=healthMetadata,proto3" json:"health_metadata,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
