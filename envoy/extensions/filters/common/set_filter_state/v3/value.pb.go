@@ -113,6 +113,26 @@ type FilterStateValue struct {
 	SharedWithUpstream FilterStateValue_SharedWithUpstream `protobuf:"varint,4,opt,name=shared_with_upstream,json=sharedWithUpstream,proto3,enum=envoy.extensions.filters.common.set_filter_state.v3.FilterStateValue_SharedWithUpstream" json:"shared_with_upstream,omitempty"`
 	// Skip the update if the value evaluates to an empty string.
 	// This option can be used to supply multiple alternatives for the same filter state object key.
+	//
+	// .. note::
+	//
+	//   A command operator that has no value renders as ``-`` in a text format string, so a
+	//   ``format_string`` such as ``%FILTER_STATE(missing.key:PLAIN)%`` evaluates to ``-``, not to
+	//   an empty string, and the object is set to ``-``. To skip the update in that case, also set
+	//   :ref:`omit_empty_values
+	//   <envoy_v3_api_field_config.core.v3.SubstitutionFormatString.omit_empty_values>` in the
+	//   ``format_string``:
+	//
+	//   .. code-block:: yaml
+	//
+	//      object_key: my.custom.key
+	//      factory_key: envoy.string
+	//      skip_if_empty: true
+	//      format_string:
+	//        omit_empty_values: true
+	//        text_format_source:
+	//          inline_string: "%FILTER_STATE(missing.key:PLAIN)%"
+	//
 	SkipIfEmpty   bool `protobuf:"varint,5,opt,name=skip_if_empty,json=skipIfEmpty,proto3" json:"skip_if_empty,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
