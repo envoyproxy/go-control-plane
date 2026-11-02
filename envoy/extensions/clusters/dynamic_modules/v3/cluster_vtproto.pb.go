@@ -10,6 +10,7 @@ package dynamic_modulesv3
 import (
 	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
 	anypb "github.com/planetscale/vtprotobuf/types/known/anypb"
+	wrapperspb "github.com/planetscale/vtprotobuf/types/known/wrapperspb"
 	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
@@ -51,15 +52,15 @@ func (m *ClusterConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if m.UsePersistentHostPartitions {
-		i--
-		if m.UsePersistentHostPartitions {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
+	if m.UsePersistentHostPartitions != nil {
+		size, err := (*wrapperspb.BoolValue)(m.UsePersistentHostPartitions).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
 		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
 		i--
-		dAtA[i] = 0x20
+		dAtA[i] = 0x22
 	}
 	if m.ClusterConfig != nil {
 		size, err := (*anypb.Any)(m.ClusterConfig).MarshalToSizedBufferVTStrict(dAtA[:i])
@@ -127,8 +128,9 @@ func (m *ClusterConfig) SizeVT() (n int) {
 		l = (*anypb.Any)(m.ClusterConfig).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
-	if m.UsePersistentHostPartitions {
-		n += 2
+	if m.UsePersistentHostPartitions != nil {
+		l = (*wrapperspb.BoolValue)(m.UsePersistentHostPartitions).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n

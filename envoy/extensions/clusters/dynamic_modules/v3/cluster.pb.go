@@ -13,6 +13,7 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	anypb "google.golang.org/protobuf/types/known/anypb"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -68,7 +69,7 @@ type ClusterConfig struct {
 	// ``envoy_dynamic_module_callback_cluster_lb_set_host_data`` takes, can refer to a different host
 	// after an add. Bulk adds are slower than with the default storage. An aggregate cluster that lists
 	// this cluster rebuilds all of its host lists on every worker after each update.
-	UsePersistentHostPartitions bool `protobuf:"varint,4,opt,name=use_persistent_host_partitions,json=usePersistentHostPartitions,proto3" json:"use_persistent_host_partitions,omitempty"`
+	UsePersistentHostPartitions *wrapperspb.BoolValue `protobuf:"bytes,4,opt,name=use_persistent_host_partitions,json=usePersistentHostPartitions,proto3" json:"use_persistent_host_partitions,omitempty"`
 	unknownFields               protoimpl.UnknownFields
 	sizeCache                   protoimpl.SizeCache
 }
@@ -124,23 +125,23 @@ func (x *ClusterConfig) GetClusterConfig() *anypb.Any {
 	return nil
 }
 
-func (x *ClusterConfig) GetUsePersistentHostPartitions() bool {
+func (x *ClusterConfig) GetUsePersistentHostPartitions() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.UsePersistentHostPartitions
 	}
-	return false
+	return nil
 }
 
 var File_envoy_extensions_clusters_dynamic_modules_v3_cluster_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_clusters_dynamic_modules_v3_cluster_proto_rawDesc = "" +
 	"\n" +
-	":envoy/extensions/clusters/dynamic_modules/v3/cluster.proto\x12,envoy.extensions.clusters.dynamic_modules.v3\x1a9envoy/extensions/dynamic_modules/v3/dynamic_modules.proto\x1a\x19google/protobuf/any.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xb5\x02\n" +
+	":envoy/extensions/clusters/dynamic_modules/v3/cluster.proto\x12,envoy.extensions.clusters.dynamic_modules.v3\x1a9envoy/extensions/dynamic_modules/v3/dynamic_modules.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xd1\x02\n" +
 	"\rClusterConfig\x12v\n" +
 	"\x15dynamic_module_config\x18\x01 \x01(\v28.envoy.extensions.dynamic_modules.v3.DynamicModuleConfigB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x13dynamicModuleConfig\x12*\n" +
 	"\fcluster_name\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\vclusterName\x12;\n" +
-	"\x0ecluster_config\x18\x03 \x01(\v2\x14.google.protobuf.AnyR\rclusterConfig\x12C\n" +
-	"\x1euse_persistent_host_partitions\x18\x04 \x01(\bR\x1busePersistentHostPartitionsB\xbb\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x0ecluster_config\x18\x03 \x01(\v2\x14.google.protobuf.AnyR\rclusterConfig\x12_\n" +
+	"\x1euse_persistent_host_partitions\x18\x04 \x01(\v2\x1a.google.protobuf.BoolValueR\x1busePersistentHostPartitionsB\xbb\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	":io.envoyproxy.envoy.extensions.clusters.dynamic_modules.v3B\fClusterProtoP\x01Zegithub.com/envoyproxy/go-control-plane/envoy/extensions/clusters/dynamic_modules/v3;dynamic_modulesv3b\x06proto3"
 
 var (
@@ -160,15 +161,17 @@ var file_envoy_extensions_clusters_dynamic_modules_v3_cluster_proto_goTypes = []
 	(*ClusterConfig)(nil),          // 0: envoy.extensions.clusters.dynamic_modules.v3.ClusterConfig
 	(*v3.DynamicModuleConfig)(nil), // 1: envoy.extensions.dynamic_modules.v3.DynamicModuleConfig
 	(*anypb.Any)(nil),              // 2: google.protobuf.Any
+	(*wrapperspb.BoolValue)(nil),   // 3: google.protobuf.BoolValue
 }
 var file_envoy_extensions_clusters_dynamic_modules_v3_cluster_proto_depIdxs = []int32{
 	1, // 0: envoy.extensions.clusters.dynamic_modules.v3.ClusterConfig.dynamic_module_config:type_name -> envoy.extensions.dynamic_modules.v3.DynamicModuleConfig
 	2, // 1: envoy.extensions.clusters.dynamic_modules.v3.ClusterConfig.cluster_config:type_name -> google.protobuf.Any
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	3, // 2: envoy.extensions.clusters.dynamic_modules.v3.ClusterConfig.use_persistent_host_partitions:type_name -> google.protobuf.BoolValue
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_clusters_dynamic_modules_v3_cluster_proto_init() }
