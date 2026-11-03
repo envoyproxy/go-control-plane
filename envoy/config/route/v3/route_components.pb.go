@@ -538,6 +538,7 @@ type VirtualHost struct {
 	// will take precedence over this config and it'll be treated independently (e.g., values are not
 	// inherited). :ref:`Retry policy <envoy_v3_api_field_config.route.v3.VirtualHost.retry_policy>` should not be
 	// set if this field is used.
+	// [#comment: add [#extension-category: envoy.router.retry_policy] when there are built-in extensions]
 	RetryPolicyTypedConfig *anypb.Any `protobuf:"bytes,20,opt,name=retry_policy_typed_config,json=retryPolicyTypedConfig,proto3" json:"retry_policy_typed_config,omitempty"`
 	// Indicates the hedge policy for all routes in this virtual host. Note that setting a
 	// route level entry will take precedence over this config and it'll be treated
@@ -2150,8 +2151,9 @@ type RouteAction struct {
 	// [#not-implemented-hide:]
 	// Specifies the configuration for retry policy extension. Note that if this is set, it'll take
 	// precedence over the virtual host level retry policy entirely (e.g., policies are not merged,
-	// the most internal one becomes the enforced policy). :ref:`Retry policy <envoy_v3_api_field_config.route.v3.VirtualHost.retry_policy>`
+	// the most internal one becomes the enforced policy). :ref:`Retry policy <envoy_v3_api_field_config.route.v3.RouteAction.retry_policy>`
 	// should not be set if this field is used.
+	// [#comment: add [#extension-category: envoy.router.retry_policy] when there are built-in extensions]
 	RetryPolicyTypedConfig *anypb.Any `protobuf:"bytes,33,opt,name=retry_policy_typed_config,json=retryPolicyTypedConfig,proto3" json:"retry_policy_typed_config,omitempty"`
 	// Specify a set of route request mirroring policies.
 	// It takes precedence over the virtual host and route config mirror policy entirely.
