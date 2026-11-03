@@ -10,6 +10,7 @@ package dynamic_modulesv3
 import (
 	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
 	anypb "github.com/planetscale/vtprotobuf/types/known/anypb"
+	durationpb "github.com/planetscale/vtprotobuf/types/known/durationpb"
 	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
@@ -50,6 +51,16 @@ func (m *DynamicModuleTlsCertificateSelector) MarshalToSizedBufferVTStrict(dAtA 
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.DynamicCertificateRequestTimeout != nil {
+		size, err := (*durationpb.Duration)(m.DynamicCertificateRequestTimeout).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x2a
 	}
 	if m.AllowDynamicCertificates {
 		i--
@@ -129,6 +140,10 @@ func (m *DynamicModuleTlsCertificateSelector) SizeVT() (n int) {
 	}
 	if m.AllowDynamicCertificates {
 		n += 2
+	}
+	if m.DynamicCertificateRequestTimeout != nil {
+		l = (*durationpb.Duration)(m.DynamicCertificateRequestTimeout).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n

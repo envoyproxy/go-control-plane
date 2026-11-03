@@ -13,6 +13,7 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	anypb "google.golang.org/protobuf/types/known/anypb"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -32,6 +33,13 @@ const (
 // certificate. This works for both downstream and upstream TLS contexts. QUIC listeners are not
 // supported.
 //
+// The listeners and clusters that use the TLS context warm until the module calls
+// “envoy_dynamic_module_callback_tls_certificate_selector_config_signal_init_complete“, so that
+// the module can provide its dynamic certificates before the first handshake. A module without
+// asynchronous initialization calls it while its configuration is created. The wait has no
+// timeout, so a module that never calls it keeps them warming, which also holds the initialization
+// of the server when it waits for them.
+//
 // Example:
 //
 // .. validated-code-block:: yaml
@@ -45,6 +53,8 @@ const (
 //	    dynamic_module_config:
 //	      name: my_module
 //	    selector_name: my_selector
+//
+// [#next-free-field: 6]
 type DynamicModuleTlsCertificateSelector struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Dynamic module configuration. See :ref:`dynamic module configuration
@@ -70,7 +80,9 @@ type DynamicModuleTlsCertificateSelector struct {
 	// Allows the module to provide certificates at runtime in addition to the ones configured in the
 	// TLS context. Each dynamic certificate is built with the settings of the TLS context, including
 	// its certificate validation, and a handshake that selects one that is not provided yet can wait
-	// until the module provides or removes it.
+	// until the module provides or removes it, or until :ref:`dynamic_certificate_request_timeout
+	// <envoy_v3_api_field_extensions.transport_sockets.tls.cert_selectors.dynamic_modules.v3.DynamicModuleTlsCertificateSelector.dynamic_certificate_request_timeout>`
+	// expires.
 	//
 	// The module also selects the certificate of a downstream handshake that resumes a session. A
 	// session that a dynamic certificate established resumes only when the selected certificate has
@@ -83,8 +95,17 @@ type DynamicModuleTlsCertificateSelector struct {
 	//
 	// Defaults to false.
 	AllowDynamicCertificates bool `protobuf:"varint,4,opt,name=allow_dynamic_certificates,json=allowDynamicCertificates,proto3" json:"allow_dynamic_certificates,omitempty"`
-	unknownFields            protoimpl.UnknownFields
-	sizeCache                protoimpl.SizeCache
+	// How long Envoy waits for the module to provide or remove a dynamic certificate after requesting
+	// it. When it expires, the handshakes that wait for the certificate fail, and the next handshake
+	// that selects it requests it again. Setting it to 0 disables the timeout, and a positive value
+	// below 1 ms is rounded up to 1 ms. It has no effect unless :ref:`allow_dynamic_certificates
+	// <envoy_v3_api_field_extensions.transport_sockets.tls.cert_selectors.dynamic_modules.v3.DynamicModuleTlsCertificateSelector.allow_dynamic_certificates>`
+	// is set.
+	//
+	// If not specified, defaults to 15 seconds.
+	DynamicCertificateRequestTimeout *durationpb.Duration `protobuf:"bytes,5,opt,name=dynamic_certificate_request_timeout,json=dynamicCertificateRequestTimeout,proto3" json:"dynamic_certificate_request_timeout,omitempty"`
+	unknownFields                    protoimpl.UnknownFields
+	sizeCache                        protoimpl.SizeCache
 }
 
 func (x *DynamicModuleTlsCertificateSelector) Reset() {
@@ -145,16 +166,24 @@ func (x *DynamicModuleTlsCertificateSelector) GetAllowDynamicCertificates() bool
 	return false
 }
 
+func (x *DynamicModuleTlsCertificateSelector) GetDynamicCertificateRequestTimeout() *durationpb.Duration {
+	if x != nil {
+		return x.DynamicCertificateRequestTimeout
+	}
+	return nil
+}
+
 var File_envoy_extensions_transport_sockets_tls_cert_selectors_dynamic_modules_v3_dynamic_modules_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_transport_sockets_tls_cert_selectors_dynamic_modules_v3_dynamic_modules_proto_rawDesc = "" +
 	"\n" +
-	"^envoy/extensions/transport_sockets/tls/cert_selectors/dynamic_modules/v3/dynamic_modules.proto\x12Henvoy.extensions.transport_sockets.tls.cert_selectors.dynamic_modules.v3\x1a9envoy/extensions/dynamic_modules/v3/dynamic_modules.proto\x1a\x19google/protobuf/any.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xc8\x02\n" +
+	"^envoy/extensions/transport_sockets/tls/cert_selectors/dynamic_modules/v3/dynamic_modules.proto\x12Henvoy.extensions.transport_sockets.tls.cert_selectors.dynamic_modules.v3\x1a9envoy/extensions/dynamic_modules/v3/dynamic_modules.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xbc\x03\n" +
 	"#DynamicModuleTlsCertificateSelector\x12v\n" +
 	"\x15dynamic_module_config\x18\x01 \x01(\v28.envoy.extensions.dynamic_modules.v3.DynamicModuleConfigB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x13dynamicModuleConfig\x12,\n" +
 	"\rselector_name\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\fselectorName\x12=\n" +
 	"\x0fselector_config\x18\x03 \x01(\v2\x14.google.protobuf.AnyR\x0eselectorConfig\x12<\n" +
-	"\x1aallow_dynamic_certificates\x18\x04 \x01(\bR\x18allowDynamicCertificatesB\xfb\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x1aallow_dynamic_certificates\x18\x04 \x01(\bR\x18allowDynamicCertificates\x12r\n" +
+	"#dynamic_certificate_request_timeout\x18\x05 \x01(\v2\x19.google.protobuf.DurationB\b\xfaB\x05\xaa\x01\x022\x00R dynamicCertificateRequestTimeoutB\xfb\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"Vio.envoyproxy.envoy.extensions.transport_sockets.tls.cert_selectors.dynamic_modules.v3B\x13DynamicModulesProtoP\x01Z\x81\x01github.com/envoyproxy/go-control-plane/envoy/extensions/transport_sockets/tls/cert_selectors/dynamic_modules/v3;dynamic_modulesv3b\x06proto3"
 
 var (
@@ -174,15 +203,17 @@ var file_envoy_extensions_transport_sockets_tls_cert_selectors_dynamic_modules_v
 	(*DynamicModuleTlsCertificateSelector)(nil), // 0: envoy.extensions.transport_sockets.tls.cert_selectors.dynamic_modules.v3.DynamicModuleTlsCertificateSelector
 	(*v3.DynamicModuleConfig)(nil),              // 1: envoy.extensions.dynamic_modules.v3.DynamicModuleConfig
 	(*anypb.Any)(nil),                           // 2: google.protobuf.Any
+	(*durationpb.Duration)(nil),                 // 3: google.protobuf.Duration
 }
 var file_envoy_extensions_transport_sockets_tls_cert_selectors_dynamic_modules_v3_dynamic_modules_proto_depIdxs = []int32{
 	1, // 0: envoy.extensions.transport_sockets.tls.cert_selectors.dynamic_modules.v3.DynamicModuleTlsCertificateSelector.dynamic_module_config:type_name -> envoy.extensions.dynamic_modules.v3.DynamicModuleConfig
 	2, // 1: envoy.extensions.transport_sockets.tls.cert_selectors.dynamic_modules.v3.DynamicModuleTlsCertificateSelector.selector_config:type_name -> google.protobuf.Any
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	3, // 2: envoy.extensions.transport_sockets.tls.cert_selectors.dynamic_modules.v3.DynamicModuleTlsCertificateSelector.dynamic_certificate_request_timeout:type_name -> google.protobuf.Duration
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() {
