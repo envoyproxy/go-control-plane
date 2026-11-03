@@ -237,6 +237,7 @@ type GrpcJsonTranscoder struct {
 	CaseInsensitiveEnumParsing bool `protobuf:"varint,14,opt,name=case_insensitive_enum_parsing,json=caseInsensitiveEnumParsing,proto3" json:"case_insensitive_enum_parsing,omitempty"`
 	// The maximum size of a request body to be transcoded, in bytes. A body exceeding this size will
 	// provoke a ``HTTP 413 Request Entity Too Large`` response.
+	// Streamed ``HttpBody`` requests are exempt from this limit.
 	//
 	// Large values may cause envoy to use a lot of memory if there are many concurrent requests.
 	//
@@ -244,6 +245,7 @@ type GrpcJsonTranscoder struct {
 	MaxRequestBodySize *wrapperspb.UInt32Value `protobuf:"bytes,15,opt,name=max_request_body_size,json=maxRequestBodySize,proto3" json:"max_request_body_size,omitempty"`
 	// The maximum size of a response body to be transcoded, in bytes. A body exceeding this size will
 	// provoke a ``HTTP 500 Internal Server Error`` response.
+	// Streamed ``HttpBody`` responses are exempt from this limit.
 	//
 	// Large values may cause envoy to use a lot of memory if there are many concurrent requests.
 	//
