@@ -28,6 +28,99 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// JWS signing algorithms, named as in the JWT “alg“ header.
+type JwtProvider_Algorithm int32
+
+const (
+	// ``RSASSA-PKCS1-v1_5`` using SHA-256.
+	JwtProvider_RS256 JwtProvider_Algorithm = 0
+	// ``RSASSA-PKCS1-v1_5`` using SHA-384.
+	JwtProvider_RS384 JwtProvider_Algorithm = 1
+	// ``RSASSA-PKCS1-v1_5`` using SHA-512.
+	JwtProvider_RS512 JwtProvider_Algorithm = 2
+	// ECDSA using P-256 and SHA-256.
+	JwtProvider_ES256 JwtProvider_Algorithm = 3
+	// ECDSA using P-384 and SHA-384.
+	JwtProvider_ES384 JwtProvider_Algorithm = 4
+	// ECDSA using P-521 and SHA-512.
+	JwtProvider_ES512 JwtProvider_Algorithm = 5
+	// ``RSASSA-PSS`` using SHA-256.
+	JwtProvider_PS256 JwtProvider_Algorithm = 6
+	// ``RSASSA-PSS`` using SHA-384.
+	JwtProvider_PS384 JwtProvider_Algorithm = 7
+	// ``RSASSA-PSS`` using SHA-512.
+	JwtProvider_PS512 JwtProvider_Algorithm = 8
+	// HMAC using SHA-256.
+	JwtProvider_HS256 JwtProvider_Algorithm = 9
+	// HMAC using SHA-384.
+	JwtProvider_HS384 JwtProvider_Algorithm = 10
+	// HMAC using SHA-512.
+	JwtProvider_HS512 JwtProvider_Algorithm = 11
+	// EdDSA using Ed25519. Matches ``EdDSA`` in the JWT header.
+	JwtProvider_EDDSA JwtProvider_Algorithm = 12
+)
+
+// Enum value maps for JwtProvider_Algorithm.
+var (
+	JwtProvider_Algorithm_name = map[int32]string{
+		0:  "RS256",
+		1:  "RS384",
+		2:  "RS512",
+		3:  "ES256",
+		4:  "ES384",
+		5:  "ES512",
+		6:  "PS256",
+		7:  "PS384",
+		8:  "PS512",
+		9:  "HS256",
+		10: "HS384",
+		11: "HS512",
+		12: "EDDSA",
+	}
+	JwtProvider_Algorithm_value = map[string]int32{
+		"RS256": 0,
+		"RS384": 1,
+		"RS512": 2,
+		"ES256": 3,
+		"ES384": 4,
+		"ES512": 5,
+		"PS256": 6,
+		"PS384": 7,
+		"PS512": 8,
+		"HS256": 9,
+		"HS384": 10,
+		"HS512": 11,
+		"EDDSA": 12,
+	}
+)
+
+func (x JwtProvider_Algorithm) Enum() *JwtProvider_Algorithm {
+	p := new(JwtProvider_Algorithm)
+	*p = x
+	return p
+}
+
+func (x JwtProvider_Algorithm) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (JwtProvider_Algorithm) Descriptor() protoreflect.EnumDescriptor {
+	return file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_enumTypes[0].Descriptor()
+}
+
+func (JwtProvider_Algorithm) Type() protoreflect.EnumType {
+	return &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_enumTypes[0]
+}
+
+func (x JwtProvider_Algorithm) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use JwtProvider_Algorithm.Descriptor instead.
+func (JwtProvider_Algorithm) EnumDescriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDescGZIP(), []int{0, 0}
+}
+
 // Please see following for JWT authentication flow:
 //
 // * `JSON Web Token (JWT) <https://tools.ietf.org/html/rfc7519>`_
@@ -58,7 +151,7 @@ const (
 //	  cache_duration:
 //	    seconds: 300
 //
-// [#next-free-field: 22]
+// [#next-free-field: 23]
 type JwtProvider struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Specify the `principal <https://tools.ietf.org/html/rfc7519#section-4.1.1>`_ that issued
@@ -136,6 +229,19 @@ type JwtProvider struct {
 	//       seconds: 86400
 	//
 	MaxLifetime *durationpb.Duration `protobuf:"bytes,21,opt,name=max_lifetime,json=maxLifetime,proto3" json:"max_lifetime,omitempty"`
+	// If not empty, a JWT is only accepted if the ``alg`` in its header is one of these algorithms.
+	// Other JWTs are rejected before any key is tried. If empty, any algorithm a key in the JWKS
+	// can verify is accepted.
+	//
+	// Example:
+	//
+	// .. code-block:: yaml
+	//
+	//     allowed_algorithms:
+	//     - RS256
+	//     - ES256
+	//
+	AllowedAlgorithms []JwtProvider_Algorithm `protobuf:"varint,22,rep,packed,name=allowed_algorithms,json=allowedAlgorithms,proto3,enum=envoy.extensions.filters.http.jwt_authn.v3.JwtProvider_Algorithm" json:"allowed_algorithms,omitempty"`
 	// `JSON Web Key Set (JWKS) <https://tools.ietf.org/html/rfc7517#appendix-A>`_ is needed to
 	// validate signature of a JWT. This field specifies where to fetch JWKS.
 	//
@@ -382,6 +488,13 @@ func (x *JwtProvider) GetRequireExpiration() bool {
 func (x *JwtProvider) GetMaxLifetime() *durationpb.Duration {
 	if x != nil {
 		return x.MaxLifetime
+	}
+	return nil
+}
+
+func (x *JwtProvider) GetAllowedAlgorithms() []JwtProvider_Algorithm {
+	if x != nil {
+		return x.AllowedAlgorithms
 	}
 	return nil
 }
@@ -2031,13 +2144,15 @@ var File_envoy_extensions_filters_http_jwt_authn_v3_config_proto protoreflect.Fi
 
 const file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDesc = "" +
 	"\n" +
-	"7envoy/extensions/filters/http/jwt_authn/v3/config.proto\x12*envoy.extensions.filters.http.jwt_authn.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a#envoy/config/core/v3/http_uri.proto\x1a,envoy/config/route/v3/route_components.proto\x1a\"envoy/type/matcher/v3/string.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xbe\v\n" +
+	"7envoy/extensions/filters/http/jwt_authn/v3/config.proto\x12*envoy.extensions.filters.http.jwt_authn.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a#envoy/config/core/v3/http_uri.proto\x1a,envoy/config/route/v3/route_components.proto\x1a\"envoy/type/matcher/v3/string.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xdc\r\n" +
 	"\vJwtProvider\x12\x16\n" +
 	"\x06issuer\x18\x01 \x01(\tR\x06issuer\x12\x1c\n" +
 	"\taudiences\x18\x02 \x03(\tR\taudiences\x12@\n" +
 	"\bsubjects\x18\x13 \x01(\v2$.envoy.type.matcher.v3.StringMatcherR\bsubjects\x12-\n" +
 	"\x12require_expiration\x18\x14 \x01(\bR\x11requireExpiration\x12<\n" +
-	"\fmax_lifetime\x18\x15 \x01(\v2\x19.google.protobuf.DurationR\vmaxLifetime\x12Y\n" +
+	"\fmax_lifetime\x18\x15 \x01(\v2\x19.google.protobuf.DurationR\vmaxLifetime\x12\x7f\n" +
+	"\x12allowed_algorithms\x18\x16 \x03(\x0e2A.envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.AlgorithmB\r\xfaB\n" +
+	"\x92\x01\a\"\x05\x82\x01\x02\x10\x01R\x11allowedAlgorithms\x12Y\n" +
 	"\vremote_jwks\x18\x03 \x01(\v26.envoy.extensions.filters.http.jwt_authn.v3.RemoteJwksH\x00R\n" +
 	"remoteJwks\x12A\n" +
 	"\n" +
@@ -2059,7 +2174,22 @@ const file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDesc = "" 
 	"\x10claim_to_headers\x18\x0f \x03(\v2<.envoy.extensions.filters.http.jwt_authn.v3.JwtClaimToHeaderR\x0eclaimToHeaders\x12*\n" +
 	"\x11clear_route_cache\x18\x11 \x01(\bR\x0fclearRouteCache\x1aH\n" +
 	"\x10NormalizePayload\x124\n" +
-	"\x16space_delimited_claims\x18\x01 \x03(\tR\x14spaceDelimitedClaims:=\x9aň\x1e8\n" +
+	"\x16space_delimited_claims\x18\x01 \x03(\tR\x14spaceDelimitedClaims\"\x9a\x01\n" +
+	"\tAlgorithm\x12\t\n" +
+	"\x05RS256\x10\x00\x12\t\n" +
+	"\x05RS384\x10\x01\x12\t\n" +
+	"\x05RS512\x10\x02\x12\t\n" +
+	"\x05ES256\x10\x03\x12\t\n" +
+	"\x05ES384\x10\x04\x12\t\n" +
+	"\x05ES512\x10\x05\x12\t\n" +
+	"\x05PS256\x10\x06\x12\t\n" +
+	"\x05PS384\x10\a\x12\t\n" +
+	"\x05PS512\x10\b\x12\t\n" +
+	"\x05HS256\x10\t\x12\t\n" +
+	"\x05HS384\x10\n" +
+	"\x12\t\n" +
+	"\x05HS512\x10\v\x12\t\n" +
+	"\x05EDDSA\x10\f:=\x9aň\x1e8\n" +
 	"6envoy.config.filter.http.jwt_authn.v2alpha.JwtProviderB\x1c\n" +
 	"\x15jwks_source_specifier\x12\x03\xf8B\x01\"c\n" +
 	"\x0eJwtCacheConfig\x12$\n" +
@@ -2160,74 +2290,77 @@ func file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDescGZIP() 
 	return file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDescData
 }
 
+var file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
 var file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_goTypes = []any{
-	(*JwtProvider)(nil),                  // 0: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider
-	(*JwtCacheConfig)(nil),               // 1: envoy.extensions.filters.http.jwt_authn.v3.JwtCacheConfig
-	(*RemoteJwks)(nil),                   // 2: envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks
-	(*JwksAsyncFetch)(nil),               // 3: envoy.extensions.filters.http.jwt_authn.v3.JwksAsyncFetch
-	(*JwtHeader)(nil),                    // 4: envoy.extensions.filters.http.jwt_authn.v3.JwtHeader
-	(*ProviderWithAudiences)(nil),        // 5: envoy.extensions.filters.http.jwt_authn.v3.ProviderWithAudiences
-	(*JwtRequirement)(nil),               // 6: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
-	(*ExtractOnlyWithoutValidation)(nil), // 7: envoy.extensions.filters.http.jwt_authn.v3.ExtractOnlyWithoutValidation
-	(*JwtRequirementOrList)(nil),         // 8: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementOrList
-	(*JwtRequirementAndList)(nil),        // 9: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementAndList
-	(*RequirementRule)(nil),              // 10: envoy.extensions.filters.http.jwt_authn.v3.RequirementRule
-	(*FilterStateRule)(nil),              // 11: envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule
-	(*JwtAuthentication)(nil),            // 12: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication
-	(*PerRouteConfig)(nil),               // 13: envoy.extensions.filters.http.jwt_authn.v3.PerRouteConfig
-	(*JwtClaimToHeader)(nil),             // 14: envoy.extensions.filters.http.jwt_authn.v3.JwtClaimToHeader
-	(*JwtProvider_NormalizePayload)(nil), // 15: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.NormalizePayload
-	nil,                                  // 16: envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule.RequiresEntry
-	nil,                                  // 17: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.ProvidersEntry
-	nil,                                  // 18: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.RequirementMapEntry
-	(*JwtClaimToHeader_PathSegment)(nil), // 19: envoy.extensions.filters.http.jwt_authn.v3.JwtClaimToHeader.PathSegment
-	(*v3.StringMatcher)(nil),             // 20: envoy.type.matcher.v3.StringMatcher
-	(*durationpb.Duration)(nil),          // 21: google.protobuf.Duration
-	(*v31.DataSource)(nil),               // 22: envoy.config.core.v3.DataSource
-	(*v31.HttpUri)(nil),                  // 23: envoy.config.core.v3.HttpUri
-	(*v31.RetryPolicy)(nil),              // 24: envoy.config.core.v3.RetryPolicy
-	(*emptypb.Empty)(nil),                // 25: google.protobuf.Empty
-	(*v32.RouteMatch)(nil),               // 26: envoy.config.route.v3.RouteMatch
+	(JwtProvider_Algorithm)(0),           // 0: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.Algorithm
+	(*JwtProvider)(nil),                  // 1: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider
+	(*JwtCacheConfig)(nil),               // 2: envoy.extensions.filters.http.jwt_authn.v3.JwtCacheConfig
+	(*RemoteJwks)(nil),                   // 3: envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks
+	(*JwksAsyncFetch)(nil),               // 4: envoy.extensions.filters.http.jwt_authn.v3.JwksAsyncFetch
+	(*JwtHeader)(nil),                    // 5: envoy.extensions.filters.http.jwt_authn.v3.JwtHeader
+	(*ProviderWithAudiences)(nil),        // 6: envoy.extensions.filters.http.jwt_authn.v3.ProviderWithAudiences
+	(*JwtRequirement)(nil),               // 7: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
+	(*ExtractOnlyWithoutValidation)(nil), // 8: envoy.extensions.filters.http.jwt_authn.v3.ExtractOnlyWithoutValidation
+	(*JwtRequirementOrList)(nil),         // 9: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementOrList
+	(*JwtRequirementAndList)(nil),        // 10: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementAndList
+	(*RequirementRule)(nil),              // 11: envoy.extensions.filters.http.jwt_authn.v3.RequirementRule
+	(*FilterStateRule)(nil),              // 12: envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule
+	(*JwtAuthentication)(nil),            // 13: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication
+	(*PerRouteConfig)(nil),               // 14: envoy.extensions.filters.http.jwt_authn.v3.PerRouteConfig
+	(*JwtClaimToHeader)(nil),             // 15: envoy.extensions.filters.http.jwt_authn.v3.JwtClaimToHeader
+	(*JwtProvider_NormalizePayload)(nil), // 16: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.NormalizePayload
+	nil,                                  // 17: envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule.RequiresEntry
+	nil,                                  // 18: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.ProvidersEntry
+	nil,                                  // 19: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.RequirementMapEntry
+	(*JwtClaimToHeader_PathSegment)(nil), // 20: envoy.extensions.filters.http.jwt_authn.v3.JwtClaimToHeader.PathSegment
+	(*v3.StringMatcher)(nil),             // 21: envoy.type.matcher.v3.StringMatcher
+	(*durationpb.Duration)(nil),          // 22: google.protobuf.Duration
+	(*v31.DataSource)(nil),               // 23: envoy.config.core.v3.DataSource
+	(*v31.HttpUri)(nil),                  // 24: envoy.config.core.v3.HttpUri
+	(*v31.RetryPolicy)(nil),              // 25: envoy.config.core.v3.RetryPolicy
+	(*emptypb.Empty)(nil),                // 26: google.protobuf.Empty
+	(*v32.RouteMatch)(nil),               // 27: envoy.config.route.v3.RouteMatch
 }
 var file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_depIdxs = []int32{
-	20, // 0: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.subjects:type_name -> envoy.type.matcher.v3.StringMatcher
-	21, // 1: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.max_lifetime:type_name -> google.protobuf.Duration
-	2,  // 2: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.remote_jwks:type_name -> envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks
-	22, // 3: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.local_jwks:type_name -> envoy.config.core.v3.DataSource
-	4,  // 4: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.from_headers:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtHeader
-	15, // 5: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.normalize_payload_in_metadata:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.NormalizePayload
-	1,  // 6: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.jwt_cache_config:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtCacheConfig
-	14, // 7: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.claim_to_headers:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtClaimToHeader
-	23, // 8: envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks.http_uri:type_name -> envoy.config.core.v3.HttpUri
-	21, // 9: envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks.cache_duration:type_name -> google.protobuf.Duration
-	3,  // 10: envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks.async_fetch:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwksAsyncFetch
-	24, // 11: envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks.retry_policy:type_name -> envoy.config.core.v3.RetryPolicy
-	21, // 12: envoy.extensions.filters.http.jwt_authn.v3.JwksAsyncFetch.failed_refetch_duration:type_name -> google.protobuf.Duration
-	5,  // 13: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.provider_and_audiences:type_name -> envoy.extensions.filters.http.jwt_authn.v3.ProviderWithAudiences
-	8,  // 14: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.requires_any:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementOrList
-	9,  // 15: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.requires_all:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementAndList
-	25, // 16: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.allow_missing_or_failed:type_name -> google.protobuf.Empty
-	25, // 17: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.allow_missing:type_name -> google.protobuf.Empty
-	7,  // 18: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.extract_only_without_validation:type_name -> envoy.extensions.filters.http.jwt_authn.v3.ExtractOnlyWithoutValidation
-	6,  // 19: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementOrList.requirements:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
-	6,  // 20: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementAndList.requirements:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
-	26, // 21: envoy.extensions.filters.http.jwt_authn.v3.RequirementRule.match:type_name -> envoy.config.route.v3.RouteMatch
-	6,  // 22: envoy.extensions.filters.http.jwt_authn.v3.RequirementRule.requires:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
-	16, // 23: envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule.requires:type_name -> envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule.RequiresEntry
-	17, // 24: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.providers:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.ProvidersEntry
-	10, // 25: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.rules:type_name -> envoy.extensions.filters.http.jwt_authn.v3.RequirementRule
-	11, // 26: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.filter_state_rules:type_name -> envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule
-	18, // 27: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.requirement_map:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.RequirementMapEntry
-	19, // 28: envoy.extensions.filters.http.jwt_authn.v3.JwtClaimToHeader.claim_path:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtClaimToHeader.PathSegment
-	6,  // 29: envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule.RequiresEntry.value:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
-	0,  // 30: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.ProvidersEntry.value:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtProvider
-	6,  // 31: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.RequirementMapEntry.value:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
-	32, // [32:32] is the sub-list for method output_type
-	32, // [32:32] is the sub-list for method input_type
-	32, // [32:32] is the sub-list for extension type_name
-	32, // [32:32] is the sub-list for extension extendee
-	0,  // [0:32] is the sub-list for field type_name
+	21, // 0: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.subjects:type_name -> envoy.type.matcher.v3.StringMatcher
+	22, // 1: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.max_lifetime:type_name -> google.protobuf.Duration
+	0,  // 2: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.allowed_algorithms:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.Algorithm
+	3,  // 3: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.remote_jwks:type_name -> envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks
+	23, // 4: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.local_jwks:type_name -> envoy.config.core.v3.DataSource
+	5,  // 5: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.from_headers:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtHeader
+	16, // 6: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.normalize_payload_in_metadata:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.NormalizePayload
+	2,  // 7: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.jwt_cache_config:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtCacheConfig
+	15, // 8: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.claim_to_headers:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtClaimToHeader
+	24, // 9: envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks.http_uri:type_name -> envoy.config.core.v3.HttpUri
+	22, // 10: envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks.cache_duration:type_name -> google.protobuf.Duration
+	4,  // 11: envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks.async_fetch:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwksAsyncFetch
+	25, // 12: envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks.retry_policy:type_name -> envoy.config.core.v3.RetryPolicy
+	22, // 13: envoy.extensions.filters.http.jwt_authn.v3.JwksAsyncFetch.failed_refetch_duration:type_name -> google.protobuf.Duration
+	6,  // 14: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.provider_and_audiences:type_name -> envoy.extensions.filters.http.jwt_authn.v3.ProviderWithAudiences
+	9,  // 15: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.requires_any:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementOrList
+	10, // 16: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.requires_all:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementAndList
+	26, // 17: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.allow_missing_or_failed:type_name -> google.protobuf.Empty
+	26, // 18: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.allow_missing:type_name -> google.protobuf.Empty
+	8,  // 19: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.extract_only_without_validation:type_name -> envoy.extensions.filters.http.jwt_authn.v3.ExtractOnlyWithoutValidation
+	7,  // 20: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementOrList.requirements:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
+	7,  // 21: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementAndList.requirements:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
+	27, // 22: envoy.extensions.filters.http.jwt_authn.v3.RequirementRule.match:type_name -> envoy.config.route.v3.RouteMatch
+	7,  // 23: envoy.extensions.filters.http.jwt_authn.v3.RequirementRule.requires:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
+	17, // 24: envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule.requires:type_name -> envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule.RequiresEntry
+	18, // 25: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.providers:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.ProvidersEntry
+	11, // 26: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.rules:type_name -> envoy.extensions.filters.http.jwt_authn.v3.RequirementRule
+	12, // 27: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.filter_state_rules:type_name -> envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule
+	19, // 28: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.requirement_map:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.RequirementMapEntry
+	20, // 29: envoy.extensions.filters.http.jwt_authn.v3.JwtClaimToHeader.claim_path:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtClaimToHeader.PathSegment
+	7,  // 30: envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule.RequiresEntry.value:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
+	1,  // 31: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.ProvidersEntry.value:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtProvider
+	7,  // 32: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.RequirementMapEntry.value:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
+	33, // [33:33] is the sub-list for method output_type
+	33, // [33:33] is the sub-list for method input_type
+	33, // [33:33] is the sub-list for extension type_name
+	33, // [33:33] is the sub-list for extension extendee
+	0,  // [0:33] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_init() }
@@ -2261,13 +2394,14 @@ func file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDesc), len(file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   20,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_goTypes,
 		DependencyIndexes: file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_depIdxs,
+		EnumInfos:         file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_enumTypes,
 		MessageInfos:      file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes,
 	}.Build()
 	File_envoy_extensions_filters_http_jwt_authn_v3_config_proto = out.File

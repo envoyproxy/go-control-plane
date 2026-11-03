@@ -94,6 +94,29 @@ func (m *JwtProvider) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.AllowedAlgorithms) > 0 {
+		var pksize2 int
+		for _, num := range m.AllowedAlgorithms {
+			pksize2 += protohelpers.SizeOfVarint(uint64(num))
+		}
+		i -= pksize2
+		j1 := i
+		for _, num1 := range m.AllowedAlgorithms {
+			num := uint64(num1)
+			for num >= 1<<7 {
+				dAtA[j1] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j1++
+			}
+			dAtA[j1] = uint8(num)
+			j1++
+		}
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(pksize2))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xb2
+	}
 	if m.MaxLifetime != nil {
 		size, err := (*durationpb.Duration)(m.MaxLifetime).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -1599,6 +1622,13 @@ func (m *JwtProvider) SizeVT() (n int) {
 	if m.MaxLifetime != nil {
 		l = (*durationpb.Duration)(m.MaxLifetime).SizeVT()
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if len(m.AllowedAlgorithms) > 0 {
+		l = 0
+		for _, e := range m.AllowedAlgorithms {
+			l += protohelpers.SizeOfVarint(uint64(e))
+		}
+		n += 2 + protohelpers.SizeOfVarint(uint64(l)) + l
 	}
 	n += len(m.unknownFields)
 	return n

@@ -120,6 +120,22 @@ func (m *JwtProvider) validate(all bool) error {
 		}
 	}
 
+	for idx, item := range m.GetAllowedAlgorithms() {
+		_, _ = idx, item
+
+		if _, ok := JwtProvider_Algorithm_name[int32(item)]; !ok {
+			err := JwtProviderValidationError{
+				field:  fmt.Sprintf("AllowedAlgorithms[%v]", idx),
+				reason: "value must be one of the defined enum values",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
 	// no validation rules for Forward
 
 	for idx, item := range m.GetFromHeaders() {
