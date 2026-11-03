@@ -40,8 +40,10 @@ type RouteConfiguration struct {
 	// Both ``virtual_hosts`` and ``vhds`` fields will be used when present. ``virtual_hosts`` can be used
 	// for a base routing table or for infrequently changing virtual hosts. ``vhds`` is used for
 	// on-demand discovery of virtual hosts. The contents of these two fields will be merged to
-	// generate a routing table for a given RouteConfiguration, with ``vhds`` derived configuration
-	// taking precedence.
+	// generate a routing table for a given RouteConfiguration. When a virtual host from ``vhds``
+	// has the same :ref:`name <envoy_v3_api_field_config.route.v3.VirtualHost.name>` as a virtual host
+	// from ``virtual_hosts``, the ``vhds`` virtual host takes precedence and the colliding
+	// ``virtual_hosts`` entry is ignored.
 	Vhds *Vhds `protobuf:"bytes,9,opt,name=vhds,proto3" json:"vhds,omitempty"`
 	// Optionally specifies a list of HTTP headers that the connection manager
 	// will consider to be internal only. If they are found on external requests they will be cleaned
