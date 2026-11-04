@@ -173,6 +173,108 @@ func (m *CommonGeoipProviderConfig_GeolocationFieldKeys) MarshalToSizedBufferVTS
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.CountryName) > 0 {
+		i -= len(m.CountryName)
+		copy(dAtA[i:], m.CountryName)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.CountryName)))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xc2
+	}
+	if len(m.MetroCode) > 0 {
+		i -= len(m.MetroCode)
+		copy(dAtA[i:], m.MetroCode)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.MetroCode)))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xba
+	}
+	if len(m.ContinentGeonameId) > 0 {
+		i -= len(m.ContinentGeonameId)
+		copy(dAtA[i:], m.ContinentGeonameId)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.ContinentGeonameId)))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xb2
+	}
+	if len(m.CountryGeonameId) > 0 {
+		i -= len(m.CountryGeonameId)
+		copy(dAtA[i:], m.CountryGeonameId)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.CountryGeonameId)))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xaa
+	}
+	if len(m.SubregionGeonameId) > 0 {
+		i -= len(m.SubregionGeonameId)
+		copy(dAtA[i:], m.SubregionGeonameId)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.SubregionGeonameId)))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xa2
+	}
+	if len(m.RegionGeonameId) > 0 {
+		i -= len(m.RegionGeonameId)
+		copy(dAtA[i:], m.RegionGeonameId)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.RegionGeonameId)))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x9a
+	}
+	if len(m.RegionName) > 0 {
+		i -= len(m.RegionName)
+		copy(dAtA[i:], m.RegionName)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.RegionName)))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x92
+	}
+	if len(m.PostalCode) > 0 {
+		i -= len(m.PostalCode)
+		copy(dAtA[i:], m.PostalCode)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.PostalCode)))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x8a
+	}
+	if len(m.TimeZone) > 0 {
+		i -= len(m.TimeZone)
+		copy(dAtA[i:], m.TimeZone)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.TimeZone)))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x82
+	}
+	if len(m.Longitude) > 0 {
+		i -= len(m.Longitude)
+		copy(dAtA[i:], m.Longitude)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.Longitude)))
+		i--
+		dAtA[i] = 0x7a
+	}
+	if len(m.Latitude) > 0 {
+		i -= len(m.Latitude)
+		copy(dAtA[i:], m.Latitude)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.Latitude)))
+		i--
+		dAtA[i] = 0x72
+	}
+	if len(m.CityGeonameId) > 0 {
+		i -= len(m.CityGeonameId)
+		copy(dAtA[i:], m.CityGeonameId)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.CityGeonameId)))
+		i--
+		dAtA[i] = 0x6a
+	}
 	if len(m.AsnOrg) > 0 {
 		i -= len(m.AsnOrg)
 		copy(dAtA[i:], m.AsnOrg)
@@ -428,6 +530,54 @@ func (m *CommonGeoipProviderConfig_GeolocationFieldKeys) SizeVT() (n int) {
 	l = len(m.AsnOrg)
 	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.CityGeonameId)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.Latitude)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.Longitude)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.TimeZone)
+	if l > 0 {
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.PostalCode)
+	if l > 0 {
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.RegionName)
+	if l > 0 {
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.RegionGeonameId)
+	if l > 0 {
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.SubregionGeonameId)
+	if l > 0 {
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.CountryGeonameId)
+	if l > 0 {
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.ContinentGeonameId)
+	if l > 0 {
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.MetroCode)
+	if l > 0 {
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.CountryName)
+	if l > 0 {
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n

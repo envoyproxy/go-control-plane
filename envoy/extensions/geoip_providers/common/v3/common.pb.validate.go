@@ -556,6 +556,8 @@ func (m *CommonGeoipProviderConfig_GeolocationFieldKeys) validate(all bool) erro
 
 	// no validation rules for Country
 
+	// no validation rules for CountryName
+
 	// no validation rules for City
 
 	// no validation rules for Region
@@ -577,6 +579,28 @@ func (m *CommonGeoipProviderConfig_GeolocationFieldKeys) validate(all bool) erro
 	// no validation rules for Isp
 
 	// no validation rules for ApplePrivateRelay
+
+	// no validation rules for CityGeonameId
+
+	// no validation rules for Latitude
+
+	// no validation rules for Longitude
+
+	// no validation rules for TimeZone
+
+	// no validation rules for PostalCode
+
+	// no validation rules for RegionName
+
+	// no validation rules for RegionGeonameId
+
+	// no validation rules for SubregionGeonameId
+
+	// no validation rules for CountryGeonameId
+
+	// no validation rules for ContinentGeonameId
+
+	// no validation rules for MetroCode
 
 	if len(errors) > 0 {
 		return CommonGeoipProviderConfig_GeolocationFieldKeysMultiError(errors)

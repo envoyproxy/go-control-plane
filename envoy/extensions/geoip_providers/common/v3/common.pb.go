@@ -265,11 +265,14 @@ func (x *CommonGeoipProviderConfig_GeolocationHeadersToAdd) GetApplePrivateRelay
 //   - The :ref:`Network GeoIP filter <config_network_filters_geoip>` stores results in the
 //     connection's filter state under the well-known key “envoy.geoip“.
 //
-// [#next-free-field: 13]
+// [#next-free-field: 25]
 type CommonGeoipProviderConfig_GeolocationFieldKeys struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// If set, the key will be used to populate the country ISO code associated with the IP address.
 	Country string `protobuf:"bytes,1,opt,name=country,proto3" json:"country,omitempty"`
+	// If set, the key will be used to populate the English name of the country associated with
+	// the IP address. Uses the country database when available, falling back to the city database.
+	CountryName string `protobuf:"bytes,24,opt,name=country_name,json=countryName,proto3" json:"country_name,omitempty"`
 	// If set, the key will be used to populate the city associated with the IP address.
 	City string `protobuf:"bytes,2,opt,name=city,proto3" json:"city,omitempty"`
 	// If set, the key will be used to populate the region ISO code associated with the IP address.
@@ -304,8 +307,48 @@ type CommonGeoipProviderConfig_GeolocationFieldKeys struct {
 	// and the result will be stored with this key. Value will be set to either ``true`` or ``false``
 	// depending on the check result.
 	ApplePrivateRelay string `protobuf:"bytes,11,opt,name=apple_private_relay,json=applePrivateRelay,proto3" json:"apple_private_relay,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	// If set, the key will be used to populate the `GeoNames <https://www.geonames.org/>`_
+	// ID of the city associated with the IP address. Requires the city database.
+	CityGeonameId string `protobuf:"bytes,13,opt,name=city_geoname_id,json=cityGeonameId,proto3" json:"city_geoname_id,omitempty"`
+	// If set, the key will be used to populate the approximate WGS84 latitude of the location
+	// associated with the IP address. Requires the city database.
+	// Value is formatted with four decimal places (e.g. ``"58.4167"``).
+	Latitude string `protobuf:"bytes,14,opt,name=latitude,proto3" json:"latitude,omitempty"`
+	// If set, the key will be used to populate the approximate WGS84 longitude of the location
+	// associated with the IP address. Requires the city database.
+	// Value is formatted with four decimal places (e.g. ``"-122.3149"``).
+	Longitude string `protobuf:"bytes,15,opt,name=longitude,proto3" json:"longitude,omitempty"`
+	// If set, the key will be used to populate the time zone associated with the IP address
+	// as found in the `IANA Time Zone Database <https://www.iana.org/time-zones>`_
+	// (e.g. ``"Europe/London"``). Requires the city database.
+	TimeZone string `protobuf:"bytes,16,opt,name=time_zone,json=timeZone,proto3" json:"time_zone,omitempty"`
+	// If set, the key will be used to populate the postal code associated with the IP address.
+	// Requires the city database.
+	PostalCode string `protobuf:"bytes,17,opt,name=postal_code,json=postalCode,proto3" json:"postal_code,omitempty"`
+	// If set, the key will be used to populate the English name of the region
+	// (least specific subdivision) associated with the IP address. Requires the city database.
+	RegionName string `protobuf:"bytes,18,opt,name=region_name,json=regionName,proto3" json:"region_name,omitempty"`
+	// If set, the key will be used to populate the `GeoNames <https://www.geonames.org/>`_
+	// ID of the region (least specific subdivision) associated with the IP address.
+	// Requires the city database.
+	RegionGeonameId string `protobuf:"bytes,19,opt,name=region_geoname_id,json=regionGeonameId,proto3" json:"region_geoname_id,omitempty"`
+	// If set, the key will be used to populate the `GeoNames <https://www.geonames.org/>`_
+	// ID of the subregion (second least specific subdivision) associated with the IP address.
+	// Requires the city database.
+	SubregionGeonameId string `protobuf:"bytes,20,opt,name=subregion_geoname_id,json=subregionGeonameId,proto3" json:"subregion_geoname_id,omitempty"`
+	// If set, the key will be used to populate the `GeoNames <https://www.geonames.org/>`_
+	// ID of the country associated with the IP address. Uses the country database when
+	// available, falling back to the city database.
+	CountryGeonameId string `protobuf:"bytes,21,opt,name=country_geoname_id,json=countryGeonameId,proto3" json:"country_geoname_id,omitempty"`
+	// If set, the key will be used to populate the `GeoNames <https://www.geonames.org/>`_
+	// ID of the continent associated with the IP address. Uses the country database when
+	// available, falling back to the city database.
+	ContinentGeonameId string `protobuf:"bytes,22,opt,name=continent_geoname_id,json=continentGeonameId,proto3" json:"continent_geoname_id,omitempty"`
+	// If set, the key will be used to populate the metro code (DMA code in the US)
+	// associated with the IP address. Requires the city database.
+	MetroCode     string `protobuf:"bytes,23,opt,name=metro_code,json=metroCode,proto3" json:"metro_code,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *CommonGeoipProviderConfig_GeolocationFieldKeys) Reset() {
@@ -341,6 +384,13 @@ func (*CommonGeoipProviderConfig_GeolocationFieldKeys) Descriptor() ([]byte, []i
 func (x *CommonGeoipProviderConfig_GeolocationFieldKeys) GetCountry() string {
 	if x != nil {
 		return x.Country
+	}
+	return ""
+}
+
+func (x *CommonGeoipProviderConfig_GeolocationFieldKeys) GetCountryName() string {
+	if x != nil {
+		return x.CountryName
 	}
 	return ""
 }
@@ -422,11 +472,88 @@ func (x *CommonGeoipProviderConfig_GeolocationFieldKeys) GetApplePrivateRelay() 
 	return ""
 }
 
+func (x *CommonGeoipProviderConfig_GeolocationFieldKeys) GetCityGeonameId() string {
+	if x != nil {
+		return x.CityGeonameId
+	}
+	return ""
+}
+
+func (x *CommonGeoipProviderConfig_GeolocationFieldKeys) GetLatitude() string {
+	if x != nil {
+		return x.Latitude
+	}
+	return ""
+}
+
+func (x *CommonGeoipProviderConfig_GeolocationFieldKeys) GetLongitude() string {
+	if x != nil {
+		return x.Longitude
+	}
+	return ""
+}
+
+func (x *CommonGeoipProviderConfig_GeolocationFieldKeys) GetTimeZone() string {
+	if x != nil {
+		return x.TimeZone
+	}
+	return ""
+}
+
+func (x *CommonGeoipProviderConfig_GeolocationFieldKeys) GetPostalCode() string {
+	if x != nil {
+		return x.PostalCode
+	}
+	return ""
+}
+
+func (x *CommonGeoipProviderConfig_GeolocationFieldKeys) GetRegionName() string {
+	if x != nil {
+		return x.RegionName
+	}
+	return ""
+}
+
+func (x *CommonGeoipProviderConfig_GeolocationFieldKeys) GetRegionGeonameId() string {
+	if x != nil {
+		return x.RegionGeonameId
+	}
+	return ""
+}
+
+func (x *CommonGeoipProviderConfig_GeolocationFieldKeys) GetSubregionGeonameId() string {
+	if x != nil {
+		return x.SubregionGeonameId
+	}
+	return ""
+}
+
+func (x *CommonGeoipProviderConfig_GeolocationFieldKeys) GetCountryGeonameId() string {
+	if x != nil {
+		return x.CountryGeonameId
+	}
+	return ""
+}
+
+func (x *CommonGeoipProviderConfig_GeolocationFieldKeys) GetContinentGeonameId() string {
+	if x != nil {
+		return x.ContinentGeonameId
+	}
+	return ""
+}
+
+func (x *CommonGeoipProviderConfig_GeolocationFieldKeys) GetMetroCode() string {
+	if x != nil {
+		return x.MetroCode
+	}
+	return ""
+}
+
 var File_envoy_extensions_geoip_providers_common_v3_common_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_geoip_providers_common_v3_common_proto_rawDesc = "" +
 	"\n" +
-	"7envoy/extensions/geoip_providers/common/v3/common.proto\x12*envoy.extensions.geoip_providers.common.v3\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xb8\t\n" +
+	"7envoy/extensions/geoip_providers/common/v3/common.proto\x12*envoy.extensions.geoip_providers.common.v3\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xf9\f\n" +
 	"\x19CommonGeoipProviderConfig\x12\x97\x01\n" +
 	"\x12geo_headers_to_add\x18\x01 \x01(\v2].envoy.extensions.geoip_providers.common.v3.CommonGeoipProviderConfig.GeolocationHeadersToAddB\v\x92ǆ\xd8\x04\x033.0\x18\x01R\x0fgeoHeadersToAdd\x12\x80\x01\n" +
 	"\x0egeo_field_keys\x18\x03 \x01(\v2Z.envoy.extensions.geoip_providers.common.v3.CommonGeoipProviderConfig.GeolocationFieldKeysR\fgeoFieldKeys\x1a\xa5\x04\n" +
@@ -445,9 +572,10 @@ const file_envoy_extensions_geoip_providers_common_v3_common_proto_rawDesc = "" 
 	"anon_proxy\x18\t \x01(\tB\v\xfaB\br\x06\xd0\x01\x01\xc0\x01\x01R\tanonProxy\x12\x1d\n" +
 	"\x03isp\x18\n" +
 	" \x01(\tB\v\xfaB\br\x06\xd0\x01\x01\xc0\x01\x01R\x03isp\x12;\n" +
-	"\x13apple_private_relay\x18\v \x01(\tB\v\xfaB\br\x06\xd0\x01\x01\xc0\x01\x01R\x11applePrivateRelay\x1a\xd5\x02\n" +
+	"\x13apple_private_relay\x18\v \x01(\tB\v\xfaB\br\x06\xd0\x01\x01\xc0\x01\x01R\x11applePrivateRelay\x1a\x96\x06\n" +
 	"\x14GeolocationFieldKeys\x12\x18\n" +
-	"\acountry\x18\x01 \x01(\tR\acountry\x12\x12\n" +
+	"\acountry\x18\x01 \x01(\tR\acountry\x12!\n" +
+	"\fcountry_name\x18\x18 \x01(\tR\vcountryName\x12\x12\n" +
 	"\x04city\x18\x02 \x01(\tR\x04city\x12\x16\n" +
 	"\x06region\x18\x03 \x01(\tR\x06region\x12\x10\n" +
 	"\x03asn\x18\x04 \x01(\tR\x03asn\x12\x17\n" +
@@ -460,7 +588,21 @@ const file_envoy_extensions_geoip_providers_common_v3_common_proto_rawDesc = "" 
 	"anon_proxy\x18\t \x01(\tR\tanonProxy\x12\x10\n" +
 	"\x03isp\x18\n" +
 	" \x01(\tR\x03isp\x12.\n" +
-	"\x13apple_private_relay\x18\v \x01(\tR\x11applePrivateRelayB\xad\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x13apple_private_relay\x18\v \x01(\tR\x11applePrivateRelay\x12&\n" +
+	"\x0fcity_geoname_id\x18\r \x01(\tR\rcityGeonameId\x12\x1a\n" +
+	"\blatitude\x18\x0e \x01(\tR\blatitude\x12\x1c\n" +
+	"\tlongitude\x18\x0f \x01(\tR\tlongitude\x12\x1b\n" +
+	"\ttime_zone\x18\x10 \x01(\tR\btimeZone\x12\x1f\n" +
+	"\vpostal_code\x18\x11 \x01(\tR\n" +
+	"postalCode\x12\x1f\n" +
+	"\vregion_name\x18\x12 \x01(\tR\n" +
+	"regionName\x12*\n" +
+	"\x11region_geoname_id\x18\x13 \x01(\tR\x0fregionGeonameId\x120\n" +
+	"\x14subregion_geoname_id\x18\x14 \x01(\tR\x12subregionGeonameId\x12,\n" +
+	"\x12country_geoname_id\x18\x15 \x01(\tR\x10countryGeonameId\x120\n" +
+	"\x14continent_geoname_id\x18\x16 \x01(\tR\x12continentGeonameId\x12\x1d\n" +
+	"\n" +
+	"metro_code\x18\x17 \x01(\tR\tmetroCodeB\xad\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"8io.envoyproxy.envoy.extensions.geoip_providers.common.v3B\vCommonProtoP\x01ZZgithub.com/envoyproxy/go-control-plane/envoy/extensions/geoip_providers/common/v3;commonv3b\x06proto3"
 
 var (
