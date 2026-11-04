@@ -407,8 +407,102 @@ func (x *BuiltRouteCache) GetVerifyOneIn() *wrapperspb.UInt32Value {
 	return nil
 }
 
+// The virtual clusters the module may select for a request with “set_virtual_cluster“.
+//
+// A virtual host matches a request against its :ref:`virtual_clusters
+// <envoy_v3_api_field_config.route.v3.VirtualHost.virtual_clusters>` in order, and the router
+// counts the request in the :ref:`statistics <config_http_filters_router_vcluster_stats>` of the
+// first one that matches. A module that knows which virtual cluster a request belongs to can select
+// it instead. Like route overrides, the virtual clusters are declared here and built when the
+// configuration loads rather than on the request path. A selected virtual cluster uses the
+// statistics of the virtual cluster of the same name on the virtual host, with the same names and
+// tags even when the virtual host does not configure that name.
+type VirtualClusterOverride struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The :ref:`name <envoy_v3_api_field_config.route.v3.VirtualHost.name>` of the virtual host whose
+	// statistics the selected virtual clusters use. The statistics of every declared name are created
+	// under this virtual host when the configuration loads. A virtual cluster selected for a route of
+	// another virtual host is dropped and counted in ``virtual_cluster_vhost_mismatch``, since its
+	// statistics would be named after the wrong virtual host. This field is required.
+	VirtualHostName string `protobuf:"bytes,1,opt,name=virtual_host_name,json=virtualHostName,proto3" json:"virtual_host_name,omitempty"`
+	// The names of the virtual clusters the module may select, which must be unique and not empty.
+	// ``other`` declares the catch all virtual cluster, which counts the requests that match none of
+	// the virtual clusters of the virtual host. At least one name is required.
+	Names []string `protobuf:"bytes,2,rep,name=names,proto3" json:"names,omitempty"`
+	// Whether the router counts a request in the virtual cluster the module selected. Otherwise the
+	// router counts it in the virtual cluster the virtual host matches and compares the two, or in
+	// the selected one when the virtual host has no virtual clusters to compare with. A request the
+	// module selects none for is left to the virtual host and never compared. If not specified,
+	// defaults to ``false``.
+	PreferSelection bool `protobuf:"varint,3,opt,name=prefer_selection,json=preferSelection,proto3" json:"prefer_selection,omitempty"`
+	// When ``prefer_selection`` is ``true``, the virtual host also matches a request the module
+	// selected a virtual cluster for, with a chance of one in this many, so that the selection is
+	// still compared with it. Zero disables the comparison. If not specified, defaults to 1024.
+	VerifyOneIn   *wrapperspb.UInt32Value `protobuf:"bytes,4,opt,name=verify_one_in,json=verifyOneIn,proto3" json:"verify_one_in,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *VirtualClusterOverride) Reset() {
+	*x = VirtualClusterOverride{}
+	mi := &file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_modules_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VirtualClusterOverride) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VirtualClusterOverride) ProtoMessage() {}
+
+func (x *VirtualClusterOverride) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_modules_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VirtualClusterOverride.ProtoReflect.Descriptor instead.
+func (*VirtualClusterOverride) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_modules_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *VirtualClusterOverride) GetVirtualHostName() string {
+	if x != nil {
+		return x.VirtualHostName
+	}
+	return ""
+}
+
+func (x *VirtualClusterOverride) GetNames() []string {
+	if x != nil {
+		return x.Names
+	}
+	return nil
+}
+
+func (x *VirtualClusterOverride) GetPreferSelection() bool {
+	if x != nil {
+		return x.PreferSelection
+	}
+	return false
+}
+
+func (x *VirtualClusterOverride) GetVerifyOneIn() *wrapperspb.UInt32Value {
+	if x != nil {
+		return x.VerifyOneIn
+	}
+	return nil
+}
+
 // Configuration for the dynamic modules route specifier.
-// [#next-free-field: 13]
+// [#next-free-field: 14]
 type DynamicModuleRouteSpecifier struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Specifies the shared object level configuration. This field is required.
@@ -475,13 +569,17 @@ type DynamicModuleRouteSpecifier struct {
 	// A per worker cache of the routes the module builds from route templates. It requires a
 	// specifier configured on a virtual host or a route. If not specified, no route is cached.
 	BuiltRouteCache *BuiltRouteCache `protobuf:"bytes,12,opt,name=built_route_cache,json=builtRouteCache,proto3" json:"built_route_cache,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// The virtual clusters the module may select for a request. If not specified,
+	// ``set_virtual_cluster`` rejects every name and the router counts every request in the virtual
+	// cluster the virtual host matches.
+	VirtualClusterOverride *VirtualClusterOverride `protobuf:"bytes,13,opt,name=virtual_cluster_override,json=virtualClusterOverride,proto3" json:"virtual_cluster_override,omitempty"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *DynamicModuleRouteSpecifier) Reset() {
 	*x = DynamicModuleRouteSpecifier{}
-	mi := &file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_modules_proto_msgTypes[3]
+	mi := &file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_modules_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -493,7 +591,7 @@ func (x *DynamicModuleRouteSpecifier) String() string {
 func (*DynamicModuleRouteSpecifier) ProtoMessage() {}
 
 func (x *DynamicModuleRouteSpecifier) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_modules_proto_msgTypes[3]
+	mi := &file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_modules_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -506,7 +604,7 @@ func (x *DynamicModuleRouteSpecifier) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DynamicModuleRouteSpecifier.ProtoReflect.Descriptor instead.
 func (*DynamicModuleRouteSpecifier) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_modules_proto_rawDescGZIP(), []int{3}
+	return file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_modules_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *DynamicModuleRouteSpecifier) GetDynamicModuleConfig() *v33.DynamicModuleConfig {
@@ -593,6 +691,13 @@ func (x *DynamicModuleRouteSpecifier) GetBuiltRouteCache() *BuiltRouteCache {
 	return nil
 }
 
+func (x *DynamicModuleRouteSpecifier) GetVirtualClusterOverride() *VirtualClusterOverride {
+	if x != nil {
+		return x.VirtualClusterOverride
+	}
+	return nil
+}
+
 var File_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_modules_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_modules_proto_rawDesc = "" +
@@ -622,7 +727,12 @@ const file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_m
 	"\x16max_entries_per_worker\x18\x01 \x01(\rB\a\xfaB\x04*\x02 \x00R\x13maxEntriesPerWorker\x12I\n" +
 	"\rmax_idle_time\x18\x02 \x01(\v2\x19.google.protobuf.DurationB\n" +
 	"\xfaB\a\xaa\x01\x042\x02\b\x01R\vmaxIdleTime\x12@\n" +
-	"\rverify_one_in\x18\x03 \x01(\v2\x1c.google.protobuf.UInt32ValueR\vverifyOneIn\"\xca\b\n" +
+	"\rverify_one_in\x18\x03 \x01(\v2\x1c.google.protobuf.UInt32ValueR\vverifyOneIn\"\xe0\x01\n" +
+	"\x16VirtualClusterOverride\x123\n" +
+	"\x11virtual_host_name\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x0fvirtualHostName\x12$\n" +
+	"\x05names\x18\x02 \x03(\tB\x0e\xfaB\v\x92\x01\b\b\x01\"\x04r\x02\x10\x01R\x05names\x12)\n" +
+	"\x10prefer_selection\x18\x03 \x01(\bR\x0fpreferSelection\x12@\n" +
+	"\rverify_one_in\x18\x04 \x01(\v2\x1c.google.protobuf.UInt32ValueR\vverifyOneIn\"\xda\t\n" +
 	"\x1bDynamicModuleRouteSpecifier\x12v\n" +
 	"\x15dynamic_module_config\x18\x01 \x01(\v28.envoy.extensions.dynamic_modules.v3.DynamicModuleConfigB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x13dynamicModuleConfig\x12%\n" +
 	"\x0especifier_name\x18\x02 \x01(\tR\rspecifierName\x12?\n" +
@@ -637,7 +747,8 @@ const file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_m
 	"\x18max_rewritten_path_bytes\x18\n" +
 	" \x01(\v2\x1c.google.protobuf.UInt32ValueB\a\xfaB\x04*\x02 \x00R\x15maxRewrittenPathBytes\x12<\n" +
 	"\x15specifier_instance_id\x18\v \x01(\tB\b\xfaB\x05r\x03\x18\x80\x02R\x13specifierInstanceId\x12x\n" +
-	"\x11built_route_cache\x18\f \x01(\v2L.envoy.extensions.router.route_specifiers.dynamic_modules.v3.BuiltRouteCacheR\x0fbuiltRouteCache*f\n" +
+	"\x11built_route_cache\x18\f \x01(\v2L.envoy.extensions.router.route_specifiers.dynamic_modules.v3.BuiltRouteCacheR\x0fbuiltRouteCache\x12\x8d\x01\n" +
+	"\x18virtual_cluster_override\x18\r \x01(\v2S.envoy.extensions.router.route_specifiers.dynamic_modules.v3.VirtualClusterOverrideR\x16virtualClusterOverride*f\n" +
 	"\rFailurePolicy\x12\x1e\n" +
 	"\x1aFAILURE_POLICY_UNSPECIFIED\x10\x00\x12\x10\n" +
 	"\fPASS_THROUGH\x10\x01\x12\f\n" +
@@ -658,58 +769,61 @@ func file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_mo
 }
 
 var file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_modules_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_modules_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_modules_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_modules_proto_goTypes = []any{
 	(FailurePolicy)(0),                         // 0: envoy.extensions.router.route_specifiers.dynamic_modules.v3.FailurePolicy
 	(*RouteTemplate)(nil),                      // 1: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteTemplate
 	(*RouteOverride)(nil),                      // 2: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride
 	(*BuiltRouteCache)(nil),                    // 3: envoy.extensions.router.route_specifiers.dynamic_modules.v3.BuiltRouteCache
-	(*DynamicModuleRouteSpecifier)(nil),        // 4: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier
-	(*v3.Route)(nil),                           // 5: envoy.config.route.v3.Route
-	(*v3.RetryPolicy)(nil),                     // 6: envoy.config.route.v3.RetryPolicy
-	(*v31.Metadata)(nil),                       // 7: envoy.config.core.v3.Metadata
-	(*v3.RouteAction_RequestMirrorPolicy)(nil), // 8: envoy.config.route.v3.RouteAction.RequestMirrorPolicy
-	(*v3.RouteAction_HashPolicy)(nil),          // 9: envoy.config.route.v3.RouteAction.HashPolicy
-	(*v3.HedgePolicy)(nil),                     // 10: envoy.config.route.v3.HedgePolicy
-	(*v3.RateLimit)(nil),                       // 11: envoy.config.route.v3.RateLimit
-	(*v3.CorsPolicy)(nil),                      // 12: envoy.config.route.v3.CorsPolicy
-	(*v32.RegexMatchAndSubstitute)(nil),        // 13: envoy.type.matcher.v3.RegexMatchAndSubstitute
-	(*v3.Tracing)(nil),                         // 14: envoy.config.route.v3.Tracing
-	(*durationpb.Duration)(nil),                // 15: google.protobuf.Duration
-	(*wrapperspb.UInt32Value)(nil),             // 16: google.protobuf.UInt32Value
-	(*v33.DynamicModuleConfig)(nil),            // 17: envoy.extensions.dynamic_modules.v3.DynamicModuleConfig
-	(*anypb.Any)(nil),                          // 18: google.protobuf.Any
-	(*v31.RuntimeFractionalPercent)(nil),       // 19: envoy.config.core.v3.RuntimeFractionalPercent
-	(*wrapperspb.BoolValue)(nil),               // 20: google.protobuf.BoolValue
+	(*VirtualClusterOverride)(nil),             // 4: envoy.extensions.router.route_specifiers.dynamic_modules.v3.VirtualClusterOverride
+	(*DynamicModuleRouteSpecifier)(nil),        // 5: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier
+	(*v3.Route)(nil),                           // 6: envoy.config.route.v3.Route
+	(*v3.RetryPolicy)(nil),                     // 7: envoy.config.route.v3.RetryPolicy
+	(*v31.Metadata)(nil),                       // 8: envoy.config.core.v3.Metadata
+	(*v3.RouteAction_RequestMirrorPolicy)(nil), // 9: envoy.config.route.v3.RouteAction.RequestMirrorPolicy
+	(*v3.RouteAction_HashPolicy)(nil),          // 10: envoy.config.route.v3.RouteAction.HashPolicy
+	(*v3.HedgePolicy)(nil),                     // 11: envoy.config.route.v3.HedgePolicy
+	(*v3.RateLimit)(nil),                       // 12: envoy.config.route.v3.RateLimit
+	(*v3.CorsPolicy)(nil),                      // 13: envoy.config.route.v3.CorsPolicy
+	(*v32.RegexMatchAndSubstitute)(nil),        // 14: envoy.type.matcher.v3.RegexMatchAndSubstitute
+	(*v3.Tracing)(nil),                         // 15: envoy.config.route.v3.Tracing
+	(*durationpb.Duration)(nil),                // 16: google.protobuf.Duration
+	(*wrapperspb.UInt32Value)(nil),             // 17: google.protobuf.UInt32Value
+	(*v33.DynamicModuleConfig)(nil),            // 18: envoy.extensions.dynamic_modules.v3.DynamicModuleConfig
+	(*anypb.Any)(nil),                          // 19: google.protobuf.Any
+	(*v31.RuntimeFractionalPercent)(nil),       // 20: envoy.config.core.v3.RuntimeFractionalPercent
+	(*wrapperspb.BoolValue)(nil),               // 21: google.protobuf.BoolValue
 }
 var file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_modules_proto_depIdxs = []int32{
-	5,  // 0: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteTemplate.route:type_name -> envoy.config.route.v3.Route
-	6,  // 1: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride.retry_policy:type_name -> envoy.config.route.v3.RetryPolicy
-	7,  // 2: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride.metadata_match:type_name -> envoy.config.core.v3.Metadata
-	8,  // 3: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride.request_mirror_policies:type_name -> envoy.config.route.v3.RouteAction.RequestMirrorPolicy
-	9,  // 4: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride.hash_policy:type_name -> envoy.config.route.v3.RouteAction.HashPolicy
-	10, // 5: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride.hedge_policy:type_name -> envoy.config.route.v3.HedgePolicy
-	11, // 6: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride.rate_limits:type_name -> envoy.config.route.v3.RateLimit
-	12, // 7: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride.cors:type_name -> envoy.config.route.v3.CorsPolicy
-	13, // 8: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride.regex_rewrite:type_name -> envoy.type.matcher.v3.RegexMatchAndSubstitute
-	14, // 9: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride.tracing:type_name -> envoy.config.route.v3.Tracing
-	7,  // 10: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride.metadata:type_name -> envoy.config.core.v3.Metadata
-	15, // 11: envoy.extensions.router.route_specifiers.dynamic_modules.v3.BuiltRouteCache.max_idle_time:type_name -> google.protobuf.Duration
-	16, // 12: envoy.extensions.router.route_specifiers.dynamic_modules.v3.BuiltRouteCache.verify_one_in:type_name -> google.protobuf.UInt32Value
-	17, // 13: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.dynamic_module_config:type_name -> envoy.extensions.dynamic_modules.v3.DynamicModuleConfig
-	18, // 14: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.specifier_config:type_name -> google.protobuf.Any
-	1,  // 15: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.route_templates:type_name -> envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteTemplate
-	2,  // 16: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.route_overrides:type_name -> envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride
-	19, // 17: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.runtime_fraction:type_name -> envoy.config.core.v3.RuntimeFractionalPercent
-	0,  // 18: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.failure_policy:type_name -> envoy.extensions.router.route_specifiers.dynamic_modules.v3.FailurePolicy
-	20, // 19: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.validate_clusters:type_name -> google.protobuf.BoolValue
-	16, // 20: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.max_rewritten_path_bytes:type_name -> google.protobuf.UInt32Value
-	3,  // 21: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.built_route_cache:type_name -> envoy.extensions.router.route_specifiers.dynamic_modules.v3.BuiltRouteCache
-	22, // [22:22] is the sub-list for method output_type
-	22, // [22:22] is the sub-list for method input_type
-	22, // [22:22] is the sub-list for extension type_name
-	22, // [22:22] is the sub-list for extension extendee
-	0,  // [0:22] is the sub-list for field type_name
+	6,  // 0: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteTemplate.route:type_name -> envoy.config.route.v3.Route
+	7,  // 1: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride.retry_policy:type_name -> envoy.config.route.v3.RetryPolicy
+	8,  // 2: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride.metadata_match:type_name -> envoy.config.core.v3.Metadata
+	9,  // 3: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride.request_mirror_policies:type_name -> envoy.config.route.v3.RouteAction.RequestMirrorPolicy
+	10, // 4: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride.hash_policy:type_name -> envoy.config.route.v3.RouteAction.HashPolicy
+	11, // 5: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride.hedge_policy:type_name -> envoy.config.route.v3.HedgePolicy
+	12, // 6: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride.rate_limits:type_name -> envoy.config.route.v3.RateLimit
+	13, // 7: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride.cors:type_name -> envoy.config.route.v3.CorsPolicy
+	14, // 8: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride.regex_rewrite:type_name -> envoy.type.matcher.v3.RegexMatchAndSubstitute
+	15, // 9: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride.tracing:type_name -> envoy.config.route.v3.Tracing
+	8,  // 10: envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride.metadata:type_name -> envoy.config.core.v3.Metadata
+	16, // 11: envoy.extensions.router.route_specifiers.dynamic_modules.v3.BuiltRouteCache.max_idle_time:type_name -> google.protobuf.Duration
+	17, // 12: envoy.extensions.router.route_specifiers.dynamic_modules.v3.BuiltRouteCache.verify_one_in:type_name -> google.protobuf.UInt32Value
+	17, // 13: envoy.extensions.router.route_specifiers.dynamic_modules.v3.VirtualClusterOverride.verify_one_in:type_name -> google.protobuf.UInt32Value
+	18, // 14: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.dynamic_module_config:type_name -> envoy.extensions.dynamic_modules.v3.DynamicModuleConfig
+	19, // 15: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.specifier_config:type_name -> google.protobuf.Any
+	1,  // 16: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.route_templates:type_name -> envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteTemplate
+	2,  // 17: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.route_overrides:type_name -> envoy.extensions.router.route_specifiers.dynamic_modules.v3.RouteOverride
+	20, // 18: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.runtime_fraction:type_name -> envoy.config.core.v3.RuntimeFractionalPercent
+	0,  // 19: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.failure_policy:type_name -> envoy.extensions.router.route_specifiers.dynamic_modules.v3.FailurePolicy
+	21, // 20: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.validate_clusters:type_name -> google.protobuf.BoolValue
+	17, // 21: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.max_rewritten_path_bytes:type_name -> google.protobuf.UInt32Value
+	3,  // 22: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.built_route_cache:type_name -> envoy.extensions.router.route_specifiers.dynamic_modules.v3.BuiltRouteCache
+	4,  // 23: envoy.extensions.router.route_specifiers.dynamic_modules.v3.DynamicModuleRouteSpecifier.virtual_cluster_override:type_name -> envoy.extensions.router.route_specifiers.dynamic_modules.v3.VirtualClusterOverride
+	24, // [24:24] is the sub-list for method output_type
+	24, // [24:24] is the sub-list for method input_type
+	24, // [24:24] is the sub-list for extension type_name
+	24, // [24:24] is the sub-list for extension extendee
+	0,  // [0:24] is the sub-list for field type_name
 }
 
 func init() {
@@ -725,7 +839,7 @@ func file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_mo
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_modules_proto_rawDesc), len(file_envoy_extensions_router_route_specifiers_dynamic_modules_v3_dynamic_modules_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   4,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

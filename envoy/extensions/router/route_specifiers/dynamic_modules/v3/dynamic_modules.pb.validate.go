@@ -773,6 +773,177 @@ var _ interface {
 	ErrorName() string
 } = BuiltRouteCacheValidationError{}
 
+// Validate checks the field values on VirtualClusterOverride with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *VirtualClusterOverride) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on VirtualClusterOverride with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// VirtualClusterOverrideMultiError, or nil if none found.
+func (m *VirtualClusterOverride) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *VirtualClusterOverride) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if utf8.RuneCountInString(m.GetVirtualHostName()) < 1 {
+		err := VirtualClusterOverrideValidationError{
+			field:  "VirtualHostName",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(m.GetNames()) < 1 {
+		err := VirtualClusterOverrideValidationError{
+			field:  "Names",
+			reason: "value must contain at least 1 item(s)",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	for idx, item := range m.GetNames() {
+		_, _ = idx, item
+
+		if utf8.RuneCountInString(item) < 1 {
+			err := VirtualClusterOverrideValidationError{
+				field:  fmt.Sprintf("Names[%v]", idx),
+				reason: "value length must be at least 1 runes",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
+	// no validation rules for PreferSelection
+
+	if all {
+		switch v := interface{}(m.GetVerifyOneIn()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, VirtualClusterOverrideValidationError{
+					field:  "VerifyOneIn",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, VirtualClusterOverrideValidationError{
+					field:  "VerifyOneIn",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetVerifyOneIn()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return VirtualClusterOverrideValidationError{
+				field:  "VerifyOneIn",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return VirtualClusterOverrideMultiError(errors)
+	}
+
+	return nil
+}
+
+// VirtualClusterOverrideMultiError is an error wrapping multiple validation
+// errors returned by VirtualClusterOverride.ValidateAll() if the designated
+// constraints aren't met.
+type VirtualClusterOverrideMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m VirtualClusterOverrideMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m VirtualClusterOverrideMultiError) AllErrors() []error { return m }
+
+// VirtualClusterOverrideValidationError is the validation error returned by
+// VirtualClusterOverride.Validate if the designated constraints aren't met.
+type VirtualClusterOverrideValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e VirtualClusterOverrideValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e VirtualClusterOverrideValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e VirtualClusterOverrideValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e VirtualClusterOverrideValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e VirtualClusterOverrideValidationError) ErrorName() string {
+	return "VirtualClusterOverrideValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e VirtualClusterOverrideValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sVirtualClusterOverride.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = VirtualClusterOverrideValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = VirtualClusterOverrideValidationError{}
+
 // Validate checks the field values on DynamicModuleRouteSpecifier with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -1063,6 +1234,35 @@ func (m *DynamicModuleRouteSpecifier) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return DynamicModuleRouteSpecifierValidationError{
 				field:  "BuiltRouteCache",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetVirtualClusterOverride()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DynamicModuleRouteSpecifierValidationError{
+					field:  "VirtualClusterOverride",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DynamicModuleRouteSpecifierValidationError{
+					field:  "VirtualClusterOverride",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetVirtualClusterOverride()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DynamicModuleRouteSpecifierValidationError{
+				field:  "VirtualClusterOverride",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

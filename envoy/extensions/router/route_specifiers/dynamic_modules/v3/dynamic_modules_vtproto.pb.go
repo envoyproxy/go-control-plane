@@ -409,6 +409,75 @@ func (m *BuiltRouteCache) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error)
 	return len(dAtA) - i, nil
 }
 
+func (m *VirtualClusterOverride) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *VirtualClusterOverride) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *VirtualClusterOverride) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.VerifyOneIn != nil {
+		size, err := (*wrapperspb.UInt32Value)(m.VerifyOneIn).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x22
+	}
+	if m.PreferSelection {
+		i--
+		if m.PreferSelection {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x18
+	}
+	if len(m.Names) > 0 {
+		for iNdEx := len(m.Names) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Names[iNdEx])
+			copy(dAtA[i:], m.Names[iNdEx])
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.Names[iNdEx])))
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if len(m.VirtualHostName) > 0 {
+		i -= len(m.VirtualHostName)
+		copy(dAtA[i:], m.VirtualHostName)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.VirtualHostName)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *DynamicModuleRouteSpecifier) MarshalVTStrict() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
@@ -438,6 +507,16 @@ func (m *DynamicModuleRouteSpecifier) MarshalToSizedBufferVTStrict(dAtA []byte) 
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.VirtualClusterOverride != nil {
+		size, err := m.VirtualClusterOverride.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x6a
 	}
 	if m.BuiltRouteCache != nil {
 		size, err := m.BuiltRouteCache.MarshalToSizedBufferVTStrict(dAtA[:i])
@@ -741,6 +820,33 @@ func (m *BuiltRouteCache) SizeVT() (n int) {
 	return n
 }
 
+func (m *VirtualClusterOverride) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.VirtualHostName)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if len(m.Names) > 0 {
+		for _, s := range m.Names {
+			l = len(s)
+			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+		}
+	}
+	if m.PreferSelection {
+		n += 2
+	}
+	if m.VerifyOneIn != nil {
+		l = (*wrapperspb.UInt32Value)(m.VerifyOneIn).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
 func (m *DynamicModuleRouteSpecifier) SizeVT() (n int) {
 	if m == nil {
 		return 0
@@ -808,6 +914,10 @@ func (m *DynamicModuleRouteSpecifier) SizeVT() (n int) {
 	}
 	if m.BuiltRouteCache != nil {
 		l = m.BuiltRouteCache.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.VirtualClusterOverride != nil {
+		l = m.VirtualClusterOverride.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
