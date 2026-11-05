@@ -33,7 +33,7 @@ const (
 // Bootstrap extensions run on the main thread and are initialized when Envoy starts. They can:
 //
 // * Perform initialization tasks when the server is initialized.
-// * Perform per-worker thread initialization when worker threads start.
+// * Run code on every worker thread.
 // * Access server-level resources like the cluster manager and dispatcher.
 type DynamicModuleBootstrapExtension struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
