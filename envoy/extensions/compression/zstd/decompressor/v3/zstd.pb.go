@@ -35,7 +35,8 @@ type Zstd struct {
 	// Please refer to `zstd manual <https://github.com/facebook/zstd/blob/dev/programs/zstd.1.md#dictionary-builder>`_
 	// to train specific dictionaries for decompression.
 	Dictionaries []*v3.DataSource `protobuf:"bytes,1,rep,name=dictionaries,proto3" json:"dictionaries,omitempty"`
-	// Value for decompressor's next output buffer. If not set, defaults to 4096.
+	// Value for decompressor's next output buffer. If not set, defaults to the zstd recommended
+	// output buffer size, ``ZSTD_DStreamOutSize()`` (128 KiB).
 	ChunkSize     *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=chunk_size,json=chunkSize,proto3" json:"chunk_size,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

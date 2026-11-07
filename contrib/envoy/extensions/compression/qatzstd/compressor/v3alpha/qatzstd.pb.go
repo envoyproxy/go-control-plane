@@ -101,7 +101,7 @@ type Qatzstd struct {
 	// Set compression parameters according to pre-defined compression level table.
 	// Note that exact compression parameters are dynamically determined,
 	// depending on both compression level and source content size (when known).
-	// Value 0 means default, and default level is 3.
+	// If not set, defaults to 3.
 	//
 	// Setting a level does not automatically set all other compression parameters
 	// to default. Setting this will however eventually dynamically impact the compression
@@ -115,7 +115,8 @@ type Qatzstd struct {
 	//
 	// Special: value 0 means "use default strategy".
 	Strategy Qatzstd_Strategy `protobuf:"varint,3,opt,name=strategy,proto3,enum=envoy.extensions.compression.qatzstd.compressor.v3alpha.Qatzstd_Strategy" json:"strategy,omitempty"`
-	// Value for compressor's next output buffer. If not set, defaults to 4096.
+	// Value for compressor's next output buffer. If not set, defaults to the zstd recommended
+	// output buffer size, ``ZSTD_CStreamOutSize()`` (about 128 KiB).
 	ChunkSize *wrapperspb.UInt32Value `protobuf:"bytes,5,opt,name=chunk_size,json=chunkSize,proto3" json:"chunk_size,omitempty"`
 	// Enable QAT to accelerate Zstd compression or not. If not set, defaults to false.
 	//

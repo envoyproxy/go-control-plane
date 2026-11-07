@@ -120,7 +120,8 @@ type Zstd struct {
 	// Please refer to `zstd manual <https://github.com/facebook/zstd/blob/dev/programs/zstd.1.md#dictionary-builder>`_
 	// to train a specific dictionary for compression.
 	Dictionary *v3.DataSource `protobuf:"bytes,4,opt,name=dictionary,proto3" json:"dictionary,omitempty"`
-	// Value for compressor's next output buffer. If not set, defaults to 4096.
+	// Value for compressor's next output buffer. If not set, defaults to the zstd recommended
+	// output buffer size, ``ZSTD_CStreamOutSize()`` (about 128 KiB).
 	ChunkSize     *wrapperspb.UInt32Value `protobuf:"bytes,5,opt,name=chunk_size,json=chunkSize,proto3" json:"chunk_size,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
