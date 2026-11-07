@@ -213,10 +213,20 @@ func (*SinkConfig_HttpService) isSinkConfig_ProtocolSpecifier() {}
 // stat, add static labels, and aggregate multiple stats into a single metric.
 type SinkConfig_ConversionAction struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The metric name to use for the stat.
+	// The metric name to use for the stat. If empty, the metric is named as if the stat matched no
+	// conversion, see :ref:`use_tag_extracted_name
+	// <envoy_v3_api_field_extensions.stat_sinks.open_telemetry.v3.SinkConfig.use_tag_extracted_name>`
+	// and :ref:`prefix <envoy_v3_api_field_extensions.stat_sinks.open_telemetry.v3.SinkConfig.prefix>`,
+	// instead of with an empty name, which is not a valid OTLP metric name. This lets a conversion
+	// without a metric name apply to many stats, e.g. to report them under a resource of their own,
+	// without merging them into a single metric.
 	MetricName string `protobuf:"bytes,2,opt,name=metric_name,json=metricName,proto3" json:"metric_name,omitempty"`
 	// Static metric labels to use for the metric.
 	StaticMetricLabels []*v1.KeyValue `protobuf:"bytes,3,rep,name=static_metric_labels,json=staticMetricLabels,proto3" json:"static_metric_labels,omitempty"`
+	// If set, the metric is reported under the OTLP resource that this defines, instead of the
+	// resource built from :ref:`resource_detectors
+	// <envoy_v3_api_field_extensions.stat_sinks.open_telemetry.v3.SinkConfig.resource_detectors>`.
+	ResourceConversion *SinkConfig_ResourceConversion `protobuf:"bytes,4,opt,name=resource_conversion,json=resourceConversion,proto3" json:"resource_conversion,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -265,6 +275,88 @@ func (x *SinkConfig_ConversionAction) GetStaticMetricLabels() []*v1.KeyValue {
 	return nil
 }
 
+func (x *SinkConfig_ConversionAction) GetResourceConversion() *SinkConfig_ResourceConversion {
+	if x != nil {
+		return x.ResourceConversion
+	}
+	return nil
+}
+
+// ResourceConversion defines the OTLP resource that a converted metric is reported under. It
+// lets one sink report metrics on behalf of several entities, e.g. a gateway that reports the
+// metrics of each workload that it serves under that workload's resource.
+//
+// Each attribute of the resource is either static or set from a stat tag. The resource doesn't
+// inherit the attributes of the resource built from :ref:`resource_detectors
+// <envoy_v3_api_field_extensions.stat_sinks.open_telemetry.v3.SinkConfig.resource_detectors>`.
+// The config is rejected if an attribute is set more than once.
+//
+// If a stat lacks one of the tags in “tags_to_resource_attributes“, or has it with an empty
+// value, the stat is reported as if the action had no resource conversion: under the resource
+// built from “resource_detectors“, with its tags as data point attributes. The metric name and
+// the static metric labels of the action still apply.
+//
+// Within an export request, the metrics whose resources have the same attributes are reported
+// under the same “ResourceMetrics“. This includes the metrics that are reported under the
+// resource built from “resource_detectors“, if it has the same attributes.
+type SinkConfig_ResourceConversion struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Static attributes of the resource. Their keys must not be empty, and their values must be
+	// strings.
+	StaticResourceAttributes []*v1.KeyValue `protobuf:"bytes,1,rep,name=static_resource_attributes,json=staticResourceAttributes,proto3" json:"static_resource_attributes,omitempty"`
+	// The stat tags that set the other attributes of the resource. A tag may be listed more than
+	// once to set several attributes. These tags are reported as resource attributes instead of
+	// data point attributes, unless the stat is reported as if the action had no resource
+	// conversion, see above.
+	TagsToResourceAttributes []*SinkConfig_ResourceConversion_TagToResourceAttribute `protobuf:"bytes,2,rep,name=tags_to_resource_attributes,json=tagsToResourceAttributes,proto3" json:"tags_to_resource_attributes,omitempty"`
+	unknownFields            protoimpl.UnknownFields
+	sizeCache                protoimpl.SizeCache
+}
+
+func (x *SinkConfig_ResourceConversion) Reset() {
+	*x = SinkConfig_ResourceConversion{}
+	mi := &file_envoy_extensions_stat_sinks_open_telemetry_v3_open_telemetry_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SinkConfig_ResourceConversion) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SinkConfig_ResourceConversion) ProtoMessage() {}
+
+func (x *SinkConfig_ResourceConversion) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_stat_sinks_open_telemetry_v3_open_telemetry_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SinkConfig_ResourceConversion.ProtoReflect.Descriptor instead.
+func (*SinkConfig_ResourceConversion) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_stat_sinks_open_telemetry_v3_open_telemetry_proto_rawDescGZIP(), []int{0, 1}
+}
+
+func (x *SinkConfig_ResourceConversion) GetStaticResourceAttributes() []*v1.KeyValue {
+	if x != nil {
+		return x.StaticResourceAttributes
+	}
+	return nil
+}
+
+func (x *SinkConfig_ResourceConversion) GetTagsToResourceAttributes() []*SinkConfig_ResourceConversion_TagToResourceAttribute {
+	if x != nil {
+		return x.TagsToResourceAttributes
+	}
+	return nil
+}
+
 // DropAction is an action that, when matched, will prevent the stat from being converted to an OTLP metric and flushed.
 type SinkConfig_DropAction struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -274,7 +366,7 @@ type SinkConfig_DropAction struct {
 
 func (x *SinkConfig_DropAction) Reset() {
 	*x = SinkConfig_DropAction{}
-	mi := &file_envoy_extensions_stat_sinks_open_telemetry_v3_open_telemetry_proto_msgTypes[2]
+	mi := &file_envoy_extensions_stat_sinks_open_telemetry_v3_open_telemetry_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -286,7 +378,7 @@ func (x *SinkConfig_DropAction) String() string {
 func (*SinkConfig_DropAction) ProtoMessage() {}
 
 func (x *SinkConfig_DropAction) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_stat_sinks_open_telemetry_v3_open_telemetry_proto_msgTypes[2]
+	mi := &file_envoy_extensions_stat_sinks_open_telemetry_v3_open_telemetry_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -299,14 +391,69 @@ func (x *SinkConfig_DropAction) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SinkConfig_DropAction.ProtoReflect.Descriptor instead.
 func (*SinkConfig_DropAction) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_stat_sinks_open_telemetry_v3_open_telemetry_proto_rawDescGZIP(), []int{0, 1}
+	return file_envoy_extensions_stat_sinks_open_telemetry_v3_open_telemetry_proto_rawDescGZIP(), []int{0, 2}
+}
+
+// Sets a resource attribute to the value of a stat tag.
+type SinkConfig_ResourceConversion_TagToResourceAttribute struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The name of the stat tag.
+	TagName string `protobuf:"bytes,1,opt,name=tag_name,json=tagName,proto3" json:"tag_name,omitempty"`
+	// The key of the resource attribute that the tag sets. If empty, ``tag_name`` is used.
+	ResourceAttributeKey string `protobuf:"bytes,2,opt,name=resource_attribute_key,json=resourceAttributeKey,proto3" json:"resource_attribute_key,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *SinkConfig_ResourceConversion_TagToResourceAttribute) Reset() {
+	*x = SinkConfig_ResourceConversion_TagToResourceAttribute{}
+	mi := &file_envoy_extensions_stat_sinks_open_telemetry_v3_open_telemetry_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SinkConfig_ResourceConversion_TagToResourceAttribute) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SinkConfig_ResourceConversion_TagToResourceAttribute) ProtoMessage() {}
+
+func (x *SinkConfig_ResourceConversion_TagToResourceAttribute) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_stat_sinks_open_telemetry_v3_open_telemetry_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SinkConfig_ResourceConversion_TagToResourceAttribute.ProtoReflect.Descriptor instead.
+func (*SinkConfig_ResourceConversion_TagToResourceAttribute) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_stat_sinks_open_telemetry_v3_open_telemetry_proto_rawDescGZIP(), []int{0, 1, 0}
+}
+
+func (x *SinkConfig_ResourceConversion_TagToResourceAttribute) GetTagName() string {
+	if x != nil {
+		return x.TagName
+	}
+	return ""
+}
+
+func (x *SinkConfig_ResourceConversion_TagToResourceAttribute) GetResourceAttributeKey() string {
+	if x != nil {
+		return x.ResourceAttributeKey
+	}
+	return ""
 }
 
 var File_envoy_extensions_stat_sinks_open_telemetry_v3_open_telemetry_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_stat_sinks_open_telemetry_v3_open_telemetry_proto_rawDesc = "" +
 	"\n" +
-	"Benvoy/extensions/stat_sinks/open_telemetry/v3/open_telemetry.proto\x12-envoy.extensions.stat_sinks.open_telemetry.v3\x1a$envoy/config/core/v3/extension.proto\x1a'envoy/config/core/v3/grpc_service.proto\x1a'envoy/config/core/v3/http_service.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a*opentelemetry/proto/common/v1/common.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x89\a\n" +
+	"Benvoy/extensions/stat_sinks/open_telemetry/v3/open_telemetry.proto\x12-envoy.extensions.stat_sinks.open_telemetry.v3\x1a$envoy/config/core/v3/extension.proto\x1a'envoy/config/core/v3/grpc_service.proto\x1a'envoy/config/core/v3/http_service.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a*opentelemetry/proto/common/v1/common.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x9f\v\n" +
 	"\n" +
 	"SinkConfig\x12P\n" +
 	"\fgrpc_service\x18\x01 \x01(\v2!.envoy.config.core.v3.GrpcServiceB\b\xfaB\x05\x8a\x01\x02\x10\x01H\x00R\vgrpcService\x12F\n" +
@@ -319,11 +466,18 @@ const file_envoy_extensions_stat_sinks_open_telemetry_v3_open_telemetry_proto_ra
 	"\x06prefix\x18\x06 \x01(\tR\x06prefix\x12X\n" +
 	"\x19custom_metric_conversions\x18\b \x01(\v2\x1c.xds.type.matcher.v3.MatcherR\x17customMetricConversions\x12<\n" +
 	"\x1bmax_data_points_per_request\x18\n" +
-	" \x01(\rR\x17maxDataPointsPerRequest\x1a\x8e\x01\n" +
+	" \x01(\rR\x17maxDataPointsPerRequest\x1a\x8d\x02\n" +
 	"\x10ConversionAction\x12\x1f\n" +
 	"\vmetric_name\x18\x02 \x01(\tR\n" +
 	"metricName\x12Y\n" +
-	"\x14static_metric_labels\x18\x03 \x03(\v2'.opentelemetry.proto.common.v1.KeyValueR\x12staticMetricLabels\x1a\f\n" +
+	"\x14static_metric_labels\x18\x03 \x03(\v2'.opentelemetry.proto.common.v1.KeyValueR\x12staticMetricLabels\x12}\n" +
+	"\x13resource_conversion\x18\x04 \x01(\v2L.envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig.ResourceConversionR\x12resourceConversion\x1a\x94\x03\n" +
+	"\x12ResourceConversion\x12e\n" +
+	"\x1astatic_resource_attributes\x18\x01 \x03(\v2'.opentelemetry.proto.common.v1.KeyValueR\x18staticResourceAttributes\x12\xa2\x01\n" +
+	"\x1btags_to_resource_attributes\x18\x02 \x03(\v2c.envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig.ResourceConversion.TagToResourceAttributeR\x18tagsToResourceAttributes\x1ar\n" +
+	"\x16TagToResourceAttribute\x12\"\n" +
+	"\btag_name\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\atagName\x124\n" +
+	"\x16resource_attribute_key\x18\x02 \x01(\tR\x14resourceAttributeKey\x1a\f\n" +
 	"\n" +
 	"DropActionB\x19\n" +
 	"\x12protocol_specifier\x12\x03\xf8B\x01B\xc2\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
@@ -341,31 +495,36 @@ func file_envoy_extensions_stat_sinks_open_telemetry_v3_open_telemetry_proto_raw
 	return file_envoy_extensions_stat_sinks_open_telemetry_v3_open_telemetry_proto_rawDescData
 }
 
-var file_envoy_extensions_stat_sinks_open_telemetry_v3_open_telemetry_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_envoy_extensions_stat_sinks_open_telemetry_v3_open_telemetry_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_envoy_extensions_stat_sinks_open_telemetry_v3_open_telemetry_proto_goTypes = []any{
-	(*SinkConfig)(nil),                  // 0: envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig
-	(*SinkConfig_ConversionAction)(nil), // 1: envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig.ConversionAction
-	(*SinkConfig_DropAction)(nil),       // 2: envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig.DropAction
-	(*v3.GrpcService)(nil),              // 3: envoy.config.core.v3.GrpcService
-	(*v3.HttpService)(nil),              // 4: envoy.config.core.v3.HttpService
-	(*v3.TypedExtensionConfig)(nil),     // 5: envoy.config.core.v3.TypedExtensionConfig
-	(*wrapperspb.BoolValue)(nil),        // 6: google.protobuf.BoolValue
-	(*v31.Matcher)(nil),                 // 7: xds.type.matcher.v3.Matcher
-	(*v1.KeyValue)(nil),                 // 8: opentelemetry.proto.common.v1.KeyValue
+	(*SinkConfig)(nil),                                           // 0: envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig
+	(*SinkConfig_ConversionAction)(nil),                          // 1: envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig.ConversionAction
+	(*SinkConfig_ResourceConversion)(nil),                        // 2: envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig.ResourceConversion
+	(*SinkConfig_DropAction)(nil),                                // 3: envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig.DropAction
+	(*SinkConfig_ResourceConversion_TagToResourceAttribute)(nil), // 4: envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig.ResourceConversion.TagToResourceAttribute
+	(*v3.GrpcService)(nil),                                       // 5: envoy.config.core.v3.GrpcService
+	(*v3.HttpService)(nil),                                       // 6: envoy.config.core.v3.HttpService
+	(*v3.TypedExtensionConfig)(nil),                              // 7: envoy.config.core.v3.TypedExtensionConfig
+	(*wrapperspb.BoolValue)(nil),                                 // 8: google.protobuf.BoolValue
+	(*v31.Matcher)(nil),                                          // 9: xds.type.matcher.v3.Matcher
+	(*v1.KeyValue)(nil),                                          // 10: opentelemetry.proto.common.v1.KeyValue
 }
 var file_envoy_extensions_stat_sinks_open_telemetry_v3_open_telemetry_proto_depIdxs = []int32{
-	3, // 0: envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig.grpc_service:type_name -> envoy.config.core.v3.GrpcService
-	4, // 1: envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig.http_service:type_name -> envoy.config.core.v3.HttpService
-	5, // 2: envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig.resource_detectors:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	6, // 3: envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig.emit_tags_as_attributes:type_name -> google.protobuf.BoolValue
-	6, // 4: envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig.use_tag_extracted_name:type_name -> google.protobuf.BoolValue
-	7, // 5: envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig.custom_metric_conversions:type_name -> xds.type.matcher.v3.Matcher
-	8, // 6: envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig.ConversionAction.static_metric_labels:type_name -> opentelemetry.proto.common.v1.KeyValue
-	7, // [7:7] is the sub-list for method output_type
-	7, // [7:7] is the sub-list for method input_type
-	7, // [7:7] is the sub-list for extension type_name
-	7, // [7:7] is the sub-list for extension extendee
-	0, // [0:7] is the sub-list for field type_name
+	5,  // 0: envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig.grpc_service:type_name -> envoy.config.core.v3.GrpcService
+	6,  // 1: envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig.http_service:type_name -> envoy.config.core.v3.HttpService
+	7,  // 2: envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig.resource_detectors:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	8,  // 3: envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig.emit_tags_as_attributes:type_name -> google.protobuf.BoolValue
+	8,  // 4: envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig.use_tag_extracted_name:type_name -> google.protobuf.BoolValue
+	9,  // 5: envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig.custom_metric_conversions:type_name -> xds.type.matcher.v3.Matcher
+	10, // 6: envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig.ConversionAction.static_metric_labels:type_name -> opentelemetry.proto.common.v1.KeyValue
+	2,  // 7: envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig.ConversionAction.resource_conversion:type_name -> envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig.ResourceConversion
+	10, // 8: envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig.ResourceConversion.static_resource_attributes:type_name -> opentelemetry.proto.common.v1.KeyValue
+	4,  // 9: envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig.ResourceConversion.tags_to_resource_attributes:type_name -> envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig.ResourceConversion.TagToResourceAttribute
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_stat_sinks_open_telemetry_v3_open_telemetry_proto_init() }
@@ -383,7 +542,7 @@ func file_envoy_extensions_stat_sinks_open_telemetry_v3_open_telemetry_proto_ini
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_stat_sinks_open_telemetry_v3_open_telemetry_proto_rawDesc), len(file_envoy_extensions_stat_sinks_open_telemetry_v3_open_telemetry_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

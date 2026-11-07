@@ -433,6 +433,35 @@ func (m *SinkConfig_ConversionAction) validate(all bool) error {
 
 	}
 
+	if all {
+		switch v := interface{}(m.GetResourceConversion()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SinkConfig_ConversionActionValidationError{
+					field:  "ResourceConversion",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SinkConfig_ConversionActionValidationError{
+					field:  "ResourceConversion",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetResourceConversion()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SinkConfig_ConversionActionValidationError{
+				field:  "ResourceConversion",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return SinkConfig_ConversionActionMultiError(errors)
 	}
@@ -513,6 +542,177 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = SinkConfig_ConversionActionValidationError{}
+
+// Validate checks the field values on SinkConfig_ResourceConversion with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SinkConfig_ResourceConversion) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SinkConfig_ResourceConversion with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// SinkConfig_ResourceConversionMultiError, or nil if none found.
+func (m *SinkConfig_ResourceConversion) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SinkConfig_ResourceConversion) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetStaticResourceAttributes() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, SinkConfig_ResourceConversionValidationError{
+						field:  fmt.Sprintf("StaticResourceAttributes[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, SinkConfig_ResourceConversionValidationError{
+						field:  fmt.Sprintf("StaticResourceAttributes[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return SinkConfig_ResourceConversionValidationError{
+					field:  fmt.Sprintf("StaticResourceAttributes[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	for idx, item := range m.GetTagsToResourceAttributes() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, SinkConfig_ResourceConversionValidationError{
+						field:  fmt.Sprintf("TagsToResourceAttributes[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, SinkConfig_ResourceConversionValidationError{
+						field:  fmt.Sprintf("TagsToResourceAttributes[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return SinkConfig_ResourceConversionValidationError{
+					field:  fmt.Sprintf("TagsToResourceAttributes[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return SinkConfig_ResourceConversionMultiError(errors)
+	}
+
+	return nil
+}
+
+// SinkConfig_ResourceConversionMultiError is an error wrapping multiple
+// validation errors returned by SinkConfig_ResourceConversion.ValidateAll()
+// if the designated constraints aren't met.
+type SinkConfig_ResourceConversionMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SinkConfig_ResourceConversionMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SinkConfig_ResourceConversionMultiError) AllErrors() []error { return m }
+
+// SinkConfig_ResourceConversionValidationError is the validation error
+// returned by SinkConfig_ResourceConversion.Validate if the designated
+// constraints aren't met.
+type SinkConfig_ResourceConversionValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SinkConfig_ResourceConversionValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SinkConfig_ResourceConversionValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SinkConfig_ResourceConversionValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SinkConfig_ResourceConversionValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SinkConfig_ResourceConversionValidationError) ErrorName() string {
+	return "SinkConfig_ResourceConversionValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SinkConfig_ResourceConversionValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSinkConfig_ResourceConversion.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SinkConfig_ResourceConversionValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SinkConfig_ResourceConversionValidationError{}
 
 // Validate checks the field values on SinkConfig_DropAction with the rules
 // defined in the proto definition for this message. If any rules are
@@ -615,3 +815,130 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = SinkConfig_DropActionValidationError{}
+
+// Validate checks the field values on
+// SinkConfig_ResourceConversion_TagToResourceAttribute with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *SinkConfig_ResourceConversion_TagToResourceAttribute) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// SinkConfig_ResourceConversion_TagToResourceAttribute with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in
+// SinkConfig_ResourceConversion_TagToResourceAttributeMultiError, or nil if
+// none found.
+func (m *SinkConfig_ResourceConversion_TagToResourceAttribute) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SinkConfig_ResourceConversion_TagToResourceAttribute) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if utf8.RuneCountInString(m.GetTagName()) < 1 {
+		err := SinkConfig_ResourceConversion_TagToResourceAttributeValidationError{
+			field:  "TagName",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	// no validation rules for ResourceAttributeKey
+
+	if len(errors) > 0 {
+		return SinkConfig_ResourceConversion_TagToResourceAttributeMultiError(errors)
+	}
+
+	return nil
+}
+
+// SinkConfig_ResourceConversion_TagToResourceAttributeMultiError is an error
+// wrapping multiple validation errors returned by
+// SinkConfig_ResourceConversion_TagToResourceAttribute.ValidateAll() if the
+// designated constraints aren't met.
+type SinkConfig_ResourceConversion_TagToResourceAttributeMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SinkConfig_ResourceConversion_TagToResourceAttributeMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SinkConfig_ResourceConversion_TagToResourceAttributeMultiError) AllErrors() []error { return m }
+
+// SinkConfig_ResourceConversion_TagToResourceAttributeValidationError is the
+// validation error returned by
+// SinkConfig_ResourceConversion_TagToResourceAttribute.Validate if the
+// designated constraints aren't met.
+type SinkConfig_ResourceConversion_TagToResourceAttributeValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SinkConfig_ResourceConversion_TagToResourceAttributeValidationError) Field() string {
+	return e.field
+}
+
+// Reason function returns reason value.
+func (e SinkConfig_ResourceConversion_TagToResourceAttributeValidationError) Reason() string {
+	return e.reason
+}
+
+// Cause function returns cause value.
+func (e SinkConfig_ResourceConversion_TagToResourceAttributeValidationError) Cause() error {
+	return e.cause
+}
+
+// Key function returns key value.
+func (e SinkConfig_ResourceConversion_TagToResourceAttributeValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SinkConfig_ResourceConversion_TagToResourceAttributeValidationError) ErrorName() string {
+	return "SinkConfig_ResourceConversion_TagToResourceAttributeValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SinkConfig_ResourceConversion_TagToResourceAttributeValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSinkConfig_ResourceConversion_TagToResourceAttribute.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SinkConfig_ResourceConversion_TagToResourceAttributeValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SinkConfig_ResourceConversion_TagToResourceAttributeValidationError{}

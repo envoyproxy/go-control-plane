@@ -51,6 +51,16 @@ func (m *SinkConfig_ConversionAction) MarshalToSizedBufferVTStrict(dAtA []byte) 
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.ResourceConversion != nil {
+		size, err := m.ResourceConversion.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x22
+	}
 	if len(m.StaticMetricLabels) > 0 {
 		for iNdEx := len(m.StaticMetricLabels) - 1; iNdEx >= 0; iNdEx-- {
 			if vtmsg, ok := interface{}(m.StaticMetricLabels[iNdEx]).(interface {
@@ -81,6 +91,122 @@ func (m *SinkConfig_ConversionAction) MarshalToSizedBufferVTStrict(dAtA []byte) 
 		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.MetricName)))
 		i--
 		dAtA[i] = 0x12
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *SinkConfig_ResourceConversion_TagToResourceAttribute) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *SinkConfig_ResourceConversion_TagToResourceAttribute) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *SinkConfig_ResourceConversion_TagToResourceAttribute) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if len(m.ResourceAttributeKey) > 0 {
+		i -= len(m.ResourceAttributeKey)
+		copy(dAtA[i:], m.ResourceAttributeKey)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.ResourceAttributeKey)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.TagName) > 0 {
+		i -= len(m.TagName)
+		copy(dAtA[i:], m.TagName)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.TagName)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *SinkConfig_ResourceConversion) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *SinkConfig_ResourceConversion) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *SinkConfig_ResourceConversion) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if len(m.TagsToResourceAttributes) > 0 {
+		for iNdEx := len(m.TagsToResourceAttributes) - 1; iNdEx >= 0; iNdEx-- {
+			size, err := m.TagsToResourceAttributes[iNdEx].MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if len(m.StaticResourceAttributes) > 0 {
+		for iNdEx := len(m.StaticResourceAttributes) - 1; iNdEx >= 0; iNdEx-- {
+			if vtmsg, ok := interface{}(m.StaticResourceAttributes[iNdEx]).(interface {
+				MarshalToSizedBufferVTStrict([]byte) (int, error)
+			}); ok {
+				size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+			} else {
+				encoded, err := proto.Marshal(m.StaticResourceAttributes[iNdEx])
+				if err != nil {
+					return 0, err
+				}
+				i -= len(encoded)
+				copy(dAtA[i:], encoded)
+				i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
 	}
 	return len(dAtA) - i, nil
 }
@@ -352,6 +478,56 @@ func (m *SinkConfig_ConversionAction) SizeVT() (n int) {
 			} else {
 				l = proto.Size(e)
 			}
+			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+		}
+	}
+	if m.ResourceConversion != nil {
+		l = m.ResourceConversion.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *SinkConfig_ResourceConversion_TagToResourceAttribute) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.TagName)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.ResourceAttributeKey)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *SinkConfig_ResourceConversion) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.StaticResourceAttributes) > 0 {
+		for _, e := range m.StaticResourceAttributes {
+			if size, ok := interface{}(e).(interface {
+				SizeVT() int
+			}); ok {
+				l = size.SizeVT()
+			} else {
+				l = proto.Size(e)
+			}
+			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+		}
+	}
+	if len(m.TagsToResourceAttributes) > 0 {
+		for _, e := range m.TagsToResourceAttributes {
+			l = e.SizeVT()
 			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 		}
 	}
