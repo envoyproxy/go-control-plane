@@ -326,6 +326,38 @@ func (m *OpenTelemetryConfig) validate(all bool) error {
 		}
 	}
 
+	for idx, item := range m.GetIncomingTraceContext() {
+		_, _ = idx, item
+
+		if _, ok := OpenTelemetryConfig_TraceContextFormat_name[int32(item)]; !ok {
+			err := OpenTelemetryConfigValidationError{
+				field:  fmt.Sprintf("IncomingTraceContext[%v]", idx),
+				reason: "value must be one of the defined enum values",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
+	for idx, item := range m.GetOutgoingTraceContext() {
+		_, _ = idx, item
+
+		if _, ok := OpenTelemetryConfig_TraceContextFormat_name[int32(item)]; !ok {
+			err := OpenTelemetryConfigValidationError{
+				field:  fmt.Sprintf("OutgoingTraceContext[%v]", idx),
+				reason: "value must be one of the defined enum values",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return OpenTelemetryConfigMultiError(errors)
 	}

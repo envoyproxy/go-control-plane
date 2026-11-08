@@ -9,6 +9,7 @@ package tracev3
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
@@ -24,11 +25,79 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Trace context formats that can be extracted from downstream requests and injected into
+// upstream requests.
+type OpenTelemetryConfig_TraceContextFormat int32
+
+const (
+	// W3C Trace Context: the :ref:`traceparent <config_http_conn_man_headers_traceparent>` and
+	// ``tracestate`` headers.
+	// See `W3C Trace Context <https://www.w3.org/TR/trace-context/>`_.
+	OpenTelemetryConfig_TRACE_CONTEXT OpenTelemetryConfig_TraceContextFormat = 0
+	// B3 single header: the :ref:`b3 <config_http_conn_man_headers_b3>` header.
+	// See `B3 propagation <https://github.com/openzipkin/b3-propagation>`_.
+	//
+	// When extracting, both the single header and the multiple header encodings are accepted, with
+	// the single header taking precedence. When injecting, the single header is written, and any
+	// ``x-b3-*`` headers already on the request are rewritten so that they describe the same span.
+	OpenTelemetryConfig_B3 OpenTelemetryConfig_TraceContextFormat = 1
+	// B3 multiple headers: the :ref:`x-b3-traceid <config_http_conn_man_headers_x-b3-traceid>`,
+	// ``x-b3-spanid``, ``x-b3-sampled`` and ``x-b3-flags`` headers.
+	// See `B3 propagation <https://github.com/openzipkin/b3-propagation>`_.
+	//
+	// When extracting, both the single header and the multiple header encodings are accepted, with
+	// the single header taking precedence. When injecting, ``x-b3-traceid``, ``x-b3-spanid`` and
+	// ``x-b3-sampled`` are written, and a ``b3`` header already on the request is rewritten so that
+	// it describes the same span.
+	OpenTelemetryConfig_B3_MULTI OpenTelemetryConfig_TraceContextFormat = 2
+)
+
+// Enum value maps for OpenTelemetryConfig_TraceContextFormat.
+var (
+	OpenTelemetryConfig_TraceContextFormat_name = map[int32]string{
+		0: "TRACE_CONTEXT",
+		1: "B3",
+		2: "B3_MULTI",
+	}
+	OpenTelemetryConfig_TraceContextFormat_value = map[string]int32{
+		"TRACE_CONTEXT": 0,
+		"B3":            1,
+		"B3_MULTI":      2,
+	}
+)
+
+func (x OpenTelemetryConfig_TraceContextFormat) Enum() *OpenTelemetryConfig_TraceContextFormat {
+	p := new(OpenTelemetryConfig_TraceContextFormat)
+	*p = x
+	return p
+}
+
+func (x OpenTelemetryConfig_TraceContextFormat) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (OpenTelemetryConfig_TraceContextFormat) Descriptor() protoreflect.EnumDescriptor {
+	return file_envoy_config_trace_v3_opentelemetry_proto_enumTypes[0].Descriptor()
+}
+
+func (OpenTelemetryConfig_TraceContextFormat) Type() protoreflect.EnumType {
+	return &file_envoy_config_trace_v3_opentelemetry_proto_enumTypes[0]
+}
+
+func (x OpenTelemetryConfig_TraceContextFormat) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use OpenTelemetryConfig_TraceContextFormat.Descriptor instead.
+func (OpenTelemetryConfig_TraceContextFormat) EnumDescriptor() ([]byte, []int) {
+	return file_envoy_config_trace_v3_opentelemetry_proto_rawDescGZIP(), []int{0, 0}
+}
+
 // Configuration for the OpenTelemetry tracer.
 //
 //	[#extension: envoy.tracers.opentelemetry]
 //
-// [#next-free-field: 11]
+// [#next-free-field: 13]
 type OpenTelemetryConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The upstream gRPC cluster that will receive OTLP traces.
@@ -84,8 +153,29 @@ type OpenTelemetryConfig struct {
 	// Specifies whether to set the instrumentation scope name ("envoy") and version on emitted traces.
 	// If not specified, the default is to set the instrumentation scope name and version.
 	SetInstrumentationScope *wrapperspb.BoolValue `protobuf:"bytes,9,opt,name=set_instrumentation_scope,json=setInstrumentationScope,proto3" json:"set_instrumentation_scope,omitempty"`
-	unknownFields           protoimpl.UnknownFields
-	sizeCache               protoimpl.SizeCache
+	// The trace context formats to extract from downstream requests, in order of precedence.
+	// The first format whose headers are present and valid is used as the parent of the span; the
+	// remaining formats are ignored. A format whose headers are malformed is skipped. If headers
+	// were present but none of them could be extracted, the request is not traced.
+	//
+	// B3 trace context without a sampling decision joins the trace, and the span's sampling
+	// decision is made by Envoy as if it were the first span in the trace.
+	//
+	// B3 headers that carry a decision not to sample but no trace context, such as ``b3: 0`` or
+	// ``x-b3-sampled: 0`` without ``x-b3-traceid`` and ``x-b3-spanid``, start a new trace that is
+	// not sampled, regardless of Envoy's tracing decision or the configured sampler. A decision to
+	// sample without trace context is ignored.
+	//
+	// Each format may be listed at most once. If not specified, the default is ``[TRACE_CONTEXT]``.
+	IncomingTraceContext []OpenTelemetryConfig_TraceContextFormat `protobuf:"varint,11,rep,packed,name=incoming_trace_context,json=incomingTraceContext,proto3,enum=envoy.config.trace.v3.OpenTelemetryConfig_TraceContextFormat" json:"incoming_trace_context,omitempty"`
+	// The trace context formats to inject into upstream requests. Headers of formats that are not
+	// listed are left unchanged, except that injecting either B3 encoding also rewrites headers of
+	// the other B3 encoding that are already on the request.
+	//
+	// Each format may be listed at most once. If not specified, the default is ``[TRACE_CONTEXT]``.
+	OutgoingTraceContext []OpenTelemetryConfig_TraceContextFormat `protobuf:"varint,12,rep,packed,name=outgoing_trace_context,json=outgoingTraceContext,proto3,enum=envoy.config.trace.v3.OpenTelemetryConfig_TraceContextFormat" json:"outgoing_trace_context,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *OpenTelemetryConfig) Reset() {
@@ -188,11 +278,25 @@ func (x *OpenTelemetryConfig) GetSetInstrumentationScope() *wrapperspb.BoolValue
 	return nil
 }
 
+func (x *OpenTelemetryConfig) GetIncomingTraceContext() []OpenTelemetryConfig_TraceContextFormat {
+	if x != nil {
+		return x.IncomingTraceContext
+	}
+	return nil
+}
+
+func (x *OpenTelemetryConfig) GetOutgoingTraceContext() []OpenTelemetryConfig_TraceContextFormat {
+	if x != nil {
+		return x.OutgoingTraceContext
+	}
+	return nil
+}
+
 var File_envoy_config_trace_v3_opentelemetry_proto protoreflect.FileDescriptor
 
 const file_envoy_config_trace_v3_opentelemetry_proto_rawDesc = "" +
 	"\n" +
-	")envoy/config/trace/v3/opentelemetry.proto\x12\x15envoy.config.trace.v3\x1a$envoy/config/core/v3/extension.proto\x1a'envoy/config/core/v3/grpc_service.proto\x1a'envoy/config/core/v3/http_service.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1eudpa/annotations/migrate.proto\x1a\x1dudpa/annotations/status.proto\"\xe6\x06\n" +
+	")envoy/config/trace/v3/opentelemetry.proto\x12\x15envoy.config.trace.v3\x1a$envoy/config/core/v3/extension.proto\x1a'envoy/config/core/v3/grpc_service.proto\x1a'envoy/config/core/v3/http_service.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1eudpa/annotations/migrate.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xaf\t\n" +
 	"\x13OpenTelemetryConfig\x12[\n" +
 	"\fgrpc_service\x18\x01 \x01(\v2!.envoy.config.core.v3.GrpcServiceB\x15\xf2\x98\xfe\x8f\x05\x0f\x12\rotlp_exporterR\vgrpcService\x12[\n" +
 	"\fhttp_service\x18\x03 \x01(\v2!.envoy.config.core.v3.HttpServiceB\x15\xf2\x98\xfe\x8f\x05\x0f\x12\rotlp_exporterR\vhttpService\x12]\n" +
@@ -204,7 +308,15 @@ const file_envoy_config_trace_v3_opentelemetry_proto_rawDesc = "" +
 	"\x0emax_cache_size\x18\x06 \x01(\v2\x1c.google.protobuf.UInt32ValueR\fmaxCacheSize\x12l\n" +
 	"%set_telemetry_sdk_resource_attributes\x18\a \x01(\v2\x1a.google.protobuf.BoolValueR!setTelemetrySdkResourceAttributes\x12h\n" +
 	"#set_service_name_resource_attribute\x18\b \x01(\v2\x1a.google.protobuf.BoolValueR\x1fsetServiceNameResourceAttribute\x12V\n" +
-	"\x19set_instrumentation_scope\x18\t \x01(\v2\x1a.google.protobuf.BoolValueR\x17setInstrumentationScopeB\x89\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x19set_instrumentation_scope\x18\t \x01(\v2\x1a.google.protobuf.BoolValueR\x17setInstrumentationScope\x12\x82\x01\n" +
+	"\x16incoming_trace_context\x18\v \x03(\x0e2=.envoy.config.trace.v3.OpenTelemetryConfig.TraceContextFormatB\r\xfaB\n" +
+	"\x92\x01\a\"\x05\x82\x01\x02\x10\x01R\x14incomingTraceContext\x12\x82\x01\n" +
+	"\x16outgoing_trace_context\x18\f \x03(\x0e2=.envoy.config.trace.v3.OpenTelemetryConfig.TraceContextFormatB\r\xfaB\n" +
+	"\x92\x01\a\"\x05\x82\x01\x02\x10\x01R\x14outgoingTraceContext\"=\n" +
+	"\x12TraceContextFormat\x12\x11\n" +
+	"\rTRACE_CONTEXT\x10\x00\x12\x06\n" +
+	"\x02B3\x10\x01\x12\f\n" +
+	"\bB3_MULTI\x10\x02B\x89\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"#io.envoyproxy.envoy.config.trace.v3B\x12OpentelemetryProtoP\x01ZDgithub.com/envoyproxy/go-control-plane/envoy/config/trace/v3;tracev3b\x06proto3"
 
 var (
@@ -219,30 +331,34 @@ func file_envoy_config_trace_v3_opentelemetry_proto_rawDescGZIP() []byte {
 	return file_envoy_config_trace_v3_opentelemetry_proto_rawDescData
 }
 
+var file_envoy_config_trace_v3_opentelemetry_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_envoy_config_trace_v3_opentelemetry_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_envoy_config_trace_v3_opentelemetry_proto_goTypes = []any{
-	(*OpenTelemetryConfig)(nil),     // 0: envoy.config.trace.v3.OpenTelemetryConfig
-	(*v3.GrpcService)(nil),          // 1: envoy.config.core.v3.GrpcService
-	(*v3.HttpService)(nil),          // 2: envoy.config.core.v3.HttpService
-	(*v3.TypedExtensionConfig)(nil), // 3: envoy.config.core.v3.TypedExtensionConfig
-	(*wrapperspb.UInt32Value)(nil),  // 4: google.protobuf.UInt32Value
-	(*wrapperspb.BoolValue)(nil),    // 5: google.protobuf.BoolValue
+	(OpenTelemetryConfig_TraceContextFormat)(0), // 0: envoy.config.trace.v3.OpenTelemetryConfig.TraceContextFormat
+	(*OpenTelemetryConfig)(nil),                 // 1: envoy.config.trace.v3.OpenTelemetryConfig
+	(*v3.GrpcService)(nil),                      // 2: envoy.config.core.v3.GrpcService
+	(*v3.HttpService)(nil),                      // 3: envoy.config.core.v3.HttpService
+	(*v3.TypedExtensionConfig)(nil),             // 4: envoy.config.core.v3.TypedExtensionConfig
+	(*wrapperspb.UInt32Value)(nil),              // 5: google.protobuf.UInt32Value
+	(*wrapperspb.BoolValue)(nil),                // 6: google.protobuf.BoolValue
 }
 var file_envoy_config_trace_v3_opentelemetry_proto_depIdxs = []int32{
-	1, // 0: envoy.config.trace.v3.OpenTelemetryConfig.grpc_service:type_name -> envoy.config.core.v3.GrpcService
-	2, // 1: envoy.config.trace.v3.OpenTelemetryConfig.http_service:type_name -> envoy.config.core.v3.HttpService
-	3, // 2: envoy.config.trace.v3.OpenTelemetryConfig.exporter:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	3, // 3: envoy.config.trace.v3.OpenTelemetryConfig.resource_detectors:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	3, // 4: envoy.config.trace.v3.OpenTelemetryConfig.sampler:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	4, // 5: envoy.config.trace.v3.OpenTelemetryConfig.max_cache_size:type_name -> google.protobuf.UInt32Value
-	5, // 6: envoy.config.trace.v3.OpenTelemetryConfig.set_telemetry_sdk_resource_attributes:type_name -> google.protobuf.BoolValue
-	5, // 7: envoy.config.trace.v3.OpenTelemetryConfig.set_service_name_resource_attribute:type_name -> google.protobuf.BoolValue
-	5, // 8: envoy.config.trace.v3.OpenTelemetryConfig.set_instrumentation_scope:type_name -> google.protobuf.BoolValue
-	9, // [9:9] is the sub-list for method output_type
-	9, // [9:9] is the sub-list for method input_type
-	9, // [9:9] is the sub-list for extension type_name
-	9, // [9:9] is the sub-list for extension extendee
-	0, // [0:9] is the sub-list for field type_name
+	2,  // 0: envoy.config.trace.v3.OpenTelemetryConfig.grpc_service:type_name -> envoy.config.core.v3.GrpcService
+	3,  // 1: envoy.config.trace.v3.OpenTelemetryConfig.http_service:type_name -> envoy.config.core.v3.HttpService
+	4,  // 2: envoy.config.trace.v3.OpenTelemetryConfig.exporter:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	4,  // 3: envoy.config.trace.v3.OpenTelemetryConfig.resource_detectors:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	4,  // 4: envoy.config.trace.v3.OpenTelemetryConfig.sampler:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	5,  // 5: envoy.config.trace.v3.OpenTelemetryConfig.max_cache_size:type_name -> google.protobuf.UInt32Value
+	6,  // 6: envoy.config.trace.v3.OpenTelemetryConfig.set_telemetry_sdk_resource_attributes:type_name -> google.protobuf.BoolValue
+	6,  // 7: envoy.config.trace.v3.OpenTelemetryConfig.set_service_name_resource_attribute:type_name -> google.protobuf.BoolValue
+	6,  // 8: envoy.config.trace.v3.OpenTelemetryConfig.set_instrumentation_scope:type_name -> google.protobuf.BoolValue
+	0,  // 9: envoy.config.trace.v3.OpenTelemetryConfig.incoming_trace_context:type_name -> envoy.config.trace.v3.OpenTelemetryConfig.TraceContextFormat
+	0,  // 10: envoy.config.trace.v3.OpenTelemetryConfig.outgoing_trace_context:type_name -> envoy.config.trace.v3.OpenTelemetryConfig.TraceContextFormat
+	11, // [11:11] is the sub-list for method output_type
+	11, // [11:11] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_envoy_config_trace_v3_opentelemetry_proto_init() }
@@ -255,13 +371,14 @@ func file_envoy_config_trace_v3_opentelemetry_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_config_trace_v3_opentelemetry_proto_rawDesc), len(file_envoy_config_trace_v3_opentelemetry_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_envoy_config_trace_v3_opentelemetry_proto_goTypes,
 		DependencyIndexes: file_envoy_config_trace_v3_opentelemetry_proto_depIdxs,
+		EnumInfos:         file_envoy_config_trace_v3_opentelemetry_proto_enumTypes,
 		MessageInfos:      file_envoy_config_trace_v3_opentelemetry_proto_msgTypes,
 	}.Build()
 	File_envoy_config_trace_v3_opentelemetry_proto = out.File

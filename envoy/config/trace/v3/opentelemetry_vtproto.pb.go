@@ -51,6 +51,48 @@ func (m *OpenTelemetryConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, er
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.OutgoingTraceContext) > 0 {
+		var pksize2 int
+		for _, num := range m.OutgoingTraceContext {
+			pksize2 += protohelpers.SizeOfVarint(uint64(num))
+		}
+		i -= pksize2
+		j1 := i
+		for _, num1 := range m.OutgoingTraceContext {
+			num := uint64(num1)
+			for num >= 1<<7 {
+				dAtA[j1] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j1++
+			}
+			dAtA[j1] = uint8(num)
+			j1++
+		}
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(pksize2))
+		i--
+		dAtA[i] = 0x62
+	}
+	if len(m.IncomingTraceContext) > 0 {
+		var pksize4 int
+		for _, num := range m.IncomingTraceContext {
+			pksize4 += protohelpers.SizeOfVarint(uint64(num))
+		}
+		i -= pksize4
+		j3 := i
+		for _, num1 := range m.IncomingTraceContext {
+			num := uint64(num1)
+			for num >= 1<<7 {
+				dAtA[j3] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j3++
+			}
+			dAtA[j3] = uint8(num)
+			j3++
+		}
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(pksize4))
+		i--
+		dAtA[i] = 0x5a
+	}
 	if m.Exporter != nil {
 		if vtmsg, ok := interface{}(m.Exporter).(interface {
 			MarshalToSizedBufferVTStrict([]byte) (int, error)
@@ -290,6 +332,20 @@ func (m *OpenTelemetryConfig) SizeVT() (n int) {
 			l = proto.Size(m.Exporter)
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if len(m.IncomingTraceContext) > 0 {
+		l = 0
+		for _, e := range m.IncomingTraceContext {
+			l += protohelpers.SizeOfVarint(uint64(e))
+		}
+		n += 1 + protohelpers.SizeOfVarint(uint64(l)) + l
+	}
+	if len(m.OutgoingTraceContext) > 0 {
+		l = 0
+		for _, e := range m.OutgoingTraceContext {
+			l += protohelpers.SizeOfVarint(uint64(e))
+		}
+		n += 1 + protohelpers.SizeOfVarint(uint64(l)) + l
 	}
 	n += len(m.unknownFields)
 	return n
