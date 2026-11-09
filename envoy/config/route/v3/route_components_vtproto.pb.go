@@ -1922,6 +1922,13 @@ func (m *RouteAction_RequestMirrorPolicy) MarshalToSizedBufferVTStrict(dAtA []by
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.StatPrefix) > 0 {
+		i -= len(m.StatPrefix)
+		copy(dAtA[i:], m.StatPrefix)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.StatPrefix)))
+		i--
+		dAtA[i] = 0x4a
+	}
 	if len(m.HostRewriteLiteral) > 0 {
 		i -= len(m.HostRewriteLiteral)
 		copy(dAtA[i:], m.HostRewriteLiteral)
@@ -7461,6 +7468,10 @@ func (m *RouteAction_RequestMirrorPolicy) SizeVT() (n int) {
 		}
 	}
 	l = len(m.HostRewriteLiteral)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.StatPrefix)
 	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}

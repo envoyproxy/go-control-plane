@@ -7948,6 +7948,8 @@ func (m *RouteAction_RequestMirrorPolicy) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
+	// no validation rules for StatPrefix
+
 	if len(errors) > 0 {
 		return RouteAction_RequestMirrorPolicyMultiError(errors)
 	}

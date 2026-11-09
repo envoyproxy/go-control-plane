@@ -4916,7 +4916,7 @@ func (*RouteMatch_ConnectMatcher) Descriptor() ([]byte, []int) {
 //
 //	Shadowing doesn't support HTTP CONNECT and upgrades.
 //
-// [#next-free-field: 9]
+// [#next-free-field: 10]
 type RouteAction_RequestMirrorPolicy struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Only one of ``cluster`` and ``cluster_header`` can be specified.
@@ -4967,8 +4967,21 @@ type RouteAction_RequestMirrorPolicy struct {
 	// <envoy_v3_api_field_config.route.v3.RouteAction.RequestMirrorPolicy.disable_shadow_host_suffix_append>`
 	// is implicitly enabled if this field is set.
 	HostRewriteLiteral string `protobuf:"bytes,8,opt,name=host_rewrite_literal,json=hostRewriteLiteral,proto3" json:"host_rewrite_literal,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	// The human readable prefix to use when emitting statistics for this mirror policy. The
+	// statistics are rooted at ``mirror.<stat_prefix>.`` and count how many requests were
+	// selected for mirroring, how many mirrors were started, and how each mirror ended. See
+	// :ref:`mirror policy statistics <config_http_filters_router_mirror_stats>`.
+	//
+	// The statistics are emitted in the server's root scope, so policies that use the same
+	// ``stat_prefix`` share the same counters, wherever they are configured. This includes
+	// cluster-level :ref:`request_mirror_policies
+	// <envoy_v3_api_field_extensions.upstreams.http.v3.HttpProtocolOptions.request_mirror_policies>`,
+	// which take precedence over route-level policies.
+	//
+	// If empty, no per policy statistics are emitted.
+	StatPrefix    string `protobuf:"bytes,9,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *RouteAction_RequestMirrorPolicy) Reset() {
@@ -5046,6 +5059,13 @@ func (x *RouteAction_RequestMirrorPolicy) GetRequestHeadersMutations() []*v35.He
 func (x *RouteAction_RequestMirrorPolicy) GetHostRewriteLiteral() string {
 	if x != nil {
 		return x.HostRewriteLiteral
+	}
+	return ""
+}
+
+func (x *RouteAction_RequestMirrorPolicy) GetStatPrefix() string {
+	if x != nil {
+		return x.StatPrefix
 	}
 	return ""
 }
@@ -7855,7 +7875,7 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\x1callow_private_network_access\x18\f \x01(\v2\x1a.google.protobuf.BoolValueR\x19allowPrivateNetworkAccess\x12a\n" +
 	"\x1fforward_not_matching_preflights\x18\r \x01(\v2\x1a.google.protobuf.BoolValueR\x1cforwardNotMatchingPreflights:$\x9aň\x1e\x1f\n" +
 	"\x1denvoy.api.v2.route.CorsPolicyB\x13\n" +
-	"\x11enabled_specifierJ\x04\b\x01\x10\x02J\x04\b\b\x10\tJ\x04\b\a\x10\bR\fallow_originR\x12allow_origin_regexR\aenabled\"\xe7/\n" +
+	"\x11enabled_specifierJ\x04\b\x01\x10\x02J\x04\b\b\x10\tJ\x04\b\a\x10\bR\fallow_originR\x12allow_origin_regexR\aenabled\"\x880\n" +
 	"\vRouteAction\x12#\n" +
 	"\acluster\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01H\x00R\acluster\x126\n" +
 	"\x0ecluster_header\x18\x02 \x01(\tB\r\xfaB\n" +
@@ -7896,7 +7916,7 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\x18internal_redirect_action\x18\x1a \x01(\x0e29.envoy.config.route.v3.RouteAction.InternalRedirectActionB\v\x92ǆ\xd8\x04\x033.0\x18\x01R\x16internalRedirectAction\x12_\n" +
 	"\x16max_internal_redirects\x18\x1f \x01(\v2\x1c.google.protobuf.UInt32ValueB\v\x92ǆ\xd8\x04\x033.0\x18\x01R\x14maxInternalRedirects\x12E\n" +
 	"\fhedge_policy\x18\x1b \x01(\v2\".envoy.config.route.v3.HedgePolicyR\vhedgePolicy\x12d\n" +
-	"\x13max_stream_duration\x18$ \x01(\v24.envoy.config.route.v3.RouteAction.MaxStreamDurationR\x11maxStreamDuration\x1a\x88\x05\n" +
+	"\x13max_stream_duration\x18$ \x01(\v24.envoy.config.route.v3.RouteAction.MaxStreamDurationR\x11maxStreamDuration\x1a\xa9\x05\n" +
 	"\x13RequestMirrorPolicy\x123\n" +
 	"\acluster\x18\x01 \x01(\tB\x19\xf2\x98\xfe\x8f\x05\x13\x12\x11cluster_specifierR\acluster\x12K\n" +
 	"\x0ecluster_header\x18\x05 \x01(\tB$\xfaB\br\x06\xc8\x01\x00\xc0\x01\x01\xf2\x98\xfe\x8f\x05\x13\x12\x11cluster_specifierR\rclusterHeader\x12Y\n" +
@@ -7904,7 +7924,9 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\rtrace_sampled\x18\x04 \x01(\v2\x1a.google.protobuf.BoolValueR\ftraceSampled\x12H\n" +
 	"!disable_shadow_host_suffix_append\x18\x06 \x01(\bR\x1ddisableShadowHostSuffixAppend\x12|\n" +
 	"\x19request_headers_mutations\x18\a \x03(\v25.envoy.config.common.mutation_rules.v3.HeaderMutationB\t\xfaB\x06\x92\x01\x03\x10\xe8\aR\x17requestHeadersMutations\x12=\n" +
-	"\x14host_rewrite_literal\x18\b \x01(\tB\v\xfaB\br\x06\xc8\x01\x00\xc0\x01\x02R\x12hostRewriteLiteral:9\x9aň\x1e4\n" +
+	"\x14host_rewrite_literal\x18\b \x01(\tB\v\xfaB\br\x06\xc8\x01\x00\xc0\x01\x02R\x12hostRewriteLiteral\x12\x1f\n" +
+	"\vstat_prefix\x18\t \x01(\tR\n" +
+	"statPrefix:9\x9aň\x1e4\n" +
 	"2envoy.api.v2.route.RouteAction.RequestMirrorPolicyJ\x04\b\x02\x10\x03R\vruntime_key\x1a\xd6\v\n" +
 	"\n" +
 	"HashPolicy\x12N\n" +
