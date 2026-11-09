@@ -3777,7 +3777,11 @@ type RateLimit struct {
 	// requests based on the action with this field set to true. Users should ensure that the rate limit is enforced by the actions
 	// applied on the request path, i.e. the ones with this field set to false.
 	//
-	// Currently, this is only supported by the HTTP global rate filter.
+	// Supported by HTTP global rate limiting. HTTP local rate limiting supports this only for the
+	// filter's embedded ``rate_limits``, including per-route ``typed_per_filter_config``, and ignores it
+	// for route and virtual-host ``rate_limits``. Local completion charges matching descriptor buckets
+	// in full, overdrawing them by up to one bucket of tokens when the usage exceeds the remaining
+	// budget; the default bucket is consumed only on requests.
 	ApplyOnStreamDone bool `protobuf:"varint,6,opt,name=apply_on_stream_done,json=applyOnStreamDone,proto3" json:"apply_on_stream_done,omitempty"`
 	// Descriptor level X-RateLimit headers options which may override the filter level setting.
 	XRatelimitOption RateLimit_XRateLimitOption `protobuf:"varint,7,opt,name=x_ratelimit_option,json=xRatelimitOption,proto3,enum=envoy.config.route.v3.RateLimit_XRateLimitOption" json:"x_ratelimit_option,omitempty"`

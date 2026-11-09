@@ -167,6 +167,11 @@ type LocalRateLimit struct {
 	//   2. :ref:`dynamic metadata <envoy_v3_api_field_config.route.v3.RateLimit.Action.dynamic_metadata>`.
 	//   3. :ref:`disable_key <envoy_v3_api_field_config.route.v3.RateLimit.disable_key>`.
 	//   4. :ref:`override limit <envoy_v3_api_field_config.route.v3.RateLimit.limit>`.
+	//
+	//   :ref:`apply_on_stream_done <envoy_v3_api_field_config.route.v3.RateLimit.apply_on_stream_done>`
+	//   updates descriptor buckets from response context at completion without enforcing the current
+	//   request, in both the filter-level and per-route configuration. Use request-path actions for the
+	//   same descriptor to enforce subsequent requests.
 	RateLimits []*v33.RateLimit `protobuf:"bytes,17,rep,name=rate_limits,json=rateLimits,proto3" json:"rate_limits,omitempty"`
 	// Specifies the max dynamic descriptors kept in the cache for a particular wildcard descriptor
 	// configured in the global :ref:`descriptors<envoy_v3_api_field_extensions.filters.http.local_ratelimit.v3.LocalRateLimit.descriptors>`.
