@@ -3306,7 +3306,11 @@ func (*Cluster_CommonLbConfig_LocalityWeightedLbConfig) Descriptor() ([]byte, []
 type Cluster_CommonLbConfig_ConsistentHashingLbConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// If set to ``true``, the cluster will use hostname instead of the resolved
-	// address as the key to consistently hash to an upstream host. Only valid for StrictDNS clusters with hostnames which resolve to a single IP address.
+	// address as the key to consistently hash to an upstream host. Only valid for
+	// ``STRICT_DNS``, ``STATIC`` and ``EDS`` clusters. The :ref:`hostname
+	// <envoy_v3_api_field_config.endpoint.v3.Endpoint.hostname>` field of the endpoint is used as
+	// the hostname if set. Otherwise, for ``STRICT_DNS`` clusters the configured endpoint address is
+	// used, and for other clusters the host falls back to hashing by the resolved address.
 	UseHostnameForHashing bool `protobuf:"varint,1,opt,name=use_hostname_for_hashing,json=useHostnameForHashing,proto3" json:"use_hostname_for_hashing,omitempty"`
 	// Configures percentage of average cluster load to bound per upstream host. For example, with a value of 150
 	// no upstream host will get a load more than 1.5 times the average load of all the hosts in the cluster.
