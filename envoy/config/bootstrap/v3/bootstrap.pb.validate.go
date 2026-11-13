@@ -1015,6 +1015,8 @@ func (m *Bootstrap) validate(all bool) error {
 
 	// no validation rules for EnableWorkerCpuAffinity
 
+	// no validation rules for EnableBreakingChangesObservability
+
 	switch v := m.StatsFlush.(type) {
 	case *Bootstrap_StatsFlushOnAdmin:
 		if v == nil {

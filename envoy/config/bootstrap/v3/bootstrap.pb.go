@@ -199,7 +199,7 @@ func (ApiListenerManager_ThreadingModel) EnumDescriptor() ([]byte, []int) {
 }
 
 // Bootstrap :ref:`configuration overview <config_overview_bootstrap>`.
-// [#next-free-field: 45]
+// [#next-free-field: 46]
 type Bootstrap struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Node identity to present to the management server and for instance
@@ -450,8 +450,16 @@ type Bootstrap struct {
 	//
 	// Defaults to ``false``.
 	EnableWorkerCpuAffinity bool `protobuf:"varint,43,opt,name=enable_worker_cpu_affinity,json=enableWorkerCpuAffinity,proto3" json:"enable_worker_cpu_affinity,omitempty"`
-	unknownFields           protoimpl.UnknownFields
-	sizeCache               protoimpl.SizeCache
+	// When enabled, Envoy records observed breaking changes in the ``envoy.breaking_changes_tracker``
+	// filter state object, which can be logged via access logs using
+	// ``%FILTER_STATE(envoy.breaking_changes_tracker:PLAIN)%``.
+	// See :ref:`Enabling observability for breaking changes
+	// <arch_overview_runtime_breaking_changes_observability>`.
+	//
+	// Defaults to ``false``.
+	EnableBreakingChangesObservability bool `protobuf:"varint,45,opt,name=enable_breaking_changes_observability,json=enableBreakingChangesObservability,proto3" json:"enable_breaking_changes_observability,omitempty"`
+	unknownFields                      protoimpl.UnknownFields
+	sizeCache                          protoimpl.SizeCache
 }
 
 func (x *Bootstrap) Reset() {
@@ -798,6 +806,13 @@ func (x *Bootstrap) GetMemoryAllocatorManager() *MemoryAllocatorManager {
 func (x *Bootstrap) GetEnableWorkerCpuAffinity() bool {
 	if x != nil {
 		return x.EnableWorkerCpuAffinity
+	}
+	return false
+}
+
+func (x *Bootstrap) GetEnableBreakingChangesObservability() bool {
+	if x != nil {
+		return x.EnableBreakingChangesObservability
 	}
 	return false
 }
@@ -2541,7 +2556,7 @@ var File_envoy_config_bootstrap_v3_bootstrap_proto protoreflect.FileDescriptor
 
 const file_envoy_config_bootstrap_v3_bootstrap_proto_rawDesc = "" +
 	"\n" +
-	")envoy/config/bootstrap/v3/bootstrap.proto\x12\x19envoy.config.bootstrap.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a%envoy/config/cluster/v3/cluster.proto\x1a\"envoy/config/core/v3/address.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a/envoy/config/core/v3/event_service_config.proto\x1a$envoy/config/core/v3/extension.proto\x1a#envoy/config/core/v3/resolver.proto\x1a(envoy/config/core/v3/socket_option.proto\x1a'envoy/config/listener/v3/listener.proto\x1a#envoy/config/metrics/v3/stats.proto\x1a'envoy/config/overload/v3/overload.proto\x1a'envoy/config/trace/v3/http_tracer.proto\x1a6envoy/extensions/transport_sockets/tls/v3/secret.proto\x1a\"envoy/type/matcher/v3/string.proto\x1a\x1benvoy/type/v3/percent.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1eudpa/annotations/migrate.proto\x1a\x1fudpa/annotations/security.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xb9&\n" +
+	")envoy/config/bootstrap/v3/bootstrap.proto\x12\x19envoy.config.bootstrap.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a%envoy/config/cluster/v3/cluster.proto\x1a\"envoy/config/core/v3/address.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a/envoy/config/core/v3/event_service_config.proto\x1a$envoy/config/core/v3/extension.proto\x1a#envoy/config/core/v3/resolver.proto\x1a(envoy/config/core/v3/socket_option.proto\x1a'envoy/config/listener/v3/listener.proto\x1a#envoy/config/metrics/v3/stats.proto\x1a'envoy/config/overload/v3/overload.proto\x1a'envoy/config/trace/v3/http_tracer.proto\x1a6envoy/extensions/transport_sockets/tls/v3/secret.proto\x1a\"envoy/type/matcher/v3/string.proto\x1a\x1benvoy/type/v3/percent.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1eudpa/annotations/migrate.proto\x1a\x1fudpa/annotations/security.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\x8c'\n" +
 	"\tBootstrap\x12.\n" +
 	"\x04node\x18\x01 \x01(\v2\x1a.envoy.config.core.v3.NodeR\x04node\x12.\n" +
 	"\x13node_context_params\x18\x1a \x03(\tR\x11nodeContextParams\x12_\n" +
@@ -2587,7 +2602,8 @@ const file_envoy_config_bootstrap_v3_bootstrap_proto_rawDesc = "" +
 	"\x16application_log_config\x18& \x01(\v29.envoy.config.bootstrap.v3.Bootstrap.ApplicationLogConfigR\x14applicationLogConfig\x12\x89\x01\n" +
 	" grpc_async_client_manager_config\x18( \x01(\v2A.envoy.config.bootstrap.v3.Bootstrap.GrpcAsyncClientManagerConfigR\x1cgrpcAsyncClientManagerConfig\x12k\n" +
 	"\x18memory_allocator_manager\x18) \x01(\v21.envoy.config.bootstrap.v3.MemoryAllocatorManagerR\x16memoryAllocatorManager\x12;\n" +
-	"\x1aenable_worker_cpu_affinity\x18+ \x01(\bR\x17enableWorkerCpuAffinity\x1a\x9a\x02\n" +
+	"\x1aenable_worker_cpu_affinity\x18+ \x01(\bR\x17enableWorkerCpuAffinity\x12Q\n" +
+	"%enable_breaking_changes_observability\x18- \x01(\bR\"enableBreakingChangesObservability\x1a\x9a\x02\n" +
 	"\x0fStaticResources\x12@\n" +
 	"\tlisteners\x18\x01 \x03(\v2\".envoy.config.listener.v3.ListenerR\tlisteners\x12<\n" +
 	"\bclusters\x18\x02 \x03(\v2 .envoy.config.cluster.v3.ClusterR\bclusters\x12K\n" +

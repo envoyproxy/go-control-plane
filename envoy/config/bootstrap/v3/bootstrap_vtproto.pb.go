@@ -484,6 +484,18 @@ func (m *Bootstrap) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.EnableBreakingChangesObservability {
+		i--
+		if m.EnableBreakingChangesObservability {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x2
+		i--
+		dAtA[i] = 0xe8
+	}
 	if msg, ok := m.StatsEviction.(*Bootstrap_RuntimeStatsEvictionInterval); ok {
 		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -2933,6 +2945,9 @@ func (m *Bootstrap) SizeVT() (n int) {
 		n += vtmsg.SizeVT()
 	}
 	if m.EnableWorkerCpuAffinity {
+		n += 3
+	}
+	if m.EnableBreakingChangesObservability {
 		n += 3
 	}
 	n += len(m.unknownFields)
