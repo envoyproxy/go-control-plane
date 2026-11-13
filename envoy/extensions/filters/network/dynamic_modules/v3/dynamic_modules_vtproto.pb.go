@@ -10,6 +10,7 @@ package dynamic_modulesv3
 import (
 	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
 	anypb "github.com/planetscale/vtprotobuf/types/known/anypb"
+	durationpb "github.com/planetscale/vtprotobuf/types/known/durationpb"
 	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
@@ -20,6 +21,59 @@ const (
 	// Verify that runtime/protoimpl is sufficiently up-to-date.
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
+
+func (m *DynamicModuleNetworkFilter_AccessLogOptions) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *DynamicModuleNetworkFilter_AccessLogOptions) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *DynamicModuleNetworkFilter_AccessLogOptions) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.FlushAccessLogOnStart {
+		i--
+		if m.FlushAccessLogOnStart {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.AccessLogFlushInterval != nil {
+		size, err := (*durationpb.Duration)(m.AccessLogFlushInterval).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
 
 func (m *DynamicModuleNetworkFilter) MarshalVTStrict() (dAtA []byte, err error) {
 	if m == nil {
@@ -50,6 +104,40 @@ func (m *DynamicModuleNetworkFilter) MarshalToSizedBufferVTStrict(dAtA []byte) (
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.AccessLogOptions != nil {
+		size, err := m.AccessLogOptions.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x32
+	}
+	if len(m.AccessLog) > 0 {
+		for iNdEx := len(m.AccessLog) - 1; iNdEx >= 0; iNdEx-- {
+			if vtmsg, ok := interface{}(m.AccessLog[iNdEx]).(interface {
+				MarshalToSizedBufferVTStrict([]byte) (int, error)
+			}); ok {
+				size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+			} else {
+				encoded, err := proto.Marshal(m.AccessLog[iNdEx])
+				if err != nil {
+					return 0, err
+				}
+				i -= len(encoded)
+				copy(dAtA[i:], encoded)
+				i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+			}
+			i--
+			dAtA[i] = 0x2a
+		}
 	}
 	if m.TerminalFilter {
 		i--
@@ -103,6 +191,23 @@ func (m *DynamicModuleNetworkFilter) MarshalToSizedBufferVTStrict(dAtA []byte) (
 	return len(dAtA) - i, nil
 }
 
+func (m *DynamicModuleNetworkFilter_AccessLogOptions) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.AccessLogFlushInterval != nil {
+		l = (*durationpb.Duration)(m.AccessLogFlushInterval).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.FlushAccessLogOnStart {
+		n += 2
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
 func (m *DynamicModuleNetworkFilter) SizeVT() (n int) {
 	if m == nil {
 		return 0
@@ -129,6 +234,22 @@ func (m *DynamicModuleNetworkFilter) SizeVT() (n int) {
 	}
 	if m.TerminalFilter {
 		n += 2
+	}
+	if len(m.AccessLog) > 0 {
+		for _, e := range m.AccessLog {
+			if size, ok := interface{}(e).(interface {
+				SizeVT() int
+			}); ok {
+				l = size.SizeVT()
+			} else {
+				l = proto.Size(e)
+			}
+			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+		}
+	}
+	if m.AccessLogOptions != nil {
+		l = m.AccessLogOptions.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n

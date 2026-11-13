@@ -8,10 +8,13 @@ package dynamic_modulesv3
 
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
+	v31 "github.com/envoyproxy/go-control-plane/envoy/config/accesslog/v3"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/extensions/dynamic_modules/v3"
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	anypb "google.golang.org/protobuf/types/known/anypb"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -36,6 +39,7 @@ const (
 // * Inspect, modify, or inject data into the downstream connection.
 // * Access connection-level information such as addresses and TLS status.
 // * Control connection lifecycle (e.g., close the connection).
+// [#next-free-field: 7]
 type DynamicModuleNetworkFilter struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Specifies the shared-object level configuration.
@@ -82,8 +86,23 @@ type DynamicModuleNetworkFilter struct {
 	//
 	// Defaults to ``false``.
 	TerminalFilter bool `protobuf:"varint,4,opt,name=terminal_filter,json=terminalFilter,proto3" json:"terminal_filter,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// Configuration for :ref:`access logs <arch_overview_access_logs>` emitted by this filter. The
+	// filter flushes them with the access log type ``TcpConnectionEnd`` when the connection is
+	// closed, and the module can flush them with the types ``TcpUpstreamConnected`` and
+	// ``TcpPeriodic`` at its own events, such as once it has connected to its upstream. The filter
+	// records the time the connection ends, and gives the connection a stream ID if it has none. A
+	// TCP proxy later in the chain replaces that stream ID when it sees the connection. If empty, the
+	// filter does none of this, and ``access_log_options`` has no effect. Access logs are not
+	// supported on QUIC listeners.
+	//
+	// A terminal module that reaches its upstream itself can report the upstream, the timing, the
+	// bytes and the outcome of the connection through the dynamic module ABI, so that access logs
+	// show them as they do for the TCP proxy.
+	AccessLog []*v31.AccessLog `protobuf:"bytes,5,rep,name=access_log,json=accessLog,proto3" json:"access_log,omitempty"`
+	// Additional options for the access logs in ``access_log``.
+	AccessLogOptions *DynamicModuleNetworkFilter_AccessLogOptions `protobuf:"bytes,6,opt,name=access_log_options,json=accessLogOptions,proto3" json:"access_log_options,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *DynamicModuleNetworkFilter) Reset() {
@@ -144,17 +163,95 @@ func (x *DynamicModuleNetworkFilter) GetTerminalFilter() bool {
 	return false
 }
 
+func (x *DynamicModuleNetworkFilter) GetAccessLog() []*v31.AccessLog {
+	if x != nil {
+		return x.AccessLog
+	}
+	return nil
+}
+
+func (x *DynamicModuleNetworkFilter) GetAccessLogOptions() *DynamicModuleNetworkFilter_AccessLogOptions {
+	if x != nil {
+		return x.AccessLogOptions
+	}
+	return nil
+}
+
+type DynamicModuleNetworkFilter_AccessLogOptions struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The interval at which the filter flushes access logs of type ``TcpPeriodic``. If not
+	// specified, the filter does not flush them periodically. The interval must be at least 1ms.
+	AccessLogFlushInterval *durationpb.Duration `protobuf:"bytes,1,opt,name=access_log_flush_interval,json=accessLogFlushInterval,proto3" json:"access_log_flush_interval,omitempty"`
+	// If set to ``true``, the filter flushes an access log of type ``TcpConnectionStart`` when it
+	// receives a new connection, before the module's new connection hook runs.
+	//
+	// Defaults to ``false``.
+	FlushAccessLogOnStart bool `protobuf:"varint,2,opt,name=flush_access_log_on_start,json=flushAccessLogOnStart,proto3" json:"flush_access_log_on_start,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
+}
+
+func (x *DynamicModuleNetworkFilter_AccessLogOptions) Reset() {
+	*x = DynamicModuleNetworkFilter_AccessLogOptions{}
+	mi := &file_envoy_extensions_filters_network_dynamic_modules_v3_dynamic_modules_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DynamicModuleNetworkFilter_AccessLogOptions) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DynamicModuleNetworkFilter_AccessLogOptions) ProtoMessage() {}
+
+func (x *DynamicModuleNetworkFilter_AccessLogOptions) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_filters_network_dynamic_modules_v3_dynamic_modules_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DynamicModuleNetworkFilter_AccessLogOptions.ProtoReflect.Descriptor instead.
+func (*DynamicModuleNetworkFilter_AccessLogOptions) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_network_dynamic_modules_v3_dynamic_modules_proto_rawDescGZIP(), []int{0, 0}
+}
+
+func (x *DynamicModuleNetworkFilter_AccessLogOptions) GetAccessLogFlushInterval() *durationpb.Duration {
+	if x != nil {
+		return x.AccessLogFlushInterval
+	}
+	return nil
+}
+
+func (x *DynamicModuleNetworkFilter_AccessLogOptions) GetFlushAccessLogOnStart() bool {
+	if x != nil {
+		return x.FlushAccessLogOnStart
+	}
+	return false
+}
+
 var File_envoy_extensions_filters_network_dynamic_modules_v3_dynamic_modules_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_filters_network_dynamic_modules_v3_dynamic_modules_proto_rawDesc = "" +
 	"\n" +
-	"Ienvoy/extensions/filters/network/dynamic_modules/v3/dynamic_modules.proto\x123envoy.extensions.filters.network.dynamic_modules.v3\x1a9envoy/extensions/dynamic_modules/v3/dynamic_modules.proto\x1a\x19google/protobuf/any.proto\x1a\x1dudpa/annotations/status.proto\"\x8f\x02\n" +
+	"Ienvoy/extensions/filters/network/dynamic_modules/v3/dynamic_modules.proto\x123envoy.extensions.filters.network.dynamic_modules.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a9envoy/extensions/dynamic_modules/v3/dynamic_modules.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x98\x05\n" +
 	"\x1aDynamicModuleNetworkFilter\x12l\n" +
 	"\x15dynamic_module_config\x18\x01 \x01(\v28.envoy.extensions.dynamic_modules.v3.DynamicModuleConfigR\x13dynamicModuleConfig\x12\x1f\n" +
 	"\vfilter_name\x18\x02 \x01(\tR\n" +
 	"filterName\x129\n" +
 	"\rfilter_config\x18\x03 \x01(\v2\x14.google.protobuf.AnyR\ffilterConfig\x12'\n" +
-	"\x0fterminal_filter\x18\x04 \x01(\bR\x0eterminalFilterB\xd0\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x0fterminal_filter\x18\x04 \x01(\bR\x0eterminalFilter\x12C\n" +
+	"\n" +
+	"access_log\x18\x05 \x03(\v2$.envoy.config.accesslog.v3.AccessLogR\taccessLog\x12\x8e\x01\n" +
+	"\x12access_log_options\x18\x06 \x01(\v2`.envoy.extensions.filters.network.dynamic_modules.v3.DynamicModuleNetworkFilter.AccessLogOptionsR\x10accessLogOptions\x1a\xb0\x01\n" +
+	"\x10AccessLogOptions\x12b\n" +
+	"\x19access_log_flush_interval\x18\x01 \x01(\v2\x19.google.protobuf.DurationB\f\xfaB\t\xaa\x01\x062\x04\x10\xc0\x84=R\x16accessLogFlushInterval\x128\n" +
+	"\x19flush_access_log_on_start\x18\x02 \x01(\bR\x15flushAccessLogOnStartB\xd0\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"Aio.envoyproxy.envoy.extensions.filters.network.dynamic_modules.v3B\x13DynamicModulesProtoP\x01Zlgithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/dynamic_modules/v3;dynamic_modulesv3b\x06proto3"
 
 var (
@@ -169,20 +266,26 @@ func file_envoy_extensions_filters_network_dynamic_modules_v3_dynamic_modules_pr
 	return file_envoy_extensions_filters_network_dynamic_modules_v3_dynamic_modules_proto_rawDescData
 }
 
-var file_envoy_extensions_filters_network_dynamic_modules_v3_dynamic_modules_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_envoy_extensions_filters_network_dynamic_modules_v3_dynamic_modules_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_envoy_extensions_filters_network_dynamic_modules_v3_dynamic_modules_proto_goTypes = []any{
-	(*DynamicModuleNetworkFilter)(nil), // 0: envoy.extensions.filters.network.dynamic_modules.v3.DynamicModuleNetworkFilter
-	(*v3.DynamicModuleConfig)(nil),     // 1: envoy.extensions.dynamic_modules.v3.DynamicModuleConfig
-	(*anypb.Any)(nil),                  // 2: google.protobuf.Any
+	(*DynamicModuleNetworkFilter)(nil),                  // 0: envoy.extensions.filters.network.dynamic_modules.v3.DynamicModuleNetworkFilter
+	(*DynamicModuleNetworkFilter_AccessLogOptions)(nil), // 1: envoy.extensions.filters.network.dynamic_modules.v3.DynamicModuleNetworkFilter.AccessLogOptions
+	(*v3.DynamicModuleConfig)(nil),                      // 2: envoy.extensions.dynamic_modules.v3.DynamicModuleConfig
+	(*anypb.Any)(nil),                                   // 3: google.protobuf.Any
+	(*v31.AccessLog)(nil),                               // 4: envoy.config.accesslog.v3.AccessLog
+	(*durationpb.Duration)(nil),                         // 5: google.protobuf.Duration
 }
 var file_envoy_extensions_filters_network_dynamic_modules_v3_dynamic_modules_proto_depIdxs = []int32{
-	1, // 0: envoy.extensions.filters.network.dynamic_modules.v3.DynamicModuleNetworkFilter.dynamic_module_config:type_name -> envoy.extensions.dynamic_modules.v3.DynamicModuleConfig
-	2, // 1: envoy.extensions.filters.network.dynamic_modules.v3.DynamicModuleNetworkFilter.filter_config:type_name -> google.protobuf.Any
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	2, // 0: envoy.extensions.filters.network.dynamic_modules.v3.DynamicModuleNetworkFilter.dynamic_module_config:type_name -> envoy.extensions.dynamic_modules.v3.DynamicModuleConfig
+	3, // 1: envoy.extensions.filters.network.dynamic_modules.v3.DynamicModuleNetworkFilter.filter_config:type_name -> google.protobuf.Any
+	4, // 2: envoy.extensions.filters.network.dynamic_modules.v3.DynamicModuleNetworkFilter.access_log:type_name -> envoy.config.accesslog.v3.AccessLog
+	1, // 3: envoy.extensions.filters.network.dynamic_modules.v3.DynamicModuleNetworkFilter.access_log_options:type_name -> envoy.extensions.filters.network.dynamic_modules.v3.DynamicModuleNetworkFilter.AccessLogOptions
+	5, // 4: envoy.extensions.filters.network.dynamic_modules.v3.DynamicModuleNetworkFilter.AccessLogOptions.access_log_flush_interval:type_name -> google.protobuf.Duration
+	5, // [5:5] is the sub-list for method output_type
+	5, // [5:5] is the sub-list for method input_type
+	5, // [5:5] is the sub-list for extension type_name
+	5, // [5:5] is the sub-list for extension extendee
+	0, // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_network_dynamic_modules_v3_dynamic_modules_proto_init() }
@@ -196,7 +299,7 @@ func file_envoy_extensions_filters_network_dynamic_modules_v3_dynamic_modules_pr
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_filters_network_dynamic_modules_v3_dynamic_modules_proto_rawDesc), len(file_envoy_extensions_filters_network_dynamic_modules_v3_dynamic_modules_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

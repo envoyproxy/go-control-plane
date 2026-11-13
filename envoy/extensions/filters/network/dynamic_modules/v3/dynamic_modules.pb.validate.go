@@ -120,6 +120,69 @@ func (m *DynamicModuleNetworkFilter) validate(all bool) error {
 
 	// no validation rules for TerminalFilter
 
+	for idx, item := range m.GetAccessLog() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, DynamicModuleNetworkFilterValidationError{
+						field:  fmt.Sprintf("AccessLog[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, DynamicModuleNetworkFilterValidationError{
+						field:  fmt.Sprintf("AccessLog[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DynamicModuleNetworkFilterValidationError{
+					field:  fmt.Sprintf("AccessLog[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if all {
+		switch v := interface{}(m.GetAccessLogOptions()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DynamicModuleNetworkFilterValidationError{
+					field:  "AccessLogOptions",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DynamicModuleNetworkFilterValidationError{
+					field:  "AccessLogOptions",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAccessLogOptions()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DynamicModuleNetworkFilterValidationError{
+				field:  "AccessLogOptions",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return DynamicModuleNetworkFilterMultiError(errors)
 	}
@@ -199,3 +262,141 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DynamicModuleNetworkFilterValidationError{}
+
+// Validate checks the field values on
+// DynamicModuleNetworkFilter_AccessLogOptions with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *DynamicModuleNetworkFilter_AccessLogOptions) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// DynamicModuleNetworkFilter_AccessLogOptions with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in
+// DynamicModuleNetworkFilter_AccessLogOptionsMultiError, or nil if none found.
+func (m *DynamicModuleNetworkFilter_AccessLogOptions) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DynamicModuleNetworkFilter_AccessLogOptions) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if d := m.GetAccessLogFlushInterval(); d != nil {
+		dur, err := d.AsDuration(), d.CheckValid()
+		if err != nil {
+			err = DynamicModuleNetworkFilter_AccessLogOptionsValidationError{
+				field:  "AccessLogFlushInterval",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		} else {
+
+			gte := time.Duration(0*time.Second + 1000000*time.Nanosecond)
+
+			if dur < gte {
+				err := DynamicModuleNetworkFilter_AccessLogOptionsValidationError{
+					field:  "AccessLogFlushInterval",
+					reason: "value must be greater than or equal to 1ms",
+				}
+				if !all {
+					return err
+				}
+				errors = append(errors, err)
+			}
+
+		}
+	}
+
+	// no validation rules for FlushAccessLogOnStart
+
+	if len(errors) > 0 {
+		return DynamicModuleNetworkFilter_AccessLogOptionsMultiError(errors)
+	}
+
+	return nil
+}
+
+// DynamicModuleNetworkFilter_AccessLogOptionsMultiError is an error wrapping
+// multiple validation errors returned by
+// DynamicModuleNetworkFilter_AccessLogOptions.ValidateAll() if the designated
+// constraints aren't met.
+type DynamicModuleNetworkFilter_AccessLogOptionsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DynamicModuleNetworkFilter_AccessLogOptionsMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DynamicModuleNetworkFilter_AccessLogOptionsMultiError) AllErrors() []error { return m }
+
+// DynamicModuleNetworkFilter_AccessLogOptionsValidationError is the validation
+// error returned by DynamicModuleNetworkFilter_AccessLogOptions.Validate if
+// the designated constraints aren't met.
+type DynamicModuleNetworkFilter_AccessLogOptionsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DynamicModuleNetworkFilter_AccessLogOptionsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DynamicModuleNetworkFilter_AccessLogOptionsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DynamicModuleNetworkFilter_AccessLogOptionsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DynamicModuleNetworkFilter_AccessLogOptionsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DynamicModuleNetworkFilter_AccessLogOptionsValidationError) ErrorName() string {
+	return "DynamicModuleNetworkFilter_AccessLogOptionsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DynamicModuleNetworkFilter_AccessLogOptionsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDynamicModuleNetworkFilter_AccessLogOptions.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DynamicModuleNetworkFilter_AccessLogOptionsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DynamicModuleNetworkFilter_AccessLogOptionsValidationError{}
