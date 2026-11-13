@@ -85,6 +85,16 @@ func (m *FaultAbort) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.DryRun {
+		i--
+		if m.DryRun {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x38
+	}
 	if len(m.ResponseBody) > 0 {
 		i -= len(m.ResponseBody)
 		copy(dAtA[i:], m.ResponseBody)
@@ -425,6 +435,9 @@ func (m *FaultAbort) SizeVT() (n int) {
 	l = len(m.ResponseBody)
 	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.DryRun {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n

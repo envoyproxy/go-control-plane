@@ -28,7 +28,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// [#next-free-field: 7]
+// [#next-free-field: 8]
 type FaultAbort struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to ErrorType:
@@ -42,7 +42,35 @@ type FaultAbort struct {
 	Percentage *v3.FractionalPercent `protobuf:"bytes,3,opt,name=percentage,proto3" json:"percentage,omitempty"`
 	// The response body to be returned when aborting the request.
 	// If not specified, defaults to "fault filter abort".
-	ResponseBody  string `protobuf:"bytes,6,opt,name=response_body,json=responseBody,proto3" json:"response_body,omitempty"`
+	ResponseBody string `protobuf:"bytes,6,opt,name=response_body,json=responseBody,proto3" json:"response_body,omitempty"`
+	// If true, requests matching the abort fault will not be aborted and the ``FI``
+	// response flag will not be set. Instead, the ``aborts_dry_run`` stat is
+	// incremented and a ``dry_run_abort`` struct containing the would-be status
+	// code (``{"http_status": <code>}`` or ``{"grpc_status": <code>}``) is merged
+	// into the fault filter's dynamic metadata namespace (e.g.
+	// ``envoy.filters.http.fault``). User-configured :ref:`filter_metadata
+	// <envoy_v3_api_field_extensions.filters.http.fault.v3.HTTPFault.filter_metadata>`
+	// is not written for dry-run abort matches (if another fault such as
+	// :ref:`delay <envoy_v3_api_field_extensions.filters.http.fault.v3.HTTPFault.delay>`
+	// is injected on the same request and writes ``filter_metadata``,
+	// ``dry_run_abort`` is merged alongside it). Defaults to ``false``.
+	//
+	// .. note::
+	//   * This setting intentionally applies only to abort fault injection. Any
+	//     :ref:`delay <envoy_v3_api_field_extensions.filters.http.fault.v3.HTTPFault.delay>` or
+	//     :ref:`response_rate_limit
+	//     <envoy_v3_api_field_extensions.filters.http.fault.v3.HTTPFault.response_rate_limit>`
+	//     configured on the same filter is still injected normally.
+	//   * Dry-run evaluation skips the :ref:`max_active_faults
+	//     <envoy_v3_api_field_extensions.filters.http.fault.v3.HTTPFault.max_active_faults>`
+	//     check, so ``aborts_dry_run`` can be higher than what enforcement would
+	//     actually abort and ``faults_overflow`` is not incremented.
+	//   * When combined with :ref:`header_abort
+	//     <envoy_v3_api_field_extensions.filters.http.fault.v3.FaultAbort.header_abort>`,
+	//     aborts requested by the client through ``x-envoy-fault-abort-request`` or
+	//     ``x-envoy-fault-abort-grpc-request`` are counted and recorded in
+	//     ``dry_run_abort`` dynamic metadata but not applied.
+	DryRun        bool `protobuf:"varint,7,opt,name=dry_run,json=dryRun,proto3" json:"dry_run,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -123,6 +151,13 @@ func (x *FaultAbort) GetResponseBody() string {
 		return x.ResponseBody
 	}
 	return ""
+}
+
+func (x *FaultAbort) GetDryRun() bool {
+	if x != nil {
+		return x.DryRun
+	}
+	return false
 }
 
 type isFaultAbort_ErrorType interface {
@@ -229,6 +264,9 @@ type HTTPFault struct {
 	DisableDownstreamClusterStats bool `protobuf:"varint,15,opt,name=disable_downstream_cluster_stats,json=disableDownstreamClusterStats,proto3" json:"disable_downstream_cluster_stats,omitempty"`
 	// When an abort or delay fault is executed, the metadata struct provided here will be added to the
 	// request's dynamic metadata under the namespace corresponding to the name of the fault filter.
+	// This metadata is not written for :ref:`dry_run
+	// <envoy_v3_api_field_extensions.filters.http.fault.v3.FaultAbort.dry_run>` abort matches, which
+	// instead merge a ``dry_run_abort`` struct into the fault filter's dynamic metadata namespace.
 	// This data can be logged as part of Access Logs using the :ref:`command operator
 	// <config_access_log_command_operators>` %DYNAMIC_METADATA(NAMESPACE)%, where NAMESPACE is the name of
 	// the fault filter.
@@ -422,7 +460,7 @@ var File_envoy_extensions_filters_http_fault_v3_fault_proto protoreflect.FileDes
 
 const file_envoy_extensions_filters_http_fault_v3_fault_proto_rawDesc = "" +
 	"\n" +
-	"2envoy/extensions/filters/http/fault/v3/fault.proto\x12&envoy.extensions.filters.http.fault.v3\x1a,envoy/config/route/v3/route_components.proto\x1a4envoy/extensions/filters/common/fault/v3/fault.proto\x1a\x1benvoy/type/v3/percent.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xc9\x03\n" +
+	"2envoy/extensions/filters/http/fault/v3/fault.proto\x12&envoy.extensions.filters.http.fault.v3\x1a,envoy/config/route/v3/route_components.proto\x1a4envoy/extensions/filters/common/fault/v3/fault.proto\x1a\x1benvoy/type/v3/percent.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xe2\x03\n" +
 	"\n" +
 	"FaultAbort\x12.\n" +
 	"\vhttp_status\x18\x02 \x01(\rB\v\xfaB\b*\x06\x10\xd8\x04(\xc8\x01H\x00R\n" +
@@ -433,7 +471,8 @@ const file_envoy_extensions_filters_http_fault_v3_fault_proto_rawDesc = "" +
 	"\n" +
 	"percentage\x18\x03 \x01(\v2 .envoy.type.v3.FractionalPercentR\n" +
 	"percentage\x12#\n" +
-	"\rresponse_body\x18\x06 \x01(\tR\fresponseBody\x1aN\n" +
+	"\rresponse_body\x18\x06 \x01(\tR\fresponseBody\x12\x17\n" +
+	"\adry_run\x18\a \x01(\bR\x06dryRun\x1aN\n" +
 	"\vHeaderAbort:?\x9aň\x1e:\n" +
 	"8envoy.config.filter.http.fault.v2.FaultAbort.HeaderAbort:3\x9aň\x1e.\n" +
 	",envoy.config.filter.http.fault.v2.FaultAbortB\x11\n" +

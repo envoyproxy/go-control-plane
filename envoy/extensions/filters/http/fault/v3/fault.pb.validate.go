@@ -89,6 +89,8 @@ func (m *FaultAbort) validate(all bool) error {
 
 	// no validation rules for ResponseBody
 
+	// no validation rules for DryRun
+
 	oneofErrorTypePresent := false
 	switch v := m.ErrorType.(type) {
 	case *FaultAbort_HttpStatus:
