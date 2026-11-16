@@ -62,6 +62,13 @@ type Config struct {
 	//
 	// "configuration_version" must contain a 1 byte unsigned integer of value less than 7.
 	// See https://datatracker.ietf.org/doc/html/draft-ietf-quic-load-balancers#name-config-rotation.
+	//
+	// To change the encryption key, change the configuration version too, so that a load balancer can
+	// hold the previous and the new configuration side by side while connection IDs issued under the
+	// previous one are still in use. An SDS update that changes the key under the active configuration
+	// version is applied, with a warning: connection IDs already issued under the previous key may no
+	// longer be routed to this server by a load balancer holding the new key. An update with an
+	// identical key and version leaves the active configuration unchanged.
 	EncryptionParameters *v31.SdsSecretConfig `protobuf:"bytes,5,opt,name=encryption_parameters,json=encryptionParameters,proto3" json:"encryption_parameters,omitempty"`
 	// Use the unencrypted mode. This is useful for testing or a simplified implementation of the
 	// downstream load balancer, but allows for linking different CIDs for the same connection, and
