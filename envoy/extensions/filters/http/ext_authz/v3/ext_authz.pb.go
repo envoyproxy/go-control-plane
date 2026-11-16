@@ -83,7 +83,7 @@ func (ShadowDecision_CheckResult) EnumDescriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_http_ext_authz_v3_ext_authz_proto_rawDescGZIP(), []int{1, 0}
 }
 
-// [#next-free-field: 35]
+// [#next-free-field: 36]
 type ExtAuthz struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// External authorization service configuration.
@@ -336,6 +336,25 @@ type ExtAuthz struct {
 	//
 	// It is set to ``false`` by default for backwards compatibility.
 	EncodeRawHeaders bool `protobuf:"varint,23,opt,name=encode_raw_headers,json=encodeRawHeaders,proto3" json:"encode_raw_headers,omitempty"`
+	// Whether to read header values from :ref:`HeaderValue.raw_value
+	// <envoy_v3_api_field_config.core.v3.HeaderValue.raw_value>` in gRPC authorization responses
+	// (:ref:`CheckResponse <envoy_v3_api_msg_service.auth.v3.CheckResponse>`).
+	//
+	// When set to ``true``, each header value in gRPC ``OK``, ``denied``, and ``error`` responses is
+	// read from ``HeaderValue.raw_value`` when non-empty, falling back to
+	// :ref:`HeaderValue.value <envoy_v3_api_field_config.core.v3.HeaderValue.value>` when
+	// ``raw_value`` is empty. This allows gRPC authorization servers to return non-UTF-8 header
+	// values while remaining compatible with servers that populate ``value``.
+	//
+	// When set to ``false``, only ``HeaderValue.value`` is read and ``HeaderValue.raw_value`` is
+	// ignored.
+	//
+	// .. note::
+	//   This field applies exclusively to the gRPC ext_authz service and has no effect on the HTTP
+	//   service.
+	//
+	// Defaults to ``false``.
+	ReadRawHeaderValue bool `protobuf:"varint,35,opt,name=read_raw_header_value,json=readRawHeaderValue,proto3" json:"read_raw_header_value,omitempty"`
 	// Rules for what modifications an ext_authz server may make to the request headers before
 	// continuing decoding or forwarding upstream.
 	//
@@ -654,6 +673,13 @@ func (x *ExtAuthz) GetEncodeRawHeaders() bool {
 	return false
 }
 
+func (x *ExtAuthz) GetReadRawHeaderValue() bool {
+	if x != nil {
+		return x.ReadRawHeaderValue
+	}
+	return false
+}
+
 func (x *ExtAuthz) GetDecoderHeaderMutationRules() *v33.HeaderMutationRules {
 	if x != nil {
 		return x.DecoderHeaderMutationRules
@@ -746,7 +772,10 @@ type ShadowDecision struct {
 	StatusCode uint32 `protobuf:"varint,2,opt,name=status_code,json=statusCode,proto3" json:"status_code,omitempty"`
 	// Response headers the auth server asked to set on a denied response
 	// (e.g. ``WWW-Authenticate``, ``Set-Cookie``). Populated for ``DENIED`` only.
-	// Preserves ordering and duplicate header names.
+	// Preserves ordering and duplicate header names. For each header,
+	// :ref:`value <envoy_v3_api_field_config.core.v3.HeaderValue.value>` is populated for valid
+	// UTF-8 values, and :ref:`raw_value
+	// <envoy_v3_api_field_config.core.v3.HeaderValue.raw_value>` is populated for non-UTF-8 values.
 	ResponseHeaders []*v3.HeaderValue `protobuf:"bytes,3,rep,name=response_headers,json=responseHeaders,proto3" json:"response_headers,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
@@ -1441,7 +1470,7 @@ var File_envoy_extensions_filters_http_ext_authz_v3_ext_authz_proto protoreflect
 
 const file_envoy_extensions_filters_http_ext_authz_v3_ext_authz_proto_rawDesc = "" +
 	"\n" +
-	":envoy/extensions/filters/http/ext_authz/v3/ext_authz.proto\x12*envoy.extensions.filters.http.ext_authz.v3\x1a:envoy/config/common/mutation_rules/v3/mutation_rules.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a'envoy/config/core/v3/grpc_service.proto\x1a#envoy/config/core/v3/http_uri.proto\x1a$envoy/type/matcher/v3/metadata.proto\x1a\"envoy/type/matcher/v3/string.proto\x1a\x1fenvoy/type/v3/http_status.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a udpa/annotations/sensitive.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xb4\x13\n" +
+	":envoy/extensions/filters/http/ext_authz/v3/ext_authz.proto\x12*envoy.extensions.filters.http.ext_authz.v3\x1a:envoy/config/common/mutation_rules/v3/mutation_rules.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a'envoy/config/core/v3/grpc_service.proto\x1a#envoy/config/core/v3/http_uri.proto\x1a$envoy/type/matcher/v3/metadata.proto\x1a\"envoy/type/matcher/v3/string.proto\x1a\x1fenvoy/type/v3/http_status.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a udpa/annotations/sensitive.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xe7\x13\n" +
 	"\bExtAuthz\x12F\n" +
 	"\fgrpc_service\x18\x01 \x01(\v2!.envoy.config.core.v3.GrpcServiceH\x00R\vgrpcService\x12\\\n" +
 	"\fhttp_service\x18\x03 \x01(\v27.envoy.extensions.filters.http.ext_authz.v3.HttpServiceH\x00R\vhttpService\x12^\n" +
@@ -1470,7 +1499,8 @@ const file_envoy_extensions_filters_http_ext_authz_v3_ext_authz_proto_rawDesc = 
 	"\x12disallowed_headers\x18\x19 \x01(\v2(.envoy.type.matcher.v3.ListStringMatcherR\x11disallowedHeaders\x12.\n" +
 	"\x13include_tls_session\x18\x12 \x01(\bR\x11includeTlsSession\x12]\n" +
 	"\x1dcharge_cluster_response_stats\x18\x14 \x01(\v2\x1a.google.protobuf.BoolValueR\x1achargeClusterResponseStats\x12,\n" +
-	"\x12encode_raw_headers\x18\x17 \x01(\bR\x10encodeRawHeaders\x12}\n" +
+	"\x12encode_raw_headers\x18\x17 \x01(\bR\x10encodeRawHeaders\x121\n" +
+	"\x15read_raw_header_value\x18# \x01(\bR\x12readRawHeaderValue\x12}\n" +
 	"\x1ddecoder_header_mutation_rules\x18\x1a \x01(\v2:.envoy.config.common.mutation_rules.v3.HeaderMutationRulesR\x1adecoderHeaderMutationRules\x12e\n" +
 	"!enable_dynamic_metadata_ingestion\x18\x1b \x01(\v2\x1a.google.protobuf.BoolValueR\x1eenableDynamicMetadataIngestion\x12@\n" +
 	"\x0ffilter_metadata\x18\x1c \x01(\v2\x17.google.protobuf.StructR\x0efilterMetadata\x125\n" +

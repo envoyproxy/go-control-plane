@@ -350,6 +350,8 @@ func (m *ExtAuthz) validate(all bool) error {
 
 	// no validation rules for EncodeRawHeaders
 
+	// no validation rules for ReadRawHeaderValue
+
 	if all {
 		switch v := interface{}(m.GetDecoderHeaderMutationRules()).(type) {
 		case interface{ ValidateAll() error }:
