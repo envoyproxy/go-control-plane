@@ -10,6 +10,7 @@
 - Programmatic ADS client that supports communication with an xDS management server (#604)
 - Added cache support for custom resource names with delta xDS (#609)
 - Added support for the FilterChain resource type for Filter Chain Discovery Service (FCDS)
+- Added the `WithReuseUnchangedResources` snapshot cache option: a resource that is the same object under the same name as in the node's previous snapshot keeps its delta version without being encoded and hashed again, and delta responses reuse the bytes encoded for hashing
 
 ### Changed
 

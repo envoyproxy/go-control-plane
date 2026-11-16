@@ -49,6 +49,23 @@ func newCachedResourceWithTTL(name string, res types.ResourceWithTTL, cacheVersi
 	return cachedRes
 }
 
+// newMarshaledCachedResourceWithTTL creates a cachedResource from bytes and a resource
+// version already computed for res, so neither is computed again.
+func newMarshaledCachedResourceWithTTL(name string, res types.ResourceWithTTL, cacheVersion string, marshaled []byte, resourceVersion string) *cachedResource {
+	return &cachedResource{
+		name:         name,
+		resource:     res.Resource,
+		ttl:          res.TTL,
+		cacheVersion: cacheVersion,
+		marshalFunc: func() ([]byte, error) {
+			return marshaled, nil
+		},
+		computeResourceVersionFunc: func() (string, error) {
+			return resourceVersion, nil
+		},
+	}
+}
+
 // getMarshaledResource lazily marshals the resource and returns the bytes.
 func (c *cachedResource) getMarshaledResource() ([]byte, error) {
 	return c.marshalFunc()
