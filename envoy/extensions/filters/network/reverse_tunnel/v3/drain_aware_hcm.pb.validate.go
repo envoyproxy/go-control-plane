@@ -89,6 +89,66 @@ func (m *DrainAwareHttpConnectionManager) validate(all bool) error {
 
 	// no validation rules for EnableDrainWithGoaway
 
+	if d := m.GetMetadataDelay(); d != nil {
+		dur, err := d.AsDuration(), d.CheckValid()
+		if err != nil {
+			err = DrainAwareHttpConnectionManagerValidationError{
+				field:  "MetadataDelay",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		} else {
+
+			gte := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+			if dur < gte {
+				err := DrainAwareHttpConnectionManagerValidationError{
+					field:  "MetadataDelay",
+					reason: "value must be greater than or equal to 0s",
+				}
+				if !all {
+					return err
+				}
+				errors = append(errors, err)
+			}
+
+		}
+	}
+
+	if d := m.GetShutdownNoticeDelay(); d != nil {
+		dur, err := d.AsDuration(), d.CheckValid()
+		if err != nil {
+			err = DrainAwareHttpConnectionManagerValidationError{
+				field:  "ShutdownNoticeDelay",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		} else {
+
+			gte := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+			if dur < gte {
+				err := DrainAwareHttpConnectionManagerValidationError{
+					field:  "ShutdownNoticeDelay",
+					reason: "value must be greater than or equal to 0s",
+				}
+				if !all {
+					return err
+				}
+				errors = append(errors, err)
+			}
+
+		}
+	}
+
 	if len(errors) > 0 {
 		return DrainAwareHttpConnectionManagerMultiError(errors)
 	}

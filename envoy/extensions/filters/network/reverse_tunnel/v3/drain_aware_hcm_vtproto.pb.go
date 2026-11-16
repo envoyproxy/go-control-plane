@@ -9,6 +9,7 @@ package reverse_tunnelv3
 
 import (
 	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
+	durationpb "github.com/planetscale/vtprotobuf/types/known/durationpb"
 	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
@@ -49,6 +50,26 @@ func (m *DrainAwareHttpConnectionManager) MarshalToSizedBufferVTStrict(dAtA []by
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.ShutdownNoticeDelay != nil {
+		size, err := (*durationpb.Duration)(m.ShutdownNoticeDelay).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x22
+	}
+	if m.MetadataDelay != nil {
+		size, err := (*durationpb.Duration)(m.MetadataDelay).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1a
 	}
 	if m.EnableDrainWithGoaway {
 		i--
@@ -103,6 +124,14 @@ func (m *DrainAwareHttpConnectionManager) SizeVT() (n int) {
 	}
 	if m.EnableDrainWithGoaway {
 		n += 2
+	}
+	if m.MetadataDelay != nil {
+		l = (*durationpb.Duration)(m.MetadataDelay).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.ShutdownNoticeDelay != nil {
+		l = (*durationpb.Duration)(m.ShutdownNoticeDelay).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n

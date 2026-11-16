@@ -9,8 +9,10 @@ package reverse_tunnelv3
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/http_connection_manager/v3"
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -24,9 +26,16 @@ const (
 )
 
 // Configuration for the drain-aware HTTP Connection Manager.
-// All HCM fields are forwarded verbatim; the only difference is that this
-// filter registers a listener-drain callback and emits a GOAWAY before the
-// connection is closed.
+// All HCM fields are forwarded verbatim. In addition, when the listener drains,
+// every connection is drained like an HCM graceful drain, whether or not any of
+// the fields below are set: a soft GOAWAY (shutdown notice) is sent when the
+// drain starts, and the final GOAWAY follows after “hcm_config.drain_timeout“,
+// extended by “hcm_config.drain_timeout_jitter“ if set. With
+// “enable_drain_with_goaway“, a reverse tunnel instead dials a replacement
+// when the drain starts and sends the soft GOAWAY and an optional METADATA frame
+// at the configured delays before the final GOAWAY. Without
+// “shutdown_notice_delay“, such a tunnel receives no GOAWAY until the final
+// one, so it keeps serving while the replacement is established.
 type DrainAwareHttpConnectionManager struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The underlying HCM configuration to apply.
@@ -34,10 +43,21 @@ type DrainAwareHttpConnectionManager struct {
 	// When true, a peer-initiated GOAWAY on a reverse tunnel makes the initiator drop the draining
 	// tunnel and dial a replacement, so capacity is restored before the old tunnel closes while its
 	// in-flight streams finish. Default false, so the behavior is opt-in and unconfigured listeners
-	// are unaffected.
+	// are unaffected. Required by ``metadata_delay`` and ``shutdown_notice_delay``.
 	EnableDrainWithGoaway bool `protobuf:"varint,2,opt,name=enable_drain_with_goaway,json=enableDrainWithGoaway,proto3" json:"enable_drain_with_goaway,omitempty"`
-	unknownFields         protoimpl.UnknownFields
-	sizeCache             protoimpl.SizeCache
+	// Delay from the start of a reverse tunnel drain until a METADATA frame carrying
+	// ``envoy.reverse_tunnel.drain: true`` is sent. Requires ``enable_drain_with_goaway`` and
+	// ``hcm_config.http2_protocol_options.allow_metadata``. Must be less than
+	// ``hcm_config.drain_timeout`` and, if set, ``shutdown_notice_delay``; otherwise the config is
+	// rejected. Default: 0s (not sent).
+	MetadataDelay *durationpb.Duration `protobuf:"bytes,3,opt,name=metadata_delay,json=metadataDelay,proto3" json:"metadata_delay,omitempty"`
+	// Delay from the start of a reverse tunnel drain until the soft GOAWAY (shutdown notice) is
+	// sent, telling the peer to stop opening new streams on this tunnel. Requires
+	// ``enable_drain_with_goaway``. Must be less than ``hcm_config.drain_timeout``; otherwise the
+	// config is rejected. Default: 0s (not sent).
+	ShutdownNoticeDelay *durationpb.Duration `protobuf:"bytes,4,opt,name=shutdown_notice_delay,json=shutdownNoticeDelay,proto3" json:"shutdown_notice_delay,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *DrainAwareHttpConnectionManager) Reset() {
@@ -84,15 +104,31 @@ func (x *DrainAwareHttpConnectionManager) GetEnableDrainWithGoaway() bool {
 	return false
 }
 
+func (x *DrainAwareHttpConnectionManager) GetMetadataDelay() *durationpb.Duration {
+	if x != nil {
+		return x.MetadataDelay
+	}
+	return nil
+}
+
+func (x *DrainAwareHttpConnectionManager) GetShutdownNoticeDelay() *durationpb.Duration {
+	if x != nil {
+		return x.ShutdownNoticeDelay
+	}
+	return nil
+}
+
 var File_envoy_extensions_filters_network_reverse_tunnel_v3_drain_aware_hcm_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_filters_network_reverse_tunnel_v3_drain_aware_hcm_proto_rawDesc = "" +
 	"\n" +
-	"Henvoy/extensions/filters/network/reverse_tunnel/v3/drain_aware_hcm.proto\x122envoy.extensions.filters.network.reverse_tunnel.v3\x1aYenvoy/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto\x1a\x1dudpa/annotations/status.proto\"\xcd\x01\n" +
+	"Henvoy/extensions/filters/network/reverse_tunnel/v3/drain_aware_hcm.proto\x122envoy.extensions.filters.network.reverse_tunnel.v3\x1aYenvoy/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xf2\x02\n" +
 	"\x1fDrainAwareHttpConnectionManager\x12q\n" +
 	"\n" +
 	"hcm_config\x18\x01 \x01(\v2R.envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManagerR\thcmConfig\x127\n" +
-	"\x18enable_drain_with_goaway\x18\x02 \x01(\bR\x15enableDrainWithGoawayB\xcc\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x18enable_drain_with_goaway\x18\x02 \x01(\bR\x15enableDrainWithGoaway\x12J\n" +
+	"\x0emetadata_delay\x18\x03 \x01(\v2\x19.google.protobuf.DurationB\b\xfaB\x05\xaa\x01\x022\x00R\rmetadataDelay\x12W\n" +
+	"\x15shutdown_notice_delay\x18\x04 \x01(\v2\x19.google.protobuf.DurationB\b\xfaB\x05\xaa\x01\x022\x00R\x13shutdownNoticeDelayB\xcc\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"@io.envoyproxy.envoy.extensions.filters.network.reverse_tunnel.v3B\x12DrainAwareHcmProtoP\x01Zjgithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/reverse_tunnel/v3;reverse_tunnelv3b\x06proto3"
 
 var (
@@ -111,14 +147,17 @@ var file_envoy_extensions_filters_network_reverse_tunnel_v3_drain_aware_hcm_prot
 var file_envoy_extensions_filters_network_reverse_tunnel_v3_drain_aware_hcm_proto_goTypes = []any{
 	(*DrainAwareHttpConnectionManager)(nil), // 0: envoy.extensions.filters.network.reverse_tunnel.v3.DrainAwareHttpConnectionManager
 	(*v3.HttpConnectionManager)(nil),        // 1: envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+	(*durationpb.Duration)(nil),             // 2: google.protobuf.Duration
 }
 var file_envoy_extensions_filters_network_reverse_tunnel_v3_drain_aware_hcm_proto_depIdxs = []int32{
 	1, // 0: envoy.extensions.filters.network.reverse_tunnel.v3.DrainAwareHttpConnectionManager.hcm_config:type_name -> envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	2, // 1: envoy.extensions.filters.network.reverse_tunnel.v3.DrainAwareHttpConnectionManager.metadata_delay:type_name -> google.protobuf.Duration
+	2, // 2: envoy.extensions.filters.network.reverse_tunnel.v3.DrainAwareHttpConnectionManager.shutdown_notice_delay:type_name -> google.protobuf.Duration
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_network_reverse_tunnel_v3_drain_aware_hcm_proto_init() }

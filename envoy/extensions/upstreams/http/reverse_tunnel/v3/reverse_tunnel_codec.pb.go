@@ -27,6 +27,9 @@ type ReverseTunnelUpstreamCodecOptions struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// When true, the upstream HTTP/2 client codec emits a GOAWAY when the reverse tunnel begins
 	// draining. Defaults to false, in which case the stock HTTP/2 client codec is used unchanged.
+	// When true, a connection-level METADATA frame carrying ``envoy.reverse_tunnel.drain: true``
+	// also notifies the reverse tunnel reporter; this requires the cluster's
+	// ``http2_protocol_options.allow_metadata``.
 	EnableDrainWithGoaway bool `protobuf:"varint,1,opt,name=enable_drain_with_goaway,json=enableDrainWithGoaway,proto3" json:"enable_drain_with_goaway,omitempty"`
 	unknownFields         protoimpl.UnknownFields
 	sizeCache             protoimpl.SizeCache
