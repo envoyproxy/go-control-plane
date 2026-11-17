@@ -37,7 +37,16 @@ type Zstd struct {
 	Dictionaries []*v3.DataSource `protobuf:"bytes,1,rep,name=dictionaries,proto3" json:"dictionaries,omitempty"`
 	// Value for decompressor's next output buffer. If not set, defaults to the zstd recommended
 	// output buffer size, ``ZSTD_DStreamOutSize()`` (128 KiB).
-	ChunkSize     *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=chunk_size,json=chunkSize,proto3" json:"chunk_size,omitempty"`
+	ChunkSize *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=chunk_size,json=chunkSize,proto3" json:"chunk_size,omitempty"`
+	// Ratio used to calculate the per-call output threshold before adding ``max_block_size``.
+	// Defaults to 100.
+	MaxInflateRatio *wrapperspb.UInt32Value `protobuf:"bytes,3,opt,name=max_inflate_ratio,json=maxInflateRatio,proto3" json:"max_inflate_ratio,omitempty"`
+	// Additional output allowance in bytes per decompression call. Set this to the sender's maximum
+	// uncompressed zstd block size to allow for a block that spans input chunks. The output threshold
+	// for a call is its compressed input size times ``max_inflate_ratio`` plus ``max_block_size``.
+	// The decompressor forwards the output step that crosses the threshold and ends the call.
+	// Defaults to 0. The largest zstd block is 128 KiB.
+	MaxBlockSize  *wrapperspb.UInt32Value `protobuf:"bytes,4,opt,name=max_block_size,json=maxBlockSize,proto3" json:"max_block_size,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -86,15 +95,31 @@ func (x *Zstd) GetChunkSize() *wrapperspb.UInt32Value {
 	return nil
 }
 
+func (x *Zstd) GetMaxInflateRatio() *wrapperspb.UInt32Value {
+	if x != nil {
+		return x.MaxInflateRatio
+	}
+	return nil
+}
+
+func (x *Zstd) GetMaxBlockSize() *wrapperspb.UInt32Value {
+	if x != nil {
+		return x.MaxBlockSize
+	}
+	return nil
+}
+
 var File_envoy_extensions_compression_zstd_decompressor_v3_zstd_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_compression_zstd_decompressor_v3_zstd_proto_rawDesc = "" +
 	"\n" +
-	"<envoy/extensions/compression/zstd/decompressor/v3/zstd.proto\x121envoy.extensions.compression.zstd.decompressor.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x97\x01\n" +
+	"<envoy/extensions/compression/zstd/decompressor/v3/zstd.proto\x121envoy.extensions.compression.zstd.decompressor.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xb9\x02\n" +
 	"\x04Zstd\x12D\n" +
 	"\fdictionaries\x18\x01 \x03(\v2 .envoy.config.core.v3.DataSourceR\fdictionaries\x12I\n" +
 	"\n" +
-	"chunk_size\x18\x02 \x01(\v2\x1c.google.protobuf.UInt32ValueB\f\xfaB\t*\a\x18\x80\x80\x04(\x80 R\tchunkSizeB\xbf\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"chunk_size\x18\x02 \x01(\v2\x1c.google.protobuf.UInt32ValueB\f\xfaB\t*\a\x18\x80\x80\x04(\x80 R\tchunkSize\x12Q\n" +
+	"\x11max_inflate_ratio\x18\x03 \x01(\v2\x1c.google.protobuf.UInt32ValueB\a\xfaB\x04*\x02(\x01R\x0fmaxInflateRatio\x12M\n" +
+	"\x0emax_block_size\x18\x04 \x01(\v2\x1c.google.protobuf.UInt32ValueB\t\xfaB\x06*\x04\x18\x80\x80\bR\fmaxBlockSizeB\xbf\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"?io.envoyproxy.envoy.extensions.compression.zstd.decompressor.v3B\tZstdProtoP\x01Zggithub.com/envoyproxy/go-control-plane/envoy/extensions/compression/zstd/decompressor/v3;decompressorv3b\x06proto3"
 
 var (
@@ -118,11 +143,13 @@ var file_envoy_extensions_compression_zstd_decompressor_v3_zstd_proto_goTypes = 
 var file_envoy_extensions_compression_zstd_decompressor_v3_zstd_proto_depIdxs = []int32{
 	1, // 0: envoy.extensions.compression.zstd.decompressor.v3.Zstd.dictionaries:type_name -> envoy.config.core.v3.DataSource
 	2, // 1: envoy.extensions.compression.zstd.decompressor.v3.Zstd.chunk_size:type_name -> google.protobuf.UInt32Value
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	2, // 2: envoy.extensions.compression.zstd.decompressor.v3.Zstd.max_inflate_ratio:type_name -> google.protobuf.UInt32Value
+	2, // 3: envoy.extensions.compression.zstd.decompressor.v3.Zstd.max_block_size:type_name -> google.protobuf.UInt32Value
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_compression_zstd_decompressor_v3_zstd_proto_init() }

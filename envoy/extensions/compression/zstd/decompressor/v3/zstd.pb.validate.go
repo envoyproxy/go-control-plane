@@ -106,6 +106,36 @@ func (m *Zstd) validate(all bool) error {
 
 	}
 
+	if wrapper := m.GetMaxInflateRatio(); wrapper != nil {
+
+		if wrapper.GetValue() < 1 {
+			err := ZstdValidationError{
+				field:  "MaxInflateRatio",
+				reason: "value must be greater than or equal to 1",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
+	if wrapper := m.GetMaxBlockSize(); wrapper != nil {
+
+		if wrapper.GetValue() > 131072 {
+			err := ZstdValidationError{
+				field:  "MaxBlockSize",
+				reason: "value must be less than or equal to 131072",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return ZstdMultiError(errors)
 	}

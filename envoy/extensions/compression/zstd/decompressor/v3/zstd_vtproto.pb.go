@@ -51,6 +51,26 @@ func (m *Zstd) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.MaxBlockSize != nil {
+		size, err := (*wrapperspb.UInt32Value)(m.MaxBlockSize).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x22
+	}
+	if m.MaxInflateRatio != nil {
+		size, err := (*wrapperspb.UInt32Value)(m.MaxInflateRatio).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1a
+	}
 	if m.ChunkSize != nil {
 		size, err := (*wrapperspb.UInt32Value)(m.ChunkSize).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -108,6 +128,14 @@ func (m *Zstd) SizeVT() (n int) {
 	}
 	if m.ChunkSize != nil {
 		l = (*wrapperspb.UInt32Value)(m.ChunkSize).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.MaxInflateRatio != nil {
+		l = (*wrapperspb.UInt32Value)(m.MaxInflateRatio).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.MaxBlockSize != nil {
+		l = (*wrapperspb.UInt32Value)(m.MaxBlockSize).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
