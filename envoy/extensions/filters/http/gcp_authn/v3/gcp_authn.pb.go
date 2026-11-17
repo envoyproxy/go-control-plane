@@ -464,7 +464,7 @@ type Audience_BoundAccessToken struct {
 	// Optional custom OAuth scopes for the bound access token request.
 	// If empty, the filter will not request scopes explicitly, so the metadata server's default
 	// scopes will be used.
-	// When populated, the filter appends "&scopes=<comma-separated-scopes>" to the
+	// When populated, the filter appends "?scopes=<comma-separated-scopes>" to the
 	// metadata server token request. Note that the metadata server replaces default
 	// scopes with the provided list rather than appending; to preserve general GCP API
 	// access, callers should explicitly include "https://www.googleapis.com/auth/cloud-platform".
