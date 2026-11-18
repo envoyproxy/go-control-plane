@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- OnDeltaStreamClosed, OnStreamDeltaRequest, and OnStreamDeltaResponse now take a `context` (todo PR number here)
+
 ## Release v0.11.0
 
 ### Added

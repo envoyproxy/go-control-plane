@@ -49,7 +49,7 @@ func (cb *Callbacks) OnDeltaStreamOpen(_ context.Context, id int64, typ string) 
 	return nil
 }
 
-func (cb *Callbacks) OnDeltaStreamClosed(id int64, node *core.Node) {
+func (cb *Callbacks) OnDeltaStreamClosed(_ context.Context, id int64, node *core.Node) {
 	if cb.Debug {
 		log.Printf("delta stream %d of node %s closed\n", id, node.Id)
 	}
@@ -79,13 +79,13 @@ func (cb *Callbacks) OnStreamResponse(_ context.Context, id int64, req *discover
 	}
 }
 
-func (cb *Callbacks) OnStreamDeltaResponse(int64, *discovery.DeltaDiscoveryRequest, *discovery.DeltaDiscoveryResponse) {
+func (cb *Callbacks) OnStreamDeltaResponse(context.Context, int64, *discovery.DeltaDiscoveryRequest, *discovery.DeltaDiscoveryResponse) {
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
 	cb.DeltaResponses++
 }
 
-func (cb *Callbacks) OnStreamDeltaRequest(int64, *discovery.DeltaDiscoveryRequest) error {
+func (cb *Callbacks) OnStreamDeltaRequest(context.Context, int64, *discovery.DeltaDiscoveryRequest) error {
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
 	cb.DeltaRequests++
