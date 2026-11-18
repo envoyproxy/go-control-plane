@@ -72,10 +72,10 @@ type Callbacks interface {
 // CallbackFuncs is a convenience type for implementing the Callbacks interface.
 type CallbackFuncs struct {
 	StreamOpenFunc          func(context.Context, int64, string) error
-	StreamClosedFunc        func(int64, *core.Node)
+	StreamClosedFunc        func(context.Context, int64, *core.Node)
 	DeltaStreamOpenFunc     func(context.Context, int64, string) error
 	DeltaStreamClosedFunc   func(context.Context, int64, *core.Node)
-	StreamRequestFunc       func(int64, *discovery.DiscoveryRequest) error
+	StreamRequestFunc       func(context.Context, int64, *discovery.DiscoveryRequest) error
 	StreamResponseFunc      func(context.Context, int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
 	StreamDeltaRequestFunc  func(context.Context, int64, *discovery.DeltaDiscoveryRequest) error
 	StreamDeltaResponseFunc func(context.Context, int64, *discovery.DeltaDiscoveryRequest, *discovery.DeltaDiscoveryResponse)
@@ -95,9 +95,9 @@ func (c CallbackFuncs) OnStreamOpen(ctx context.Context, streamID int64, typeURL
 }
 
 // OnStreamClosed invokes StreamClosedFunc.
-func (c CallbackFuncs) OnStreamClosed(streamID int64, node *core.Node) {
+func (c CallbackFuncs) OnStreamClosed(ctx context.Context, streamID int64, node *core.Node) {
 	if c.StreamClosedFunc != nil {
-		c.StreamClosedFunc(streamID, node)
+		c.StreamClosedFunc(ctx, streamID, node)
 	}
 }
 
@@ -118,9 +118,9 @@ func (c CallbackFuncs) OnDeltaStreamClosed(ctx context.Context, streamID int64, 
 }
 
 // OnStreamRequest invokes StreamRequestFunc.
-func (c CallbackFuncs) OnStreamRequest(streamID int64, req *discovery.DiscoveryRequest) error {
+func (c CallbackFuncs) OnStreamRequest(ctx context.Context, streamID int64, req *discovery.DiscoveryRequest) error {
 	if c.StreamRequestFunc != nil {
-		return c.StreamRequestFunc(streamID, req)
+		return c.StreamRequestFunc(ctx, streamID, req)
 	}
 
 	return nil

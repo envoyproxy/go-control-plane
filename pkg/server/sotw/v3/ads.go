@@ -76,7 +76,7 @@ func (s *server) processADS(sw *streamWrapper, reqCh chan *discovery.DiscoveryRe
 			}
 
 			if s.callbacks != nil {
-				if err := s.callbacks.OnStreamRequest(sw.ID, req); err != nil {
+				if err := s.callbacks.OnStreamRequest(sw.stream.Context(), sw.ID, req); err != nil {
 					return err
 				}
 			}
