@@ -454,7 +454,7 @@ func TestDeltaCallbacksContext(t *testing.T) {
 	str := makeMockDeltaStream(t)
 	defer str.cancel()
 	defer close(str.recv)
-	str.sendError = true // End the stream after the response callback.
+	str.sendError = true
 
 	config := makeMockConfigWatcher()
 	config.deltaResources = makeDeltaResources()
