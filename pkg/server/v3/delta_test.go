@@ -453,8 +453,6 @@ func TestDeltaCallbacksContext(t *testing.T) {
 	defer goleak.VerifyNone(t)
 	str := makeMockDeltaStream(t)
 	defer str.cancel()
-	defer close(str.recv)
-	str.sendError = true
 
 	config := makeMockConfigWatcher()
 	config.deltaResources = makeDeltaResources()
@@ -468,13 +466,14 @@ func TestDeltaCallbacksContext(t *testing.T) {
 		},
 		StreamDeltaResponseFunc: func(ctx context.Context, _ int64, _ *discovery.DeltaDiscoveryRequest, _ *discovery.DeltaDiscoveryResponse) {
 			responseCtx = ctx
+			close(str.recv)
 		},
 		DeltaStreamClosedFunc: func(ctx context.Context, _ int64, _ *core.Node) {
 			closedCtx = ctx
 		},
 	})
 
-	require.EqualError(t, s.DeltaAggregatedResources(str), "send error")
+	require.NoError(t, s.DeltaAggregatedResources(str))
 	assert.Same(t, str.Context(), requestCtx)
 	assert.Same(t, str.Context(), responseCtx)
 	assert.Same(t, str.Context(), closedCtx)
