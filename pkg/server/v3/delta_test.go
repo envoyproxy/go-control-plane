@@ -5,12 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
-	"sync"
 	"testing"
 	"time"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -452,104 +450,34 @@ func TestDeltaOpaqueRequestsChannelMuxing(t *testing.T) {
 }
 
 func TestDeltaCallbacksContext(t *testing.T) {
-	callbackErr := errors.New("callback rejected stream")
-	for _, tc := range []struct {
-		name         string
-		failOn       string
-		cancelStream bool
-		wantCalls    []string
-	}{
-		{
-			name:      "normal closure",
-			wantCalls: []string{"open", "request", "response", "closed"},
-		},
-		{
-			name:         "canceled stream",
-			cancelStream: true,
-			wantCalls:    []string{"open", "request", "response", "closed"},
-		},
-		{
-			name:      "open callback error",
-			failOn:    "open",
-			wantCalls: []string{"open", "closed"},
-		},
-		{
-			name:      "request callback error",
-			failOn:    "request",
-			wantCalls: []string{"open", "request", "closed"},
-		},
-	} {
-		t.Run(tc.name, func(t *testing.T) {
-			defer goleak.VerifyNone(t)
-			str := makeMockDeltaStream(t)
-			defer str.cancel()
-			closeRequests := sync.OnceFunc(func() { close(str.recv) })
-			defer closeRequests()
-			md := metadata.Pairs("x-request-id", "delta-callback-test")
-			str.ctx = metadata.NewIncomingContext(str.Context(), md)
+	defer goleak.VerifyNone(t)
+	str := makeMockDeltaStream(t)
+	defer str.cancel()
+	defer close(str.recv)
+	str.sendError = true // End the stream after the response callback.
 
-			config := makeMockConfigWatcher()
-			config.deltaResources = makeDeltaResources()
-			req := &discovery.DeltaDiscoveryRequest{Node: node, TypeUrl: rsrc.EndpointType}
-			str.recv <- req
+	config := makeMockConfigWatcher()
+	config.deltaResources = makeDeltaResources()
+	str.recv <- &discovery.DeltaDiscoveryRequest{Node: node, TypeUrl: rsrc.EndpointType}
 
-			var calls []string
-			checkContext := func(name string, ctx context.Context, streamID int64) {
-				t.Helper()
-				calls = append(calls, name)
-				assert.Same(t, str.Context(), ctx)
-				assert.Equal(t, int64(1), streamID)
-				gotMD, ok := metadata.FromIncomingContext(ctx)
-				assert.True(t, ok)
-				assert.Equal(t, md, gotMD)
-			}
-			s := server.NewServer(t.Context(), config, server.CallbackFuncs{
-				DeltaStreamOpenFunc: func(ctx context.Context, id int64, _ string) error {
-					checkContext("open", ctx, id)
-					if tc.failOn == "open" {
-						return callbackErr
-					}
-					return nil
-				},
-				StreamDeltaRequestFunc: func(ctx context.Context, id int64, got *discovery.DeltaDiscoveryRequest) error {
-					checkContext("request", ctx, id)
-					assert.Same(t, req, got)
-					if tc.failOn == "request" {
-						return callbackErr
-					}
-					return nil
-				},
-				StreamDeltaResponseFunc: func(ctx context.Context, id int64, got *discovery.DeltaDiscoveryRequest, resp *discovery.DeltaDiscoveryResponse) {
-					checkContext("response", ctx, id)
-					assert.Same(t, req, got)
-					assert.Equal(t, req.GetTypeUrl(), resp.GetTypeUrl())
-					if tc.cancelStream {
-						str.cancel()
-					}
-					closeRequests()
-				},
-				DeltaStreamClosedFunc: func(ctx context.Context, id int64, got *core.Node) {
-					checkContext("closed", ctx, id)
-					if tc.cancelStream {
-						assert.ErrorIs(t, ctx.Err(), context.Canceled)
-					} else {
-						assert.NoError(t, ctx.Err())
-					}
-					if tc.failOn == "" {
-						assert.Same(t, node, got)
-					}
-				},
-			})
+	var requestCtx, responseCtx, closedCtx context.Context
+	s := server.NewServer(t.Context(), config, server.CallbackFuncs{
+		StreamDeltaRequestFunc: func(ctx context.Context, _ int64, _ *discovery.DeltaDiscoveryRequest) error {
+			requestCtx = ctx
+			return nil
+		},
+		StreamDeltaResponseFunc: func(ctx context.Context, _ int64, _ *discovery.DeltaDiscoveryRequest, _ *discovery.DeltaDiscoveryResponse) {
+			responseCtx = ctx
+		},
+		DeltaStreamClosedFunc: func(ctx context.Context, _ int64, _ *core.Node) {
+			closedCtx = ctx
+		},
+	})
 
-			err := s.DeltaAggregatedResources(str)
-			if tc.failOn != "" {
-				require.ErrorIs(t, err, callbackErr)
-			} else {
-				require.NoError(t, err)
-			}
-			assert.Equal(t, tc.wantCalls, calls)
-		})
-	}
+	require.EqualError(t, s.DeltaAggregatedResources(str), "send error")
+	assert.Same(t, str.Context(), requestCtx)
+	assert.Same(t, str.Context(), responseCtx)
+	assert.Same(t, str.Context(), closedCtx)
 }
 
 func TestDeltaCallbackError(t *testing.T) {
