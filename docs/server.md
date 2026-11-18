@@ -13,7 +13,7 @@ For a fully functional gRPC server, check out the provided example for what that
 
 ### Callbacks
 
-All go-control-plane xDS server implementations require `Callback` methods. Callbacks are executed at certain steps of the management server lifecycle. The interface to be implemented can be found [here](https://godoc.org/github.com/envoyproxy/go-control-plane/pkg/server/v2#Callbacks).
+All go-control-plane xDS server implementations require `Callback` methods. Callbacks are executed at certain steps of the management server lifecycle. The interface to be implemented can be found [here](https://pkg.go.dev/github.com/envoyproxy/go-control-plane/pkg/server/v3#Callbacks).
 
 An example implemention of the Callback interface can be found below:
 ```go
