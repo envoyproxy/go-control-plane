@@ -533,7 +533,6 @@ type VirtualHost struct {
 	// route level entry will take precedence over this config and it'll be treated
 	// independently (e.g., values are not inherited).
 	RetryPolicy *RetryPolicy `protobuf:"bytes,16,opt,name=retry_policy,json=retryPolicy,proto3" json:"retry_policy,omitempty"`
-	// [#not-implemented-hide:]
 	// Specifies the configuration for retry policy extension. Note that setting a route level entry
 	// will take precedence over this config and it'll be treated independently (e.g., values are not
 	// inherited). :ref:`Retry policy <envoy_v3_api_field_config.route.v3.VirtualHost.retry_policy>` should not be
@@ -2148,7 +2147,6 @@ type RouteAction struct {
 	// it'll take precedence over the virtual host level retry policy entirely
 	// (e.g., policies are not merged, the most internal one becomes the enforced policy).
 	RetryPolicy *RetryPolicy `protobuf:"bytes,9,opt,name=retry_policy,json=retryPolicy,proto3" json:"retry_policy,omitempty"`
-	// [#not-implemented-hide:]
 	// Specifies the configuration for retry policy extension. Note that if this is set, it'll take
 	// precedence over the virtual host level retry policy entirely (e.g., policies are not merged,
 	// the most internal one becomes the enforced policy). :ref:`Retry policy <envoy_v3_api_field_config.route.v3.RouteAction.retry_policy>`
