@@ -459,6 +459,17 @@ func (m *LocalRateLimit) validate(all bool) error {
 
 	// no validation rules for EnableRetryAfterHeader
 
+	if _, ok := v3.RateLimitsOverrideOption_name[int32(m.GetRateLimitsOverrideOption())]; !ok {
+		err := LocalRateLimitValidationError{
+			field:  "RateLimitsOverrideOption",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if len(errors) > 0 {
 		return LocalRateLimitMultiError(errors)
 	}

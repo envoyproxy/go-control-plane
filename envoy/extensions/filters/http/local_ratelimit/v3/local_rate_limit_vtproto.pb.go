@@ -51,6 +51,13 @@ func (m *LocalRateLimit) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) 
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.RateLimitsOverrideOption != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.RateLimitsOverrideOption))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xa0
+	}
 	if m.EnableRetryAfterHeader {
 		i--
 		if m.EnableRetryAfterHeader {
@@ -473,6 +480,9 @@ func (m *LocalRateLimit) SizeVT() (n int) {
 	}
 	if m.EnableRetryAfterHeader {
 		n += 3
+	}
+	if m.RateLimitsOverrideOption != 0 {
+		n += 2 + protohelpers.SizeOfVarint(uint64(m.RateLimitsOverrideOption))
 	}
 	n += len(m.unknownFields)
 	return n

@@ -11,6 +11,7 @@ import (
 	v32 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/ratelimit/v3"
 	v33 "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
+	v34 "github.com/envoyproxy/go-control-plane/envoy/extensions/common/ratelimit/v3"
 	v31 "github.com/envoyproxy/go-control-plane/envoy/type/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -190,7 +191,7 @@ func (RateLimitPerRoute_OverrideOptions) EnumDescriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_rawDescGZIP(), []int{1, 1}
 }
 
-// [#next-free-field: 20]
+// [#next-free-field: 21]
 type RateLimit struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The rate limit domain to use when calling the rate limit service.
@@ -308,7 +309,9 @@ type RateLimit struct {
 	// :ref:`VirtualHost.rate_limits<envoy_v3_api_field_config.route.v3.VirtualHost.rate_limits>` or
 	// :ref:`RouteAction.rate_limits<envoy_v3_api_field_config.route.v3.RouteAction.rate_limits>` fields
 	// will be ignored. However, :ref:`RateLimitPerRoute.rate_limits<envoy_v3_api_field_extensions.filters.http.ratelimit.v3.RateLimitPerRoute.rate_limits>`
-	// will take precedence over this field.
+	// will take precedence over this field, unless :ref:`rate_limits_override_option
+	// <envoy_v3_api_field_extensions.filters.http.ratelimit.v3.RateLimit.rate_limits_override_option>`
+	// resolves to ``ALL_LEVELS``, in which case both are applied.
 	//
 	// .. note::
 	//   Not all configuration fields of
@@ -332,8 +335,14 @@ type RateLimit struct {
 	//
 	// Disabled by default.
 	EnableRetryAfterHeader bool `protobuf:"varint,19,opt,name=enable_retry_after_header,json=enableRetryAfterHeader,proto3" json:"enable_retry_after_header,omitempty"`
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	// The filter level default of
+	// :ref:`rate_limits_override_option
+	// <envoy_v3_api_field_extensions.filters.http.ratelimit.v3.RateLimitPerRoute.rate_limits_override_option>`.
+	// The filter level config is the least specific one, so the value is only used if all the
+	// per-route configs leave the option ``RATE_LIMITS_OVERRIDE_OPTION_UNSPECIFIED``.
+	RateLimitsOverrideOption v34.RateLimitsOverrideOption `protobuf:"varint,20,opt,name=rate_limits_override_option,json=rateLimitsOverrideOption,proto3,enum=envoy.extensions.common.ratelimit.v3.RateLimitsOverrideOption" json:"rate_limits_override_option,omitempty"`
+	unknownFields            protoimpl.UnknownFields
+	sizeCache                protoimpl.SizeCache
 }
 
 func (x *RateLimit) Reset() {
@@ -499,6 +508,14 @@ func (x *RateLimit) GetEnableRetryAfterHeader() bool {
 	return false
 }
 
+func (x *RateLimit) GetRateLimitsOverrideOption() v34.RateLimitsOverrideOption {
+	if x != nil {
+		return x.RateLimitsOverrideOption
+	}
+	return v34.RateLimitsOverrideOption(0)
+}
+
+// [#next-free-field: 6]
 type RateLimitPerRoute struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Specifies if the rate limit filter should include the virtual host rate limits.
@@ -514,7 +531,10 @@ type RateLimitPerRoute struct {
 	// :ref:`VirtualHost.rate_limits<envoy_v3_api_field_config.route.v3.VirtualHost.rate_limits>`,
 	// :ref:`RouteAction.rate_limits<envoy_v3_api_field_config.route.v3.RouteAction.rate_limits>` and
 	// :ref:`RateLimit.rate_limits<envoy_v3_api_field_extensions.filters.http.ratelimit.v3.RateLimit.rate_limits>` fields
-	// will be ignored.
+	// will be ignored. If :ref:`rate_limits_override_option
+	// <envoy_v3_api_field_extensions.filters.http.ratelimit.v3.RateLimitPerRoute.rate_limits_override_option>`
+	// resolves to ``ALL_LEVELS``, the ``rate_limits`` of the less specific per-route configs and
+	// ``RateLimit.rate_limits`` are applied as well.
 	//
 	// .. note::
 	//   Not all configuration fields of
@@ -527,9 +547,25 @@ type RateLimitPerRoute struct {
 	//   4. :ref:`override limit <envoy_v3_api_field_config.route.v3.RateLimit.limit>`.
 	RateLimits []*v33.RateLimit `protobuf:"bytes,3,rep,name=rate_limits,json=rateLimits,proto3" json:"rate_limits,omitempty"`
 	// Overrides the domain. If not set, uses the filter-level domain instead.
-	Domain        string `protobuf:"bytes,4,opt,name=domain,proto3" json:"domain,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Domain string `protobuf:"bytes,4,opt,name=domain,proto3" json:"domain,omitempty"`
+	// Determines how the ``rate_limits`` of the per-route configs at different levels and the
+	// filter level :ref:`rate_limits <envoy_v3_api_field_extensions.filters.http.ratelimit.v3.RateLimit.rate_limits>`
+	// are applied. The value of the most specific config that is not
+	// ``RATE_LIMITS_OVERRIDE_OPTION_UNSPECIFIED`` takes effect, and the filter level
+	// :ref:`rate_limits_override_option
+	// <envoy_v3_api_field_extensions.filters.http.ratelimit.v3.RateLimit.rate_limits_override_option>`
+	// is the least specific one. If all of them are ``RATE_LIMITS_OVERRIDE_OPTION_UNSPECIFIED``,
+	// :ref:`MOST_SPECIFIC_ONLY <envoy_v3_api_enum_value_extensions.common.ratelimit.v3.RateLimitsOverrideOption.MOST_SPECIFIC_ONLY>`
+	// is used.
+	//
+	// If ``ALL_LEVELS`` is used, the descriptors generated from the ``rate_limits`` of all levels,
+	// including the filter level, are merged and sent to the rate limit service in a single request,
+	// with the descriptors from the more specific levels first. The :ref:`domain
+	// <envoy_v3_api_field_extensions.filters.http.ratelimit.v3.RateLimitPerRoute.domain>` of the most
+	// specific per-route config is still used if set, otherwise the filter level domain is used.
+	RateLimitsOverrideOption v34.RateLimitsOverrideOption `protobuf:"varint,5,opt,name=rate_limits_override_option,json=rateLimitsOverrideOption,proto3,enum=envoy.extensions.common.ratelimit.v3.RateLimitsOverrideOption" json:"rate_limits_override_option,omitempty"`
+	unknownFields            protoimpl.UnknownFields
+	sizeCache                protoimpl.SizeCache
 }
 
 func (x *RateLimitPerRoute) Reset() {
@@ -590,11 +626,18 @@ func (x *RateLimitPerRoute) GetDomain() string {
 	return ""
 }
 
+func (x *RateLimitPerRoute) GetRateLimitsOverrideOption() v34.RateLimitsOverrideOption {
+	if x != nil {
+		return x.RateLimitsOverrideOption
+	}
+	return v34.RateLimitsOverrideOption(0)
+}
+
 var File_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_rawDesc = "" +
 	"\n" +
-	";envoy/extensions/filters/http/ratelimit/v3/rate_limit.proto\x12*envoy.extensions.filters.http.ratelimit.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a#envoy/config/ratelimit/v3/rls.proto\x1a,envoy/config/route/v3/route_components.proto\x1a\x1fenvoy/type/v3/http_status.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xe8\v\n" +
+	";envoy/extensions/filters/http/ratelimit/v3/rate_limit.proto\x12*envoy.extensions.filters.http.ratelimit.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a#envoy/config/ratelimit/v3/rls.proto\x1a,envoy/config/route/v3/route_components.proto\x1a4envoy/extensions/common/ratelimit/v3/ratelimit.proto\x1a\x1fenvoy/type/v3/http_status.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xf2\f\n" +
 	"\tRateLimit\x12\x1f\n" +
 	"\x06domain\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x06domain\x12\x1d\n" +
 	"\x05stage\x18\x02 \x01(\rB\a\xfaB\x04*\x02\x18\n" +
@@ -619,17 +662,19 @@ const file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_rawDesc =
 	"\vrate_limits\x18\x11 \x03(\v2 .envoy.config.route.v3.RateLimitR\n" +
 	"rateLimits\x12-\n" +
 	"\x12metadata_namespace\x18\x12 \x01(\tR\x11metadataNamespace\x129\n" +
-	"\x19enable_retry_after_header\x18\x13 \x01(\bR\x16enableRetryAfterHeader\"<\n" +
+	"\x19enable_retry_after_header\x18\x13 \x01(\bR\x16enableRetryAfterHeader\x12\x87\x01\n" +
+	"\x1brate_limits_override_option\x18\x14 \x01(\x0e2>.envoy.extensions.common.ratelimit.v3.RateLimitsOverrideOptionB\b\xfaB\x05\x82\x01\x02\x10\x01R\x18rateLimitsOverrideOption\"<\n" +
 	"\x1bXRateLimitHeadersRFCVersion\x12\a\n" +
 	"\x03OFF\x10\x00\x12\x14\n" +
 	"\x10DRAFT_VERSION_03\x10\x01:7\x9aň\x1e2\n" +
-	"0envoy.config.filter.http.rate_limit.v2.RateLimit\"\x8f\x04\n" +
+	"0envoy.config.filter.http.rate_limit.v2.RateLimit\"\x99\x05\n" +
 	"\x11RateLimitPerRoute\x12\x81\x01\n" +
 	"\x0evh_rate_limits\x18\x01 \x01(\x0e2Q.envoy.extensions.filters.http.ratelimit.v3.RateLimitPerRoute.VhRateLimitsOptionsB\b\xfaB\x05\x82\x01\x02\x10\x01R\fvhRateLimits\x12\x80\x01\n" +
 	"\x0foverride_option\x18\x02 \x01(\x0e2M.envoy.extensions.filters.http.ratelimit.v3.RateLimitPerRoute.OverrideOptionsB\b\xfaB\x05\x82\x01\x02\x10\x01R\x0eoverrideOption\x12A\n" +
 	"\vrate_limits\x18\x03 \x03(\v2 .envoy.config.route.v3.RateLimitR\n" +
 	"rateLimits\x12\x16\n" +
-	"\x06domain\x18\x04 \x01(\tR\x06domain\"<\n" +
+	"\x06domain\x18\x04 \x01(\tR\x06domain\x12\x87\x01\n" +
+	"\x1brate_limits_override_option\x18\x05 \x01(\x0e2>.envoy.extensions.common.ratelimit.v3.RateLimitsOverrideOptionB\b\xfaB\x05\x82\x01\x02\x10\x01R\x18rateLimitsOverrideOption\"<\n" +
 	"\x13VhRateLimitsOptions\x12\f\n" +
 	"\bOVERRIDE\x10\x00\x12\v\n" +
 	"\aINCLUDE\x10\x01\x12\n" +
@@ -668,6 +713,7 @@ var file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_goTypes = [
 	(*v32.HeaderValueOption)(nil),              // 8: envoy.config.core.v3.HeaderValueOption
 	(*v32.RuntimeFractionalPercent)(nil),       // 9: envoy.config.core.v3.RuntimeFractionalPercent
 	(*v33.RateLimit)(nil),                      // 10: envoy.config.route.v3.RateLimit
+	(v34.RateLimitsOverrideOption)(0),          // 11: envoy.extensions.common.ratelimit.v3.RateLimitsOverrideOption
 }
 var file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_depIdxs = []int32{
 	5,  // 0: envoy.extensions.filters.http.ratelimit.v3.RateLimit.timeout:type_name -> google.protobuf.Duration
@@ -680,14 +726,16 @@ var file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_depIdxs = [
 	9,  // 7: envoy.extensions.filters.http.ratelimit.v3.RateLimit.filter_enforced:type_name -> envoy.config.core.v3.RuntimeFractionalPercent
 	9,  // 8: envoy.extensions.filters.http.ratelimit.v3.RateLimit.failure_mode_deny_percent:type_name -> envoy.config.core.v3.RuntimeFractionalPercent
 	10, // 9: envoy.extensions.filters.http.ratelimit.v3.RateLimit.rate_limits:type_name -> envoy.config.route.v3.RateLimit
-	1,  // 10: envoy.extensions.filters.http.ratelimit.v3.RateLimitPerRoute.vh_rate_limits:type_name -> envoy.extensions.filters.http.ratelimit.v3.RateLimitPerRoute.VhRateLimitsOptions
-	2,  // 11: envoy.extensions.filters.http.ratelimit.v3.RateLimitPerRoute.override_option:type_name -> envoy.extensions.filters.http.ratelimit.v3.RateLimitPerRoute.OverrideOptions
-	10, // 12: envoy.extensions.filters.http.ratelimit.v3.RateLimitPerRoute.rate_limits:type_name -> envoy.config.route.v3.RateLimit
-	13, // [13:13] is the sub-list for method output_type
-	13, // [13:13] is the sub-list for method input_type
-	13, // [13:13] is the sub-list for extension type_name
-	13, // [13:13] is the sub-list for extension extendee
-	0,  // [0:13] is the sub-list for field type_name
+	11, // 10: envoy.extensions.filters.http.ratelimit.v3.RateLimit.rate_limits_override_option:type_name -> envoy.extensions.common.ratelimit.v3.RateLimitsOverrideOption
+	1,  // 11: envoy.extensions.filters.http.ratelimit.v3.RateLimitPerRoute.vh_rate_limits:type_name -> envoy.extensions.filters.http.ratelimit.v3.RateLimitPerRoute.VhRateLimitsOptions
+	2,  // 12: envoy.extensions.filters.http.ratelimit.v3.RateLimitPerRoute.override_option:type_name -> envoy.extensions.filters.http.ratelimit.v3.RateLimitPerRoute.OverrideOptions
+	10, // 13: envoy.extensions.filters.http.ratelimit.v3.RateLimitPerRoute.rate_limits:type_name -> envoy.config.route.v3.RateLimit
+	11, // 14: envoy.extensions.filters.http.ratelimit.v3.RateLimitPerRoute.rate_limits_override_option:type_name -> envoy.extensions.common.ratelimit.v3.RateLimitsOverrideOption
+	15, // [15:15] is the sub-list for method output_type
+	15, // [15:15] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_init() }

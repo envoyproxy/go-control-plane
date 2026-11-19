@@ -18,6 +18,8 @@ import (
 	"unicode/utf8"
 
 	"google.golang.org/protobuf/types/known/anypb"
+
+	v3 "github.com/envoyproxy/go-control-plane/envoy/extensions/common/ratelimit/v3"
 )
 
 // ensure the imports are used
@@ -34,6 +36,8 @@ var (
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
 	_ = sort.Sort
+
+	_ = v3.RateLimitsOverrideOption(0)
 )
 
 // Validate checks the field values on RateLimit with the rules defined in the
@@ -407,6 +411,17 @@ func (m *RateLimit) validate(all bool) error {
 
 	// no validation rules for EnableRetryAfterHeader
 
+	if _, ok := v3.RateLimitsOverrideOption_name[int32(m.GetRateLimitsOverrideOption())]; !ok {
+		err := RateLimitValidationError{
+			field:  "RateLimitsOverrideOption",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if len(errors) > 0 {
 		return RateLimitMultiError(errors)
 	}
@@ -570,6 +585,17 @@ func (m *RateLimitPerRoute) validate(all bool) error {
 	}
 
 	// no validation rules for Domain
+
+	if _, ok := v3.RateLimitsOverrideOption_name[int32(m.GetRateLimitsOverrideOption())]; !ok {
+		err := RateLimitPerRouteValidationError{
+			field:  "RateLimitsOverrideOption",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
 
 	if len(errors) > 0 {
 		return RateLimitPerRouteMultiError(errors)

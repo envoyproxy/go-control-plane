@@ -134,6 +134,63 @@ func (VhRateLimitsOptions) EnumDescriptor() ([]byte, []int) {
 	return file_envoy_extensions_common_ratelimit_v3_ratelimit_proto_rawDescGZIP(), []int{1}
 }
 
+// Determines how the embedded “rate_limits“ of the filter configs at different levels (from least
+// to most specific: filter level, route configuration, virtual host, route, weighted cluster) are
+// applied.
+type RateLimitsOverrideOption int32
+
+const (
+	// Not specified. The behavior is determined by the filter. See the documentation of the
+	// filter's ``rate_limits_override_option``.
+	RateLimitsOverrideOption_RATE_LIMITS_OVERRIDE_OPTION_UNSPECIFIED RateLimitsOverrideOption = 0
+	// Only the ``rate_limits`` of the most specific filter config are applied.
+	RateLimitsOverrideOption_MOST_SPECIFIC_ONLY RateLimitsOverrideOption = 1
+	// The ``rate_limits`` of the filter configs at all levels are applied. How they are applied is
+	// determined by the filter. See the documentation of the filter's ``rate_limits_override_option``.
+	RateLimitsOverrideOption_ALL_LEVELS RateLimitsOverrideOption = 2
+)
+
+// Enum value maps for RateLimitsOverrideOption.
+var (
+	RateLimitsOverrideOption_name = map[int32]string{
+		0: "RATE_LIMITS_OVERRIDE_OPTION_UNSPECIFIED",
+		1: "MOST_SPECIFIC_ONLY",
+		2: "ALL_LEVELS",
+	}
+	RateLimitsOverrideOption_value = map[string]int32{
+		"RATE_LIMITS_OVERRIDE_OPTION_UNSPECIFIED": 0,
+		"MOST_SPECIFIC_ONLY":                      1,
+		"ALL_LEVELS":                              2,
+	}
+)
+
+func (x RateLimitsOverrideOption) Enum() *RateLimitsOverrideOption {
+	p := new(RateLimitsOverrideOption)
+	*p = x
+	return p
+}
+
+func (x RateLimitsOverrideOption) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (RateLimitsOverrideOption) Descriptor() protoreflect.EnumDescriptor {
+	return file_envoy_extensions_common_ratelimit_v3_ratelimit_proto_enumTypes[2].Descriptor()
+}
+
+func (RateLimitsOverrideOption) Type() protoreflect.EnumType {
+	return &file_envoy_extensions_common_ratelimit_v3_ratelimit_proto_enumTypes[2]
+}
+
+func (x RateLimitsOverrideOption) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use RateLimitsOverrideOption.Descriptor instead.
+func (RateLimitsOverrideOption) EnumDescriptor() ([]byte, []int) {
+	return file_envoy_extensions_common_ratelimit_v3_ratelimit_proto_rawDescGZIP(), []int{2}
+}
+
 // A RateLimitDescriptor is a list of hierarchical entries that are used by the service to
 // determine the final rate limit key and overall allowed limit. Here are some examples of how
 // they might be used for the domain "envoy".
@@ -525,7 +582,12 @@ const file_envoy_extensions_common_ratelimit_v3_ratelimit_proto_rawDesc = "" +
 	"\bOVERRIDE\x10\x00\x12\v\n" +
 	"\aINCLUDE\x10\x01\x12\n" +
 	"\n" +
-	"\x06IGNORE\x10\x02B\xa7\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x06IGNORE\x10\x02*o\n" +
+	"\x18RateLimitsOverrideOption\x12+\n" +
+	"'RATE_LIMITS_OVERRIDE_OPTION_UNSPECIFIED\x10\x00\x12\x16\n" +
+	"\x12MOST_SPECIFIC_ONLY\x10\x01\x12\x0e\n" +
+	"\n" +
+	"ALL_LEVELS\x10\x02B\xa7\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"2io.envoyproxy.envoy.extensions.common.ratelimit.v3B\x0eRatelimitProtoP\x01ZWgithub.com/envoyproxy/go-control-plane/envoy/extensions/common/ratelimit/v3;ratelimitv3b\x06proto3"
 
 var (
@@ -540,29 +602,30 @@ func file_envoy_extensions_common_ratelimit_v3_ratelimit_proto_rawDescGZIP() []b
 	return file_envoy_extensions_common_ratelimit_v3_ratelimit_proto_rawDescData
 }
 
-var file_envoy_extensions_common_ratelimit_v3_ratelimit_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_envoy_extensions_common_ratelimit_v3_ratelimit_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
 var file_envoy_extensions_common_ratelimit_v3_ratelimit_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_envoy_extensions_common_ratelimit_v3_ratelimit_proto_goTypes = []any{
 	(XRateLimitHeadersRFCVersion)(0),              // 0: envoy.extensions.common.ratelimit.v3.XRateLimitHeadersRFCVersion
 	(VhRateLimitsOptions)(0),                      // 1: envoy.extensions.common.ratelimit.v3.VhRateLimitsOptions
-	(*RateLimitDescriptor)(nil),                   // 2: envoy.extensions.common.ratelimit.v3.RateLimitDescriptor
-	(*LocalRateLimitDescriptor)(nil),              // 3: envoy.extensions.common.ratelimit.v3.LocalRateLimitDescriptor
-	(*LocalClusterRateLimit)(nil),                 // 4: envoy.extensions.common.ratelimit.v3.LocalClusterRateLimit
-	(*RateLimitDescriptor_Entry)(nil),             // 5: envoy.extensions.common.ratelimit.v3.RateLimitDescriptor.Entry
-	(*RateLimitDescriptor_RateLimitOverride)(nil), // 6: envoy.extensions.common.ratelimit.v3.RateLimitDescriptor.RateLimitOverride
-	(*wrapperspb.UInt64Value)(nil),                // 7: google.protobuf.UInt64Value
-	(*v3.TokenBucket)(nil),                        // 8: envoy.type.v3.TokenBucket
-	(v3.RateLimitUnit)(0),                         // 9: envoy.type.v3.RateLimitUnit
-	(*wrapperspb.UInt32Value)(nil),                // 10: google.protobuf.UInt32Value
+	(RateLimitsOverrideOption)(0),                 // 2: envoy.extensions.common.ratelimit.v3.RateLimitsOverrideOption
+	(*RateLimitDescriptor)(nil),                   // 3: envoy.extensions.common.ratelimit.v3.RateLimitDescriptor
+	(*LocalRateLimitDescriptor)(nil),              // 4: envoy.extensions.common.ratelimit.v3.LocalRateLimitDescriptor
+	(*LocalClusterRateLimit)(nil),                 // 5: envoy.extensions.common.ratelimit.v3.LocalClusterRateLimit
+	(*RateLimitDescriptor_Entry)(nil),             // 6: envoy.extensions.common.ratelimit.v3.RateLimitDescriptor.Entry
+	(*RateLimitDescriptor_RateLimitOverride)(nil), // 7: envoy.extensions.common.ratelimit.v3.RateLimitDescriptor.RateLimitOverride
+	(*wrapperspb.UInt64Value)(nil),                // 8: google.protobuf.UInt64Value
+	(*v3.TokenBucket)(nil),                        // 9: envoy.type.v3.TokenBucket
+	(v3.RateLimitUnit)(0),                         // 10: envoy.type.v3.RateLimitUnit
+	(*wrapperspb.UInt32Value)(nil),                // 11: google.protobuf.UInt32Value
 }
 var file_envoy_extensions_common_ratelimit_v3_ratelimit_proto_depIdxs = []int32{
-	5,  // 0: envoy.extensions.common.ratelimit.v3.RateLimitDescriptor.entries:type_name -> envoy.extensions.common.ratelimit.v3.RateLimitDescriptor.Entry
-	6,  // 1: envoy.extensions.common.ratelimit.v3.RateLimitDescriptor.limit:type_name -> envoy.extensions.common.ratelimit.v3.RateLimitDescriptor.RateLimitOverride
-	7,  // 2: envoy.extensions.common.ratelimit.v3.RateLimitDescriptor.hits_addend:type_name -> google.protobuf.UInt64Value
-	5,  // 3: envoy.extensions.common.ratelimit.v3.LocalRateLimitDescriptor.entries:type_name -> envoy.extensions.common.ratelimit.v3.RateLimitDescriptor.Entry
-	8,  // 4: envoy.extensions.common.ratelimit.v3.LocalRateLimitDescriptor.token_bucket:type_name -> envoy.type.v3.TokenBucket
-	9,  // 5: envoy.extensions.common.ratelimit.v3.RateLimitDescriptor.RateLimitOverride.unit:type_name -> envoy.type.v3.RateLimitUnit
-	10, // 6: envoy.extensions.common.ratelimit.v3.RateLimitDescriptor.RateLimitOverride.unit_multiplier:type_name -> google.protobuf.UInt32Value
+	6,  // 0: envoy.extensions.common.ratelimit.v3.RateLimitDescriptor.entries:type_name -> envoy.extensions.common.ratelimit.v3.RateLimitDescriptor.Entry
+	7,  // 1: envoy.extensions.common.ratelimit.v3.RateLimitDescriptor.limit:type_name -> envoy.extensions.common.ratelimit.v3.RateLimitDescriptor.RateLimitOverride
+	8,  // 2: envoy.extensions.common.ratelimit.v3.RateLimitDescriptor.hits_addend:type_name -> google.protobuf.UInt64Value
+	6,  // 3: envoy.extensions.common.ratelimit.v3.LocalRateLimitDescriptor.entries:type_name -> envoy.extensions.common.ratelimit.v3.RateLimitDescriptor.Entry
+	9,  // 4: envoy.extensions.common.ratelimit.v3.LocalRateLimitDescriptor.token_bucket:type_name -> envoy.type.v3.TokenBucket
+	10, // 5: envoy.extensions.common.ratelimit.v3.RateLimitDescriptor.RateLimitOverride.unit:type_name -> envoy.type.v3.RateLimitUnit
+	11, // 6: envoy.extensions.common.ratelimit.v3.RateLimitDescriptor.RateLimitOverride.unit_multiplier:type_name -> google.protobuf.UInt32Value
 	7,  // [7:7] is the sub-list for method output_type
 	7,  // [7:7] is the sub-list for method input_type
 	7,  // [7:7] is the sub-list for extension type_name
@@ -580,7 +643,7 @@ func file_envoy_extensions_common_ratelimit_v3_ratelimit_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_common_ratelimit_v3_ratelimit_proto_rawDesc), len(file_envoy_extensions_common_ratelimit_v3_ratelimit_proto_rawDesc)),
-			NumEnums:      2,
+			NumEnums:      3,
 			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,

@@ -51,6 +51,13 @@ func (m *RateLimit) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.RateLimitsOverrideOption != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.RateLimitsOverrideOption))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xa0
+	}
 	if m.EnableRetryAfterHeader {
 		i--
 		if m.EnableRetryAfterHeader {
@@ -360,6 +367,11 @@ func (m *RateLimitPerRoute) MarshalToSizedBufferVTStrict(dAtA []byte) (int, erro
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.RateLimitsOverrideOption != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.RateLimitsOverrideOption))
+		i--
+		dAtA[i] = 0x28
+	}
 	if len(m.Domain) > 0 {
 		i -= len(m.Domain)
 		copy(dAtA[i:], m.Domain)
@@ -532,6 +544,9 @@ func (m *RateLimit) SizeVT() (n int) {
 	if m.EnableRetryAfterHeader {
 		n += 3
 	}
+	if m.RateLimitsOverrideOption != 0 {
+		n += 2 + protohelpers.SizeOfVarint(uint64(m.RateLimitsOverrideOption))
+	}
 	n += len(m.unknownFields)
 	return n
 }
@@ -563,6 +578,9 @@ func (m *RateLimitPerRoute) SizeVT() (n int) {
 	l = len(m.Domain)
 	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.RateLimitsOverrideOption != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.RateLimitsOverrideOption))
 	}
 	n += len(m.unknownFields)
 	return n
