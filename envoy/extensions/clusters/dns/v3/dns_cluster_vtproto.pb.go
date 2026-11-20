@@ -10,6 +10,7 @@ package dnsv3
 import (
 	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
 	durationpb "github.com/planetscale/vtprotobuf/types/known/durationpb"
+	wrapperspb "github.com/planetscale/vtprotobuf/types/known/wrapperspb"
 	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
@@ -103,6 +104,16 @@ func (m *DnsCluster) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.SkipDrainingOnResolution != nil {
+		size, err := (*wrapperspb.BoolValue)(m.SkipDrainingOnResolution).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x5a
 	}
 	if m.DnsMinRefreshRate != nil {
 		size, err := (*durationpb.Duration)(m.DnsMinRefreshRate).MarshalToSizedBufferVTStrict(dAtA[:i])
@@ -251,6 +262,10 @@ func (m *DnsCluster) SizeVT() (n int) {
 	}
 	if m.DnsMinRefreshRate != nil {
 		l = (*durationpb.Duration)(m.DnsMinRefreshRate).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.SkipDrainingOnResolution != nil {
+		l = (*wrapperspb.BoolValue)(m.SkipDrainingOnResolution).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)

@@ -216,6 +216,35 @@ func (m *DnsCluster) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetSkipDrainingOnResolution()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DnsClusterValidationError{
+					field:  "SkipDrainingOnResolution",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DnsClusterValidationError{
+					field:  "SkipDrainingOnResolution",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSkipDrainingOnResolution()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DnsClusterValidationError{
+				field:  "SkipDrainingOnResolution",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return DnsClusterMultiError(errors)
 	}

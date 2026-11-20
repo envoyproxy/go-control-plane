@@ -14,6 +14,7 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -26,7 +27,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// [#next-free-field: 11]
+// [#next-free-field: 12]
 type DnsCluster struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// This value is the cluster’s DNS refresh rate. The value configured must be at least 1ms.
@@ -79,8 +80,19 @@ type DnsCluster struct {
 	// set, the TTL from the DNS response is used directly with no minimum floor.
 	// The value must be at least 1 second.
 	DnsMinRefreshRate *durationpb.Duration `protobuf:"bytes,10,opt,name=dns_min_refresh_rate,json=dnsMinRefreshRate,proto3" json:"dns_min_refresh_rate,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	// Only takes effect when
+	// :ref:`all_addresses_in_single_endpoint <envoy_v3_api_field_extensions.clusters.dns.v3.DnsCluster.all_addresses_in_single_endpoint>`
+	// is true. If true, a DNS resolution that changes the resolved addresses updates the addresses
+	// of the existing logical host in place. The host is not replaced, so no cluster membership
+	// update is published and existing connection pools are not drained; new connections use the
+	// new addresses. This avoids connection churn for DNS servers that rotate their answers
+	// frequently, e.g. for load balancing. If false, the logical host is replaced by a new host
+	// whenever the resolved addresses change, which drains the connection pools of the old host,
+	// so that connections to addresses that are no longer resolved are drained as well.
+	// Defaults to true.
+	SkipDrainingOnResolution *wrapperspb.BoolValue `protobuf:"bytes,11,opt,name=skip_draining_on_resolution,json=skipDrainingOnResolution,proto3" json:"skip_draining_on_resolution,omitempty"`
+	unknownFields            protoimpl.UnknownFields
+	sizeCache                protoimpl.SizeCache
 }
 
 func (x *DnsCluster) Reset() {
@@ -169,6 +181,13 @@ func (x *DnsCluster) GetDnsMinRefreshRate() *durationpb.Duration {
 	return nil
 }
 
+func (x *DnsCluster) GetSkipDrainingOnResolution() *wrapperspb.BoolValue {
+	if x != nil {
+		return x.SkipDrainingOnResolution
+	}
+	return nil
+}
+
 type DnsCluster_RefreshRate struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Specifies the base interval between refreshes. This parameter is required and must be greater
@@ -232,7 +251,7 @@ var File_envoy_extensions_clusters_dns_v3_dns_cluster_proto protoreflect.FileDes
 
 const file_envoy_extensions_clusters_dns_v3_dns_cluster_proto_rawDesc = "" +
 	"\n" +
-	"2envoy/extensions/clusters/dns/v3/dns_cluster.proto\x12 envoy.extensions.clusters.dns.v3\x1a$envoy/config/core/v3/extension.proto\x1a1envoy/extensions/clusters/common/dns/v3/dns.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xd7\x06\n" +
+	"2envoy/extensions/clusters/dns/v3/dns_cluster.proto\x12 envoy.extensions.clusters.dns.v3\x1a$envoy/config/core/v3/extension.proto\x1a1envoy/extensions/clusters/common/dns/v3/dns.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xb2\a\n" +
 	"\n" +
 	"DnsCluster\x12Q\n" +
 	"\x10dns_refresh_rate\x18\x03 \x01(\v2\x19.google.protobuf.DurationB\f\xfaB\t\xaa\x01\x06*\x04\x10\xc0\x84=R\x0ednsRefreshRate\x12q\n" +
@@ -245,7 +264,8 @@ const file_envoy_extensions_clusters_dns_v3_dns_cluster_proto_rawDesc = "" +
 	" all_addresses_in_single_endpoint\x18\t \x01(\bR\x1callAddressesInSingleEndpoint\x12V\n" +
 	"\x14dns_min_refresh_rate\x18\n" +
 	" \x01(\v2\x19.google.protobuf.DurationB\n" +
-	"\xfaB\a\xaa\x01\x042\x02\b\x01R\x11dnsMinRefreshRate\x1a\xa9\x01\n" +
+	"\xfaB\a\xaa\x01\x042\x02\b\x01R\x11dnsMinRefreshRate\x12Y\n" +
+	"\x1bskip_draining_on_resolution\x18\v \x01(\v2\x1a.google.protobuf.BoolValueR\x18skipDrainingOnResolution\x1a\xa9\x01\n" +
 	"\vRefreshRate\x12N\n" +
 	"\rbase_interval\x18\x01 \x01(\v2\x19.google.protobuf.DurationB\x0e\xfaB\v\xaa\x01\b\b\x01*\x04\x10\xc0\x84=R\fbaseInterval\x12J\n" +
 	"\fmax_interval\x18\x02 \x01(\v2\x19.google.protobuf.DurationB\f\xfaB\t\xaa\x01\x06*\x04\x10\xc0\x84=R\vmaxIntervalB\x9a\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
@@ -270,6 +290,7 @@ var file_envoy_extensions_clusters_dns_v3_dns_cluster_proto_goTypes = []any{
 	(*durationpb.Duration)(nil),     // 2: google.protobuf.Duration
 	(*v3.TypedExtensionConfig)(nil), // 3: envoy.config.core.v3.TypedExtensionConfig
 	(v31.DnsLookupFamily)(0),        // 4: envoy.extensions.clusters.common.dns.v3.DnsLookupFamily
+	(*wrapperspb.BoolValue)(nil),    // 5: google.protobuf.BoolValue
 }
 var file_envoy_extensions_clusters_dns_v3_dns_cluster_proto_depIdxs = []int32{
 	2, // 0: envoy.extensions.clusters.dns.v3.DnsCluster.dns_refresh_rate:type_name -> google.protobuf.Duration
@@ -278,13 +299,14 @@ var file_envoy_extensions_clusters_dns_v3_dns_cluster_proto_depIdxs = []int32{
 	3, // 3: envoy.extensions.clusters.dns.v3.DnsCluster.typed_dns_resolver_config:type_name -> envoy.config.core.v3.TypedExtensionConfig
 	4, // 4: envoy.extensions.clusters.dns.v3.DnsCluster.dns_lookup_family:type_name -> envoy.extensions.clusters.common.dns.v3.DnsLookupFamily
 	2, // 5: envoy.extensions.clusters.dns.v3.DnsCluster.dns_min_refresh_rate:type_name -> google.protobuf.Duration
-	2, // 6: envoy.extensions.clusters.dns.v3.DnsCluster.RefreshRate.base_interval:type_name -> google.protobuf.Duration
-	2, // 7: envoy.extensions.clusters.dns.v3.DnsCluster.RefreshRate.max_interval:type_name -> google.protobuf.Duration
-	8, // [8:8] is the sub-list for method output_type
-	8, // [8:8] is the sub-list for method input_type
-	8, // [8:8] is the sub-list for extension type_name
-	8, // [8:8] is the sub-list for extension extendee
-	0, // [0:8] is the sub-list for field type_name
+	5, // 6: envoy.extensions.clusters.dns.v3.DnsCluster.skip_draining_on_resolution:type_name -> google.protobuf.BoolValue
+	2, // 7: envoy.extensions.clusters.dns.v3.DnsCluster.RefreshRate.base_interval:type_name -> google.protobuf.Duration
+	2, // 8: envoy.extensions.clusters.dns.v3.DnsCluster.RefreshRate.max_interval:type_name -> google.protobuf.Duration
+	9, // [9:9] is the sub-list for method output_type
+	9, // [9:9] is the sub-list for method input_type
+	9, // [9:9] is the sub-list for extension type_name
+	9, // [9:9] is the sub-list for extension extendee
+	0, // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_clusters_dns_v3_dns_cluster_proto_init() }
