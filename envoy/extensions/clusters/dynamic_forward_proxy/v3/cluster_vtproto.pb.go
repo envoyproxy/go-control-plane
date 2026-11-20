@@ -52,6 +52,16 @@ func (m *ClusterConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.SkipDrainingOnResolution != nil {
+		size, err := (*wrapperspb.BoolValue)(m.SkipDrainingOnResolution).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x2a
+	}
 	if msg, ok := m.ClusterImplementationSpecifier.(*ClusterConfig_SubClustersConfig); ok {
 		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -265,6 +275,10 @@ func (m *ClusterConfig) SizeVT() (n int) {
 	}
 	if m.AllowCoalescedConnections {
 		n += 2
+	}
+	if m.SkipDrainingOnResolution != nil {
+		l = (*wrapperspb.BoolValue)(m.SkipDrainingOnResolution).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n

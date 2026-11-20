@@ -66,6 +66,35 @@ func (m *ClusterConfig) validate(all bool) error {
 
 	// no validation rules for AllowCoalescedConnections
 
+	if all {
+		switch v := interface{}(m.GetSkipDrainingOnResolution()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ClusterConfigValidationError{
+					field:  "SkipDrainingOnResolution",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ClusterConfigValidationError{
+					field:  "SkipDrainingOnResolution",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSkipDrainingOnResolution()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClusterConfigValidationError{
+				field:  "SkipDrainingOnResolution",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch v := m.ClusterImplementationSpecifier.(type) {
 	case *ClusterConfig_DnsCacheConfig:
 		if v == nil {

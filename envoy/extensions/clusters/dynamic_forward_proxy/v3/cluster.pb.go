@@ -32,6 +32,7 @@ const (
 // Configuration for the dynamic forward proxy cluster. See the :ref:`architecture overview
 // <arch_overview_http_dynamic_forward_proxy>` for more information.
 // [#extension: envoy.clusters.dynamic_forward_proxy]
+// [#next-free-field: 6]
 type ClusterConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to ClusterImplementationSpecifier:
@@ -62,8 +63,18 @@ type ClusterConfig struct {
 	//   <https://datatracker.ietf.org/doc/html/rfc7540#section-9.1.1>`_
 	//
 	AllowCoalescedConnections bool `protobuf:"varint,3,opt,name=allow_coalesced_connections,json=allowCoalescedConnections,proto3" json:"allow_coalesced_connections,omitempty"`
-	unknownFields             protoimpl.UnknownFields
-	sizeCache                 protoimpl.SizeCache
+	// Only takes effect when
+	// :ref:`dns_cache_config <envoy_v3_api_field_extensions.clusters.dynamic_forward_proxy.v3.ClusterConfig.dns_cache_config>`
+	// is used. If true, a DNS resolution that changes the address of a host updates the address of
+	// the existing host in place. The host is not replaced, so no cluster membership update is
+	// published and existing connection pools are not drained; new connections use the new
+	// address. If false, the host is replaced by a new host whenever its address changes, which
+	// drains the connection pools of the old host, so that connections to addresses that are no
+	// longer resolved are drained as well.
+	// Defaults to true.
+	SkipDrainingOnResolution *wrapperspb.BoolValue `protobuf:"bytes,5,opt,name=skip_draining_on_resolution,json=skipDrainingOnResolution,proto3" json:"skip_draining_on_resolution,omitempty"`
+	unknownFields            protoimpl.UnknownFields
+	sizeCache                protoimpl.SizeCache
 }
 
 func (x *ClusterConfig) Reset() {
@@ -133,6 +144,13 @@ func (x *ClusterConfig) GetAllowCoalescedConnections() bool {
 		return x.AllowCoalescedConnections
 	}
 	return false
+}
+
+func (x *ClusterConfig) GetSkipDrainingOnResolution() *wrapperspb.BoolValue {
+	if x != nil {
+		return x.SkipDrainingOnResolution
+	}
+	return nil
 }
 
 type isClusterConfig_ClusterImplementationSpecifier interface {
@@ -265,12 +283,13 @@ var File_envoy_extensions_clusters_dynamic_forward_proxy_v3_cluster_proto protor
 
 const file_envoy_extensions_clusters_dynamic_forward_proxy_v3_cluster_proto_rawDesc = "" +
 	"\n" +
-	"@envoy/extensions/clusters/dynamic_forward_proxy/v3/cluster.proto\x122envoy.extensions.clusters.dynamic_forward_proxy.v3\x1a%envoy/config/cluster/v3/cluster.proto\x1a\"envoy/config/core/v3/address.proto\x1a2envoy/extensions/clusters/dns/v3/dns_cluster.proto\x1a@envoy/extensions/common/dynamic_forward_proxy/v3/dns_cache.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xe8\x03\n" +
+	"@envoy/extensions/clusters/dynamic_forward_proxy/v3/cluster.proto\x122envoy.extensions.clusters.dynamic_forward_proxy.v3\x1a%envoy/config/cluster/v3/cluster.proto\x1a\"envoy/config/core/v3/address.proto\x1a2envoy/extensions/clusters/dns/v3/dns_cluster.proto\x1a@envoy/extensions/common/dynamic_forward_proxy/v3/dns_cache.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xc3\x04\n" +
 	"\rClusterConfig\x12l\n" +
 	"\x10dns_cache_config\x18\x01 \x01(\v2@.envoy.extensions.common.dynamic_forward_proxy.v3.DnsCacheConfigH\x00R\x0ednsCacheConfig\x12w\n" +
 	"\x13sub_clusters_config\x18\x04 \x01(\v2E.envoy.extensions.clusters.dynamic_forward_proxy.v3.SubClustersConfigH\x00R\x11subClustersConfig\x12C\n" +
 	"\x1eallow_insecure_cluster_options\x18\x02 \x01(\bR\x1ballowInsecureClusterOptions\x12>\n" +
-	"\x1ballow_coalesced_connections\x18\x03 \x01(\bR\x19allowCoalescedConnections:G\x9aň\x1eB\n" +
+	"\x1ballow_coalesced_connections\x18\x03 \x01(\bR\x19allowCoalescedConnections\x12Y\n" +
+	"\x1bskip_draining_on_resolution\x18\x05 \x01(\v2\x1a.google.protobuf.BoolValueR\x18skipDrainingOnResolution:G\x9aň\x1eB\n" +
 	"@envoy.config.cluster.dynamic_forward_proxy.v2alpha.ClusterConfigB\"\n" +
 	" cluster_implementation_specifier\"\xb5\x03\n" +
 	"\x11SubClustersConfig\x12P\n" +
@@ -298,25 +317,27 @@ var file_envoy_extensions_clusters_dynamic_forward_proxy_v3_cluster_proto_goType
 	(*ClusterConfig)(nil),          // 0: envoy.extensions.clusters.dynamic_forward_proxy.v3.ClusterConfig
 	(*SubClustersConfig)(nil),      // 1: envoy.extensions.clusters.dynamic_forward_proxy.v3.SubClustersConfig
 	(*v3.DnsCacheConfig)(nil),      // 2: envoy.extensions.common.dynamic_forward_proxy.v3.DnsCacheConfig
-	(v31.Cluster_LbPolicy)(0),      // 3: envoy.config.cluster.v3.Cluster.LbPolicy
-	(*wrapperspb.UInt32Value)(nil), // 4: google.protobuf.UInt32Value
-	(*durationpb.Duration)(nil),    // 5: google.protobuf.Duration
-	(*v32.SocketAddress)(nil),      // 6: envoy.config.core.v3.SocketAddress
-	(*v33.DnsCluster)(nil),         // 7: envoy.extensions.clusters.dns.v3.DnsCluster
+	(*wrapperspb.BoolValue)(nil),   // 3: google.protobuf.BoolValue
+	(v31.Cluster_LbPolicy)(0),      // 4: envoy.config.cluster.v3.Cluster.LbPolicy
+	(*wrapperspb.UInt32Value)(nil), // 5: google.protobuf.UInt32Value
+	(*durationpb.Duration)(nil),    // 6: google.protobuf.Duration
+	(*v32.SocketAddress)(nil),      // 7: envoy.config.core.v3.SocketAddress
+	(*v33.DnsCluster)(nil),         // 8: envoy.extensions.clusters.dns.v3.DnsCluster
 }
 var file_envoy_extensions_clusters_dynamic_forward_proxy_v3_cluster_proto_depIdxs = []int32{
 	2, // 0: envoy.extensions.clusters.dynamic_forward_proxy.v3.ClusterConfig.dns_cache_config:type_name -> envoy.extensions.common.dynamic_forward_proxy.v3.DnsCacheConfig
 	1, // 1: envoy.extensions.clusters.dynamic_forward_proxy.v3.ClusterConfig.sub_clusters_config:type_name -> envoy.extensions.clusters.dynamic_forward_proxy.v3.SubClustersConfig
-	3, // 2: envoy.extensions.clusters.dynamic_forward_proxy.v3.SubClustersConfig.lb_policy:type_name -> envoy.config.cluster.v3.Cluster.LbPolicy
-	4, // 3: envoy.extensions.clusters.dynamic_forward_proxy.v3.SubClustersConfig.max_sub_clusters:type_name -> google.protobuf.UInt32Value
-	5, // 4: envoy.extensions.clusters.dynamic_forward_proxy.v3.SubClustersConfig.sub_cluster_ttl:type_name -> google.protobuf.Duration
-	6, // 5: envoy.extensions.clusters.dynamic_forward_proxy.v3.SubClustersConfig.preresolve_clusters:type_name -> envoy.config.core.v3.SocketAddress
-	7, // 6: envoy.extensions.clusters.dynamic_forward_proxy.v3.SubClustersConfig.dns_cluster_config:type_name -> envoy.extensions.clusters.dns.v3.DnsCluster
-	7, // [7:7] is the sub-list for method output_type
-	7, // [7:7] is the sub-list for method input_type
-	7, // [7:7] is the sub-list for extension type_name
-	7, // [7:7] is the sub-list for extension extendee
-	0, // [0:7] is the sub-list for field type_name
+	3, // 2: envoy.extensions.clusters.dynamic_forward_proxy.v3.ClusterConfig.skip_draining_on_resolution:type_name -> google.protobuf.BoolValue
+	4, // 3: envoy.extensions.clusters.dynamic_forward_proxy.v3.SubClustersConfig.lb_policy:type_name -> envoy.config.cluster.v3.Cluster.LbPolicy
+	5, // 4: envoy.extensions.clusters.dynamic_forward_proxy.v3.SubClustersConfig.max_sub_clusters:type_name -> google.protobuf.UInt32Value
+	6, // 5: envoy.extensions.clusters.dynamic_forward_proxy.v3.SubClustersConfig.sub_cluster_ttl:type_name -> google.protobuf.Duration
+	7, // 6: envoy.extensions.clusters.dynamic_forward_proxy.v3.SubClustersConfig.preresolve_clusters:type_name -> envoy.config.core.v3.SocketAddress
+	8, // 7: envoy.extensions.clusters.dynamic_forward_proxy.v3.SubClustersConfig.dns_cluster_config:type_name -> envoy.extensions.clusters.dns.v3.DnsCluster
+	8, // [8:8] is the sub-list for method output_type
+	8, // [8:8] is the sub-list for method input_type
+	8, // [8:8] is the sub-list for extension type_name
+	8, // [8:8] is the sub-list for extension extendee
+	0, // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_clusters_dynamic_forward_proxy_v3_cluster_proto_init() }
