@@ -9,6 +9,7 @@ package mcpv3
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	_ "github.com/cncf/xds/go/xds/annotations/v3"
+	_ "github.com/envoyproxy/go-control-plane/envoy/annotations"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -506,7 +507,7 @@ func (x *ParserConfig) GetGroupMetadataKey() string {
 }
 
 // Per-route override configuration for MCP filter
-// [#next-free-field: 7]
+// [#next-free-field: 9]
 type McpOverride struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Overrides the global traffic mode for this route.
@@ -515,16 +516,37 @@ type McpOverride struct {
 	// When set, this overrides the global max_request_body_size for this route.
 	// It defaults to 8KB (8192 bytes).
 	MaxRequestBodySize *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=max_request_body_size,json=maxRequestBodySize,proto3" json:"max_request_body_size,omitempty"`
-	// Overrides the global clear_route_cache setting for this route.
+	// This field is deprecated; please use
+	// :ref:`clear_route_cache_override
+	// <envoy_v3_api_field_extensions.filters.http.mcp.v3.McpOverride.clear_route_cache_override>`
+	// as replacement. When true, clears the route cache for this route. When false, the global
+	// clear_route_cache setting is used.
+	//
+	// Deprecated: Marked as deprecated in envoy/extensions/filters/http/mcp/v3/mcp.proto.
 	ClearRouteCache bool `protobuf:"varint,3,opt,name=clear_route_cache,json=clearRouteCache,proto3" json:"clear_route_cache,omitempty"`
-	// Overrides the global parser config for this route.
+	// Overrides the global parser config for this route. If not set, the global parser config is
+	// used.
 	ParserConfig *ParserConfig `protobuf:"bytes,4,opt,name=parser_config,json=parserConfig,proto3" json:"parser_config,omitempty"`
-	// Overrides the global request storage mode for this route.
+	// Overrides the global request storage mode for this route. If ``MODE_UNSPECIFIED``, the global
+	// request storage mode is used.
 	RequestStorageMode Mcp_RequestStorageMode `protobuf:"varint,5,opt,name=request_storage_mode,json=requestStorageMode,proto3,enum=envoy.extensions.filters.http.mcp.v3.Mcp_RequestStorageMode" json:"request_storage_mode,omitempty"`
-	// Overrides the global reject_duplicate_keys setting for this route.
+	// This field is deprecated; please use
+	// :ref:`reject_duplicate_keys_override
+	// <envoy_v3_api_field_extensions.filters.http.mcp.v3.McpOverride.reject_duplicate_keys_override>`
+	// as replacement. When true, rejects duplicate keys for this route. When false, the global
+	// reject_duplicate_keys setting is used.
+	//
+	// Deprecated: Marked as deprecated in envoy/extensions/filters/http/mcp/v3/mcp.proto.
 	RejectDuplicateKeys bool `protobuf:"varint,6,opt,name=reject_duplicate_keys,json=rejectDuplicateKeys,proto3" json:"reject_duplicate_keys,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	// Overrides the global clear_route_cache setting for this route. If not set, the deprecated
+	// ``clear_route_cache`` field is used when true, otherwise the global setting is used.
+	ClearRouteCacheOverride *wrapperspb.BoolValue `protobuf:"bytes,7,opt,name=clear_route_cache_override,json=clearRouteCacheOverride,proto3" json:"clear_route_cache_override,omitempty"`
+	// Overrides the global reject_duplicate_keys setting for this route. If not set, the
+	// deprecated ``reject_duplicate_keys`` field is used when true, otherwise the global setting is
+	// used.
+	RejectDuplicateKeysOverride *wrapperspb.BoolValue `protobuf:"bytes,8,opt,name=reject_duplicate_keys_override,json=rejectDuplicateKeysOverride,proto3" json:"reject_duplicate_keys_override,omitempty"`
+	unknownFields               protoimpl.UnknownFields
+	sizeCache                   protoimpl.SizeCache
 }
 
 func (x *McpOverride) Reset() {
@@ -571,6 +593,7 @@ func (x *McpOverride) GetMaxRequestBodySize() *wrapperspb.UInt32Value {
 	return nil
 }
 
+// Deprecated: Marked as deprecated in envoy/extensions/filters/http/mcp/v3/mcp.proto.
 func (x *McpOverride) GetClearRouteCache() bool {
 	if x != nil {
 		return x.ClearRouteCache
@@ -592,11 +615,26 @@ func (x *McpOverride) GetRequestStorageMode() Mcp_RequestStorageMode {
 	return Mcp_MODE_UNSPECIFIED
 }
 
+// Deprecated: Marked as deprecated in envoy/extensions/filters/http/mcp/v3/mcp.proto.
 func (x *McpOverride) GetRejectDuplicateKeys() bool {
 	if x != nil {
 		return x.RejectDuplicateKeys
 	}
 	return false
+}
+
+func (x *McpOverride) GetClearRouteCacheOverride() *wrapperspb.BoolValue {
+	if x != nil {
+		return x.ClearRouteCacheOverride
+	}
+	return nil
+}
+
+func (x *McpOverride) GetRejectDuplicateKeysOverride() *wrapperspb.BoolValue {
+	if x != nil {
+		return x.RejectDuplicateKeysOverride
+	}
+	return nil
 }
 
 type Mcp_TraceContextPropagationConfig struct {
@@ -802,7 +840,7 @@ var File_envoy_extensions_filters_http_mcp_v3_mcp_proto protoreflect.FileDescrip
 
 const file_envoy_extensions_filters_http_mcp_v3_mcp_proto_rawDesc = "" +
 	"\n" +
-	".envoy/extensions/filters/http/mcp/v3/mcp.proto\x12$envoy.extensions.filters.http.mcp.v3\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xaf\f\n" +
+	".envoy/extensions/filters/http/mcp/v3/mcp.proto\x12$envoy.extensions.filters.http.mcp.v3\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xaf\f\n" +
 	"\x03Mcp\x12b\n" +
 	"\ftraffic_mode\x18\x01 \x01(\x0e25.envoy.extensions.filters.http.mcp.v3.Mcp.TrafficModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\vtrafficMode\x12*\n" +
 	"\x11clear_route_cache\x18\x02 \x01(\bR\x0fclearRouteCache\x12O\n" +
@@ -845,14 +883,16 @@ const file_envoy_extensions_filters_http_mcp_v3_mcp_proto_rawDesc = "" +
 	"\fMethodConfig\x12\x1f\n" +
 	"\x06method\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x06method\x12\x14\n" +
 	"\x05group\x18\x02 \x01(\tR\x05group\x12u\n" +
-	"\x10extraction_rules\x18\x03 \x03(\v2J.envoy.extensions.filters.http.mcp.v3.ParserConfig.AttributeExtractionRuleR\x0fextractionRules\"\xf5\x03\n" +
+	"\x10extraction_rules\x18\x03 \x03(\v2J.envoy.extensions.filters.http.mcp.v3.ParserConfig.AttributeExtractionRuleR\x0fextractionRules\"\xc9\x05\n" +
 	"\vMcpOverride\x12b\n" +
 	"\ftraffic_mode\x18\x01 \x01(\x0e25.envoy.extensions.filters.http.mcp.v3.Mcp.TrafficModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\vtrafficMode\x12O\n" +
-	"\x15max_request_body_size\x18\x02 \x01(\v2\x1c.google.protobuf.UInt32ValueR\x12maxRequestBodySize\x12*\n" +
-	"\x11clear_route_cache\x18\x03 \x01(\bR\x0fclearRouteCache\x12W\n" +
+	"\x15max_request_body_size\x18\x02 \x01(\v2\x1c.google.protobuf.UInt32ValueR\x12maxRequestBodySize\x127\n" +
+	"\x11clear_route_cache\x18\x03 \x01(\bB\v\x92ǆ\xd8\x04\x033.0\x18\x01R\x0fclearRouteCache\x12W\n" +
 	"\rparser_config\x18\x04 \x01(\v22.envoy.extensions.filters.http.mcp.v3.ParserConfigR\fparserConfig\x12x\n" +
-	"\x14request_storage_mode\x18\x05 \x01(\x0e2<.envoy.extensions.filters.http.mcp.v3.Mcp.RequestStorageModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\x12requestStorageMode\x122\n" +
-	"\x15reject_duplicate_keys\x18\x06 \x01(\bR\x13rejectDuplicateKeysB\xa3\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
+	"\x14request_storage_mode\x18\x05 \x01(\x0e2<.envoy.extensions.filters.http.mcp.v3.Mcp.RequestStorageModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\x12requestStorageMode\x12?\n" +
+	"\x15reject_duplicate_keys\x18\x06 \x01(\bB\v\x92ǆ\xd8\x04\x033.0\x18\x01R\x13rejectDuplicateKeys\x12W\n" +
+	"\x1aclear_route_cache_override\x18\a \x01(\v2\x1a.google.protobuf.BoolValueR\x17clearRouteCacheOverride\x12_\n" +
+	"\x1ereject_duplicate_keys_override\x18\b \x01(\v2\x1a.google.protobuf.BoolValueR\x1brejectDuplicateKeysOverrideB\xa3\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
 	"2io.envoyproxy.envoy.extensions.filters.http.mcp.v3B\bMcpProtoP\x01ZQgithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/mcp/v3;mcpv3b\x06proto3"
 
 var (
@@ -900,13 +940,15 @@ var file_envoy_extensions_filters_http_mcp_v3_mcp_proto_depIdxs = []int32{
 	11, // 11: envoy.extensions.filters.http.mcp.v3.McpOverride.max_request_body_size:type_name -> google.protobuf.UInt32Value
 	5,  // 12: envoy.extensions.filters.http.mcp.v3.McpOverride.parser_config:type_name -> envoy.extensions.filters.http.mcp.v3.ParserConfig
 	1,  // 13: envoy.extensions.filters.http.mcp.v3.McpOverride.request_storage_mode:type_name -> envoy.extensions.filters.http.mcp.v3.Mcp.RequestStorageMode
-	3,  // 14: envoy.extensions.filters.http.mcp.v3.Mcp.TraceContextPropagationConfig.mode:type_name -> envoy.extensions.filters.http.mcp.v3.Mcp.TraceContextPropagationConfig.TraceContextPropagationMode
-	9,  // 15: envoy.extensions.filters.http.mcp.v3.ParserConfig.MethodConfig.extraction_rules:type_name -> envoy.extensions.filters.http.mcp.v3.ParserConfig.AttributeExtractionRule
-	16, // [16:16] is the sub-list for method output_type
-	16, // [16:16] is the sub-list for method input_type
-	16, // [16:16] is the sub-list for extension type_name
-	16, // [16:16] is the sub-list for extension extendee
-	0,  // [0:16] is the sub-list for field type_name
+	12, // 14: envoy.extensions.filters.http.mcp.v3.McpOverride.clear_route_cache_override:type_name -> google.protobuf.BoolValue
+	12, // 15: envoy.extensions.filters.http.mcp.v3.McpOverride.reject_duplicate_keys_override:type_name -> google.protobuf.BoolValue
+	3,  // 16: envoy.extensions.filters.http.mcp.v3.Mcp.TraceContextPropagationConfig.mode:type_name -> envoy.extensions.filters.http.mcp.v3.Mcp.TraceContextPropagationConfig.TraceContextPropagationMode
+	9,  // 17: envoy.extensions.filters.http.mcp.v3.ParserConfig.MethodConfig.extraction_rules:type_name -> envoy.extensions.filters.http.mcp.v3.ParserConfig.AttributeExtractionRule
+	18, // [18:18] is the sub-list for method output_type
+	18, // [18:18] is the sub-list for method input_type
+	18, // [18:18] is the sub-list for extension type_name
+	18, // [18:18] is the sub-list for extension extendee
+	0,  // [0:18] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_http_mcp_v3_mcp_proto_init() }

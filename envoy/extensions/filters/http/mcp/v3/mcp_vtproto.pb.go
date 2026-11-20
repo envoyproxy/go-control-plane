@@ -400,6 +400,26 @@ func (m *McpOverride) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.RejectDuplicateKeysOverride != nil {
+		size, err := (*wrapperspb.BoolValue)(m.RejectDuplicateKeysOverride).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x42
+	}
+	if m.ClearRouteCacheOverride != nil {
+		size, err := (*wrapperspb.BoolValue)(m.ClearRouteCacheOverride).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x3a
+	}
 	if m.RejectDuplicateKeys {
 		i--
 		if m.RejectDuplicateKeys {
@@ -608,6 +628,14 @@ func (m *McpOverride) SizeVT() (n int) {
 	}
 	if m.RejectDuplicateKeys {
 		n += 2
+	}
+	if m.ClearRouteCacheOverride != nil {
+		l = (*wrapperspb.BoolValue)(m.ClearRouteCacheOverride).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.RejectDuplicateKeysOverride != nil {
+		l = (*wrapperspb.BoolValue)(m.RejectDuplicateKeysOverride).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n

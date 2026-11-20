@@ -586,6 +586,64 @@ func (m *McpOverride) validate(all bool) error {
 
 	// no validation rules for RejectDuplicateKeys
 
+	if all {
+		switch v := interface{}(m.GetClearRouteCacheOverride()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, McpOverrideValidationError{
+					field:  "ClearRouteCacheOverride",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, McpOverrideValidationError{
+					field:  "ClearRouteCacheOverride",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetClearRouteCacheOverride()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return McpOverrideValidationError{
+				field:  "ClearRouteCacheOverride",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetRejectDuplicateKeysOverride()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, McpOverrideValidationError{
+					field:  "RejectDuplicateKeysOverride",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, McpOverrideValidationError{
+					field:  "RejectDuplicateKeysOverride",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRejectDuplicateKeysOverride()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return McpOverrideValidationError{
+				field:  "RejectDuplicateKeysOverride",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return McpOverrideMultiError(errors)
 	}
