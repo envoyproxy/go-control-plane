@@ -33,6 +33,16 @@ type Snapshot struct {
 	// instantiated by calling ConstructVersionMap().
 	// VersionMap is only to be used with delta xDS.
 	VersionMap map[string]map[string]string
+
+	// inheritedVersions holds versions taken from a previous snapshot for resources
+	// that are the very same object under the same name. ConstructVersionMap uses
+	// them instead of re-hashing and then drops them.
+	inheritedVersions map[string]map[string]string
+
+	// marshaled holds the bytes encoded while hashing in ConstructVersionMap when
+	// keepMarshaled is set, so a delta response doesn't encode the same resource again.
+	marshaled     map[string]map[string][]byte
+	keepMarshaled bool
 }
 
 var _ ResourceSnapshot = &Snapshot{}
@@ -176,31 +186,88 @@ func (s *Snapshot) ConstructVersionMap() error {
 		return nil
 	}
 
-	s.VersionMap = make(map[string]map[string]string)
+	versionMap := make(map[string]map[string]string)
+	marshaled := make(map[string]map[string][]byte)
 
 	for i, resources := range s.Resources {
 		typeURL, err := GetResponseTypeURL(types.ResponseType(i))
 		if err != nil {
 			return err
 		}
-		if _, ok := s.VersionMap[typeURL]; !ok {
-			s.VersionMap[typeURL] = make(map[string]string, len(resources.Items))
-		}
+		versions := make(map[string]string, len(resources.Items))
+		versionMap[typeURL] = versions
+		inherited := s.inheritedVersions[typeURL]
 
-		for _, r := range resources.Items {
-			// Hash our version in here and build the version map.
+		for name, r := range resources.Items {
+			if v, ok := inherited[name]; ok {
+				versions[name] = v
+				continue
+			}
+
 			marshaledResource, err := MarshalResource(r.Resource)
 			if err != nil {
 				return err
 			}
 			v := HashResource(marshaledResource)
 			if v == "" {
-				return fmt.Errorf("failed to build resource version: %w", err)
+				return errors.New("failed to build resource version")
 			}
 
-			s.VersionMap[typeURL][GetResourceName(r.Resource)] = v
+			versions[name] = v
+			if !s.keepMarshaled {
+				continue
+			}
+			if marshaled[typeURL] == nil {
+				marshaled[typeURL] = make(map[string][]byte)
+			}
+			marshaled[typeURL][name] = marshaledResource
 		}
 	}
 
+	s.VersionMap = versionMap
+	s.marshaled = marshaled
+	s.inheritedVersions = nil
+
 	return nil
+}
+
+// inheritVersions records, for each resource that is the same object under the same
+// name in prev, the version prev already computed, so ConstructVersionMap can skip
+// encoding and hashing it. It relies on resources never being modified once they are
+// part of a snapshot.
+func (s *Snapshot) inheritVersions(prev *Snapshot) {
+	if s == nil || prev == nil || s == prev || s.VersionMap != nil || prev.VersionMap == nil {
+		return
+	}
+
+	for i, resources := range s.Resources {
+		// Every index of Resources is a known type, so the lookup can't fail.
+		typeURL, _ := GetResponseTypeURL(types.ResponseType(i))
+		prevItems := prev.Resources[i].Items
+		prevVersions := prev.VersionMap[typeURL]
+		if len(prevItems) == 0 || len(prevVersions) == 0 {
+			continue
+		}
+
+		for name, r := range resources.Items {
+			prevRes, sameName := prevItems[name]
+			v, hasVersion := prevVersions[name]
+			if !sameName || !hasVersion || prevRes.Resource != r.Resource {
+				continue
+			}
+			if s.inheritedVersions == nil {
+				s.inheritedVersions = make(map[string]map[string]string)
+			}
+			if s.inheritedVersions[typeURL] == nil {
+				s.inheritedVersions[typeURL] = make(map[string]string)
+			}
+			s.inheritedVersions[typeURL][name] = v
+		}
+	}
+}
+
+// getMarshaledResource returns the bytes encoded for name while building the version
+// map, if any.
+func (s *Snapshot) getMarshaledResource(typeURL, name string) []byte {
+	return s.marshaled[typeURL][name]
 }
