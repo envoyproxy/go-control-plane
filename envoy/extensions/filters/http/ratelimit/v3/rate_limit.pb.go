@@ -8,6 +8,7 @@ package ratelimitv3
 
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
+	_ "github.com/envoyproxy/go-control-plane/envoy/annotations"
 	v32 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/ratelimit/v3"
 	v33 "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
@@ -80,6 +81,11 @@ func (RateLimit_XRateLimitHeadersRFCVersion) EnumDescriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_rawDescGZIP(), []int{0, 0}
 }
 
+// .. attention::
+//
+//	This enum is deprecated. It is only used by the deprecated :ref:`vh_rate_limits
+//	<envoy_v3_api_field_extensions.filters.http.ratelimit.v3.RateLimitPerRoute.vh_rate_limits>`.
+//
 // [#next-major-version: unify with local ratelimit, should use common.ratelimit.v3.VhRateLimitsOptions instead.]
 type RateLimitPerRoute_VhRateLimitsOptions int32
 
@@ -134,6 +140,11 @@ func (RateLimitPerRoute_VhRateLimitsOptions) EnumDescriptor() ([]byte, []int) {
 }
 
 // The override option determines how the filter handles the cases where there is an override config at a more specific level than this one (from least to most specific: virtual host, route, cluster weight).
+//
+// .. attention::
+//
+//	This enum is deprecated. It is only used by the deprecated ``override_option``.
+//
 // [#not-implemented-hide:]
 type RateLimitPerRoute_OverrideOptions int32
 
@@ -202,6 +213,16 @@ type RateLimit struct {
 	// .. note::
 	//
 	//  The filter supports a range of 0 - 10 inclusively for stage numbers.
+	//
+	// .. attention::
+	//
+	//   This field is deprecated. It only selects the deprecated
+	//   :ref:`VirtualHost.rate_limits <envoy_v3_api_field_config.route.v3.VirtualHost.rate_limits>` and
+	//   :ref:`RouteAction.rate_limits <envoy_v3_api_field_config.route.v3.RouteAction.rate_limits>`
+	//   with the same :ref:`stage <envoy_v3_api_field_config.route.v3.RateLimit.stage>` and has no
+	//   effect on the ``rate_limits`` configured in the filter config.
+	//
+	// Deprecated: Marked as deprecated in envoy/extensions/filters/http/ratelimit/v3/rate_limit.proto.
 	Stage uint32 `protobuf:"varint,2,opt,name=stage,proto3" json:"stage,omitempty"`
 	// The type of requests the filter should apply to. The supported
 	// types are ``internal``, ``external`` or ``both``. A request is considered internal if
@@ -305,7 +326,7 @@ type RateLimit struct {
 	FailureModeDenyPercent *v32.RuntimeFractionalPercent `protobuf:"bytes,16,opt,name=failure_mode_deny_percent,json=failureModeDenyPercent,proto3" json:"failure_mode_deny_percent,omitempty"`
 	// Rate limit configuration that is used to generate a list of descriptor entries based on
 	// the request context. The generated entries will be sent to the rate limit service.
-	// If this is set, then
+	// If this is set, then the deprecated
 	// :ref:`VirtualHost.rate_limits<envoy_v3_api_field_config.route.v3.VirtualHost.rate_limits>` or
 	// :ref:`RouteAction.rate_limits<envoy_v3_api_field_config.route.v3.RouteAction.rate_limits>` fields
 	// will be ignored. However, :ref:`RateLimitPerRoute.rate_limits<envoy_v3_api_field_extensions.filters.http.ratelimit.v3.RateLimitPerRoute.rate_limits>`
@@ -382,6 +403,7 @@ func (x *RateLimit) GetDomain() string {
 	return ""
 }
 
+// Deprecated: Marked as deprecated in envoy/extensions/filters/http/ratelimit/v3/rate_limit.proto.
 func (x *RateLimit) GetStage() uint32 {
 	if x != nil {
 		return x.Stage
@@ -519,15 +541,31 @@ func (x *RateLimit) GetRateLimitsOverrideOption() v34.RateLimitsOverrideOption {
 type RateLimitPerRoute struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Specifies if the rate limit filter should include the virtual host rate limits.
-	// [#next-major-version: unify with local ratelimit, should use common.ratelimit.v3.VhRateLimitsOptions instead.]
+	//
+	// .. attention::
+	//
+	//   This field is deprecated. It only applies to the deprecated
+	//   :ref:`VirtualHost.rate_limits <envoy_v3_api_field_config.route.v3.VirtualHost.rate_limits>` and
+	//   :ref:`RouteAction.rate_limits <envoy_v3_api_field_config.route.v3.RouteAction.rate_limits>`.
+	//   Use ``rate_limits_override_option`` to control how the ``rate_limits`` of different levels
+	//   are applied instead.
+	//
+	// Deprecated: Marked as deprecated in envoy/extensions/filters/http/ratelimit/v3/rate_limit.proto.
 	VhRateLimits RateLimitPerRoute_VhRateLimitsOptions `protobuf:"varint,1,opt,name=vh_rate_limits,json=vhRateLimits,proto3,enum=envoy.extensions.filters.http.ratelimit.v3.RateLimitPerRoute_VhRateLimitsOptions" json:"vh_rate_limits,omitempty"`
 	// Specifies if the rate limit filter should include the lower levels (route level, virtual host level or cluster weight level) rate limits override options.
+	//
+	// .. attention::
+	//
+	//   This field is deprecated. Use ``rate_limits_override_option`` instead.
+	//
 	// [#not-implemented-hide:]
+	//
+	// Deprecated: Marked as deprecated in envoy/extensions/filters/http/ratelimit/v3/rate_limit.proto.
 	OverrideOption RateLimitPerRoute_OverrideOptions `protobuf:"varint,2,opt,name=override_option,json=overrideOption,proto3,enum=envoy.extensions.filters.http.ratelimit.v3.RateLimitPerRoute_OverrideOptions" json:"override_option,omitempty"`
 	// Rate limit configuration that is used to generate a list of descriptor entries based on
 	// the request context. The generated entries will be used to find one or multiple matched rate
 	// limit rule from the ``descriptors``.
-	// If this is set, then
+	// If this is set, then the deprecated
 	// :ref:`VirtualHost.rate_limits<envoy_v3_api_field_config.route.v3.VirtualHost.rate_limits>`,
 	// :ref:`RouteAction.rate_limits<envoy_v3_api_field_config.route.v3.RouteAction.rate_limits>` and
 	// :ref:`RateLimit.rate_limits<envoy_v3_api_field_extensions.filters.http.ratelimit.v3.RateLimit.rate_limits>` fields
@@ -598,6 +636,7 @@ func (*RateLimitPerRoute) Descriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_rawDescGZIP(), []int{1}
 }
 
+// Deprecated: Marked as deprecated in envoy/extensions/filters/http/ratelimit/v3/rate_limit.proto.
 func (x *RateLimitPerRoute) GetVhRateLimits() RateLimitPerRoute_VhRateLimitsOptions {
 	if x != nil {
 		return x.VhRateLimits
@@ -605,6 +644,7 @@ func (x *RateLimitPerRoute) GetVhRateLimits() RateLimitPerRoute_VhRateLimitsOpti
 	return RateLimitPerRoute_OVERRIDE
 }
 
+// Deprecated: Marked as deprecated in envoy/extensions/filters/http/ratelimit/v3/rate_limit.proto.
 func (x *RateLimitPerRoute) GetOverrideOption() RateLimitPerRoute_OverrideOptions {
 	if x != nil {
 		return x.OverrideOption
@@ -637,11 +677,11 @@ var File_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto protoreflec
 
 const file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_rawDesc = "" +
 	"\n" +
-	";envoy/extensions/filters/http/ratelimit/v3/rate_limit.proto\x12*envoy.extensions.filters.http.ratelimit.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a#envoy/config/ratelimit/v3/rls.proto\x1a,envoy/config/route/v3/route_components.proto\x1a4envoy/extensions/common/ratelimit/v3/ratelimit.proto\x1a\x1fenvoy/type/v3/http_status.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xf2\f\n" +
+	";envoy/extensions/filters/http/ratelimit/v3/rate_limit.proto\x12*envoy.extensions.filters.http.ratelimit.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a#envoy/config/ratelimit/v3/rls.proto\x1a,envoy/config/route/v3/route_components.proto\x1a4envoy/extensions/common/ratelimit/v3/ratelimit.proto\x1a\x1fenvoy/type/v3/http_status.proto\x1a\x1egoogle/protobuf/duration.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xfd\f\n" +
 	"\tRateLimit\x12\x1f\n" +
-	"\x06domain\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x06domain\x12\x1d\n" +
-	"\x05stage\x18\x02 \x01(\rB\a\xfaB\x04*\x02\x18\n" +
-	"R\x05stage\x12D\n" +
+	"\x06domain\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x06domain\x12(\n" +
+	"\x05stage\x18\x02 \x01(\rB\x12\xfaB\x04*\x02\x18\n" +
+	"\x92ǆ\xd8\x04\x033.0\x18\x01R\x05stage\x12D\n" +
 	"\frequest_type\x18\x03 \x01(\tB!\xfaB\x1er\x1cR\binternalR\bexternalR\x04bothR\x00R\vrequestType\x123\n" +
 	"\atimeout\x18\x04 \x01(\v2\x19.google.protobuf.DurationR\atimeout\x12*\n" +
 	"\x11failure_mode_deny\x18\x05 \x01(\bR\x0ffailureModeDeny\x12J\n" +
@@ -667,10 +707,10 @@ const file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_rawDesc =
 	"\x1bXRateLimitHeadersRFCVersion\x12\a\n" +
 	"\x03OFF\x10\x00\x12\x14\n" +
 	"\x10DRAFT_VERSION_03\x10\x01:7\x9aň\x1e2\n" +
-	"0envoy.config.filter.http.rate_limit.v2.RateLimit\"\x99\x05\n" +
-	"\x11RateLimitPerRoute\x12\x81\x01\n" +
-	"\x0evh_rate_limits\x18\x01 \x01(\x0e2Q.envoy.extensions.filters.http.ratelimit.v3.RateLimitPerRoute.VhRateLimitsOptionsB\b\xfaB\x05\x82\x01\x02\x10\x01R\fvhRateLimits\x12\x80\x01\n" +
-	"\x0foverride_option\x18\x02 \x01(\x0e2M.envoy.extensions.filters.http.ratelimit.v3.RateLimitPerRoute.OverrideOptionsB\b\xfaB\x05\x82\x01\x02\x10\x01R\x0eoverrideOption\x12A\n" +
+	"0envoy.config.filter.http.rate_limit.v2.RateLimit\"\xaf\x05\n" +
+	"\x11RateLimitPerRoute\x12\x8c\x01\n" +
+	"\x0evh_rate_limits\x18\x01 \x01(\x0e2Q.envoy.extensions.filters.http.ratelimit.v3.RateLimitPerRoute.VhRateLimitsOptionsB\x13\xfaB\x05\x82\x01\x02\x10\x01\x92ǆ\xd8\x04\x033.0\x18\x01R\fvhRateLimits\x12\x8b\x01\n" +
+	"\x0foverride_option\x18\x02 \x01(\x0e2M.envoy.extensions.filters.http.ratelimit.v3.RateLimitPerRoute.OverrideOptionsB\x13\xfaB\x05\x82\x01\x02\x10\x01\x92ǆ\xd8\x04\x033.0\x18\x01R\x0eoverrideOption\x12A\n" +
 	"\vrate_limits\x18\x03 \x03(\v2 .envoy.config.route.v3.RateLimitR\n" +
 	"rateLimits\x12\x16\n" +
 	"\x06domain\x18\x04 \x01(\tR\x06domain\x12\x87\x01\n" +

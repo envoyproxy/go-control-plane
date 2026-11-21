@@ -461,6 +461,20 @@ type VirtualHost struct {
 	VirtualClusters []*VirtualCluster `protobuf:"bytes,5,rep,name=virtual_clusters,json=virtualClusters,proto3" json:"virtual_clusters,omitempty"`
 	// Specifies a set of rate limit configurations that will be applied to the
 	// virtual host.
+	//
+	// .. attention::
+	//
+	//   This field is deprecated. Please use :ref:`RateLimitPerRoute.rate_limits
+	//   <envoy_v3_api_field_extensions.filters.http.ratelimit.v3.RateLimitPerRoute.rate_limits>` via
+	//   ``typed_per_filter_config`` or the filter level :ref:`RateLimit.rate_limits
+	//   <envoy_v3_api_field_extensions.filters.http.ratelimit.v3.RateLimit.rate_limits>` instead. For
+	//   the local rate limit filter, use :ref:`LocalRateLimit.rate_limits
+	//   <envoy_v3_api_field_extensions.filters.http.local_ratelimit.v3.LocalRateLimit.rate_limits>`.
+	//   The :ref:`stage <envoy_v3_api_field_config.route.v3.RateLimit.stage>` and
+	//   :ref:`disable_key <envoy_v3_api_field_config.route.v3.RateLimit.disable_key>` fields are not
+	//   supported by these replacements.
+	//
+	// Deprecated: Marked as deprecated in envoy/config/route/v3/route_components.proto.
 	RateLimits []*RateLimit `protobuf:"bytes,6,rep,name=rate_limits,json=rateLimits,proto3" json:"rate_limits,omitempty"`
 	// Specifies a list of HTTP headers that should be added to each request
 	// handled by this virtual host. Headers specified at this level are applied
@@ -682,6 +696,7 @@ func (x *VirtualHost) GetVirtualClusters() []*VirtualCluster {
 	return nil
 }
 
+// Deprecated: Marked as deprecated in envoy/config/route/v3/route_components.proto.
 func (x *VirtualHost) GetRateLimits() []*RateLimit {
 	if x != nil {
 		return x.RateLimits
@@ -2161,6 +2176,20 @@ type RouteAction struct {
 	Priority v31.RoutingPriority `protobuf:"varint,11,opt,name=priority,proto3,enum=envoy.config.core.v3.RoutingPriority" json:"priority,omitempty"`
 	// Specifies a set of rate limit configurations that could be applied to the
 	// route.
+	//
+	// .. attention::
+	//
+	//   This field is deprecated. Please use :ref:`RateLimitPerRoute.rate_limits
+	//   <envoy_v3_api_field_extensions.filters.http.ratelimit.v3.RateLimitPerRoute.rate_limits>` via
+	//   ``typed_per_filter_config`` or the filter level :ref:`RateLimit.rate_limits
+	//   <envoy_v3_api_field_extensions.filters.http.ratelimit.v3.RateLimit.rate_limits>` instead. For
+	//   the local rate limit filter, use :ref:`LocalRateLimit.rate_limits
+	//   <envoy_v3_api_field_extensions.filters.http.local_ratelimit.v3.LocalRateLimit.rate_limits>`.
+	//   The :ref:`stage <envoy_v3_api_field_config.route.v3.RateLimit.stage>` and
+	//   :ref:`disable_key <envoy_v3_api_field_config.route.v3.RateLimit.disable_key>` fields are not
+	//   supported by these replacements.
+	//
+	// Deprecated: Marked as deprecated in envoy/config/route/v3/route_components.proto.
 	RateLimits []*RateLimit `protobuf:"bytes,13,rep,name=rate_limits,json=rateLimits,proto3" json:"rate_limits,omitempty"`
 	// Specifies if the rate limit filter should include the virtual host rate
 	// limits. By default, if the route configured rate limits, the virtual host
@@ -2507,6 +2536,7 @@ func (x *RouteAction) GetPriority() v31.RoutingPriority {
 	return v31.RoutingPriority(0)
 }
 
+// Deprecated: Marked as deprecated in envoy/config/route/v3/route_components.proto.
 func (x *RouteAction) GetRateLimits() []*RateLimit {
 	if x != nil {
 		return x.RateLimits
@@ -7724,7 +7754,7 @@ var File_envoy_config_route_v3_route_components_proto protoreflect.FileDescripto
 
 const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\n" +
-	",envoy/config/route/v3/route_components.proto\x12\x15envoy.config.route.v3\x1a:envoy/config/common/mutation_rules/v3/mutation_rules.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a$envoy/config/core/v3/extension.proto\x1a)envoy/config/core/v3/proxy_protocol.proto\x1a5envoy/config/core/v3/substitution_format_string.proto\x1a#envoy/type/matcher/v3/address.proto\x1a(envoy/type/matcher/v3/filter_state.proto\x1a$envoy/type/matcher/v3/metadata.proto\x1a!envoy/type/matcher/v3/regex.proto\x1a\"envoy/type/matcher/v3/string.proto\x1a%envoy/type/metadata/v3/metadata.proto\x1a&envoy/type/tracing/v3/custom_tag.proto\x1a\x1benvoy/type/v3/percent.proto\x1a\x19envoy/type/v3/range.proto\x1a\"envoy/type/v3/ratelimit_unit.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1eudpa/annotations/migrate.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\x84\x11\n" +
+	",envoy/config/route/v3/route_components.proto\x12\x15envoy.config.route.v3\x1a:envoy/config/common/mutation_rules/v3/mutation_rules.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a$envoy/config/core/v3/extension.proto\x1a)envoy/config/core/v3/proxy_protocol.proto\x1a5envoy/config/core/v3/substitution_format_string.proto\x1a#envoy/type/matcher/v3/address.proto\x1a(envoy/type/matcher/v3/filter_state.proto\x1a$envoy/type/matcher/v3/metadata.proto\x1a!envoy/type/matcher/v3/regex.proto\x1a\"envoy/type/matcher/v3/string.proto\x1a%envoy/type/metadata/v3/metadata.proto\x1a&envoy/type/tracing/v3/custom_tag.proto\x1a\x1benvoy/type/v3/percent.proto\x1a\x19envoy/type/v3/range.proto\x1a\"envoy/type/v3/ratelimit_unit.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1eudpa/annotations/migrate.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\x91\x11\n" +
 	"\vVirtualHost\x12\x1b\n" +
 	"\x04name\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x04name\x12,\n" +
 	"\adomains\x18\x02 \x03(\tB\x12\xfaB\x0f\x92\x01\f\b\x01\"\br\x06\xc8\x01\x00\xc0\x01\x02R\adomains\x12M\n" +
@@ -7732,8 +7762,8 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\amatcher\x18\x15 \x01(\v2\x1c.xds.type.matcher.v3.MatcherB\x17\xf2\x98\xfe\x8f\x05\x11\x12\x0froute_selectionR\amatcher\x12`\n" +
 	"\vrequire_tls\x18\x04 \x01(\x0e25.envoy.config.route.v3.VirtualHost.TlsRequirementTypeB\b\xfaB\x05\x82\x01\x02\x10\x01R\n" +
 	"requireTls\x12P\n" +
-	"\x10virtual_clusters\x18\x05 \x03(\v2%.envoy.config.route.v3.VirtualClusterR\x0fvirtualClusters\x12A\n" +
-	"\vrate_limits\x18\x06 \x03(\v2 .envoy.config.route.v3.RateLimitR\n" +
+	"\x10virtual_clusters\x18\x05 \x03(\v2%.envoy.config.route.v3.VirtualClusterR\x0fvirtualClusters\x12N\n" +
+	"\vrate_limits\x18\x06 \x03(\v2 .envoy.config.route.v3.RateLimitB\v\x92ǆ\xd8\x04\x033.0\x18\x01R\n" +
 	"rateLimits\x12g\n" +
 	"\x16request_headers_to_add\x18\a \x03(\v2'.envoy.config.core.v3.HeaderValueOptionB\t\xfaB\x06\x92\x01\x03\x10\xe8\aR\x13requestHeadersToAdd\x12M\n" +
 	"\x19request_headers_to_remove\x18\r \x03(\tB\x12\xfaB\x0f\x92\x01\f\"\n" +
@@ -7873,7 +7903,7 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\x1callow_private_network_access\x18\f \x01(\v2\x1a.google.protobuf.BoolValueR\x19allowPrivateNetworkAccess\x12a\n" +
 	"\x1fforward_not_matching_preflights\x18\r \x01(\v2\x1a.google.protobuf.BoolValueR\x1cforwardNotMatchingPreflights:$\x9aň\x1e\x1f\n" +
 	"\x1denvoy.api.v2.route.CorsPolicyB\x13\n" +
-	"\x11enabled_specifierJ\x04\b\x01\x10\x02J\x04\b\b\x10\tJ\x04\b\a\x10\bR\fallow_originR\x12allow_origin_regexR\aenabled\"\x880\n" +
+	"\x11enabled_specifierJ\x04\b\x01\x10\x02J\x04\b\b\x10\tJ\x04\b\a\x10\bR\fallow_originR\x12allow_origin_regexR\aenabled\"\x950\n" +
 	"\vRouteAction\x12#\n" +
 	"\acluster\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01H\x00R\acluster\x126\n" +
 	"\x0ecluster_header\x18\x02 \x01(\tB\r\xfaB\n" +
@@ -7900,8 +7930,8 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\fretry_policy\x18\t \x01(\v2\".envoy.config.route.v3.RetryPolicyR\vretryPolicy\x12O\n" +
 	"\x19retry_policy_typed_config\x18! \x01(\v2\x14.google.protobuf.AnyR\x16retryPolicyTypedConfig\x12n\n" +
 	"\x17request_mirror_policies\x18\x1e \x03(\v26.envoy.config.route.v3.RouteAction.RequestMirrorPolicyR\x15requestMirrorPolicies\x12K\n" +
-	"\bpriority\x18\v \x01(\x0e2%.envoy.config.core.v3.RoutingPriorityB\b\xfaB\x05\x82\x01\x02\x10\x01R\bpriority\x12A\n" +
-	"\vrate_limits\x18\r \x03(\v2 .envoy.config.route.v3.RateLimitR\n" +
+	"\bpriority\x18\v \x01(\x0e2%.envoy.config.core.v3.RoutingPriorityB\b\xfaB\x05\x82\x01\x02\x10\x01R\bpriority\x12N\n" +
+	"\vrate_limits\x18\r \x03(\v2 .envoy.config.route.v3.RateLimitB\v\x92ǆ\xd8\x04\x033.0\x18\x01R\n" +
 	"rateLimits\x12\\\n" +
 	"\x16include_vh_rate_limits\x18\x0e \x01(\v2\x1a.google.protobuf.BoolValueB\v\x92ǆ\xd8\x04\x033.0\x18\x01R\x13includeVhRateLimits\x12N\n" +
 	"\vhash_policy\x18\x0f \x03(\v2-.envoy.config.route.v3.RouteAction.HashPolicyR\n" +

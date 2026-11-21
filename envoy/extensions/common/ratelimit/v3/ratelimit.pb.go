@@ -82,6 +82,10 @@ func (XRateLimitHeadersRFCVersion) EnumDescriptor() ([]byte, []int) {
 	return file_envoy_extensions_common_ratelimit_v3_ratelimit_proto_rawDescGZIP(), []int{0}
 }
 
+// .. attention::
+//
+//	This enum is deprecated. It is only used by the deprecated :ref:`LocalRateLimit.vh_rate_limits
+//	<envoy_v3_api_field_extensions.filters.http.local_ratelimit.v3.LocalRateLimit.vh_rate_limits>`.
 type VhRateLimitsOptions int32
 
 const (

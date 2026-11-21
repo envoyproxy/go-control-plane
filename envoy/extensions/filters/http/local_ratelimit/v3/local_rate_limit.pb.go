@@ -8,6 +8,7 @@ package local_ratelimitv3
 
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
+	_ "github.com/envoyproxy/go-control-plane/envoy/annotations"
 	v31 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	v33 "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
 	v32 "github.com/envoyproxy/go-control-plane/envoy/extensions/common/ratelimit/v3"
@@ -96,6 +97,16 @@ type LocalRateLimit struct {
 	// .. note::
 	//
 	//  The filter supports a range of 0 - 10 inclusively for stage numbers.
+	//
+	// .. attention::
+	//
+	//   This field is deprecated. It only selects the deprecated
+	//   :ref:`VirtualHost.rate_limits <envoy_v3_api_field_config.route.v3.VirtualHost.rate_limits>` and
+	//   :ref:`RouteAction.rate_limits <envoy_v3_api_field_config.route.v3.RouteAction.rate_limits>`
+	//   with the same :ref:`stage <envoy_v3_api_field_config.route.v3.RateLimit.stage>` and has no
+	//   effect on the ``rate_limits`` configured in the filter config.
+	//
+	// Deprecated: Marked as deprecated in envoy/extensions/filters/http/local_ratelimit/v3/local_rate_limit.proto.
 	Stage uint32 `protobuf:"varint,9,opt,name=stage,proto3" json:"stage,omitempty"`
 	// Specifies the scope of the rate limiter's token bucket.
 	// If set to false, the token bucket is shared across all worker threads,
@@ -140,6 +151,16 @@ type LocalRateLimit struct {
 	// Disabled by default.
 	EnableXRatelimitHeaders v32.XRateLimitHeadersRFCVersion `protobuf:"varint,12,opt,name=enable_x_ratelimit_headers,json=enableXRatelimitHeaders,proto3,enum=envoy.extensions.common.ratelimit.v3.XRateLimitHeadersRFCVersion" json:"enable_x_ratelimit_headers,omitempty"`
 	// Specifies if the local rate limit filter should include the virtual host rate limits.
+	//
+	// .. attention::
+	//
+	//   This field is deprecated. It only applies to the deprecated
+	//   :ref:`VirtualHost.rate_limits <envoy_v3_api_field_config.route.v3.VirtualHost.rate_limits>` and
+	//   :ref:`RouteAction.rate_limits <envoy_v3_api_field_config.route.v3.RouteAction.rate_limits>`.
+	//   Use ``rate_limits_override_option`` to control how the ``rate_limits`` of different levels
+	//   are applied instead.
+	//
+	// Deprecated: Marked as deprecated in envoy/extensions/filters/http/local_ratelimit/v3/local_rate_limit.proto.
 	VhRateLimits v32.VhRateLimitsOptions `protobuf:"varint,13,opt,name=vh_rate_limits,json=vhRateLimits,proto3,enum=envoy.extensions.common.ratelimit.v3.VhRateLimitsOptions" json:"vh_rate_limits,omitempty"`
 	// Specifies if default token bucket should be always consumed.
 	// If set to false, default token bucket will only be consumed when there is
@@ -153,7 +174,7 @@ type LocalRateLimit struct {
 	// Rate limit configuration that is used to generate a list of descriptor entries based on
 	// the request context. The generated entries will be used to find one or multiple matched rate
 	// limit rule from the ``descriptors``.
-	// If this is set, then
+	// If this is set, then the deprecated
 	// :ref:`VirtualHost.rate_limits<envoy_v3_api_field_config.route.v3.VirtualHost.rate_limits>` or
 	// :ref:`RouteAction.rate_limits<envoy_v3_api_field_config.route.v3.RouteAction.rate_limits>` fields
 	// will be ignored.
@@ -310,6 +331,7 @@ func (x *LocalRateLimit) GetDescriptors() []*v32.LocalRateLimitDescriptor {
 	return nil
 }
 
+// Deprecated: Marked as deprecated in envoy/extensions/filters/http/local_ratelimit/v3/local_rate_limit.proto.
 func (x *LocalRateLimit) GetStage() uint32 {
 	if x != nil {
 		return x.Stage
@@ -338,6 +360,7 @@ func (x *LocalRateLimit) GetEnableXRatelimitHeaders() v32.XRateLimitHeadersRFCVe
 	return v32.XRateLimitHeadersRFCVersion(0)
 }
 
+// Deprecated: Marked as deprecated in envoy/extensions/filters/http/local_ratelimit/v3/local_rate_limit.proto.
 func (x *LocalRateLimit) GetVhRateLimits() v32.VhRateLimitsOptions {
 	if x != nil {
 		return x.VhRateLimits
@@ -391,7 +414,7 @@ var File_envoy_extensions_filters_http_local_ratelimit_v3_local_rate_limit_proto
 
 const file_envoy_extensions_filters_http_local_ratelimit_v3_local_rate_limit_proto_rawDesc = "" +
 	"\n" +
-	"Genvoy/extensions/filters/http/local_ratelimit/v3/local_rate_limit.proto\x120envoy.extensions.filters.http.local_ratelimit.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a,envoy/config/route/v3/route_components.proto\x1a4envoy/extensions/common/ratelimit/v3/ratelimit.proto\x1a\x1fenvoy/type/v3/http_status.proto\x1a envoy/type/v3/token_bucket.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xb5\r\n" +
+	"Genvoy/extensions/filters/http/local_ratelimit/v3/local_rate_limit.proto\x120envoy.extensions.filters.http.local_ratelimit.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a,envoy/config/route/v3/route_components.proto\x1a4envoy/extensions/common/ratelimit/v3/ratelimit.proto\x1a\x1fenvoy/type/v3/http_status.proto\x1a envoy/type/v3/token_bucket.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xcb\r\n" +
 	"\x0eLocalRateLimit\x12(\n" +
 	"\vstat_prefix\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\n" +
 	"statPrefix\x121\n" +
@@ -404,13 +427,13 @@ const file_envoy_extensions_filters_http_local_ratelimit_v3_local_rate_limit_pro
 	"R\"requestHeadersToAddWhenNotEnforced\x12h\n" +
 	"\x17response_headers_to_add\x18\x06 \x03(\v2'.envoy.config.core.v3.HeaderValueOptionB\b\xfaB\x05\x92\x01\x02\x10\n" +
 	"R\x14responseHeadersToAdd\x12`\n" +
-	"\vdescriptors\x18\b \x03(\v2>.envoy.extensions.common.ratelimit.v3.LocalRateLimitDescriptorR\vdescriptors\x12\x1d\n" +
-	"\x05stage\x18\t \x01(\rB\a\xfaB\x04*\x02\x18\n" +
-	"R\x05stage\x12Y\n" +
+	"\vdescriptors\x18\b \x03(\v2>.envoy.extensions.common.ratelimit.v3.LocalRateLimitDescriptorR\vdescriptors\x12(\n" +
+	"\x05stage\x18\t \x01(\rB\x12\xfaB\x04*\x02\x18\n" +
+	"\x92ǆ\xd8\x04\x033.0\x18\x01R\x05stage\x12Y\n" +
 	"*local_rate_limit_per_downstream_connection\x18\v \x01(\bR%localRateLimitPerDownstreamConnection\x12t\n" +
 	"\x18local_cluster_rate_limit\x18\x10 \x01(\v2;.envoy.extensions.common.ratelimit.v3.LocalClusterRateLimitR\x15localClusterRateLimit\x12\x88\x01\n" +
-	"\x1aenable_x_ratelimit_headers\x18\f \x01(\x0e2A.envoy.extensions.common.ratelimit.v3.XRateLimitHeadersRFCVersionB\b\xfaB\x05\x82\x01\x02\x10\x01R\x17enableXRatelimitHeaders\x12i\n" +
-	"\x0evh_rate_limits\x18\r \x01(\x0e29.envoy.extensions.common.ratelimit.v3.VhRateLimitsOptionsB\b\xfaB\x05\x82\x01\x02\x10\x01R\fvhRateLimits\x12h\n" +
+	"\x1aenable_x_ratelimit_headers\x18\f \x01(\x0e2A.envoy.extensions.common.ratelimit.v3.XRateLimitHeadersRFCVersionB\b\xfaB\x05\x82\x01\x02\x10\x01R\x17enableXRatelimitHeaders\x12t\n" +
+	"\x0evh_rate_limits\x18\r \x01(\x0e29.envoy.extensions.common.ratelimit.v3.VhRateLimitsOptionsB\x13\xfaB\x05\x82\x01\x02\x10\x01\x92ǆ\xd8\x04\x033.0\x18\x01R\fvhRateLimits\x12h\n" +
 	"#always_consume_default_token_bucket\x18\x0e \x01(\v2\x1a.google.protobuf.BoolValueR\x1falwaysConsumeDefaultTokenBucket\x12J\n" +
 	"\"rate_limited_as_resource_exhausted\x18\x0f \x01(\bR\x1erateLimitedAsResourceExhausted\x12A\n" +
 	"\vrate_limits\x18\x11 \x03(\v2 .envoy.config.route.v3.RateLimitR\n" +
