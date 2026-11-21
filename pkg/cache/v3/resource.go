@@ -286,7 +286,10 @@ func getScopedRouteReferences(src *route.ScopedRouteConfiguration, out map[resou
 	routes := map[string]bool{}
 
 	// For a scoped route configuration, the dependent resource is the RouteConfigurationName.
-	routes[src.GetRouteConfigurationName()] = true
+	// A scoped route carrying its RouteConfiguration inline does not reference any RDS resource.
+	if name := src.GetRouteConfigurationName(); name != "" {
+		routes[name] = true
+	}
 
 	if len(routes) > 0 {
 		if _, ok := out[resource.RouteType]; !ok {

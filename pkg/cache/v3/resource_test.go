@@ -60,11 +60,20 @@ var (
 	testExtensionConfig = resource.MakeExtensionConfig(resource.Ads, extensionConfigName, routeName)
 )
 
+// makeInlineScopedRouteConfig returns a scoped route carrying its route configuration
+// inline instead of referencing it by name through RDS.
+func makeInlineScopedRouteConfig(scopedRouteName, routeConfigName string) *route.ScopedRouteConfiguration {
+	scopedRoute := resource.MakeScopedRouteConfig(scopedRouteName, "", []string{"1.2.3.4"})
+	scopedRoute.RouteConfiguration = resource.MakeRouteConfig(routeConfigName, clusterName)
+	return scopedRoute
+}
+
 func TestValidate(t *testing.T) {
 	require.NoError(t, testEndpoint.Validate())
 	require.NoError(t, testCluster.Validate())
 	require.NoError(t, testRoute.Validate())
 	require.NoError(t, testScopedRoute.Validate())
+	require.NoError(t, makeInlineScopedRouteConfig(scopedRouteName, routeName).Validate())
 	require.NoError(t, testVirtualHost.Validate())
 	require.NoError(t, testFilterChain.Validate())
 	require.NoError(t, testListener.Validate())
@@ -211,6 +220,10 @@ func TestGetResourceReferences(t *testing.T) {
 		{
 			in:  testScopedRoute,
 			out: map[rsrc.Type]map[string]bool{rsrc.RouteType: {routeName: true}},
+		},
+		{
+			in:  makeInlineScopedRouteConfig(scopedRouteName, routeName),
+			out: map[rsrc.Type]map[string]bool{},
 		},
 		{
 			in:  testVirtualHost,

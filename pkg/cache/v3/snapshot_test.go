@@ -141,6 +141,20 @@ func TestScopedRouteListenerWithInlineScopedRouteAndNoRouteIsInconsistent(t *tes
 	require.Error(t, snap.Consistent())
 }
 
+func TestScopedRouteWithInlineRouteConfigurationIsConsistent(t *testing.T) {
+	snap, err := cache.NewSnapshot(fixture.version, map[rsrc.Type][]types.Resource{
+		rsrc.ListenerType: {
+			resource.MakeScopedRouteHTTPListener(resource.Xds, "listener0", 80),
+		},
+		rsrc.ScopedRouteType: {
+			makeInlineScopedRouteConfig("scopedRoute0", "inlineRoute0"),
+		},
+	})
+
+	require.NoError(t, err)
+	require.NoError(t, snap.Consistent())
+}
+
 func TestMultipleListenersWithScopedRouteAndRouteIsConsistent(t *testing.T) {
 	snap, _ := cache.NewSnapshot(fixture.version, map[rsrc.Type][]types.Resource{
 		rsrc.ListenerType: {
