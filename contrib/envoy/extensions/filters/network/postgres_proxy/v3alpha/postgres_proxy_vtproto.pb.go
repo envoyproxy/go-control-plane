@@ -10,6 +10,7 @@ package v3alpha
 import (
 	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
 	wrapperspb "github.com/planetscale/vtprotobuf/types/known/wrapperspb"
+	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
@@ -49,6 +50,28 @@ func (m *PostgresProxy) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.Rules != nil {
+		if vtmsg, ok := interface{}(m.Rules).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.Rules)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+		}
+		i--
+		dAtA[i] = 0x32
 	}
 	if m.DownstreamSsl != 0 {
 		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.DownstreamSsl))
@@ -112,6 +135,16 @@ func (m *PostgresProxy) SizeVT() (n int) {
 	}
 	if m.DownstreamSsl != 0 {
 		n += 1 + protohelpers.SizeOfVarint(uint64(m.DownstreamSsl))
+	}
+	if m.Rules != nil {
+		if size, ok := interface{}(m.Rules).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.Rules)
+		}
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n

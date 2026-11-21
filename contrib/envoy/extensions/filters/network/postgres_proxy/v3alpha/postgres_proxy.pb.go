@@ -9,6 +9,7 @@ package v3alpha
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	_ "github.com/envoyproxy/go-control-plane/envoy/annotations"
+	v3 "github.com/envoyproxy/go-control-plane/envoy/config/rbac/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -86,7 +87,7 @@ func (PostgresProxy_SSLMode) EnumDescriptor() ([]byte, []int) {
 	return file_contrib_envoy_extensions_filters_network_postgres_proxy_v3alpha_postgres_proxy_proto_rawDescGZIP(), []int{0, 0}
 }
 
-// [#next-free-field: 6]
+// [#next-free-field: 7]
 type PostgresProxy struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The human readable prefix to use when emitting :ref:`statistics
@@ -124,6 +125,22 @@ type PostgresProxy struct {
 	// :ref:`starttls transport socket <envoy_v3_api_msg_extensions.transport_sockets.starttls.v3.UpstreamStartTlsConfig>`.
 	// Defaults to ``DISABLE``.
 	DownstreamSsl PostgresProxy_SSLMode `protobuf:"varint,5,opt,name=downstream_ssl,json=downstreamSsl,proto3,enum=envoy.extensions.filters.network.postgres_proxy.v3alpha.PostgresProxy_SSLMode" json:"downstream_ssl,omitempty"`
+	// These RBAC rules are evaluated when a StartupMessage or CancelRequest is decoded.
+	// Startup attributes, such as user and database, are exposed as dynamic metadata under
+	// envoy.filters.network.postgres_proxy. Rules can also match TCP connection properties
+	// and SSL peer identity when Envoy terminates downstream TLS.
+	// For SSL passthrough, rules are evaluated when the SSLRequest is received. SSLRequest and
+	// CancelRequest evaluations use the packet type and available connection properties.
+	// Enabling RBAC preserves empty startup attribute values so key/value pairs are parsed correctly.
+	// The filter publishes the packet type under ``envoy.filters.network.postgres_proxy.rbac``.
+	// An ``ALLOW`` ruleset with no policies denies every connection. ``LOG`` rules can also observe a
+	// ``GSSENCRequest``.
+	// With ``ALLOW`` or ``DENY`` rules, an oversized or invalid client startup packet is rejected,
+	// including a PostgreSQL 17 direct TLS handshake. When the server declines passthrough SSL, the
+	// rules are evaluated again on the next startup packet.
+	// See the :ref:`Postgres proxy filter documentation <config_network_filters_postgres_proxy_rbac>`
+	// for the metadata and evaluation behavior in each encryption mode.
+	Rules         *v3.RBAC `protobuf:"bytes,6,opt,name=rules,proto3" json:"rules,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -194,18 +211,26 @@ func (x *PostgresProxy) GetDownstreamSsl() PostgresProxy_SSLMode {
 	return PostgresProxy_DISABLE
 }
 
+func (x *PostgresProxy) GetRules() *v3.RBAC {
+	if x != nil {
+		return x.Rules
+	}
+	return nil
+}
+
 var File_contrib_envoy_extensions_filters_network_postgres_proxy_v3alpha_postgres_proxy_proto protoreflect.FileDescriptor
 
 const file_contrib_envoy_extensions_filters_network_postgres_proxy_v3alpha_postgres_proxy_proto_rawDesc = "" +
 	"\n" +
-	"Tcontrib/envoy/extensions/filters/network/postgres_proxy/v3alpha/postgres_proxy.proto\x127envoy.extensions.filters.network.postgres_proxy.v3alpha\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xcf\x03\n" +
+	"Tcontrib/envoy/extensions/filters/network/postgres_proxy/v3alpha/postgres_proxy.proto\x127envoy.extensions.filters.network.postgres_proxy.v3alpha\x1a\x1fenvoy/config/rbac/v3/rbac.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x81\x04\n" +
 	"\rPostgresProxy\x12(\n" +
 	"\vstat_prefix\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\n" +
 	"statPrefix\x12H\n" +
 	"\x12enable_sql_parsing\x18\x02 \x01(\v2\x1a.google.protobuf.BoolValueR\x10enableSqlParsing\x120\n" +
 	"\rterminate_ssl\x18\x03 \x01(\bB\v\x92ǆ\xd8\x04\x033.0\x18\x01R\fterminateSsl\x12q\n" +
 	"\fupstream_ssl\x18\x04 \x01(\x0e2N.envoy.extensions.filters.network.postgres_proxy.v3alpha.PostgresProxy.SSLModeR\vupstreamSsl\x12u\n" +
-	"\x0edownstream_ssl\x18\x05 \x01(\x0e2N.envoy.extensions.filters.network.postgres_proxy.v3alpha.PostgresProxy.SSLModeR\rdownstreamSsl\".\n" +
+	"\x0edownstream_ssl\x18\x05 \x01(\x0e2N.envoy.extensions.filters.network.postgres_proxy.v3alpha.PostgresProxy.SSLModeR\rdownstreamSsl\x120\n" +
+	"\x05rules\x18\x06 \x01(\v2\x1a.envoy.config.rbac.v3.RBACR\x05rules\".\n" +
 	"\aSSLMode\x12\v\n" +
 	"\aDISABLE\x10\x00\x12\v\n" +
 	"\aREQUIRE\x10\x01\x12\t\n" +
@@ -230,16 +255,18 @@ var file_contrib_envoy_extensions_filters_network_postgres_proxy_v3alpha_postgre
 	(PostgresProxy_SSLMode)(0),   // 0: envoy.extensions.filters.network.postgres_proxy.v3alpha.PostgresProxy.SSLMode
 	(*PostgresProxy)(nil),        // 1: envoy.extensions.filters.network.postgres_proxy.v3alpha.PostgresProxy
 	(*wrapperspb.BoolValue)(nil), // 2: google.protobuf.BoolValue
+	(*v3.RBAC)(nil),              // 3: envoy.config.rbac.v3.RBAC
 }
 var file_contrib_envoy_extensions_filters_network_postgres_proxy_v3alpha_postgres_proxy_proto_depIdxs = []int32{
 	2, // 0: envoy.extensions.filters.network.postgres_proxy.v3alpha.PostgresProxy.enable_sql_parsing:type_name -> google.protobuf.BoolValue
 	0, // 1: envoy.extensions.filters.network.postgres_proxy.v3alpha.PostgresProxy.upstream_ssl:type_name -> envoy.extensions.filters.network.postgres_proxy.v3alpha.PostgresProxy.SSLMode
 	0, // 2: envoy.extensions.filters.network.postgres_proxy.v3alpha.PostgresProxy.downstream_ssl:type_name -> envoy.extensions.filters.network.postgres_proxy.v3alpha.PostgresProxy.SSLMode
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	3, // 3: envoy.extensions.filters.network.postgres_proxy.v3alpha.PostgresProxy.rules:type_name -> envoy.config.rbac.v3.RBAC
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() {
