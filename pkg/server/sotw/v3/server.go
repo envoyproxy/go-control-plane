@@ -40,10 +40,10 @@ type Callbacks interface {
 	// Returning an error will end processing and close the stream. OnStreamClosed will still be called.
 	OnStreamOpen(context.Context, int64, string) error
 	// OnStreamClosed is called immediately prior to closing an xDS stream with a stream ID.
-	OnStreamClosed(int64, *core.Node)
+	OnStreamClosed(context.Context, int64, *core.Node)
 	// OnStreamRequest is called once a request is received on a stream.
 	// Returning an error will end processing and close the stream. OnStreamClosed will still be called.
-	OnStreamRequest(int64, *discovery.DiscoveryRequest) error
+	OnStreamRequest(context.Context, int64, *discovery.DiscoveryRequest) error
 	// OnStreamResponse is called immediately prior to sending a response on a stream.
 	OnStreamResponse(context.Context, int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
 }
@@ -198,7 +198,7 @@ func responseMatchesCurrentSubscription(resp cache.Response, sub stream.Subscrip
 func (s *streamWrapper) shutdown() {
 	s.watches.close()
 	if s.callbacks != nil {
-		s.callbacks.OnStreamClosed(s.ID, s.node)
+		s.callbacks.OnStreamClosed(s.stream.Context(), s.ID, s.node)
 	}
 }
 

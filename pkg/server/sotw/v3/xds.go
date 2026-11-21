@@ -100,7 +100,7 @@ func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryReque
 			}
 
 			if s.callbacks != nil {
-				if err := s.callbacks.OnStreamRequest(sw.ID, req); err != nil {
+				if err := s.callbacks.OnStreamRequest(str.Context(), sw.ID, req); err != nil {
 					return err
 				}
 			}

@@ -13,7 +13,7 @@ For a fully functional gRPC server, check out the provided example for what that
 
 ### Callbacks
 
-All go-control-plane xDS server implementations require `Callback` methods. Callbacks are executed at certain steps of the management server lifecycle. The interface to be implemented can be found [here](https://godoc.org/github.com/envoyproxy/go-control-plane/pkg/server/v2#Callbacks).
+All go-control-plane xDS server implementations require `Callback` methods. Callbacks are executed at certain steps of the management server lifecycle. The interface to be implemented can be found [here](https://pkg.go.dev/github.com/envoyproxy/go-control-plane/pkg/server/v3#Callbacks).
 
 An example implemention of the Callback interface can be found below:
 ```go
@@ -47,7 +47,7 @@ func (cb *Callbacks) OnStreamOpen(_ context.Context, id int64, typ string) error
 	}
 	return nil
 }
-func (cb *Callbacks) OnStreamClosed(id int64, node *core.Node) {
+func (cb *Callbacks) OnStreamClosed(_ context.Context, id int64, node *core.Node) {
 	if cb.Debug {
 		log.Printf("stream %d of node %s closed\n", id, node.Id)
 	}
@@ -58,12 +58,12 @@ func (cb *Callbacks) OnDeltaStreamOpen(_ context.Context, id int64, typ string) 
 	}
 	return nil
 }
-func (cb *Callbacks) OnDeltaStreamClosed(id int64, node *core.Node) {
+func (cb *Callbacks) OnDeltaStreamClosed(_ context.Context, id int64, node *core.Node) {
 	if cb.Debug {
 		log.Printf("delta stream %d of node %s closed\n", id, node.Id)
 	}
 }
-func (cb *Callbacks) OnStreamRequest(int64, *discovery.DiscoveryRequest) error {
+func (cb *Callbacks) OnStreamRequest(context.Context, int64, *discovery.DiscoveryRequest) error {
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
 	cb.Requests++
@@ -75,12 +75,12 @@ func (cb *Callbacks) OnStreamRequest(int64, *discovery.DiscoveryRequest) error {
 }
 func (cb *Callbacks) OnStreamResponse(context.Context, int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse) {
 }
-func (cb *Callbacks) OnStreamDeltaResponse(id int64, req *discovery.DeltaDiscoveryRequest, res *discovery.DeltaDiscoveryResponse) {
+func (cb *Callbacks) OnStreamDeltaResponse(_ context.Context, id int64, req *discovery.DeltaDiscoveryRequest, res *discovery.DeltaDiscoveryResponse) {
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
 	cb.DeltaResponses++
 }
-func (cb *Callbacks) OnStreamDeltaRequest(id int64, req *discovery.DeltaDiscoveryRequest) error {
+func (cb *Callbacks) OnStreamDeltaRequest(_ context.Context, id int64, req *discovery.DeltaDiscoveryRequest) error {
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
 	cb.DeltaRequests++

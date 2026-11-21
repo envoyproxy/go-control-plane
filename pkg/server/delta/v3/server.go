@@ -28,12 +28,12 @@ type Callbacks interface {
 	// Returning an error will end processing and close the stream. OnStreamClosed will still be called.
 	OnDeltaStreamOpen(context.Context, int64, string) error
 	// OnDeltaStreamClosed is called immediately prior to closing an xDS stream with a stream ID.
-	OnDeltaStreamClosed(int64, *core.Node)
+	OnDeltaStreamClosed(context.Context, int64, *core.Node)
 	// OnStreamDeltaRequest is called once a request is received on a stream.
 	// Returning an error will end processing and close the stream. OnStreamClosed will still be called.
-	OnStreamDeltaRequest(int64, *discovery.DeltaDiscoveryRequest) error
+	OnStreamDeltaRequest(context.Context, int64, *discovery.DeltaDiscoveryRequest) error
 	// OnStreamDeltaResponse is called immediately prior to sending a response on a stream.
-	OnStreamDeltaResponse(int64, *discovery.DeltaDiscoveryRequest, *discovery.DeltaDiscoveryResponse)
+	OnStreamDeltaResponse(context.Context, int64, *discovery.DeltaDiscoveryRequest, *discovery.DeltaDiscoveryResponse)
 }
 
 var deltaErrorResponse = &cache.RawDeltaResponse{}
@@ -105,7 +105,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 	defer func() {
 		watches.Cancel()
 		if s.callbacks != nil {
-			s.callbacks.OnDeltaStreamClosed(streamID, node)
+			s.callbacks.OnDeltaStreamClosed(str.Context(), streamID, node)
 		}
 	}()
 
@@ -123,7 +123,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 		streamNonce++
 		response.Nonce = strconv.FormatInt(streamNonce, 10)
 		if s.callbacks != nil {
-			s.callbacks.OnStreamDeltaResponse(streamID, resp.GetDeltaRequest(), response)
+			s.callbacks.OnStreamDeltaResponse(str.Context(), streamID, resp.GetDeltaRequest(), response)
 		}
 
 		return response.GetNonce(), str.Send(response)
@@ -203,7 +203,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			}
 
 			if s.callbacks != nil {
-				if err := s.callbacks.OnStreamDeltaRequest(streamID, req); err != nil {
+				if err := s.callbacks.OnStreamDeltaRequest(str.Context(), streamID, req); err != nil {
 					return err
 				}
 			}

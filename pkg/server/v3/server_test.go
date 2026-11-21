@@ -728,6 +728,34 @@ func TestNilPropagationOverResponseChannelShouldCloseTheStream(t *testing.T) {
 	assert.Equal(t, 0, config.watches)
 }
 
+func TestCallbacksContext(t *testing.T) {
+	for name, typeURL := range map[string]string{"xDS": rsrc.EndpointType, "ordered ADS": rsrc.AnyType} {
+		t.Run(name, func(t *testing.T) {
+			str := makeMockStream(t)
+			ctx, cancel := context.WithCancel(t.Context())
+			defer cancel()
+			str.ctx = ctx
+			str.recv <- &discovery.DiscoveryRequest{Node: node, TypeUrl: rsrc.EndpointType}
+			close(str.recv)
+
+			var requestCtx, closedCtx context.Context
+			s := server.NewServer(t.Context(), makeMockConfigWatcher(), server.CallbackFuncs{
+				StreamRequestFunc: func(ctx context.Context, _ int64, _ *discovery.DiscoveryRequest) error {
+					requestCtx = ctx
+					return nil
+				},
+				StreamClosedFunc: func(ctx context.Context, _ int64, _ *core.Node) {
+					closedCtx = ctx
+				},
+			}, sotw.WithOrderedADS())
+
+			require.NoError(t, s.StreamHandler(str, typeURL))
+			assert.Same(t, ctx, requestCtx)
+			assert.Same(t, ctx, closedCtx)
+		})
+	}
+}
+
 func TestCallbackError(t *testing.T) {
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
