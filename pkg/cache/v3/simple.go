@@ -114,7 +114,28 @@ type snapshotCache struct {
 	// hash is the hashing function for Envoy nodes
 	hash NodeHash
 
+	// reuseUnchangedResources is set by WithReuseUnchangedResources.
+	reuseUnchangedResources bool
+
 	mu sync.RWMutex
+}
+
+// SnapshotCacheOption configures a snapshot cache.
+type SnapshotCacheOption func(*snapshotCache)
+
+// WithReuseUnchangedResources makes a snapshot reuse the delta version of every resource
+// that is the same object under the same name as in the node's previous snapshot, instead
+// of encoding and hashing it again, and keeps the bytes encoded for hashing to build delta
+// responses. It saves CPU for control planes that rebuild snapshots from mostly unchanged
+// resource objects, at the cost of holding the encoded bytes in memory.
+//
+// With this option, resources must not be modified once they are part of a snapshot:
+// a resource modified in place and passed again keeps its previous version, so delta
+// clients don't receive the change.
+func WithReuseUnchangedResources() SnapshotCacheOption {
+	return func(cache *snapshotCache) {
+		cache.reuseUnchangedResources = true
+	}
 }
 
 // missingRequestResource is returned when the request is specifically dropped due to the resources in the request not matching the snapshot content.
@@ -139,11 +160,11 @@ func (e missingRequestResource) Error() string {
 // is OK.
 //
 // Logger is optional.
-func NewSnapshotCache(ads bool, hash NodeHash, logger log.Logger) SnapshotCache {
-	return newSnapshotCache(ads, hash, logger)
+func NewSnapshotCache(ads bool, hash NodeHash, logger log.Logger, opts ...SnapshotCacheOption) SnapshotCache {
+	return newSnapshotCache(ads, hash, logger, opts...)
 }
 
-func newSnapshotCache(ads bool, hash NodeHash, logger log.Logger) *snapshotCache {
+func newSnapshotCache(ads bool, hash NodeHash, logger log.Logger, opts ...SnapshotCacheOption) *snapshotCache {
 	if logger == nil {
 		logger = log.NewDefaultLogger()
 	}
@@ -154,6 +175,9 @@ func newSnapshotCache(ads bool, hash NodeHash, logger log.Logger) *snapshotCache
 		snapshots: make(map[string]ResourceSnapshot),
 		status:    make(map[string]*statusInfo),
 		hash:      hash,
+	}
+	for _, opt := range opts {
+		opt(cache)
 	}
 
 	return cache
@@ -174,8 +198,8 @@ func newSnapshotCache(ads bool, hash NodeHash, logger log.Logger) *snapshotCache
 //
 // The context provides a way to cancel the heartbeating routine, while the heartbeatInterval
 // parameter controls how often heartbeating occurs.
-func NewSnapshotCacheWithHeartbeating(ctx context.Context, ads bool, hash NodeHash, logger log.Logger, heartbeatInterval time.Duration) SnapshotCache {
-	cache := newSnapshotCache(ads, hash, logger)
+func NewSnapshotCacheWithHeartbeating(ctx context.Context, ads bool, hash NodeHash, logger log.Logger, heartbeatInterval time.Duration, opts ...SnapshotCacheOption) SnapshotCache {
+	cache := newSnapshotCache(ads, hash, logger, opts...)
 	go func() {
 		t := time.NewTicker(heartbeatInterval)
 
@@ -266,6 +290,12 @@ func (cache *snapshotCache) SetSnapshot(ctx context.Context, node string, snapsh
 	defer cache.mu.Unlock()
 
 	cache.log.Debugf("setting snapshot for node %s", node)
+	if next, ok := snapshot.(*Snapshot); ok && cache.reuseUnchangedResources {
+		next.keepMarshaled = true
+		if prev, ok := cache.snapshots[node].(*Snapshot); ok {
+			next.inheritVersions(prev)
+		}
+	}
 	// update the existing entry
 	cache.snapshots[node] = snapshot
 
@@ -706,6 +736,7 @@ func createDeltaResponse(snapshot ResourceSnapshot, watch DeltaResponseWatch, re
 	resources := snapshot.GetResourcesAndTTL(typeURL)
 	versionMap := snapshot.GetVersionMap(typeURL)
 	subscribed := watch.subscription.SubscribedResources()
+	s, _ := snapshot.(*Snapshot)
 
 	var resourcesToReturn []*cachedResource
 	var deletedResources []string
@@ -724,7 +755,13 @@ func createDeltaResponse(snapshot ResourceSnapshot, watch DeltaResponseWatch, re
 		if known && knownVersion == resVersion {
 			return
 		}
-		resourcesToReturn = append(resourcesToReturn, newCachedResourceWithTTL(name, res, version))
+		cached := newCachedResourceWithTTL(name, res, version)
+		if s != nil {
+			if marshaled := s.getMarshaledResource(typeURL, name); marshaled != nil {
+				cached = newMarshaledCachedResourceWithTTL(name, res, version, marshaled, resVersion)
+			}
+		}
+		resourcesToReturn = append(resourcesToReturn, cached)
 		returnedResources[name] = resVersion
 	}
 
