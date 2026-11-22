@@ -40,10 +40,13 @@ type DrainAwareHttpConnectionManager struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The underlying HCM configuration to apply.
 	HcmConfig *v3.HttpConnectionManager `protobuf:"bytes,1,opt,name=hcm_config,json=hcmConfig,proto3" json:"hcm_config,omitempty"`
-	// When true, a peer-initiated GOAWAY on a reverse tunnel makes the initiator drop the draining
+	// When true, a peer-initiated GOAWAY or connection-level METADATA frame carrying
+	// ``envoy.reverse_tunnel.drain: true`` on a reverse tunnel makes the initiator drop the draining
 	// tunnel and dial a replacement, so capacity is restored before the old tunnel closes while its
-	// in-flight streams finish. Default false, so the behavior is opt-in and unconfigured listeners
-	// are unaffected. Required by ``metadata_delay`` and ``shutdown_notice_delay``.
+	// in-flight streams finish. Receiving the METADATA frame requires
+	// ``hcm_config.http2_protocol_options.allow_metadata`` to be true. Default false, so the
+	// behavior is opt-in and unconfigured listeners are unaffected. Required by ``metadata_delay``
+	// and ``shutdown_notice_delay``.
 	EnableDrainWithGoaway bool `protobuf:"varint,2,opt,name=enable_drain_with_goaway,json=enableDrainWithGoaway,proto3" json:"enable_drain_with_goaway,omitempty"`
 	// Delay from the start of a reverse tunnel drain until a METADATA frame carrying
 	// ``envoy.reverse_tunnel.drain: true`` is sent. Requires ``enable_drain_with_goaway`` and
