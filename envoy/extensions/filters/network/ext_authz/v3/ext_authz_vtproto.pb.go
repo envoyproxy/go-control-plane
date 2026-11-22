@@ -50,6 +50,16 @@ func (m *ExtAuthz) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.CheckOnNewConnection {
+		i--
+		if m.CheckOnNewConnection {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x68
+	}
 	if m.ShadowMode {
 		i--
 		if m.ShadowMode {
@@ -246,6 +256,9 @@ func (m *ExtAuthz) SizeVT() (n int) {
 		}
 	}
 	if m.ShadowMode {
+		n += 2
+	}
+	if m.CheckOnNewConnection {
 		n += 2
 	}
 	n += len(m.unknownFields)

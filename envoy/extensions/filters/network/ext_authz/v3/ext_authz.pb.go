@@ -30,7 +30,7 @@ const (
 // :ref:`CheckRequest <envoy_v3_api_msg_service.auth.v3.CheckRequest>`.
 // A failed check will cause this filter to close the TCP connection, unless “shadow_mode“ is
 // enabled.
-// [#next-free-field: 13]
+// [#next-free-field: 14]
 type ExtAuthz struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The prefix to use when emitting statistics.
@@ -99,9 +99,23 @@ type ExtAuthz struct {
 	// optionally enforce it.
 	//
 	// Defaults to ``false``.
-	ShadowMode    bool `protobuf:"varint,12,opt,name=shadow_mode,json=shadowMode,proto3" json:"shadow_mode,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	ShadowMode bool `protobuf:"varint,12,opt,name=shadow_mode,json=shadowMode,proto3" json:"shadow_mode,omitempty"`
+	// Start authorization on a new connection without waiting for downstream data, blocking
+	// subsequent network filters until the check allows the connection to continue. This supports
+	// server-first protocols when this filter precedes a TCP proxy in IMMEDIATE mode.
+	//
+	// Authorization does not wait for the downstream TLS handshake to complete, even when
+	// ``include_peer_certificate`` is enabled. Do not use this option with policies that require
+	// authenticated client certificate attributes, such as the source principal or peer certificate.
+	// Metadata from subsequent network filters is also unavailable.
+	//
+	// Sets ``envoy.tcp_proxy.receive_before_connect`` to true if absent. An existing boolean true
+	// is preserved; false or an incorrectly typed value closes the connection.
+	//
+	// Defaults to false, which starts authorization when downstream data is received.
+	CheckOnNewConnection bool `protobuf:"varint,13,opt,name=check_on_new_connection,json=checkOnNewConnection,proto3" json:"check_on_new_connection,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *ExtAuthz) Reset() {
@@ -218,11 +232,18 @@ func (x *ExtAuthz) GetShadowMode() bool {
 	return false
 }
 
+func (x *ExtAuthz) GetCheckOnNewConnection() bool {
+	if x != nil {
+		return x.CheckOnNewConnection
+	}
+	return false
+}
+
 var File_envoy_extensions_filters_network_ext_authz_v3_ext_authz_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_filters_network_ext_authz_v3_ext_authz_proto_rawDesc = "" +
 	"\n" +
-	"=envoy/extensions/filters/network/ext_authz/v3/ext_authz.proto\x12-envoy.extensions.filters.network.ext_authz.v3\x1a(envoy/config/core/v3/config_source.proto\x1a'envoy/config/core/v3/grpc_service.proto\x1a$envoy/type/matcher/v3/metadata.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xb3\x06\n" +
+	"=envoy/extensions/filters/network/ext_authz/v3/ext_authz.proto\x12-envoy.extensions.filters.network.ext_authz.v3\x1a(envoy/config/core/v3/config_source.proto\x1a'envoy/config/core/v3/grpc_service.proto\x1a$envoy/type/matcher/v3/metadata.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xea\x06\n" +
 	"\bExtAuthz\x12(\n" +
 	"\vstat_prefix\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\n" +
 	"statPrefix\x12D\n" +
@@ -238,7 +259,8 @@ const file_envoy_extensions_filters_network_ext_authz_v3_ext_authz_proto_rawDesc
 	" \x03(\tR\x19metadataContextNamespaces\x12I\n" +
 	"!typed_metadata_context_namespaces\x18\v \x03(\tR\x1etypedMetadataContextNamespaces\x12\x1f\n" +
 	"\vshadow_mode\x18\f \x01(\bR\n" +
-	"shadowMode:8\x9aň\x1e3\n" +
+	"shadowMode\x125\n" +
+	"\x17check_on_new_connection\x18\r \x01(\bR\x14checkOnNewConnection:8\x9aň\x1e3\n" +
 	"1envoy.config.filter.network.ext_authz.v2.ExtAuthzB\xb8\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	";io.envoyproxy.envoy.extensions.filters.network.ext_authz.v3B\rExtAuthzProtoP\x01Z`github.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/ext_authz/v3;ext_authzv3b\x06proto3"
 
