@@ -1076,6 +1076,21 @@ func (m *CommonTlsContext) validate(all bool) error {
 		}
 	}
 
+	if wrapper := m.GetMaxSendFragment(); wrapper != nil {
+
+		if val := wrapper.GetValue(); val < 512 || val > 16384 {
+			err := CommonTlsContextValidationError{
+				field:  "MaxSendFragment",
+				reason: "value must be inside range [512, 16384]",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
 	switch v := m.ValidationContextType.(type) {
 	case *CommonTlsContext_ValidationContext:
 		if v == nil {

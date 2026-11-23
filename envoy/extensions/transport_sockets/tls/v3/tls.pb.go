@@ -486,7 +486,7 @@ func (x *TlsKeyLog) GetRemoteAddressRange() []*v3.CidrRange {
 }
 
 // TLS context shared by both client and server TLS contexts.
-// [#next-free-field: 17]
+// [#next-free-field: 18]
 type CommonTlsContext struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// TLS protocol versions, cipher suites etc.
@@ -558,9 +558,14 @@ type CommonTlsContext struct {
 	// [#extension-category: envoy.tls_handshakers]
 	CustomHandshaker *v3.TypedExtensionConfig `protobuf:"bytes,13,opt,name=custom_handshaker,json=customHandshaker,proto3" json:"custom_handshaker,omitempty"`
 	// TLS key log configuration
-	KeyLog        *TlsKeyLog `protobuf:"bytes,15,opt,name=key_log,json=keyLog,proto3" json:"key_log,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	KeyLog *TlsKeyLog `protobuf:"bytes,15,opt,name=key_log,json=keyLog,proto3" json:"key_log,omitempty"`
+	// The maximum plaintext size, in bytes, of each TLS record sent, handshake records included.
+	// Must be 512 to 16384 inclusive, and defaults to 16384. Applies to every certificate in the
+	// context. Smaller values send more records, which costs CPU, socket writes and bytes on the
+	// wire. This field has no effect on QUIC.
+	MaxSendFragment *wrapperspb.UInt32Value `protobuf:"bytes,17,opt,name=max_send_fragment,json=maxSendFragment,proto3" json:"max_send_fragment,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *CommonTlsContext) Reset() {
@@ -715,6 +720,13 @@ func (x *CommonTlsContext) GetCustomHandshaker() *v3.TypedExtensionConfig {
 func (x *CommonTlsContext) GetKeyLog() *TlsKeyLog {
 	if x != nil {
 		return x.KeyLog
+	}
+	return nil
+}
+
+func (x *CommonTlsContext) GetMaxSendFragment() *wrapperspb.UInt32Value {
+	if x != nil {
+		return x.MaxSendFragment
 	}
 	return nil
 }
@@ -1062,7 +1074,7 @@ const file_envoy_extensions_transport_sockets_tls_v3_tls_proto_rawDesc = "" +
 	"\tTlsKeyLog\x12\x1b\n" +
 	"\x04path\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x04path\x12O\n" +
 	"\x13local_address_range\x18\x02 \x03(\v2\x1f.envoy.config.core.v3.CidrRangeR\x11localAddressRange\x12Q\n" +
-	"\x14remote_address_range\x18\x03 \x03(\v2\x1f.envoy.config.core.v3.CidrRangeR\x12remoteAddressRange\"\xdd\x18\n" +
+	"\x14remote_address_range\x18\x03 \x03(\v2\x1f.envoy.config.core.v3.CidrRangeR\x12remoteAddressRange\"\xb5\x19\n" +
 	"\x10CommonTlsContext\x12W\n" +
 	"\n" +
 	"tls_params\x18\x01 \x01(\v28.envoy.extensions.transport_sockets.tls.v3.TlsParametersR\ttlsParams\x12d\n" +
@@ -1080,7 +1092,8 @@ const file_envoy_extensions_transport_sockets_tls_v3_tls_proto_rawDesc = "" +
 	"0validation_context_certificate_provider_instance\x18\f \x01(\v2W.envoy.extensions.transport_sockets.tls.v3.CommonTlsContext.CertificateProviderInstanceB\v\x92ǆ\xd8\x04\x033.0\x18\x01H\x00R,validationContextCertificateProviderInstance\x12%\n" +
 	"\x0ealpn_protocols\x18\x04 \x03(\tR\ralpnProtocols\x12W\n" +
 	"\x11custom_handshaker\x18\r \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigR\x10customHandshaker\x12M\n" +
-	"\akey_log\x18\x0f \x01(\v24.envoy.extensions.transport_sockets.tls.v3.TlsKeyLogR\x06keyLog\x1a\x92\x01\n" +
+	"\akey_log\x18\x0f \x01(\v24.envoy.extensions.transport_sockets.tls.v3.TlsKeyLogR\x06keyLog\x12V\n" +
+	"\x11max_send_fragment\x18\x11 \x01(\v2\x1c.google.protobuf.UInt32ValueB\f\xfaB\t*\a\x18\x80\x80\x01(\x80\x04R\x0fmaxSendFragment\x1a\x92\x01\n" +
 	"\x13CertificateProvider\x12\x1b\n" +
 	"\x04name\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x04name\x12O\n" +
 	"\ftyped_config\x18\x02 \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigH\x00R\vtypedConfigB\r\n" +
@@ -1161,16 +1174,17 @@ var file_envoy_extensions_transport_sockets_tls_v3_tls_proto_depIdxs = []int32{
 	6,  // 24: envoy.extensions.transport_sockets.tls.v3.CommonTlsContext.validation_context_certificate_provider_instance:type_name -> envoy.extensions.transport_sockets.tls.v3.CommonTlsContext.CertificateProviderInstance
 	17, // 25: envoy.extensions.transport_sockets.tls.v3.CommonTlsContext.custom_handshaker:type_name -> envoy.config.core.v3.TypedExtensionConfig
 	3,  // 26: envoy.extensions.transport_sockets.tls.v3.CommonTlsContext.key_log:type_name -> envoy.extensions.transport_sockets.tls.v3.TlsKeyLog
-	17, // 27: envoy.extensions.transport_sockets.tls.v3.CommonTlsContext.CertificateProvider.typed_config:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	18, // 28: envoy.extensions.transport_sockets.tls.v3.CommonTlsContext.CombinedCertificateValidationContext.default_validation_context:type_name -> envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext
-	11, // 29: envoy.extensions.transport_sockets.tls.v3.CommonTlsContext.CombinedCertificateValidationContext.validation_context_sds_secret_config:type_name -> envoy.extensions.transport_sockets.tls.v3.SdsSecretConfig
-	5,  // 30: envoy.extensions.transport_sockets.tls.v3.CommonTlsContext.CombinedCertificateValidationContext.validation_context_certificate_provider:type_name -> envoy.extensions.transport_sockets.tls.v3.CommonTlsContext.CertificateProvider
-	6,  // 31: envoy.extensions.transport_sockets.tls.v3.CommonTlsContext.CombinedCertificateValidationContext.validation_context_certificate_provider_instance:type_name -> envoy.extensions.transport_sockets.tls.v3.CommonTlsContext.CertificateProviderInstance
-	32, // [32:32] is the sub-list for method output_type
-	32, // [32:32] is the sub-list for method input_type
-	32, // [32:32] is the sub-list for extension type_name
-	32, // [32:32] is the sub-list for extension extendee
-	0,  // [0:32] is the sub-list for field type_name
+	8,  // 27: envoy.extensions.transport_sockets.tls.v3.CommonTlsContext.max_send_fragment:type_name -> google.protobuf.UInt32Value
+	17, // 28: envoy.extensions.transport_sockets.tls.v3.CommonTlsContext.CertificateProvider.typed_config:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	18, // 29: envoy.extensions.transport_sockets.tls.v3.CommonTlsContext.CombinedCertificateValidationContext.default_validation_context:type_name -> envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext
+	11, // 30: envoy.extensions.transport_sockets.tls.v3.CommonTlsContext.CombinedCertificateValidationContext.validation_context_sds_secret_config:type_name -> envoy.extensions.transport_sockets.tls.v3.SdsSecretConfig
+	5,  // 31: envoy.extensions.transport_sockets.tls.v3.CommonTlsContext.CombinedCertificateValidationContext.validation_context_certificate_provider:type_name -> envoy.extensions.transport_sockets.tls.v3.CommonTlsContext.CertificateProvider
+	6,  // 32: envoy.extensions.transport_sockets.tls.v3.CommonTlsContext.CombinedCertificateValidationContext.validation_context_certificate_provider_instance:type_name -> envoy.extensions.transport_sockets.tls.v3.CommonTlsContext.CertificateProviderInstance
+	33, // [33:33] is the sub-list for method output_type
+	33, // [33:33] is the sub-list for method input_type
+	33, // [33:33] is the sub-list for extension type_name
+	33, // [33:33] is the sub-list for extension extendee
+	0,  // [0:33] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_transport_sockets_tls_v3_tls_proto_init() }

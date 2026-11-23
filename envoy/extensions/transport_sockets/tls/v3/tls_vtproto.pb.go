@@ -634,6 +634,18 @@ func (m *CommonTlsContext) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.MaxSendFragment != nil {
+		size, err := (*wrapperspb.UInt32Value)(m.MaxSendFragment).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x8a
+	}
 	if m.CustomTlsCertificateSelector != nil {
 		if vtmsg, ok := interface{}(m.CustomTlsCertificateSelector).(interface {
 			MarshalToSizedBufferVTStrict([]byte) (int, error)
@@ -1214,6 +1226,10 @@ func (m *CommonTlsContext) SizeVT() (n int) {
 		} else {
 			l = proto.Size(m.CustomTlsCertificateSelector)
 		}
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.MaxSendFragment != nil {
+		l = (*wrapperspb.UInt32Value)(m.MaxSendFragment).SizeVT()
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
