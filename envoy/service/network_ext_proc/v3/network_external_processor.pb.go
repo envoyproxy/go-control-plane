@@ -8,7 +8,6 @@ package network_ext_procv3
 
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
-	_ "github.com/cncf/xds/go/xds/annotations/v3"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -408,7 +407,7 @@ var File_envoy_service_network_ext_proc_v3_network_external_processor_proto prot
 
 const file_envoy_service_network_ext_proc_v3_network_external_processor_proto_rawDesc = "" +
 	"\n" +
-	"Benvoy/service/network_ext_proc/v3/network_external_processor.proto\x12!envoy.service.network_ext_proc.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\">\n" +
+	"Benvoy/service/network_ext_proc/v3/network_external_processor.proto\x12!envoy.service.network_ext_proc.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1dudpa/annotations/status.proto\">\n" +
 	"\x04Data\x12\x12\n" +
 	"\x04data\x18\x01 \x01(\fR\x04data\x12\"\n" +
 	"\rend_of_stream\x18\x02 \x01(\bR\vendOfStream\"\x9b\x03\n" +
@@ -441,7 +440,7 @@ const file_envoy_service_network_ext_proc_v3_network_external_processor_proto_ra
 	"\x05CLOSE\x10\x01\x12\r\n" +
 	"\tCLOSE_RST\x10\x022\x98\x01\n" +
 	"\x18NetworkExternalProcessor\x12|\n" +
-	"\aProcess\x124.envoy.service.network_ext_proc.v3.ProcessingRequest\x1a5.envoy.service.network_ext_proc.v3.ProcessingResponse\"\x00(\x010\x01B\xbf\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
+	"\aProcess\x124.envoy.service.network_ext_proc.v3.ProcessingRequest\x1a5.envoy.service.network_ext_proc.v3.ProcessingResponse\"\x00(\x010\x01B\xb7\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"/io.envoyproxy.envoy.service.network_ext_proc.v3B\x1dNetworkExternalProcessorProtoP\x01Z[github.com/envoyproxy/go-control-plane/envoy/service/network_ext_proc/v3;network_ext_procv3b\x06proto3"
 
 var (

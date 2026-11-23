@@ -8,7 +8,6 @@ package ext_procv3
 
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
-	_ "github.com/cncf/xds/go/xds/annotations/v3"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -397,7 +396,7 @@ var File_envoy_extensions_filters_network_ext_proc_v3_ext_proc_proto protoreflec
 
 const file_envoy_extensions_filters_network_ext_proc_v3_ext_proc_proto_rawDesc = "" +
 	"\n" +
-	";envoy/extensions/filters/network/ext_proc/v3/ext_proc.proto\x12,envoy.extensions.filters.network.ext_proc.v3\x1a'envoy/config/core/v3/grpc_service.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x91\x04\n" +
+	";envoy/extensions/filters/network/ext_proc/v3/ext_proc.proto\x12,envoy.extensions.filters.network.ext_proc.v3\x1a'envoy/config/core/v3/grpc_service.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x91\x04\n" +
 	"\x18NetworkExternalProcessor\x12D\n" +
 	"\fgrpc_service\x18\x01 \x01(\v2!.envoy.config.core.v3.GrpcServiceR\vgrpcService\x12,\n" +
 	"\x12failure_mode_allow\x18\x02 \x01(\bR\x10failureModeAllow\x12e\n" +
@@ -420,7 +419,7 @@ const file_envoy_extensions_filters_network_ext_proc_v3_ext_proc_proto_rawDesc =
 	"\tsend_once\x18\x03 \x01(\v2\x1a.google.protobuf.BoolValueR\bsendOnce\x1aD\n" +
 	"\x12MetadataNamespaces\x12\x18\n" +
 	"\auntyped\x18\x01 \x03(\tR\auntyped\x12\x14\n" +
-	"\x05typed\x18\x02 \x03(\tR\x05typedB\xbc\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
+	"\x05typed\x18\x02 \x03(\tR\x05typedB\xb4\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	":io.envoyproxy.envoy.extensions.filters.network.ext_proc.v3B\fExtProcProtoP\x01Z^github.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/ext_proc/v3;ext_procv3b\x06proto3"
 
 var (
