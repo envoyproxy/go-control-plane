@@ -60,7 +60,7 @@ const (
 type LLMBinding struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The request path, as a :ref:`URI pattern
-	// <config_http_filters_ai_protocol_manager_transcoder_instructions>`: a two-way map between the
+	// <config_http_ai_filters_transcoder_instructions>`: a two-way map between the
 	// path and the request's named values, each matching one path segment. ``{model}`` is the
 	// request's model and the ``{unary|stream}`` choice its ``stream``, where the two sides differ in
 	// the path; any other variable, such as ``{project}``, is a path variable, kept beside the body

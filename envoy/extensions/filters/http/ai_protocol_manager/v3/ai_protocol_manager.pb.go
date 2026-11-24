@@ -701,7 +701,7 @@ type RequestPerRoute struct {
 	// exist.]
 	LlmProtocol v31.LLMProtocol `protobuf:"varint,1,opt,name=llm_protocol,json=llmProtocol,proto3,enum=envoy.type.ai.v3.LLMProtocol" json:"llm_protocol,omitempty"`
 	// How clients on this route carry ``llm_protocol`` on HTTP: the
-	// :ref:`binding <config_http_filters_ai_protocol_manager_transcoder_instructions>`
+	// :ref:`binding <config_http_ai_filters_transcoder_instructions>`
 	// the transcoder reads the client's path and body under. When unset, the
 	// client's path is read under the API's own binding and the bindings Envoy
 	// defines for it, so one route takes clients of the Anthropic API and of
@@ -766,7 +766,7 @@ type ResponsePerRoute struct {
 	// ``LLM_PROTOCOL_UNSPECIFIED`` falls through the precedence chain above.
 	LlmProtocol v31.LLMProtocol `protobuf:"varint,1,opt,name=llm_protocol,json=llmProtocol,proto3,enum=envoy.type.ai.v3.LLMProtocol" json:"llm_protocol,omitempty"`
 	// How the backend carries its API on HTTP: the
-	// :ref:`binding <config_http_filters_ai_protocol_manager_transcoder_instructions>`
+	// :ref:`binding <config_http_ai_filters_transcoder_instructions>`
 	// the transcoder renders the request's path from and applies to its body.
 	// When unset, a request whose backend speaks the client's API leaves in the
 	// binding it arrived in, and any other request in the backend API's own.
