@@ -80,9 +80,6 @@ type LinearCache struct {
 	// or been removed for it, and a watch is only changed by a response, which unregisters it. For
 	// those, an update can only affect the modified resources, so they are the only ones to check.
 	syncedWildcardWatches map[uint64]struct{}
-	// disableIncrementalWildcard makes every wildcard watch compare the whole cache. It is only used
-	// by tests and benchmarks to check that both ways agree.
-	disableIncrementalWildcard bool
 	// currentWatchID is used to index new watches.
 	currentWatchID uint64
 
@@ -440,7 +437,7 @@ func (cache *LinearCache) notifyAll(modified []string) error {
 	for watchID, watch := range cache.wildcardWatches {
 		var response WatchResponse
 		var err error
-		if _, synced := cache.syncedWildcardWatches[watchID]; synced && !cache.disableIncrementalWildcard {
+		if _, synced := cache.syncedWildcardWatches[watchID]; synced {
 			if !uniqueComputed {
 				uniqueModified, uniqueComputed = uniqueNames(modified), true
 			}

@@ -108,6 +108,14 @@ func (s *wcStream) pump(c *LinearCache) ([]string, error) {
 	}
 }
 
+// clearSynced makes the cache treat every wildcard watch as not in sync, so the next update compares
+// the whole cache for it. This is the behavior the incremental path has to match.
+func clearSynced(c *LinearCache) {
+	for id := range c.syncedWildcardWatches {
+		delete(c.syncedWildcardWatches, id)
+	}
+}
+
 type wcKind struct {
 	typeURL string
 	mk      func(name string, rev int) types.Resource
@@ -144,7 +152,6 @@ func runWildcardDifferential(t *testing.T, kind wcKind, seed int64) {
 	rnd := rand.New(rand.NewSource(seed))
 	const pool = 100
 	fast, ref := NewLinearCache(kind.typeURL), NewLinearCache(kind.typeURL)
-	ref.disableIncrementalWildcard = true
 	names := make([]string, pool)
 	for i := range names {
 		names[i] = fmt.Sprintf("r%03d", i)
@@ -199,6 +206,7 @@ func runWildcardDifferential(t *testing.T, kind wcKind, seed int64) {
 	for _, c := range []*LinearCache{fast, ref} {
 		require.NoError(t, c.UpdateResources(seedRes, nil))
 	}
+	clearSynced(ref)
 	connect(true, nil, false)
 	connect(false, nil, false)
 	connect(true, pick(8), false)
@@ -206,6 +214,8 @@ func runWildcardDifferential(t *testing.T, kind wcKind, seed int64) {
 	compare("connect")
 
 	for step := 0; step < 300; step++ {
+		// The reference never has synced watches, so it compares the whole cache on every update.
+		clearSynced(ref)
 		switch op := rnd.Intn(10); {
 		case op <= 3:
 			upd := map[string]types.Resource{}
@@ -326,7 +336,6 @@ func BenchmarkLinearWildcardUpdate(b *testing.B) {
 	}{{"full-scan", true}, {"incremental", false}} {
 		b.Run(tc.name, func(b *testing.B) {
 			c := NewLinearCache(resource.EndpointType)
-			c.disableIncrementalWildcard = tc.full
 			mk := func(i, rev int) types.Resource {
 				return &endpoint.ClusterLoadAssignment{ClusterName: strconv.Itoa(i), Endpoints: []*endpoint.LocalityLbEndpoints{{Priority: uint32(rev)}}}
 			}
@@ -344,6 +353,9 @@ func BenchmarkLinearWildcardUpdate(b *testing.B) {
 			b.ResetTimer()
 			var write time.Duration
 			for i := 0; i < b.N; i++ {
+				if tc.full {
+					clearSynced(c)
+				}
 				start := time.Now()
 				require.NoError(b, c.UpdateResources(map[string]types.Resource{strconv.Itoa(i % resources): mk(i%resources, i+1)}, nil))
 				write += time.Since(start)
