@@ -48,6 +48,15 @@ type watch interface {
 
 type watches map[uint64]watch
 
+// wildcardWatch is a wildcard watch along with whether its subscription is known to hold exactly the
+// cache's current versions: when it was registered no resource had changed or been removed for it,
+// and a watch is only changed by a response, which unregisters it. For synced watches an update can
+// only affect the modified resources, so they are the only ones to check.
+type wildcardWatch struct {
+	watch  watch
+	synced bool
+}
+
 func newWatches() watches {
 	return make(watches)
 }
@@ -74,12 +83,7 @@ type LinearCache struct {
 	// Keyed by the prefix with the trailing glob stripped but the separator kept (e.g. "collection/").
 	prefixWatches map[string]watches
 	// wildcardWatches keeps track of all wildcard watches currently opened.
-	wildcardWatches watches
-	// syncedWildcardWatches is the subset of wildcardWatches whose subscription is known to hold
-	// exactly the cache's current versions: when such a watch was registered no resource had changed
-	// or been removed for it, and a watch is only changed by a response, which unregisters it. For
-	// those, an update can only affect the modified resources, so they are the only ones to check.
-	syncedWildcardWatches map[uint64]struct{}
+	wildcardWatches map[uint64]*wildcardWatch
 	// currentWatchID is used to index new watches.
 	currentWatchID uint64
 
@@ -128,15 +132,14 @@ func WithLogger(log log.Logger) LinearCacheOption {
 // NewLinearCache creates a new cache. See the comments on the struct definition.
 func NewLinearCache(typeURL string, opts ...LinearCacheOption) *LinearCache {
 	out := &LinearCache{
-		typeURL:               typeURL,
-		resources:             make(map[string]*cachedResource),
-		resourceWatches:       make(map[string]watches),
-		prefixWatches:         make(map[string]watches),
-		wildcardWatches:       newWatches(),
-		syncedWildcardWatches: make(map[uint64]struct{}),
-		version:               0,
-		currentWatchID:        0,
-		log:                   log.NewDefaultLogger(),
+		typeURL:         typeURL,
+		resources:       make(map[string]*cachedResource),
+		resourceWatches: make(map[string]watches),
+		prefixWatches:   make(map[string]watches),
+		wildcardWatches: make(map[uint64]*wildcardWatch),
+		version:         0,
+		currentWatchID:  0,
+		log:             log.NewDefaultLogger(),
 	}
 	for _, opt := range opts {
 		opt(out)
@@ -434,10 +437,11 @@ func (cache *LinearCache) notifyAll(modified []string) error {
 
 	var uniqueModified []string
 	uniqueComputed := false
-	for watchID, watch := range cache.wildcardWatches {
+	for watchID, ww := range cache.wildcardWatches {
+		watch := ww.watch
 		var response WatchResponse
 		var err error
-		if _, synced := cache.syncedWildcardWatches[watchID]; synced {
+		if ww.synced {
 			if !uniqueComputed {
 				uniqueModified, uniqueComputed = uniqueNames(modified), true
 			}
@@ -449,7 +453,7 @@ func (cache *LinearCache) notifyAll(modified []string) error {
 			if err == nil && response == nil && len(removed) > 0 {
 				// sotw cannot notify a deletion for types which are not full-state, so the subscription
 				// keeps the removed names and no longer mirrors the cache: stop using the shortcut.
-				delete(cache.syncedWildcardWatches, watchID)
+				ww.synced = false
 			}
 		} else {
 			response, err = cache.computeResponse(watch, false)
@@ -673,10 +677,7 @@ func (cache *LinearCache) trackWatch(watch watch, synced bool) func() {
 	if sub.IsWildcard() {
 		cache.log.Infof("[linear cache] open watch %d (delta: %t) for %s all resources", watchID, watch.isDelta(), cache.typeURL)
 		cache.log.Debugf("[linear cache] subscription details for watch %d: known versions %v, system version %q", watchID, sub.ReturnedResources(), cache.getVersion())
-		cache.wildcardWatches[watchID] = watch
-		if synced {
-			cache.syncedWildcardWatches[watchID] = struct{}{}
-		}
+		cache.wildcardWatches[watchID] = &wildcardWatch{watch: watch, synced: synced}
 		return func() {
 			cache.mu.Lock()
 			defer cache.mu.Unlock()
@@ -713,7 +714,6 @@ func (cache *LinearCache) trackWatch(watch watch, synced bool) func() {
 func (cache *LinearCache) removeWildcardWatch(watchID uint64) {
 	cache.watchCount--
 	delete(cache.wildcardWatches, watchID)
-	delete(cache.syncedWildcardWatches, watchID)
 }
 
 // Must be called under lock.

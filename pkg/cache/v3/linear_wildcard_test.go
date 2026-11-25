@@ -111,9 +111,19 @@ func (s *wcStream) pump(c *LinearCache) ([]string, error) {
 // clearSynced makes the cache treat every wildcard watch as not in sync, so the next update compares
 // the whole cache for it. This is the behavior the incremental path has to match.
 func clearSynced(c *LinearCache) {
-	for id := range c.syncedWildcardWatches {
-		delete(c.syncedWildcardWatches, id)
+	for _, ww := range c.wildcardWatches {
+		ww.synced = false
 	}
+}
+
+func countSynced(c *LinearCache) int {
+	n := 0
+	for _, ww := range c.wildcardWatches {
+		if ww.synced {
+			n++
+		}
+	}
+	return n
 }
 
 type wcKind struct {
@@ -261,9 +271,11 @@ func runWildcardDifferential(t *testing.T, kind wcKind, seed int64) {
 	}
 
 	// the shortcut is only valid while a synced watch really holds the cache's versions
-	for id := range fast.syncedWildcardWatches {
-		w, ok := fast.wildcardWatches[id]
-		require.True(t, ok, "seed %d: synced watch %d is not registered", seed, id)
+	for id, ww := range fast.wildcardWatches {
+		if !ww.synced {
+			continue
+		}
+		w := ww.watch
 		sub := w.getSubscription()
 		known := sub.ReturnedResources()
 		assert.Len(t, known, len(fast.resources), "seed %d: synced watch %d diverged", seed, id)
@@ -273,7 +285,7 @@ func runWildcardDifferential(t *testing.T, kind wcKind, seed int64) {
 			assert.Equal(t, v, known[name], "seed %d: synced watch %d diverged on %s", seed, id, name)
 		}
 	}
-	assert.NotEmpty(t, fast.syncedWildcardWatches, "seed %d: the incremental path was not exercised", seed)
+	assert.NotZero(t, countSynced(fast), "seed %d: the incremental path was not exercised", seed)
 }
 
 func TestLinearWildcardIncrementalUnchangedAndStale(t *testing.T) {
@@ -288,14 +300,14 @@ func TestLinearWildcardIncrementalUnchangedAndStale(t *testing.T) {
 	got, err := s.pump(c)
 	require.NoError(t, err)
 	require.Len(t, got, 1)
-	assert.Len(t, c.syncedWildcardWatches, 1)
+	assert.Equal(t, 1, countSynced(c))
 
 	// rewriting identical content does not answer a delta stream, and it stays synced
 	require.NoError(t, c.UpdateResources(map[string]types.Resource{"a": mk("a", 0)}, nil))
 	got, err = s.pump(c)
 	require.NoError(t, err)
 	assert.Empty(t, got)
-	assert.Len(t, c.syncedWildcardWatches, 1)
+	assert.Equal(t, 1, countSynced(c))
 
 	// only the changed resource is returned, and removal is reported
 	require.NoError(t, c.UpdateResources(map[string]types.Resource{"b": mk("b", 1)}, []string{"a"}))
@@ -307,11 +319,11 @@ func TestLinearWildcardIncrementalUnchangedAndStale(t *testing.T) {
 
 	// a stream reconnecting with stale versions is not synced until it has been answered
 	stale := newWCStream(c, true, nil, map[string]string{"b": "old", "gone": "x"}, "")
-	assert.Len(t, c.syncedWildcardWatches, 1, "a stale stream must not be tracked as synced")
+	assert.Equal(t, 1, countSynced(c), "a stale stream must not be tracked as synced")
 	got, err = stale.pump(c)
 	require.NoError(t, err)
 	require.Len(t, got, 1)
-	assert.Len(t, c.syncedWildcardWatches, 2)
+	assert.Equal(t, 2, countSynced(c))
 }
 
 func TestLinearWildcardIncrementalCancelUntracks(t *testing.T) {
@@ -320,9 +332,9 @@ func TestLinearWildcardIncrementalCancelUntracks(t *testing.T) {
 	w := make(chan DeltaResponse, 1)
 	cancel, err := c.CreateDeltaWatch(&DeltaRequest{TypeUrl: resource.EndpointType, ResponseNonce: "n"}, sub, w)
 	require.NoError(t, err)
-	assert.Len(t, c.syncedWildcardWatches, 1)
+	assert.Equal(t, 1, countSynced(c))
 	cancel()
-	assert.Empty(t, c.syncedWildcardWatches)
+	assert.Zero(t, countSynced(c))
 	assert.Zero(t, c.NumWildcardWatches())
 }
 
