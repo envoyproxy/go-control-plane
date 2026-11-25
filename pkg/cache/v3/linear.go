@@ -75,6 +75,14 @@ type LinearCache struct {
 	prefixWatches map[string]watches
 	// wildcardWatches keeps track of all wildcard watches currently opened.
 	wildcardWatches watches
+	// syncedWildcardWatches is the subset of wildcardWatches whose subscription is known to hold
+	// exactly the cache's current versions: when such a watch was registered no resource had changed
+	// or been removed for it, and a watch is only changed by a response, which unregisters it. For
+	// those, an update can only affect the modified resources, so they are the only ones to check.
+	syncedWildcardWatches map[uint64]struct{}
+	// disableIncrementalWildcard makes every wildcard watch compare the whole cache. It is only used
+	// by tests and benchmarks to check that both ways agree.
+	disableIncrementalWildcard bool
 	// currentWatchID is used to index new watches.
 	currentWatchID uint64
 
@@ -123,14 +131,15 @@ func WithLogger(log log.Logger) LinearCacheOption {
 // NewLinearCache creates a new cache. See the comments on the struct definition.
 func NewLinearCache(typeURL string, opts ...LinearCacheOption) *LinearCache {
 	out := &LinearCache{
-		typeURL:         typeURL,
-		resources:       make(map[string]*cachedResource),
-		resourceWatches: make(map[string]watches),
-		prefixWatches:   make(map[string]watches),
-		wildcardWatches: newWatches(),
-		version:         0,
-		currentWatchID:  0,
-		log:             log.NewDefaultLogger(),
+		typeURL:               typeURL,
+		resources:             make(map[string]*cachedResource),
+		resourceWatches:       make(map[string]watches),
+		prefixWatches:         make(map[string]watches),
+		wildcardWatches:       newWatches(),
+		syncedWildcardWatches: make(map[uint64]struct{}),
+		version:               0,
+		currentWatchID:        0,
+		log:                   log.NewDefaultLogger(),
 	}
 	for _, opt := range opts {
 		opt(out)
@@ -260,11 +269,61 @@ func (cache *LinearCache) computeResourceChange(sub Subscription, useResourceVer
 }
 
 func (cache *LinearCache) computeResponse(watch watch, replyEvenIfEmpty bool) (WatchResponse, error) {
-	sub := watch.getSubscription()
-	changedResources, removedResources, err := cache.computeResourceChange(sub, watch.useResourceVersion())
+	changedResources, removedResources, err := cache.computeResourceChange(watch.getSubscription(), watch.useResourceVersion())
 	if err != nil {
 		return nil, err
 	}
+	return cache.computeResponseFromChanges(watch, replyEvenIfEmpty, changedResources, removedResources)
+}
+
+// computeWildcardChangeFromModified is computeResourceChange for a wildcard subscription that is
+// known to hold exactly the cache's versions as of before an update which modified the given
+// (unique) resources. Only those can differ, so only those are compared, which makes the cost
+// depend on the size of the update rather than on the size of the cache.
+func (cache *LinearCache) computeWildcardChangeFromModified(sub Subscription, useResourceVersion bool, modified []string) (updated, removed []string, err error) {
+	knownVersions := sub.ReturnedResources()
+	for _, name := range modified {
+		res, inCache := cache.resources[name]
+		knownVersion, known := knownVersions[name]
+		switch {
+		case !inCache:
+			if known {
+				removed = append(removed, name)
+			}
+		case !known:
+			updated = append(updated, name)
+		default:
+			resourceVersion, err := res.getVersion(useResourceVersion)
+			if err != nil {
+				return nil, nil, fmt.Errorf("failed to compute version of %s: %w", name, err)
+			}
+			if knownVersion != resourceVersion {
+				updated = append(updated, name)
+			}
+		}
+	}
+	return updated, removed, nil
+}
+
+// uniqueNames returns names without duplicates. A name can be listed twice by UpdateResources when
+// it is both updated and deleted.
+func uniqueNames(names []string) []string {
+	if len(names) < 2 {
+		return names
+	}
+	seen := make(map[string]struct{}, len(names))
+	out := make([]string, 0, len(names))
+	for _, name := range names {
+		if _, dup := seen[name]; !dup {
+			seen[name] = struct{}{}
+			out = append(out, name)
+		}
+	}
+	return out
+}
+
+func (cache *LinearCache) computeResponseFromChanges(watch watch, replyEvenIfEmpty bool, changedResources, removedResources []string) (WatchResponse, error) {
+	sub := watch.getSubscription()
 
 	if len(changedResources) == 0 && len(removedResources) == 0 && !replyEvenIfEmpty {
 		// Nothing changed.
@@ -376,8 +435,28 @@ func (cache *LinearCache) notifyAll(modified []string) error {
 		}
 	}
 
+	var uniqueModified []string
+	uniqueComputed := false
 	for watchID, watch := range cache.wildcardWatches {
-		response, err := cache.computeResponse(watch, false)
+		var response WatchResponse
+		var err error
+		if _, synced := cache.syncedWildcardWatches[watchID]; synced && !cache.disableIncrementalWildcard {
+			if !uniqueComputed {
+				uniqueModified, uniqueComputed = uniqueNames(modified), true
+			}
+			var changed, removed []string
+			changed, removed, err = cache.computeWildcardChangeFromModified(watch.getSubscription(), watch.useResourceVersion(), uniqueModified)
+			if err == nil {
+				response, err = cache.computeResponseFromChanges(watch, false, changed, removed)
+			}
+			if err == nil && response == nil && len(removed) > 0 {
+				// sotw cannot notify a deletion for types which are not full-state, so the subscription
+				// keeps the removed names and no longer mirrors the cache: stop using the shortcut.
+				delete(cache.syncedWildcardWatches, watchID)
+			}
+		} else {
+			response, err = cache.computeResponse(watch, false)
+		}
 		if err != nil {
 			return err
 		}
@@ -527,7 +606,11 @@ func (cache *LinearCache) CreateWatch(request *Request, sub Subscription, value 
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
-	response, err := cache.computeResponse(watch, replyEvenIfEmpty)
+	changed, removed, err := cache.computeResourceChange(sub, watch.useResourceVersion())
+	if err != nil {
+		return nil, fmt.Errorf("failed to compute the watch respnse: %w", err)
+	}
+	response, err := cache.computeResponseFromChanges(watch, replyEvenIfEmpty, changed, removed)
 	if err != nil {
 		return nil, fmt.Errorf("failed to compute the watch respnse: %w", err)
 	}
@@ -537,7 +620,7 @@ func (cache *LinearCache) CreateWatch(request *Request, sub Subscription, value 
 		return func() {}, nil
 	}
 
-	return cache.trackWatch(watch), nil
+	return cache.trackWatch(watch, len(changed) == 0 && len(removed) == 0), nil
 }
 
 func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, sub Subscription, value chan DeltaResponse) (func(), error) {
@@ -554,7 +637,11 @@ func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, sub Subscripti
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
-	response, err := cache.computeResponse(watch, replyEvenIfEmpty)
+	changed, removed, err := cache.computeResourceChange(sub, watch.useResourceVersion())
+	if err != nil {
+		return nil, fmt.Errorf("failed to compute the watch respnse: %w", err)
+	}
+	response, err := cache.computeResponseFromChanges(watch, replyEvenIfEmpty, changed, removed)
 	if err != nil {
 		return nil, fmt.Errorf("failed to compute the watch respnse: %w", err)
 	}
@@ -565,7 +652,7 @@ func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, sub Subscripti
 		return nil, nil
 	}
 
-	return cache.trackWatch(watch), nil
+	return cache.trackWatch(watch, len(changed) == 0 && len(removed) == 0), nil
 }
 
 func (cache *LinearCache) nextWatchID() uint64 {
@@ -576,8 +663,11 @@ func (cache *LinearCache) nextWatchID() uint64 {
 	return cache.currentWatchID
 }
 
+// trackWatch registers a watch that has nothing to be sent. synced tells that its subscription holds
+// exactly the cache's versions, which is what allows later updates to be evaluated incrementally.
+//
 // Must be called under lock.
-func (cache *LinearCache) trackWatch(watch watch) func() {
+func (cache *LinearCache) trackWatch(watch watch, synced bool) func() {
 	cache.watchCount++
 
 	watchID := cache.nextWatchID()
@@ -587,6 +677,9 @@ func (cache *LinearCache) trackWatch(watch watch) func() {
 		cache.log.Infof("[linear cache] open watch %d (delta: %t) for %s all resources", watchID, watch.isDelta(), cache.typeURL)
 		cache.log.Debugf("[linear cache] subscription details for watch %d: known versions %v, system version %q", watchID, sub.ReturnedResources(), cache.getVersion())
 		cache.wildcardWatches[watchID] = watch
+		if synced {
+			cache.syncedWildcardWatches[watchID] = struct{}{}
+		}
 		return func() {
 			cache.mu.Lock()
 			defer cache.mu.Unlock()
@@ -623,6 +716,7 @@ func (cache *LinearCache) trackWatch(watch watch) func() {
 func (cache *LinearCache) removeWildcardWatch(watchID uint64) {
 	cache.watchCount--
 	delete(cache.wildcardWatches, watchID)
+	delete(cache.syncedWildcardWatches, watchID)
 }
 
 // Must be called under lock.
