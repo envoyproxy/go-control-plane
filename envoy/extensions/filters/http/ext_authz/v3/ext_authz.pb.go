@@ -118,6 +118,21 @@ type ExtAuthz struct {
 	// Enables the filter to buffer the client request body and send it within the authorization request.
 	// The ``x-envoy-auth-partial-body: false|true`` metadata header will be added to the authorization
 	// request indicating whether the body data is partial.
+	//
+	// .. note::
+	//
+	//   ``with_request_body`` is intended only for standard HTTP request bodies. For WebSocket upgrade
+	//   requests (HTTP/1.1 ``Connection: upgrade`` with ``Upgrade: websocket``, or HTTP/2 and HTTP/3
+	//   extended ``CONNECT`` with ``:protocol = websocket``), request body buffering is skipped and the
+	//   authorization check is dispatched upon receiving request headers with an empty body and without
+	//   the ``x-envoy-auth-partial-body`` metadata header, even if downstream data follows on the stream.
+	//
+	//   For routes that accept ``CONNECT``, non-WebSocket extended ``CONNECT``, or non-WebSocket
+	//   ``Upgrade`` tunnels, disable request body buffering on the route via
+	//   :ref:`disable_request_body_buffering
+	//   <envoy_v3_api_field_extensions.filters.http.ext_authz.v3.CheckSettings.disable_request_body_buffering>`
+	//   so the filter does not wait to buffer tunnel stream data before dispatching the authorization
+	//   check.
 	WithRequestBody *BufferSettings `protobuf:"bytes,5,opt,name=with_request_body,json=withRequestBody,proto3" json:"with_request_body,omitempty"`
 	// Clears the route cache in order to allow the external authorization service to correctly affect
 	// routing decisions. The filter clears all cached routes when all of the following holds:
