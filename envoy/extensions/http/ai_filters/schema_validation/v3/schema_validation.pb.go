@@ -34,8 +34,8 @@ type SchemaValidation struct {
 	// ``envoy.ai.llm_protocol.request`` filter state object or the route's :ref:`llm_protocol
 	// <envoy_v3_api_field_extensions.filters.http.ai_protocol_manager.v3.RequestPerRoute.llm_protocol>`.
 	// ``LLM_PROTOCOL_UNSPECIFIED``, the default, detects it from the request path, then the
-	// ``anthropic-version`` header, then the payload's shape. A request none of them identifies is
-	// forwarded unvalidated.
+	// payload's shape together with the ``anthropic-version`` header. A request they do not identify
+	// is forwarded unvalidated.
 	DefaultLlmProtocol v3.LLMProtocol `protobuf:"varint,1,opt,name=default_llm_protocol,json=defaultLlmProtocol,proto3,enum=envoy.type.ai.v3.LLMProtocol" json:"default_llm_protocol,omitempty"`
 	// Forward a payload that violates its schema instead of rejecting it. It is still counted.
 	FailOpen      bool `protobuf:"varint,2,opt,name=fail_open,json=failOpen,proto3" json:"fail_open,omitempty"`
