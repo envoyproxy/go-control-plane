@@ -15,6 +15,7 @@ import (
 
 	"go.uber.org/goleak"
 
+	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
@@ -448,6 +449,36 @@ func TestDeltaOpaqueRequestsChannelMuxing(t *testing.T) {
 	}
 }
 
+func TestDeltaCallbacksContext(t *testing.T) {
+	defer goleak.VerifyNone(t)
+	str := makeMockDeltaStream(t)
+	defer str.cancel()
+
+	config := makeMockConfigWatcher()
+	config.deltaResources = makeDeltaResources()
+	str.recv <- &discovery.DeltaDiscoveryRequest{Node: node, TypeUrl: rsrc.EndpointType}
+
+	var requestCtx, responseCtx, closedCtx context.Context
+	s := server.NewServer(t.Context(), config, server.CallbackFuncs{
+		StreamDeltaRequestFunc: func(ctx context.Context, _ int64, _ *discovery.DeltaDiscoveryRequest) error {
+			requestCtx = ctx
+			return nil
+		},
+		StreamDeltaResponseFunc: func(ctx context.Context, _ int64, _ *discovery.DeltaDiscoveryRequest, _ *discovery.DeltaDiscoveryResponse) {
+			responseCtx = ctx
+			close(str.recv)
+		},
+		DeltaStreamClosedFunc: func(ctx context.Context, _ int64, _ *core.Node) {
+			closedCtx = ctx
+		},
+	})
+
+	require.NoError(t, s.DeltaAggregatedResources(str))
+	assert.Same(t, str.Context(), requestCtx)
+	assert.Same(t, str.Context(), responseCtx)
+	assert.Same(t, str.Context(), closedCtx)
+}
+
 func TestDeltaCallbackError(t *testing.T) {
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
@@ -651,7 +682,7 @@ func TestDeltaMultipleStreams(t *testing.T) {
 			context.Background(),
 			config,
 			server.CallbackFuncs{
-				StreamDeltaRequestFunc: func(int64, *discovery.DeltaDiscoveryRequest) error {
+				StreamDeltaRequestFunc: func(context.Context, int64, *discovery.DeltaDiscoveryRequest) error {
 					return errors.New("error")
 				},
 			},

@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- OnStreamClosed, OnStreamRequest, OnDeltaStreamClosed, OnStreamDeltaRequest, and OnStreamDeltaResponse now take a `context` (#1587)
+
 ## Release v0.11.0
 
 ### Added
